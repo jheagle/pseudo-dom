@@ -3,7 +3,7 @@
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @version 1.0.0
  */
-import { TreeLinker } from 'collections'
+import { TreeLinker } from 'collections/dist/collections/TreeLinker'
 import { PseudoEventTarget } from './PseudoEventTarget'
 
 /**

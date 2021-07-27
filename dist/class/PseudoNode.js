@@ -35,7 +35,7 @@ require('core-js/modules/es.object.set-prototype-of.js')
 
 require('core-js/modules/es.object.get-prototype-of.js')
 
-const _collections = require('collections')
+const _TreeLinker2 = require('collections/dist/collections/TreeLinker')
 
 const _PseudoEventTarget2 = require('./PseudoEventTarget')
 
@@ -239,7 +239,7 @@ const NodeFactory = /* #__PURE__ */(function (_TreeLinker) {
   }
 
   return NodeFactory
-}(_collections.TreeLinker))
+}(_TreeLinker2.TreeLinker))
 
 exports.NodeFactory = NodeFactory
 
@@ -429,7 +429,7 @@ const generateNode = function generateNode () {
       }
 
       element.data = new PseudoNodeAttached()
-      return _collections.TreeLinker.prototype.after.apply(list, [element])
+      return _TreeLinker2.TreeLinker.prototype.after.apply(list, [element])
     }, null)
   }
 

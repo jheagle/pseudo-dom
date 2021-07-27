@@ -76,7 +76,7 @@ root.pseudoDom = pseudoDom
  * @function generate
  * @param {Object} root
  * @param {Object} context
- * @returns {Window|class.PseudoEventTarget}
+ * @returns {Window|PseudoEventTarget}
  */
 
 pseudoDom.generate = function (root) {
@@ -84,11 +84,11 @@ pseudoDom.generate = function (root) {
 
   /**
    *
-   * @type {Window|class.PseudoEventTarget}
+   * @type {Window|PseudoEventTarget}
    */
   const newWindow = typeof root.document === 'undefined' ? root : new pseudoDom.PseudoEventTarget()
   /**
-   * @type {Node|class.PseudoNode}
+   * @type {Node|PseudoNode}
    */
 
   const Node = root.Node || new pseudoDom.PseudoNode()
@@ -98,7 +98,7 @@ pseudoDom.generate = function (root) {
   }
   /**
    *
-   * @type {Element|class.PseudoElement}
+   * @type {Element|PseudoElement}
    */
 
   const Element = root.Element || new pseudoDom.PseudoElement()
@@ -108,7 +108,7 @@ pseudoDom.generate = function (root) {
   }
   /**
    * Create an instance of HTMLElement if not available
-   * @type {HTMLElement|class.PseudoHTMLElement}
+   * @type {HTMLElement|PseudoHTMLElement}
    */
 
   const HTMLElement = root.HTMLElement || new pseudoDom.PseudoHTMLElement()
@@ -118,7 +118,7 @@ pseudoDom.generate = function (root) {
   }
   /**
    * Define document when not available
-   * @type {Document|class.PseudoHTMLDocument}
+   * @type {Document|PseudoHTMLDocument}
    */
 
   const document = root.document || new pseudoDom.PseudoHTMLDocument()

@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { LinkedTreeList } from 'collections'
+import { LinkedTreeList } from 'collections/dist/collections/LinkedTreeList'
 import { nodeListFactory } from '../dist/class/PseudoNodeList'
 import { generateNode } from '../dist/class/PseudoNode'
 
