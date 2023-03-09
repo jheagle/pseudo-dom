@@ -44,7 +44,7 @@
     "@babel/runtime-corejs3": "^7.14.8",
     "collections": "github:jheagle/collections",
     "core-js": "^3.15.2",
-    "functional-helpers": "github:jheagle/functional-helpers",
+    "si-funciona": "github:jheagle/si-funciona",
     "npm": "^7.20.1",
     "regenerator-runtime": "^0.13.9"
   },
