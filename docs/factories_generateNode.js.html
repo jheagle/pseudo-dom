@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: factories/generateNode.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: factories/generateNode.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import TreeLinker from 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'
+import PseudoNode from '../classes/PseudoNode'
+
+export class NodeFactory extends TreeLinker {}
+
+const generateNode = () => {
+  NodeFactory.fromArray = (values = [], LinkerClass = NodeFactory) => values.reduce(
+    (list, element) => {
+      if (typeof element !== 'object') {
+        element = { data: element }
+      }
+      const newElement = new LinkerClass(Object.assign({}, element, { prev: list.tail }))
+
+      /**
+       * Simulate the behaviour of the Node Class when there is no DOM available.
+       * @author Joshua Heagle &lt;joshuaheagle@gmail.com>
+       * @class
+       * @augments PseudoEventTarget
+       * @property {string} name
+       * @property {function} appendChild
+       * @property {function} removeChild
+       */
+      class PseudoNodeAttached extends PseudoNode {
+        /**
+         *
+         * @constructor
+         */
+        constructor () {
+          super()
+          this.nodeValue = element.data
+          this.textContext = ''
+        }
+
+        get baseURI () {
+          return window.location || '/'
+        }
+
+        get childNodes () {
+          return newElement.children
+        }
+
+        get firstChild () {
+          return newElement.children.first.data
+        }
+
+        get isConnected () {
+          return newElement.parent !== null
+        }
+
+        get lastChild () {
+          return newElement.children.last.data
+        }
+
+        get nextSibling () {
+          return newElement.next.data
+        }
+
+        get nodeName () {
+          return this.name || ''
+        }
+
+        get nodeType () {
+          const typeName = 'DEFAULT_NODE'
+          const nodeTypes = [
+            'DEFAULT_NODE',
+            'ELEMENT_NODE',
+            'ATTRIBUTE_NODE',
+            'TEXT_NODE',
+            'CDATA_SECTION_NODE',
+            'ENTITY_REFERENCE_NODE',
+            'ENTITY_NODE',
+            'PROCESSING_INSTRUCTION_NODE',
+            'COMMENT_NODE',
+            'DOCUMENT_NODE',
+            'DOCUMENT_TYPE_NODE',
+            'DOCUMENT_FRAGMENT_NODE',
+            'NOTATION_NODE'
+          ]
+          return nodeTypes.indexOf(typeName)
+        }
+
+        get ownerDocument () {
+          return newElement.rootParent
+        }
+
+        get parentNode () {
+          return newElement.parent
+        }
+
+        get parentElement () {
+          return newElement.parent.nodeType === 1 ? newElement.parent : null
+        }
+
+        get previousSibling () {
+          return newElement.prev
+        }
+
+        /**
+         *
+         * @param {PseudoNode} childNode
+         * @returns {PseudoNode}
+         */
+        appendChild (childNode) {
+          newElement.next = childNode
+          childNode.prev = newElement
+          return childNode
+        }
+
+        cloneNode () {}
+
+        compareDocumentPosition () {}
+
+        contains () {}
+
+        getRootNode () {
+          return newElement.rootParent
+        }
+
+        hasChildNodes () {}
+
+        insertBefore () {}
+
+        isDefaultNamespace () {}
+
+        isEqualNode () {}
+
+        isSameNode () {}
+
+        lookupPrefix () {}
+
+        lookupNamespaceURI () {}
+
+        normalize () {}
+
+        /**
+         *
+         * @param {PseudoNode} childElement
+         * @returns {PseudoNode}
+         */
+        removeChild (childElement) {
+          return this.children.splice(this.children.indexOf(childElement), 1)[0]
+        }
+
+        replaceChild () {}
+      }
+
+      newElement.data = new PseudoNodeAttached()
+      if (list.head === null) {
+        return { head: newElement, tail: newElement }
+      }
+      list.tail.next = newElement
+      newElement.prev = list.tail
+      return { head: list.head, tail: newElement }
+    },
+    { head: null, tail: null }
+  )
+  return NodeFactory
+}
+
+export default generateNode
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-pseudoDom_objects.html">pseudoDom/objects</a></li></ul><h3>Classes</h3><ul><li><a href="PseudoElement.html">PseudoElement</a></li><li><a href="PseudoEvent.html">PseudoEvent</a></li><li><a href="PseudoEventListener.html">PseudoEventListener</a></li><li><a href="PseudoEventTarget.html">PseudoEventTarget</a></li><li><a href="PseudoHTMLDocument.html">PseudoHTMLDocument</a></li><li><a href="PseudoHTMLElement.html">PseudoHTMLElement</a></li><li><a href="PseudoNode.html">PseudoNode</a></li><li><a href="PseudoNodeAttached.html">PseudoNodeAttached</a></li></ul><h3>Global</h3><ul><li><a href="global.html#previousPseudoDom">previousPseudoDom</a></li><li><a href="global.html#root">root</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Thu Nov 16 2023 23:22:35 GMT-0500 (Eastern Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
