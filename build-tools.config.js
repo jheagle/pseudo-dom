@@ -3,8 +3,8 @@ module.exports = {
   browserName: 'pseudo-dom',
 
   // Location of files to use for compiling documentation into the readme.
-  // readmeSearch: 'dist/**/!(*.min).js',
+  readmeSearch: 'dist/**/!(*.min).js',
 
   // The path the tsconfig file for running typescript or false if no ts file given.
-  useTsConfig: false
+  useTsConfig: 'tsconfig.json'
 }

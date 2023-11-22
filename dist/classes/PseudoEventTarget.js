@@ -4,13 +4,14 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 })
 exports.default = void 0
-require('core-js/modules/esnext.async-iterator.reduce.js')
-require('core-js/modules/esnext.iterator.constructor.js')
-require('core-js/modules/esnext.iterator.reduce.js')
 require('core-js/modules/esnext.async-iterator.for-each.js')
+require('core-js/modules/esnext.iterator.constructor.js')
 require('core-js/modules/esnext.iterator.for-each.js')
+require('core-js/modules/esnext.async-iterator.reduce.js')
+require('core-js/modules/esnext.iterator.reduce.js')
 var _PseudoEvent = _interopRequireDefault(require('./PseudoEvent'))
 var _PseudoEventListener = _interopRequireDefault(require('./PseudoEventListener'))
+var _Stack = _interopRequireDefault(require('collect-your-stuff/dist/collections/stack/Stack'))
 function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
 /**
  * @file Substitute for the DOM EventTarget Class.
@@ -32,8 +33,8 @@ class PseudoEventTarget {
    * @constructor
    */
   constructor () {
-    this.listeners = []
-    this.defaultEvent = []
+    this.listeners = {}
+    this.defaultEvent = {}
   }
 
   /**
@@ -51,24 +52,41 @@ class PseudoEventTarget {
      */
     const stack = this.listeners[event.type]
     let eventReturn = null
-    this.listeners[event.type] = stack.reduce(
-    /**
-     *
-     * @param {Array<PseudoEventListener>} listeners
-     * @param {PseudoEventListener} listener
-     * @returns {Array<PseudoEventListener>}
-     */
-      (listeners, listener) => {
-        if (event.immediatePropagationStopped || listener.rejectEvent(event)) {
-          return listeners.concat(listener)
-        }
-        eventReturn = listener.handleEvent(event)
-        if (listener.eventOptions.once) {
-          event.currentTarget.removeEventListener(event.eventType, event.handleEvent)
-          return listeners
-        }
-        return listeners.concat(listener)
-      }, [])
+    if (this.listeners[event.type].empty()) {
+      return eventReturn
+    }
+    let currentListener = this.listeners[event.type].top()
+    if (currentListener === null) {
+      return eventReturn
+    }
+    if (event.inner.immediatePropagationStopped || currentListener.task.rejectEvent(event)) {
+      return eventReturn
+    }
+    // Temporary store the stack
+    const runningListeners = new _Stack.default()
+    currentListener = this.listeners[event.type].pop()
+    while (currentListener !== null) {
+      eventReturn = currentListener.task.handleEvent(event)
+      if (currentListener.data.once) {
+        return currentListener.task
+      }
+      runningListeners.push(currentListener)
+      currentListener = this.listeners[event.type].top()
+      if (currentListener === null) {
+        return eventReturn
+      }
+      if (event.inner.immediatePropagationStopped || currentListener.task.rejectEvent(event)) {
+        return eventReturn
+      }
+      currentListener = this.listeners[event.type].pop()
+    }
+    if (!runningListeners.empty()) {
+      // Rebuild the stack
+      const completedListener = runningListeners.pop()
+      while (completedListener !== null) {
+        this.listeners[event.type].push(completedListener)
+      }
+    }
     return eventReturn
   }
 
@@ -79,8 +97,7 @@ class PseudoEventTarget {
    */
   setDefaultEvent (type, callback) {
     if (!(type in this.listeners)) {
-      this[type] = () => this.startEvents(type)
-      this.listeners[type] = []
+      this.listeners[type] = new _Stack.default()
     }
     this.defaultEvent[type] = callback
   }
@@ -107,20 +124,14 @@ class PseudoEventTarget {
      * type PseudoEvent
      */
     const event = new _PseudoEvent.default(eventType)
-    event.setReadOnlyProperties({
-      target: this
-    })
+    event.inner.target = this
     console.log('startEvents', event.type, event.target);
     [_PseudoEvent.default.CAPTURING_PHASE, _PseudoEvent.default.AT_TARGET, _PseudoEvent.default.BUBBLING_PHASE].forEach(phase => {
       let continueEvents = null
-      if (phase === _PseudoEvent.default.AT_TARGET || !event.propagationStopped) {
-        event.setReadOnlyProperties({
-          eventPhase: phase
-        })
+      if (phase === _PseudoEvent.default.AT_TARGET || !event.inner.propagationStopped) {
+        event.inner.eventPhase = phase
         event.composedPath().forEach(target => {
-          event.setReadOnlyProperties({
-            currentTarget: target
-          })
+          event.inner.currentTarget = target
           continueEvents = event.currentTarget.runEvents(event)
         })
       }
@@ -145,6 +156,8 @@ class PseudoEventTarget {
       passive: false
     }
     if (typeof useCapture === 'object') {
+      // Originally useCapture was a single boolean flag, later optional other flags can be used
+      // Here we take all the given flags from the object and assign them as the options
       options = Object.keys(useCapture).reduce((opts, opt) => {
         opts[opt] = useCapture[opt]
         return opts
@@ -153,23 +166,22 @@ class PseudoEventTarget {
       options.capture = useCapture
     }
     if (!(type in this.listeners)) {
-      this[type] = () => this.startEvents(type)
-      this.listeners[type] = []
+      this.listeners[type] = new _Stack.default()
     }
-    this.listeners[type] = this.listeners[type].concat([Object.assign(Object.create(_PseudoEventListener.default), _PseudoEventListener.default, {
-      eventType: type,
-      eventOptions: Object.assign({}, _PseudoEventListener.default.eventOptions, options),
-      handleEvent: (callback.handleEvent || callback).bind(this)
-    })])
-    const groupedDefault = this.listeners[type].reduce((listeners, listener) => listener.isDefault ? Object.assign({}, listeners, {
-      default: listeners.default.concat([listener])
-    }) : Object.assign({}, listeners, {
-      explicit: listeners.explicit.concat([listener])
-    }), {
-      explicit: [],
-      default: []
-    })
-    this.listeners[type] = [].concat(groupedDefault.explicit, groupedDefault.default)
+    const listener = new _PseudoEventListener.default(type, options, (callback.handleEvent || callback).bind(this))
+    this.listeners[type].push(listener)
+    const defaultListeners = []
+    const explicitListeners = []
+    let currentListener = this.listeners[type].pop()
+    while (currentListener !== null) {
+      if (currentListener.task.isDefault) {
+        defaultListeners.push(currentListener)
+      } else {
+        explicitListeners.push(currentListener)
+      }
+      currentListener = this.listeners[type].pop()
+    }
+    this.listeners[type] = _Stack.default.fromArray([].concat(explicitListeners, defaultListeners))
   }
 
   /**
@@ -182,12 +194,16 @@ class PseudoEventTarget {
       return
     }
     const stack = this.listeners[type]
-    for (let i = 0, l = stack.length; i < l; i++) {
-      if (stack[i].handleEvent === callback && !stack[i].isDefault) {
-        stack.splice(i, 1)
-        return
+    const currentListener = stack.pop()
+    const checkedListeners = []
+    while (currentListener !== null) {
+      const listener = currentListener.task
+      if (listener.handleEvent === callback && !listener.isDefault) {
+        continue
       }
+      checkedListeners.push(currentListener)
     }
+    this.listeners[type] = _Stack.default.fromArray(checkedListeners)
   }
 
   /**
@@ -198,9 +214,7 @@ class PseudoEventTarget {
    */
   dispatchEvent (event) {
     const target = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this
-    event.setReadOnlyProperties({
-      target
-    })
+    event.inner.target = target
     if (!(event.type in this.listeners)) {
       return true
     }

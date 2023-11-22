@@ -100,8 +100,9 @@ const generateNode = () => {
          * @param {PseudoNode} childNode
          * @returns {PseudoNode}
          */
-        appendChild (childNode) {
+        appendChild (childNode: PseudoNode ): PseudoNode {
           newElement.next = childNode
+          // @ts-ignore
           childNode.prev = newElement
           return childNode
         }
@@ -116,7 +117,7 @@ const generateNode = () => {
           return newElement.rootParent
         }
 
-        hasChildNodes () {}
+        hasChildNodes (): boolean { return false }
 
         insertBefore () {}
 
@@ -137,8 +138,9 @@ const generateNode = () => {
          * @param {PseudoNode} childElement
          * @returns {PseudoNode}
          */
-        removeChild (childElement) {
-          return this.children.splice(this.children.indexOf(childElement), 1)[0]
+        removeChild (childElement: TreeLinker): TreeLinker {
+          // @ts-ignore
+          return this.children.remove(childElement)
         }
 
         replaceChild () {}

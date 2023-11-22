@@ -6,40 +6,14 @@
       value: true
     })
     exports.default = void 0
-    var _PseudoEvent = _interopRequireDefault(require('././classes/PseudoEvent'))
-    var _PseudoEventTarget = _interopRequireDefault(require('././classes/PseudoEventTarget'))
-    var _PseudoNode = _interopRequireDefault(require('././classes/PseudoNode'))
-    var _PseudoElement = _interopRequireDefault(require('././classes/PseudoElement'))
-    var _PseudoHTMLElement = _interopRequireDefault(require('././classes/PseudoHTMLElement'))
-    var _PseudoHTMLDocument = _interopRequireDefault(require('././classes/PseudoHTMLDocument'))
-    function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
-    /**
- * @file All of the Pseudo Dom classes for replicating DOM structure.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
- */
-    var _default = exports.default = {
-      PseudoEvent: _PseudoEvent.default,
-      PseudoEventTarget: _PseudoEventTarget.default,
-      PseudoNode: _PseudoNode.default,
-      PseudoElement: _PseudoElement.default,
-      PseudoHTMLElement: _PseudoHTMLElement.default,
-      PseudoHTMLDocument: _PseudoHTMLDocument.default
-    }
-  }, { '././classes/PseudoElement': 2, '././classes/PseudoEvent': 3, '././classes/PseudoEventTarget': 5, '././classes/PseudoHTMLDocument': 6, '././classes/PseudoHTMLElement': 7, '././classes/PseudoNode': 8 }],
-  2: [function (require, module, exports) {
-    'use strict'
-
-    Object.defineProperty(exports, '__esModule', {
-      value: true
-    })
-    exports.default = void 0
     require('core-js/modules/esnext.async-iterator.map.js')
     require('core-js/modules/esnext.iterator.map.js')
     require('core-js/modules/esnext.async-iterator.find.js')
     require('core-js/modules/esnext.iterator.constructor.js')
     require('core-js/modules/esnext.iterator.find.js')
     var _PseudoNode = _interopRequireDefault(require('./PseudoNode'))
+    var _generateNodeList = _interopRequireDefault(require('../factories/generateNodeList'))
+    var _TreeLinker = _interopRequireDefault(require('collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'))
     function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
     /**
  * @file Substitute for the DOM Element Class.
@@ -65,23 +39,23 @@
     class PseudoElement extends _PseudoNode.default {
       /**
    * Simulate the Element object when the Dom is not available
-   * @param {string} [tagName=''] - The
-   * @param {array} [attributes=[]]
-   * @param {PseudoNode|Object} [parent={}]
-   * @param {Array} [children=[]]
+   * @param {Object} [elementOptions={}]
+   * @param {string} [elementOptions.tagName='']
+   * @param {array} [elementOptions.attributes=[]]
+   * @param {PseudoNode|Object} [elementOptions.parent={}]
+   * @param {Array} [elementOptions.children=[]]
    * @constructor
    */
       constructor () {
         const {
           tagName = '',
           attributes = [],
-          parent = {},
+          parent = null,
           children = []
         } = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {}
-        super({
-          parent,
-          children
-        })
+        super()
+        this.parent = parent
+        this.children = (0, _generateNodeList.default)(_TreeLinker.default.fromArray(children).head)
         this.tagName = tagName
         this.attributes = attributes.concat([{
           name: 'className',
@@ -93,24 +67,27 @@
           name: 'innerHTML',
           value: ''
         }])
-
         /**
-     * Map all incoming attributes to the attributes array and attach each as a property of this element
+     * Map all incoming attributes to the attribute array and attach each as a property of this element
      */
         this.attributes.map(_ref => {
           const {
             name,
             value
           } = _ref
+          // @ts-ignore
           this[name] = value
           return {
             name,
             value
           }
         })
-
         // this.classList = new DOMSettableTokenList(this.className)
         this.classList = this.className
+      }
+
+      get nodeType () {
+        return _PseudoNode.default.ELEMENT_NODE
       }
 
       /**
@@ -166,6 +143,7 @@
    */
       setAttribute (attributeName, attributeValue) {
         if (this.hasAttribute(attributeName) || this[attributeName] === 'undefined') {
+          // @ts-ignore
           this[attributeName] = attributeValue
           this.attributes.push({
             name: attributeName,
@@ -184,7 +162,6 @@
         return this.attributes.find(attribute => attribute.name === attributeName)
       }
 
-      // noinspection JSUnusedGlobalSymbols
       /**
    * Remove an assigned attribute from the Element
    * @param {string} attributeName - The string name of the attribute to be removed
@@ -193,22 +170,23 @@
       removeAttribute (attributeName) {
         if (this.hasAttribute(attributeName)) {
           delete this[attributeName]
-          delete this.getAttribute(attributeName)
+          // TODO: how do we delete it as an attribute?
         }
+
         return null
       }
     }
     var _default = exports.default = PseudoElement
-  }, { './PseudoEvent': 3, './PseudoNode': 8, 'core-js/modules/esnext.async-iterator.find.js': 107, 'core-js/modules/esnext.async-iterator.map.js': 109, 'core-js/modules/esnext.iterator.constructor.js': 111, 'core-js/modules/esnext.iterator.find.js': 112, 'core-js/modules/esnext.iterator.map.js': 114 }],
-  3: [function (require, module, exports) {
+  }, { '../factories/generateNodeList': 10, './PseudoEvent': 2, './PseudoNode': 7, 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker': 21, 'core-js/modules/esnext.async-iterator.find.js': 126, 'core-js/modules/esnext.async-iterator.map.js': 128, 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.find.js': 131, 'core-js/modules/esnext.iterator.map.js': 133 }],
+  2: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
       value: true
     })
     exports.default = void 0
-    require('core-js/modules/esnext.async-iterator.map.js')
-    require('core-js/modules/esnext.iterator.map.js')
+    var _getParentNodes = _interopRequireDefault(require('../functions/getParentNodes'))
+    function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
     /**
  * @file Substitute for the DOM Event Class.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -225,12 +203,12 @@
  * @property {number} BUBBLING_PHASE
  * @property {boolean} bubbles - A Boolean indicating whether the event bubbles up through the Dom or not.
  * @property {boolean} cancelable - A Boolean indicating whether the event is cancelable.
- * @property {boolean} composed - A Boolean value indicating whether or not the event can bubble across the boundary
+ * @property {boolean} composed - A Boolean value indicating whether the event can bubble across the boundary
  * between the shadow Dom and the regular Dom.
  * @property {function|PseudoEventTarget} currentTarget - A reference to the currently registered target for the event. This
  * is the object to which the event is currently slated to be sent; it's possible this has been changed along the way
  * through re-targeting.
- * @property {boolean} defaultPrevented - Indicates whether or not event.preventDefault() has been called on the event.
+ * @property {boolean} defaultPrevented - Indicates whether event.preventDefault() has been called on the event.
  * @property {boolean} immediatePropagationStopped - Flag that no further propagation should occur, including on current
  * target.
  * @property {boolean} propagationStopped - Flag that no further propagation should occur.
@@ -241,78 +219,111 @@
  * value is time since epoch, but in reality browsers' definitions vary; in addition, work is underway to change this
  * to be a DomHighResTimeStamp instead.
  * @property {string} type - The name of the event (case-insensitive).
- * @property {boolean} isTrusted - Indicates whether or not the event was initiated by the browser (after a user
+ * @property {boolean} isTrusted - Indicates whether the event was initiated by the browser (after a user
  * click for instance) or by a script (using an event creation method, like event.initEvent)
  */
     class PseudoEvent {
       /**
    *
-   * @param typeArg
-   * @param bubbles
-   * @param cancelable
-   * @param composed
-   * @returns {PseudoEvent}
+   * @param {string} typeArg
+   * @param {Object} [eventOptions={}]
+   * @param {boolean} [eventOptions.bubbles=true]
+   * @param {boolean} [eventOptions.cancelable=true]
+   * @param {boolean} [eventOptions.composed=true]
    * @constructor
    */
       constructor () {
-        var _this = this
         const typeArg = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : ''
         const {
           bubbles = true,
           cancelable = true,
           composed = true
         } = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {}
-        let properties = {
-          bubbles,
-          cancelable,
-          composed,
-          currentTarget: () => undefined,
+        this.properties = {
+          bubbles: true,
+          cancelable: true,
+          composed: true,
+          currentTarget: null,
           defaultPrevented: false,
           immediatePropagationStopped: false,
           propagationStopped: false,
-          eventPhase: '',
-          target: () => undefined,
+          eventPhase: 0,
+          target: null,
           timeStamp: Math.floor(Date.now() / 1000),
-          type: typeArg,
+          type: '',
           isTrusted: true
         }
-        this.setReadOnlyProperties = function () {
-          const updateProps = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {}
-          properties = Object.assign({}, properties, updateProps)
-          _this.getReadOnlyProperties = (properties => function () {
-            const name = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : ''
-            return properties[name]
-          })(properties)
-          return properties
+        this.setReadOnlyProperties({
+          type: typeArg,
+          bubbles: bubbles,
+          cancelable: cancelable,
+          composed: composed
+        })
+      }
+
+      get bubbles () {
+        return this.properties.bubbles
+      }
+
+      get cancelable () {
+        return this.properties.cancelable
+      }
+
+      get composed () {
+        return this.properties.composed
+      }
+
+      get currentTarget () {
+        return this.properties.currentTarget
+      }
+
+      get defaultPrevented () {
+        return this.properties.defaultPrevented
+      }
+
+      get eventPhase () {
+        return this.properties.eventPhase
+      }
+
+      get isTrusted () {
+        return this.properties.isTrusted
+      }
+
+      get target () {
+        return this.properties.target
+      }
+
+      get timeStamp () {
+        return this.properties.timeStamp
+      }
+
+      get type () {
+        return this.properties.type
+      }
+
+      /**
+   * Scope several accessors inside the inner object. These are only intended for usage by other DOM classes.
+   * @returns {EventInner}
+   */
+      get inner () {
+        const self = this
+        return {
+          set currentTarget (target) {
+            self.properties.currentTarget = target
+          },
+          set eventPhase (phase) {
+            self.properties.eventPhase = phase
+          },
+          set target (target) {
+            self.properties.target = target
+          },
+          get immediatePropagationStopped () {
+            return self.properties.immediatePropagationStopped
+          },
+          get propagationStopped () {
+            return self.properties.propagationStopped
+          }
         }
-        this.setReadOnlyProperties()
-        Object.keys(properties).map(propKey => Object.defineProperty(this, propKey, {
-          enumerable: true,
-          get: () => this.getReadOnlyProperties(propKey)
-        }))
-      }
-
-      /**
-   * A selector function for retrieving existing parent PseudoNode from the given child item.
-   * This function will check all the parents starting from node, and scan the attributes
-   * property for matches. The return array contains all matching parent ancestors.
-   * WARNING: This is a recursive function.
-   * @param {string} attr
-   * @param {number|string} value
-   * @param {PseudoNode} node
-   * @returns {Array.<PseudoNode>}
-   */
-      static getParentNodesFromAttribute (attr, value, node) {
-        return Object.keys(node.parentNode).length ? (node.parentNode[attr] || false) === value ? PseudoEvent.getParentNodesFromAttribute(attr, value, node.parentNode).concat([node.parentNode]) : PseudoEvent.getParentNodesFromAttribute(attr, value, node.parentNode) : []
-      }
-
-      /**
-   * A helper selector function for retrieving all parent PseudoNode for the given child node.
-   * @param {PseudoNode} node
-   * @returns {Array.<PseudoNode>}
-   */
-      static getParentNodes (node) {
-        return PseudoEvent.getParentNodesFromAttribute('', false, node)
       }
 
       /**
@@ -323,9 +334,9 @@
       composedPath () {
         switch (this.eventPhase) {
           case PseudoEvent.CAPTURING_PHASE:
-            return PseudoEvent.getParentNodes(this.target)
+            return (0, _getParentNodes.default)(this.target)
           case PseudoEvent.BUBBLING_PHASE:
-            return PseudoEvent.getParentNodes(this.target).slice().reverse()
+            return (0, _getParentNodes.default)(this.target).slice().reverse()
           case PseudoEvent.AT_TARGET:
             return [this.target]
           default:
@@ -370,24 +381,20 @@
         })
         return null
       }
-    }
 
-    // Set up the class constants
-    ['NONE', 'CAPTURING_PHASE', 'AT_TARGET', 'BUBBLING_PHASE'].reduce((phases, phase, key) => {
-      Object.defineProperty(PseudoEvent, phase, {
-        value: key,
-        writable: false,
-        static: {
-          get: () => key
-        }
-      })
-      return Object.assign({}, phases, {
-        [`${phase}`]: key
-      })
-    }, {})
+      setReadOnlyProperties () {
+        const updateProps = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {}
+        this.properties = Object.assign({}, this.properties, updateProps)
+        return this
+      }
+    }
+    PseudoEvent.NONE = 0
+    PseudoEvent.CAPTURING_PHASE = 1
+    PseudoEvent.AT_TARGET = 2
+    PseudoEvent.BUBBLING_PHASE = 3
     var _default = exports.default = PseudoEvent
-  }, { 'core-js/modules/esnext.async-iterator.map.js': 109, 'core-js/modules/esnext.iterator.map.js': 114 }],
-  4: [function (require, module, exports) {
+  }, { '../functions/getParentNodes': 11 }],
+  3: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -406,25 +413,48 @@
  * Handle events as they are stored and implemented.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @class
- * @property {string} eventTypes
+ * @property {string} eventType
  * @property {Object} eventOptions
  * @property {boolean} isDefault
  */
-    const PseudoEventListener = {
-      eventType: '',
-      eventOptions: {
-        capture: false,
-        once: false,
-        passive: false
-      },
-      isDefault: false,
+    class PseudoEventListener {
+      constructor (eventType) {
+        const {
+          capture = false,
+          once = false,
+          passive = false
+        } = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {}
+        const handleEvent = arguments.length > 2 ? arguments[2] : undefined
+        this.eventOptions = {
+          capture: false,
+          once: false,
+          passive: false
+        }
+        this.eventType = ''
+        this.isDefault = false
+        this.eventOptions = {
+          capture,
+          once,
+          passive
+        }
+        this.eventType = eventType
+        this.handler = handleEvent
+      }
+
+      get once () {
+        return this.eventOptions.once
+      }
+
       /**
    * @method
    * @name PseudoEventListener#handleEvent
    * @param {PseudoEvent} event
-   * @returns {undefined}
+   * @returns {*}
    */
-      handleEvent: event => undefined,
+      handleEvent (event) {
+        return this.handler(event)
+      }
+
       /**
    * @method
    * @name PseudoEventListener#doCapturePhase
@@ -433,7 +463,8 @@
    */
       doCapturePhase (event) {
         return event.eventPhase === _PseudoEvent.default.CAPTURING_PHASE && this.eventOptions.capture
-      },
+      }
+
       /**
    * @method
    * @name PseudoEventListener#doTargetPhase
@@ -442,7 +473,8 @@
    */
       doTargetPhase (event) {
         return event.eventPhase === _PseudoEvent.default.AT_TARGET
-      },
+      }
+
       /**
    * @method
    * @name PseudoEventListener#doBubblePhase
@@ -451,7 +483,8 @@
    */
       doBubblePhase (event) {
         return event.eventPhase === _PseudoEvent.default.BUBBLING_PHASE && (event.bubbles || !this.eventOptions.capture)
-      },
+      }
+
       /**
    * @method
    * @name PseudoEventListener#skipPhase
@@ -460,7 +493,8 @@
    */
       skipPhase (event) {
         return !this.doCapturePhase(event) && !this.doTargetPhase(event) && !this.doBubblePhase(event)
-      },
+      }
+
       /**
    * @method
    * @name PseudoEventListener#skipDefault
@@ -469,7 +503,8 @@
    */
       skipDefault (event) {
         return this.isDefault && event.defaultPrevented
-      },
+      }
+
       /**
    * @method
    * @name PseudoEventListener#stopPropagation
@@ -477,8 +512,9 @@
    * @returns {boolean}
    */
       stopPropagation (event) {
-        return !this.doTargetPhase(event) && event.propagationStopped
-      },
+        return !this.doTargetPhase(event) && event.inner.propagationStopped
+      }
+
       /**
    * @method
    * @name PseudoEventListener#nonPassiveHalt
@@ -486,8 +522,9 @@
    * @returns {boolean|*}
    */
       nonPassiveHalt (event) {
-        return !this.eventOptions.passive && (this.skipDefault(event) || event.immediatePropagationStopped || this.stopPropagation(event))
-      },
+        return !this.eventOptions.passive && (this.skipDefault(event) || event.inner.immediatePropagationStopped || this.stopPropagation(event))
+      }
+
       /**
    * @method
    * @name PseudoEventListener#rejectEvent
@@ -499,21 +536,22 @@
       }
     }
     var _default = exports.default = PseudoEventListener
-  }, { './PseudoEvent': 3 }],
-  5: [function (require, module, exports) {
+  }, { './PseudoEvent': 2 }],
+  4: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
       value: true
     })
     exports.default = void 0
-    require('core-js/modules/esnext.async-iterator.reduce.js')
-    require('core-js/modules/esnext.iterator.constructor.js')
-    require('core-js/modules/esnext.iterator.reduce.js')
     require('core-js/modules/esnext.async-iterator.for-each.js')
+    require('core-js/modules/esnext.iterator.constructor.js')
     require('core-js/modules/esnext.iterator.for-each.js')
+    require('core-js/modules/esnext.async-iterator.reduce.js')
+    require('core-js/modules/esnext.iterator.reduce.js')
     var _PseudoEvent = _interopRequireDefault(require('./PseudoEvent'))
     var _PseudoEventListener = _interopRequireDefault(require('./PseudoEventListener'))
+    var _Stack = _interopRequireDefault(require('collect-your-stuff/dist/collections/stack/Stack'))
     function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
     /**
  * @file Substitute for the DOM EventTarget Class.
@@ -535,8 +573,8 @@
    * @constructor
    */
       constructor () {
-        this.listeners = []
-        this.defaultEvent = []
+        this.listeners = {}
+        this.defaultEvent = {}
       }
 
       /**
@@ -554,24 +592,41 @@
      */
         const stack = this.listeners[event.type]
         let eventReturn = null
-        this.listeners[event.type] = stack.reduce(
-        /**
-     *
-     * @param {Array<PseudoEventListener>} listeners
-     * @param {PseudoEventListener} listener
-     * @returns {Array<PseudoEventListener>}
-     */
-          (listeners, listener) => {
-            if (event.immediatePropagationStopped || listener.rejectEvent(event)) {
-              return listeners.concat(listener)
-            }
-            eventReturn = listener.handleEvent(event)
-            if (listener.eventOptions.once) {
-              event.currentTarget.removeEventListener(event.eventType, event.handleEvent)
-              return listeners
-            }
-            return listeners.concat(listener)
-          }, [])
+        if (this.listeners[event.type].empty()) {
+          return eventReturn
+        }
+        let currentListener = this.listeners[event.type].top()
+        if (currentListener === null) {
+          return eventReturn
+        }
+        if (event.inner.immediatePropagationStopped || currentListener.task.rejectEvent(event)) {
+          return eventReturn
+        }
+        // Temporary store the stack
+        const runningListeners = new _Stack.default()
+        currentListener = this.listeners[event.type].pop()
+        while (currentListener !== null) {
+          eventReturn = currentListener.task.handleEvent(event)
+          if (currentListener.data.once) {
+            return currentListener.task
+          }
+          runningListeners.push(currentListener)
+          currentListener = this.listeners[event.type].top()
+          if (currentListener === null) {
+            return eventReturn
+          }
+          if (event.inner.immediatePropagationStopped || currentListener.task.rejectEvent(event)) {
+            return eventReturn
+          }
+          currentListener = this.listeners[event.type].pop()
+        }
+        if (!runningListeners.empty()) {
+          // Rebuild the stack
+          const completedListener = runningListeners.pop()
+          while (completedListener !== null) {
+            this.listeners[event.type].push(completedListener)
+          }
+        }
         return eventReturn
       }
 
@@ -582,8 +637,7 @@
    */
       setDefaultEvent (type, callback) {
         if (!(type in this.listeners)) {
-          this[type] = () => this.startEvents(type)
-          this.listeners[type] = []
+          this.listeners[type] = new _Stack.default()
         }
         this.defaultEvent[type] = callback
       }
@@ -610,20 +664,14 @@
      * type PseudoEvent
      */
         const event = new _PseudoEvent.default(eventType)
-        event.setReadOnlyProperties({
-          target: this
-        })
+        event.inner.target = this
         console.log('startEvents', event.type, event.target);
         [_PseudoEvent.default.CAPTURING_PHASE, _PseudoEvent.default.AT_TARGET, _PseudoEvent.default.BUBBLING_PHASE].forEach(phase => {
           let continueEvents = null
-          if (phase === _PseudoEvent.default.AT_TARGET || !event.propagationStopped) {
-            event.setReadOnlyProperties({
-              eventPhase: phase
-            })
+          if (phase === _PseudoEvent.default.AT_TARGET || !event.inner.propagationStopped) {
+            event.inner.eventPhase = phase
             event.composedPath().forEach(target => {
-              event.setReadOnlyProperties({
-                currentTarget: target
-              })
+              event.inner.currentTarget = target
               continueEvents = event.currentTarget.runEvents(event)
             })
           }
@@ -648,6 +696,8 @@
           passive: false
         }
         if (typeof useCapture === 'object') {
+          // Originally useCapture was a single boolean flag, later optional other flags can be used
+          // Here we take all the given flags from the object and assign them as the options
           options = Object.keys(useCapture).reduce((opts, opt) => {
             opts[opt] = useCapture[opt]
             return opts
@@ -656,23 +706,22 @@
           options.capture = useCapture
         }
         if (!(type in this.listeners)) {
-          this[type] = () => this.startEvents(type)
-          this.listeners[type] = []
+          this.listeners[type] = new _Stack.default()
         }
-        this.listeners[type] = this.listeners[type].concat([Object.assign(Object.create(_PseudoEventListener.default), _PseudoEventListener.default, {
-          eventType: type,
-          eventOptions: Object.assign({}, _PseudoEventListener.default.eventOptions, options),
-          handleEvent: (callback.handleEvent || callback).bind(this)
-        })])
-        const groupedDefault = this.listeners[type].reduce((listeners, listener) => listener.isDefault ? Object.assign({}, listeners, {
-          default: listeners.default.concat([listener])
-        }) : Object.assign({}, listeners, {
-          explicit: listeners.explicit.concat([listener])
-        }), {
-          explicit: [],
-          default: []
-        })
-        this.listeners[type] = [].concat(groupedDefault.explicit, groupedDefault.default)
+        const listener = new _PseudoEventListener.default(type, options, (callback.handleEvent || callback).bind(this))
+        this.listeners[type].push(listener)
+        const defaultListeners = []
+        const explicitListeners = []
+        let currentListener = this.listeners[type].pop()
+        while (currentListener !== null) {
+          if (currentListener.task.isDefault) {
+            defaultListeners.push(currentListener)
+          } else {
+            explicitListeners.push(currentListener)
+          }
+          currentListener = this.listeners[type].pop()
+        }
+        this.listeners[type] = _Stack.default.fromArray([].concat(explicitListeners, defaultListeners))
       }
 
       /**
@@ -685,12 +734,16 @@
           return
         }
         const stack = this.listeners[type]
-        for (let i = 0, l = stack.length; i < l; i++) {
-          if (stack[i].handleEvent === callback && !stack[i].isDefault) {
-            stack.splice(i, 1)
-            return
+        const currentListener = stack.pop()
+        const checkedListeners = []
+        while (currentListener !== null) {
+          const listener = currentListener.task
+          if (listener.handleEvent === callback && !listener.isDefault) {
+            continue
           }
+          checkedListeners.push(currentListener)
         }
+        this.listeners[type] = _Stack.default.fromArray(checkedListeners)
       }
 
       /**
@@ -701,9 +754,7 @@
    */
       dispatchEvent (event) {
         const target = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this
-        event.setReadOnlyProperties({
-          target
-        })
+        event.inner.target = target
         if (!(event.type in this.listeners)) {
           return true
         }
@@ -712,8 +763,8 @@
       }
     }
     var _default = exports.default = PseudoEventTarget
-  }, { './PseudoEvent': 3, './PseudoEventListener': 4, 'core-js/modules/esnext.async-iterator.for-each.js': 108, 'core-js/modules/esnext.async-iterator.reduce.js': 110, 'core-js/modules/esnext.iterator.constructor.js': 111, 'core-js/modules/esnext.iterator.for-each.js': 113, 'core-js/modules/esnext.iterator.reduce.js': 115 }],
-  6: [function (require, module, exports) {
+  }, { './PseudoEvent': 2, './PseudoEventListener': 3, 'collect-your-stuff/dist/collections/stack/Stack': 22, 'core-js/modules/esnext.async-iterator.for-each.js': 127, 'core-js/modules/esnext.async-iterator.reduce.js': 129, 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.for-each.js': 132, 'core-js/modules/esnext.iterator.reduce.js': 134 }],
+  5: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -721,6 +772,8 @@
     })
     exports.default = void 0
     var _PseudoHTMLElement = _interopRequireDefault(require('./PseudoHTMLElement'))
+    var _generateNodeList = _interopRequireDefault(require('../factories/generateNodeList'))
+    var _TreeLinker = _interopRequireDefault(require('collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'))
     function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
     /**
  * @file Substitute for the DOM HTMLDocument Class.
@@ -744,7 +797,6 @@
     class PseudoHTMLDocument extends _PseudoHTMLElement.default {
       /**
    * The root HTML element is acts as the parent to all HTML elements in the document.
-   * @returns {PseudoHTMLDocument}
    * @constructor
    */
       constructor () {
@@ -761,7 +813,6 @@
           tagName: 'head',
           parent: html
         })
-
         /**
      * Create document body element
      * @type {PseudoHTMLElement}
@@ -770,13 +821,7 @@
           tagName: 'body',
           parent: html
         })
-        html.children = [this.head, this.body]
-
-        /**
-     * Create document child element
-     * @type {PseudoHTMLElement[]}
-     */
-        this.children = [html]
+        html.children = (0, _generateNodeList.default)(_TreeLinker.default.fromArray([this.head, this.body]).head)
       }
 
       /**
@@ -794,8 +839,8 @@
       }
     }
     var _default = exports.default = PseudoHTMLDocument
-  }, { './PseudoHTMLElement': 7 }],
-  7: [function (require, module, exports) {
+  }, { '../factories/generateNodeList': 10, './PseudoHTMLElement': 6, 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker': 21 }],
+  6: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -826,17 +871,17 @@
  */
     class PseudoHTMLElement extends _PseudoElement.default {
       /**
-   * Simulate the HTMLELement object when the Dom is not available
-   * @param {string} [tagName=''] - The
-   * @param {PseudoNode|Object} [parent={}]
-   * @param {Array} [children=[]]
-   * @returns {PseudoHTMLElement}
+   * Simulate the HTMLElement object when the Dom is not available
+   * @param {Object} [elementOptions={}]
+   * @param {string} [elementOptions.tagName='']
+   * @param {PseudoNode|Object} [elementOptions.parent={}]
+   * @param {Array} [elementOptions.children=[]]
    * @constructor
    */
       constructor () {
         const {
           tagName = '',
-          parent = {},
+          parent = null,
           children = []
         } = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {}
         super({
@@ -872,8 +917,8 @@
       }
     }
     var _default = exports.default = PseudoHTMLElement
-  }, { './PseudoElement': 2 }],
-  8: [function (require, module, exports) {
+  }, { './PseudoElement': 1 }],
+  7: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -881,6 +926,7 @@
     })
     exports.default = void 0
     var _PseudoEventTarget = _interopRequireDefault(require('./PseudoEventTarget'))
+    var _generateNodeList = _interopRequireDefault(require('../factories/generateNodeList'))
     function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
     /**
  * @file Substitute for the DOM Node Class.
@@ -906,7 +952,7 @@
         super()
         this.nodeValue = ''
         this.textContext = ''
-        this.children = []
+        this.children = (0, _generateNodeList.default)()
         this.parent = undefined
       }
 
@@ -919,7 +965,7 @@
       }
 
       get firstChild () {
-        return this.children[0]
+        return this.children.first
       }
 
       get isConnected () {
@@ -927,11 +973,11 @@
       }
 
       get lastChild () {
-        return this.children[this.children.length - 1]
+        return this.children.last
       }
 
       get nextSibling () {
-        return this.isConnected ? this.parent.children[this.parent.children.indexOf(this) + 1] : null
+        return this.isConnected ? this.next : null
       }
 
       get nodeName () {
@@ -939,9 +985,7 @@
       }
 
       get nodeType () {
-        const typeName = 'DEFAULT_NODE'
-        const nodeTypes = ['DEFAULT_NODE', 'ELEMENT_NODE', 'ATTRIBUTE_NODE', 'TEXT_NODE', 'CDATA_SECTION_NODE', 'ENTITY_REFERENCE_NODE', 'ENTITY_NODE', 'PROCESSING_INSTRUCTION_NODE', 'COMMENT_NODE', 'DOCUMENT_NODE', 'DOCUMENT_TYPE_NODE', 'DOCUMENT_FRAGMENT_NODE', 'NOTATION_NODE']
-        return nodeTypes.indexOf(typeName)
+        return PseudoNode.DEFAULT_NODE
       }
 
       get ownerDocument () {
@@ -953,11 +997,11 @@
       }
 
       get parentElement () {
-        return this.parent.nodeType === 1 ? this.parent : null
+        return this.parent.nodeType === PseudoNode.ELEMENT_NODE ? this.parent : null
       }
 
       get previousSibling () {
-        return this.isConnected ? this.parent.children[this.parent.children.indexOf(this) - 1] : null
+        return this.isConnected ? this.prev : null
       }
 
       /**
@@ -966,7 +1010,7 @@
    * @returns {PseudoNode}
    */
       appendChild (childNode) {
-        this.children.push(childNode)
+        this.children.append(childNode)
         return childNode
       }
 
@@ -988,123 +1032,1883 @@
       lookupPrefix () {}
       lookupNamespaceURI () {}
       normalize () {}
-
       /**
    *
    * @param {PseudoNode} childElement
    * @returns {PseudoNode}
    */
       removeChild (childElement) {
-        return this.children.splice(this.children.indexOf(childElement), 1)[0]
+        return this.children.remove(childElement)
       }
 
       replaceChild () {}
     }
+    PseudoNode.DEFAULT_NODE = 0
+    PseudoNode.ELEMENT_NODE = 1
+    PseudoNode.ATTRIBUTE_NODE = 2
+    PseudoNode.TEXT_NODE = 3
+    PseudoNode.CDATA_SECTION_NODE = 4
+    PseudoNode.ENTITY_REFERENCE_NODE = 5
+    PseudoNode.ENTITY_NODE = 6
+    PseudoNode.PROCESSING_INSTRUCTION_NODE = 7
+    PseudoNode.COMMENT_NODE = 8
+    PseudoNode.DOCUMENT_NODE = 9
+    PseudoNode.DOCUMENT_TYPE_NODE = 10
+    PseudoNode.DOCUMENT_FRAGMENT_NODE = 11
+    PseudoNode.NOTATION_NODE = 12
     var _default = exports.default = PseudoNode
-  }, { './PseudoEventTarget': 5 }],
-  9: [function (require, module, exports) {
-    (function (global) {
-      (function () {
-        'use strict'
+  }, { '../factories/generateNodeList': 10, './PseudoEventTarget': 4 }],
+  8: [function (require, module, exports) {
+    'use strict'
 
-        Object.defineProperty(exports, '__esModule', {
-          value: true
-        })
-        exports.default = void 0
-        var _classes = require('././classes.js')
-        /**
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.default = void 0
+    require('core-js/modules/esnext.async-iterator.map.js')
+    require('core-js/modules/esnext.iterator.map.js')
+    var _LinkedTreeList = _interopRequireDefault(require('collect-your-stuff/dist/collections/linked-tree-list/LinkedTreeList'))
+    function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
+    /**
+ * @file Substitute for the NodeList interface.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @version 1.0.0
+ */
+
+    class PseudoNodeList extends _LinkedTreeList.default {
+      get entries () {
+        return Array.from(this)
+      }
+
+      get keys () {
+        return Array.from(this.innerList).keys
+      }
+
+      get values () {
+        return Array.from(this.innerList).map(item => item.data).values
+      }
+    }
+    var _default = exports.default = PseudoNodeList
+  }, { 'collect-your-stuff/dist/collections/linked-tree-list/LinkedTreeList': 20, 'core-js/modules/esnext.async-iterator.map.js': 128, 'core-js/modules/esnext.iterator.map.js': 133 }],
+  9: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.default = void 0
+    var _PseudoEventTarget = _interopRequireDefault(require('../classes/PseudoEventTarget'))
+    var _PseudoNode = _interopRequireDefault(require('../classes/PseudoNode'))
+    var _PseudoElement = _interopRequireDefault(require('../classes/PseudoElement'))
+    var _PseudoHTMLElement = _interopRequireDefault(require('../classes/PseudoHTMLElement'))
+    var _PseudoHTMLDocument = _interopRequireDefault(require('../classes/PseudoHTMLDocument'))
+    function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
+    /**
+ * Construct the Pseudo Dom to provide access to Dom objects which are otherwise not available outside the browser
+ * context.
+ * @function generateDocument
+ * @param {Object} root
+ * @param {Object} context
+ * @returns {Window|PseudoEventTarget}
+ */
+    const generateDocument = function (root) {
+      const context = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {}
+      /**
+   *
+   * @type {Window|PseudoEventTarget}
+   */
+      const newWindow = typeof root.document === 'undefined' ? root : new _PseudoEventTarget.default()
+      /**
+   * @type {Node|PseudoNode}
+   */
+      const Node = root.Node || new _PseudoNode.default()
+      if (typeof newWindow.Node === 'undefined') {
+        newWindow.Node = Node
+      }
+      /**
+   *
+   * @type {Element|PseudoElement}
+   */
+      const Element = root.Element || new _PseudoElement.default()
+      if (typeof newWindow.Element === 'undefined') {
+        newWindow.Element = Element
+      }
+      /**
+   * Create an instance of HTMLElement if not available
+   * @type {HTMLElement|PseudoHTMLElement}
+   */
+      const HTMLElement = root.HTMLElement || new _PseudoHTMLElement.default()
+      if (typeof newWindow.HTMLElement === 'undefined') {
+        newWindow.HTMLElement = HTMLElement
+      }
+      /**
+   * Define document when not available
+   * @type {Document|PseudoHTMLDocument}
+   */
+      const document = root.document || new _PseudoHTMLDocument.default()
+      if (typeof newWindow.document === 'undefined') {
+        newWindow.document = document
+      }
+      return context ? Object.assign(context, newWindow) : Object.assign(root, newWindow)
+    }
+    var _default = exports.default = generateDocument
+  }, { '../classes/PseudoElement': 1, '../classes/PseudoEventTarget': 4, '../classes/PseudoHTMLDocument': 5, '../classes/PseudoHTMLElement': 6, '../classes/PseudoNode': 7 }],
+  10: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.default = void 0
+    var _PseudoNodeList = _interopRequireDefault(require('../classes/PseudoNodeList'))
+    function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
+    const generateNodeList = function () {
+      const innerList = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null
+      return new _PseudoNodeList.default().initialize(innerList)
+    }
+    var _default = exports.default = generateNodeList
+  }, { '../classes/PseudoNodeList': 8 }],
+  11: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.default = void 0
+    var _getParentNodesFromAttribute = _interopRequireDefault(require('./getParentNodesFromAttribute'))
+    function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
+    const getParentNodes = node => (0, _getParentNodesFromAttribute.default)('', false, node)
+    var _default = exports.default = getParentNodes
+  }, { './getParentNodesFromAttribute': 12 }],
+  12: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.default = void 0
+    const getParentNodesFromAttribute = (attr, value, node) => {
+      return Object.keys(node.parentNode).length ? (node.parentNode[attr] || false) === value ? getParentNodesFromAttribute(attr, value, node.parentNode).concat([node.parentNode]) : getParentNodesFromAttribute(attr, value, node.parentNode) : []
+    }
+    var _default = exports.default = getParentNodesFromAttribute
+  }, {}],
+  13: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.default = void 0
+    var _PseudoEvent = _interopRequireDefault(require('./classes/PseudoEvent'))
+    var _PseudoEventTarget = _interopRequireDefault(require('./classes/PseudoEventTarget'))
+    var _PseudoNode = _interopRequireDefault(require('./classes/PseudoNode'))
+    var _PseudoElement = _interopRequireDefault(require('./classes/PseudoElement'))
+    var _PseudoHTMLElement = _interopRequireDefault(require('./classes/PseudoHTMLElement'))
+    var _PseudoHTMLDocument = _interopRequireDefault(require('./classes/PseudoHTMLDocument'))
+    var _generateDocument = _interopRequireDefault(require('./factories/generateDocument'))
+    function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
+    /**
  * @file All of the Pseudo Dom Helper Objects functions for simulating parts of the DOM when running scripts in NodeJs.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @version 1.0.0
  */
 
-        /**
- * Store a reference to this scope which will be Window if rendered via browser
- */
-        const root = void 0 || window || global || {}
-
-        /**
- * Store reference to any pre-existing module of the same name
- * @type {module|*}
- */
-        const previousPseudoDom = root.pseudoDom || {}
-
-        /**
+    /**
  * All methods exported from this module are encapsulated within pseudoDom.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @typedef {Object} pseudoDom
  * @module pseudoDom/objects
  */
-        const pseudoDom = {}
-        root.pseudoDom = pseudoDom
+    const pseudoDom = Object.assign({
+      generateDocument: _generateDocument.default
+    }, _PseudoEvent.default, _PseudoEventTarget.default, _PseudoNode.default, _PseudoElement.default, _PseudoHTMLElement.default, _PseudoHTMLDocument.default)
+    var _default = exports.default = pseudoDom
+    if (void 0) {
+      // @ts-ignore
+      (void 0).pseudoDom = pseudoDom
+    } else if (typeof window !== 'undefined') {
+      // @ts-ignore
+      window.pseudoDom = pseudoDom
+    }
+  }, { './classes/PseudoElement': 1, './classes/PseudoEvent': 2, './classes/PseudoEventTarget': 4, './classes/PseudoHTMLDocument': 5, './classes/PseudoHTMLElement': 6, './classes/PseudoNode': 7, './factories/generateDocument': 9 }],
+  14: [function (require, module, exports) {
+    'use strict'
 
-        /**
- * Construct the Pseudo Dom to provide access to Dom objects which are otherwise not available outside of the browser
- * context.
- * @function generate
- * @param {Object} root
- * @param {Object} context
- * @returns {Window|PseudoEventTarget}
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.default = void 0
+    require('core-js/modules/esnext.async-iterator.reduce.js')
+    require('core-js/modules/esnext.iterator.constructor.js')
+    require('core-js/modules/esnext.iterator.reduce.js')
+    /**
+ * Element represents a node in an Arrayable.
  */
-        pseudoDom.generate = function (root) {
-          const context = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {}
-          /**
-   *
-   * @type {Window|PseudoEventTarget}
+    class ArrayElement {
+      /**
+   * Create the new Element instance, provide the data and optionally configure the type of Element.
+   * @param {*} [data=null] The data to be stored in this element.
    */
-          const newWindow = typeof root.document === 'undefined' ? root : new pseudoDom.PseudoEventTarget()
-
-          /**
-   * @type {Node|PseudoNode}
-   */
-          const Node = root.Node || new pseudoDom.PseudoNode()
-          if (typeof newWindow.Node === 'undefined') {
-            newWindow.Node = Node
-          }
-
-          /**
-   *
-   * @type {Element|PseudoElement}
-   */
-          const Element = root.Element || new pseudoDom.PseudoElement()
-          if (typeof newWindow.Element === 'undefined') {
-            newWindow.Element = Element
-          }
-
-          /**
-   * Create an instance of HTMLElement if not available
-   * @type {HTMLElement|PseudoHTMLElement}
-   */
-          const HTMLElement = root.HTMLElement || new pseudoDom.PseudoHTMLElement()
-          if (typeof newWindow.HTMLElement === 'undefined') {
-            newWindow.HTMLElement = HTMLElement
-          }
-
-          /**
-   * Define document when not available
-   * @type {Document|PseudoHTMLDocument}
-   */
-          const document = root.document || new pseudoDom.PseudoHTMLDocument()
-          if (typeof newWindow.document === 'undefined') {
-            newWindow.document = document
-          }
-          return context ? Object.assign(context, pseudoDom, newWindow) : Object.assign(root, newWindow)
-        }
-
-        /**
- * Return a reference to this library while preserving the original same-named library
- * @function noConflict
- * @returns {pseudoDom}
+      constructor () {
+        const data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null
+        this.classType = ArrayElement
+        this.data = null
+        this.data = data
+      }
+    }
+    /**
+ * Make a new Element from the data given if it is not already a valid Element.
+ * @param {ArrayElement|*} element Return a valid ArrayElement instance from given data, or even an already valid one.
+ * @param {IsElement} [classType=ArrayElement] Provide the type of IsElement to use.
+ * @return {ArrayElement}
  */
-        pseudoDom.noConflict = () => {
-          root.pseudoDom = previousPseudoDom
-          return pseudoDom
+    ArrayElement.make = function (element) {
+      const classType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ArrayElement
+      if (typeof element !== 'object') {
+        // It is not an object, so instantiate the Element with element as the data
+        return new classType(element)
+      }
+      if (element.classType) {
+        // Already valid Element, return as-is
+        return element
+      }
+      // Create the new node as the configured #classType
+      return new classType(element)
+    }
+    /**
+ * Convert an array into Element instances, return the head and tail Elements.
+ * @param {Array<IsElement>} [values=[]] Provide an array of data that will be converted to array of elements.
+ * @param {IsElement} [classType=ArrayElement] Provide the type of IsElement to use.
+ * @returns {{head: ArrayElement[], tail: ArrayElement}}
+ */
+    ArrayElement.fromArray = function () {
+      const values = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : []
+      const classType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ArrayElement
+      return values.reduce((references, element) => {
+        const newElement = classType.make(element, classType)
+        if (!references.head.length) {
+          // Initialize the head and tail with the new node
+          return {
+            head: [newElement],
+            tail: newElement
+          }
         }
-        var _default = exports.default = Object.assign(pseudoDom, _classes.PseudoEvent, _classes.PseudoEventTarget, _classes.PseudoNode, _classes.PseudoElement, _classes.PseudoHTMLElement, _classes.PseudoHTMLDocument)
-      }).call(this)
-    }).call(this, typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : typeof window !== 'undefined' ? window : {})
-  }, { '././classes.js': 1 }],
-  10: [function (require, module, exports) {
+        // Only update the tail once head has been set, tail is always the most recent node
+        references.head.push(newElement)
+        references.tail = newElement
+        return references
+      }, {
+        head: [],
+        tail: null
+      })
+    }
+    var _default = exports.default = ArrayElement
+  }, { 'core-js/modules/esnext.async-iterator.reduce.js': 129, 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.reduce.js': 134 }],
+  15: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.default = void 0
+    var _ArrayElement = _interopRequireDefault(require('./ArrayElement'))
+    var _ArrayIterator = _interopRequireDefault(require('../../recipes/ArrayIterator'))
+    function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
+    /**
+ * @file arrayable list.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @version 1.1.0
+ * @memberOf module:collect-your-stuff
+ */
+
+    /**
+ * Arrayable represents a collection stored as an array.
+ */
+    class Arrayable {
+      /**
+   * Create the new Arrayable instance, configure the Arrayable class.
+   */
+      constructor () {
+        const elementClass = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _ArrayElement.default
+        this.classType = Arrayable
+        this.innerList = []
+        this.initialized = false
+        this.elementClass = elementClass
+      }
+
+      /**
+   * Initialize the inner list, should only run once.
+   * @param {Array<ArrayElement>} initialList Give the array of elements to start in this Arrayable.
+   * @return {Arrayable}
+   */
+      initialize (initialList) {
+        if (this.initialized) {
+          console.warn('Attempt to initialize non-empty list.')
+          return this
+        }
+        this.initialized = true
+        this.innerList = initialList
+        return this
+      }
+
+      /**
+   * Retrieve a copy of the innerList used.
+   * @returns {Array<ArrayElement>}
+   */
+      get list () {
+        return this.innerList
+      }
+
+      /**
+   * Retrieve the first Element from the Arrayable
+   * @returns {ArrayElement}
+   */
+      get first () {
+        return this.innerList[0]
+      }
+
+      /**
+   * Retrieve the last Element from the Arrayable
+   * @returns {ArrayElement}
+   */
+      get last () {
+        return this.innerList[this.length - 1]
+      }
+
+      /**
+   * Return the length of the list.
+   * @returns {number}
+   */
+      get length () {
+        return this.innerList.length
+      }
+
+      /**
+   * Insert a new node (or data) after a node.
+   * @param {ArrayElement|*} node The existing node as reference
+   * @param {ArrayElement|*} newNode The new node to go after the existing node
+   * @returns {Arrayable}
+   */
+      insertAfter (node, newNode) {
+        const insertAt = this.innerList.indexOf(node)
+        this.innerList.splice(insertAt + 1, 0, this.elementClass.make(newNode))
+        return this
+      }
+
+      /**
+   * Insert a new node (or data) before a node.
+   * @param {ArrayElement|*} node The existing node as reference
+   * @param {ArrayElement|*} newNode The new node to go before the existing node
+   * @returns {Arrayable}
+   */
+      insertBefore (node, newNode) {
+        const insertAt = this.innerList.indexOf(node)
+        this.innerList.splice(insertAt, 0, this.elementClass.make(newNode))
+        return this
+      }
+
+      /**
+   * Add a node (or data) after the given (or last) node in the list.
+   * @param {ArrayElement|*} node The new node to add to the end of the list
+   * @param {ArrayElement} after The existing last node
+   * @returns {Arrayable}
+   */
+      append (node) {
+        const after = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.last
+        return this.insertAfter(after, node)
+      }
+
+      /**
+   * Add a node (or data) before the given (or first) node in the list.
+   * @param {ArrayElement|*} node The new node to add to the start of the list
+   * @param {ArrayElement} before The existing first node
+   * @returns {Arrayable}
+   */
+      prepend (node) {
+        const before = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.first
+        return this.insertBefore(before, node)
+      }
+
+      /**
+   * Remove an element from this arrayable.
+   * @param {ArrayElement} node The node we wish to remove (and it will be returned after removal)
+   * @return {ArrayElement}
+   */
+      remove (node) {
+        const deleteAt = this.innerList.indexOf(node)
+        this.innerList.splice(deleteAt, 1)
+        return node
+      }
+
+      /**
+   * Retrieve an ArrayElement item from this list by numeric index, otherwise return null.
+   * @param {number} index The integer number for retrieving a node by position.
+   * @return {ArrayElement|null}
+   */
+      item (index) {
+        if (index >= this.length) {
+          // index is beyond array limit
+          return null
+        }
+        if (index >= 0) {
+          // use the positive index at nth position from the beginning of the array
+          return this.innerList[index]
+        }
+        const calculatedIndex = this.length + index
+        if (calculatedIndex < 0) {
+          // negative index is beyond array limit (minus direction)
+          return null
+        }
+        // Return the item at nth position from the end of the array
+        return this.innerList[calculatedIndex]
+      }
+
+      /**
+   * Be able to run forEach on this Arrayable to iterate over the elements.
+   * @param {forEachCallback} callback The function to call for-each element
+   * @param {Arrayable} thisArg Optional, 'this' reference
+   * @returns {Arrayable}
+   */
+      forEach (callback) {
+        const thisArg = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this
+        for (let i = 0; i < thisArg.length; ++i) {
+          callback(thisArg.item(i), i, thisArg)
+        }
+        return thisArg
+      }
+
+      /**
+   * Be able to iterate over this class.
+   * @returns {Iterator}
+   */
+      [Symbol.iterator] () {
+        const index = 0
+        return new _ArrayIterator.default(this.innerList, index)
+      }
+    }
+    /**
+ * Convert an array to an Arrayable.
+ * @param {Array} values An array of values which will be converted to elements in this arrayable
+ * @param {IsElement} [elementClass=ArrayElement] The class to use for each element
+ * @param {IsArrayable<ArrayElement>} [classType=Arrayable] Provide the type of IsArrayable to use.
+ * @returns {Arrayable}
+ */
+    Arrayable.fromArray = function () {
+      const values = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : []
+      const elementClass = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _ArrayElement.default
+      const classType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : Arrayable
+      const list = new classType(elementClass)
+      return list.initialize(elementClass.fromArray(values).head)
+    }
+    var _default = exports.default = Arrayable
+  }, { '../../recipes/ArrayIterator': 24, './ArrayElement': 14 }],
+  16: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.default = void 0
+    require('core-js/modules/esnext.async-iterator.reduce.js')
+    require('core-js/modules/esnext.iterator.constructor.js')
+    require('core-js/modules/esnext.iterator.reduce.js')
+    var _Linker = _interopRequireDefault(require('../linked-list/Linker'))
+    function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
+    /**
+ * DoubleLinker represents a node in a DoublyLinkedList which is chained by next and prev.
+ * @extends Linker
+ */
+    class DoubleLinker {
+      /**
+   * Create the new DoubleLinker instance, provide the data and optionally the next and prev references.
+   * @param {Object} [nodeData={}]
+   * @param {*} [nodeData.data=null] The data to be stored in this linker
+   * @param {DoubleLinker|null} [nodeData.next=null] The reference to the next linker if any
+   * @param {DoubleLinker|null} [nodeData.prev=null] The reference to the previous linker if any
+   */
+      constructor () {
+        const {
+          data = null,
+          next = null,
+          prev = null
+        } = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {}
+        this.classType = DoubleLinker
+        this.data = null
+        this.next = null
+        this.prev = null
+        this.data = data
+        this.next = next
+        this.prev = prev
+      }
+    }
+    /**
+ * Make a new DoubleLinker from the data given if it is not already a valid Linker.
+ * @param {DoubleLinker|*} linker Return a valid Linker instance from given data, or even an already valid one.
+ * @param {IsDoubleLinker} [classType=DoubleLinker] Provide the type of IsDoubleLinker to use.
+ * @return {DoubleLinker}
+ */
+    DoubleLinker.make = function (linker) {
+      const classType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : DoubleLinker
+      return _Linker.default.make(linker, classType)
+    }
+    /**
+ * Convert an array into DoubleLinker instances, return the head and tail DoubleLinkers.
+ * @param {Array} [values=[]] Provide an array of data that will be converted to a chain of linkers.
+ * @param {IsDoubleLinker} [classType=DoubleLinker] Provide the type of IsDoubleLinker to use.
+ * @returns {{head: DoubleLinker, tail: DoubleLinker}}
+ */
+    DoubleLinker.fromArray = function () {
+      const values = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : []
+      const classType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : DoubleLinker
+      return values.reduce((references, linker) => {
+        const newLinker = classType.make(linker, classType)
+        if (references.head === null) {
+          // Initialize the head and tail with the new node
+          return {
+            head: newLinker,
+            tail: newLinker
+          }
+        }
+        newLinker.prev = references.tail
+        // Only update the tail once head has been set, tail is always the most recent node
+        references.tail.next = newLinker
+        references.tail = newLinker
+        return references
+      }, {
+        head: null,
+        tail: null
+      })
+    }
+    var _default = exports.default = DoubleLinker
+  }, { '../linked-list/Linker': 19, 'core-js/modules/esnext.async-iterator.reduce.js': 129, 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.reduce.js': 134 }],
+  17: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.default = void 0
+    var _DoubleLinker = _interopRequireDefault(require('./DoubleLinker'))
+    var _DoubleLinkerIterator = _interopRequireDefault(require('../../recipes/DoubleLinkerIterator'))
+    var _LinkedList = _interopRequireDefault(require('../linked-list/LinkedList'))
+    function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
+    /**
+ * @file doubly linked list.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @version 1.1.0
+ * @memberOf module:collect-your-stuff
+ */
+
+    /**
+ * DoublyLinkedList represents a collection stored as a LinkedList with prev and next references.
+ * @extends LinkedList
+ */
+    class DoublyLinkedList {
+      /**
+   * Create the new DoublyLinkedList instance.
+   */
+      constructor () {
+        const linkerClass = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _DoubleLinker.default
+        this.classType = DoublyLinkedList
+        this.innerList = null
+        this.initialized = false
+        this.linkerClass = linkerClass
+      }
+
+      /**
+   * Initialize the inner list, should only run once.
+   * @param {DoubleLinker} initialList Give the list of double-linkers to start in this doubly linked-list.
+   * @return {DoublyLinkedList}
+   */
+      initialize (initialList) {
+        return _LinkedList.default.prototype.initialize.call(this, initialList)
+      }
+
+      /**
+   * Retrieve a copy of the innerList used.
+   * @returns {DoubleLinker}
+   */
+      get list () {
+        return this.innerList
+      }
+
+      /**
+   * Retrieve the first DoubleLinker in the list.
+   * @returns {DoubleLinker}
+   */
+      get first () {
+        return this.reset()
+      }
+
+      /**
+   * Retrieve the last DoubleLinker in the list.
+   * @returns {DoubleLinker}
+   */
+      get last () {
+        let tail = this.innerList
+        if (tail === null) {
+          return null
+        }
+        let next = tail.next
+        while (next !== null) {
+          tail = next
+          next = tail.next
+        }
+        return tail
+      }
+
+      /**
+   * Return the length of the list.
+   * @returns {number}
+   */
+      get length () {
+        let current = this.first
+        let length = 0
+        while (current !== null) {
+          ++length
+          current = current.next
+        }
+        return length
+      }
+
+      /**
+   * Insert a new node (or data) after a node.
+   * @param {DoubleLinker|*} node The existing node as reference
+   * @param {DoubleLinker|*} newNode The new node to go after the existing node
+   * @returns {DoublyLinkedList}
+   */
+      insertAfter (node, newNode) {
+        newNode = this.linkerClass.make(newNode)
+        if (node !== null) {
+          // Ensure the next reference of this node is assigned to the new node
+          newNode.next = node.next
+          // Ensure this node is assigned as the prev reference of the new node
+          newNode.prev = node
+          // Then set this node's next reference to the new node
+          node.next = newNode
+        }
+        if (newNode.next) {
+          // Update the next reference to ensure circular reference for prev points to the new node
+          newNode.next.prev = newNode
+        }
+        if (!this.length) {
+          this.innerList = newNode
+        }
+        this.reset()
+        return this
+      }
+
+      /**
+   * Insert a new node (or data) before a node.
+   * @param {DoubleLinker|*} node The existing node as reference
+   * @param {DoubleLinker|*} newNode The new node to go before the existing node
+   * @returns {DoublyLinkedList}
+   */
+      insertBefore (node, newNode) {
+        newNode = this.linkerClass.make(newNode)
+        if (node !== null) {
+          // The new node will reference this prev node as prev
+          newNode.prev = node.prev
+          // The new node will reference this node as next
+          newNode.next = node
+          // This prev will reference the new node
+          node.prev = newNode
+        }
+        if (newNode.prev) {
+          // Update the prev reference to ensure circular reference for next points to the new node
+          newNode.prev.next = newNode
+        }
+        if (!this.length) {
+          this.innerList = newNode
+        }
+        this.reset()
+        return this
+      }
+
+      /**
+   * Add a node (or data) after the given (or last) node in the list.
+   * @param {DoubleLinker|*} node The new node to add to the end of the list
+   * @param {DoubleLinker} after The existing last node
+   * @returns {DoubleLinker}
+   */
+      append (node) {
+        const after = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.last
+        return this.insertAfter(after, node)
+      }
+
+      /**
+   * Add a node (or data) before the given (or first) node in the list.
+   * @param {DoubleLinker|*} node The new node to add to the start of the list
+   * @param {DoubleLinker} before The existing first node
+   * @returns {DoubleLinker}
+   */
+      prepend (node) {
+        const before = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.first
+        return this.insertBefore(before, node)
+      }
+
+      /**
+   * Remove a linker from this linked list.
+   * @param {DoubleLinker} node The node we wish to remove (and it will be returned after removal)
+   * @return {DoubleLinker}
+   */
+      remove (node) {
+        if (node === null) {
+          return null
+        }
+        if (node.prev) {
+          // The previous node will reference this next node
+          node.prev.next = node.next
+        }
+        if (node.next) {
+          // The next node will reference this previous node
+          node.next.prev = node.prev
+        }
+        // Update head reference
+        this.reset()
+        return node
+      }
+
+      /**
+   * Refresh all references and return head reference.
+   * @return {DoubleLinker}
+   */
+      reset () {
+        // Start at the pointer for the list
+        let pointer = this.innerList
+        if (pointer === null) {
+          return null
+        }
+        let next = pointer.next
+        // Follow references till the end
+        while (next !== null) {
+          pointer = next
+          next = pointer.next
+        }
+        let prev = pointer.prev
+        // From final reference, follow references back to the beginning
+        while (prev !== null) {
+          pointer = prev
+          prev = pointer.prev
+        }
+        // All the live references should have been found, and we are pointing to the true head
+        this.innerList = pointer
+        return pointer
+      }
+
+      /**
+   * Retrieve a DoubleLinker item from this list by numeric index, otherwise return null.
+   * @param {number} index The integer number for retrieving a node by position.
+   * @returns {DoubleLinker|null}
+   */
+      item (index) {
+        if (index >= 0) {
+          // For a positive index, start from the beginning of the list until the current item counter equals our index
+          let current = this.first
+          let currentIndex = -1
+          while (++currentIndex < index && current !== null) {
+            current = current.next
+          }
+          return currentIndex === index ? current : null
+        }
+        // For a negative index, get the delta of index and length, then go backwards until we reach that delta
+        let current = this.last
+        let currentIndex = this.length
+        const calculatedIndex = this.length + index
+        if (calculatedIndex < 0) {
+          return null
+        }
+        while (--currentIndex > calculatedIndex && current !== null) {
+          current = current.prev
+        }
+        return currentIndex === calculatedIndex ? current : null
+      }
+
+      /**
+   * Be able to run forEach on this DoublyLinkedList to iterate over the DoubleLinker Items.
+   * @param {forEachCallback} callback The function to call for-each double linker
+   * @param {DoublyLinkedList} thisArg Optional, 'this' reference
+   */
+      forEach (callback) {
+        const thisArg = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this
+        return _LinkedList.default.prototype.forEach.call(this, callback, thisArg)
+      }
+
+      /**
+   * Be able to iterate over this class.
+   * @returns {Iterator}
+   */
+      [Symbol.iterator] () {
+        const current = this.first
+        return new _DoubleLinkerIterator.default(current)
+      }
+    }
+    /**
+ * Convert an array into a DoublyLinkedList instance, return the new instance.
+ * @param {Array} [values=[]] An array of values which will be converted to linkers in this doubly-linked-list
+ * @param {IsDoubleLinker} [linkerClass=DoubleLinker] The class to use for each linker
+ * @param {IsArrayable<IsDoubleLinker>} [classType=LinkedList] Provide the type of IsArrayable to use.
+ * @returns {DoublyLinkedList}
+ */
+    DoublyLinkedList.fromArray = function () {
+      const values = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : []
+      const linkerClass = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _DoubleLinker.default
+      const classType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : DoublyLinkedList
+      return _LinkedList.default.fromArray(values, linkerClass, classType)
+    }
+    var _default = exports.default = DoublyLinkedList
+  }, { '../../recipes/DoubleLinkerIterator': 25, '../linked-list/LinkedList': 18, './DoubleLinker': 16 }],
+  18: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.default = void 0
+    var _Linker = _interopRequireDefault(require('./Linker'))
+    var _LinkerIterator = _interopRequireDefault(require('../../recipes/LinkerIterator'))
+    var _Arrayable = _interopRequireDefault(require('../arrayable/Arrayable'))
+    function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
+    /**
+ * LinkedList represents a collection stored as a LinkedList with next references.
+ * @extends Arrayable
+ */
+    class LinkedList {
+      /**
+   * Create the new LinkedList instance.
+   */
+      constructor () {
+        const linkerClass = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _Linker.default
+        this.classType = LinkedList
+        this.innerList = null
+        this.initialized = false
+        this.linkerClass = linkerClass
+      }
+
+      /**
+   * Initialize the inner list, should only run once.
+   * @param {Linker|Array} initialList Give the list of linkers to start in this linked-list.
+   * @return {LinkedList}
+   */
+      initialize (initialList) {
+        return _Arrayable.default.prototype.initialize.call(this, initialList)
+      }
+
+      /**
+   * Retrieve a copy of the innerList used.
+   * @returns {Linker}
+   */
+      get list () {
+        return this.innerList
+      }
+
+      /**
+   * Retrieve the first Linker in the list.
+   * @returns {Linker}
+   */
+      get first () {
+        return this.innerList
+      }
+
+      /**
+   * Retrieve the last Linker in the list.
+   * @returns {Linker}
+   */
+      get last () {
+        let tail = this.innerList
+        if (tail === null) {
+          return null
+        }
+        let next = tail.next
+        while (next !== null) {
+          tail = next
+          next = tail.next
+        }
+        return tail
+      }
+
+      /**
+   * Return the length of the list.
+   * @returns {number}
+   */
+      get length () {
+        let current = this.first
+        let length = 0
+        while (current !== null) {
+          ++length
+          current = current.next
+        }
+        return length
+      }
+
+      /**
+   * Insert a new node (or data) after a node.
+   * @param {Linker|*} node The existing node as reference
+   * @param {Linker|*} newNode The new node to go after the existing node
+   * @returns {LinkedList}
+   */
+      insertAfter (node, newNode) {
+        newNode = this.linkerClass.make(newNode)
+        if (node !== null) {
+          // Ensure the next reference of this node is assigned to the new node
+          newNode.next = node.next
+          // Then set this node's next reference to the new node
+          node.next = newNode
+        }
+        if (!this.length) {
+          this.innerList = newNode
+        }
+        return this
+      }
+
+      /**
+   * Insert a new node (or data) before a node.
+   * @param {Linker|*} node The existing node as reference
+   * @param {Linker|*} newNode The new node to go before the existing node
+   * @returns {LinkedList}
+   */
+      insertBefore (node, newNode) {
+        newNode = this.linkerClass.make(newNode)
+        let prevNode = null
+        let currentNode = this.first
+        while (currentNode !== node) {
+          prevNode = currentNode
+          currentNode = currentNode.next
+        }
+        // The new node will reference this node as next
+        newNode.next = node
+        if (prevNode) {
+          // Ensure the next reference of the previous node is assigned to the new node
+          prevNode.next = newNode
+        }
+        if (node === this.first || node === null) {
+          this.innerList = newNode
+        }
+        return this
+      }
+
+      /**
+   * Add a node (or data) after the given (or last) node in the list.
+   * @param {Linker|*} node The new node to add to the end of the list
+   * @param {Linker} after The existing last node
+   * @returns {Linker}
+   */
+      append (node) {
+        const after = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.last
+        return this.insertAfter(after, node)
+      }
+
+      /**
+   * Add a node (or data) before the given (or first) node in the list.
+   * @param {Linker|*} node The new node to add to the start of the list
+   * @param {Linker} before The existing first node
+   * @returns {Linker}
+   */
+      prepend (node) {
+        const before = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.first
+        return this.insertBefore(before, node)
+      }
+
+      /**
+   * Remove a linker from this linked list.
+   * @param {Linker} node The node we wish to remove (and it will be returned after removal)
+   * @return {Linker}
+   */
+      remove (node) {
+        let prevNode = null
+        let currentNode = this.first
+        while (currentNode !== node) {
+          prevNode = currentNode
+          currentNode = currentNode.next
+        }
+        if (prevNode) {
+          // Ensure the next reference of the previous node skips over the removed node
+          prevNode.next = node.next
+        }
+        if (node === this.first && node !== null) {
+          // Update list head to point to next if it was this node
+          this.innerList = node.next
+        }
+        return node
+      }
+
+      /**
+   * Retrieve a Linker item from this list by numeric index, otherwise return null.
+   * @param {number} index The integer number for retrieving a node by position.
+   * @returns {Linker|null}
+   */
+      item (index) {
+        if (index >= 0) {
+          let current = this.first
+          let currentIndex = -1
+          while (++currentIndex < index && current !== null) {
+            current = current.next
+          }
+          return currentIndex === index ? current : null
+        }
+        let current = this.first
+        let currentIndex = 0
+        const calculatedIndex = this.length + index
+        if (calculatedIndex < 0) {
+          return null
+        }
+        while (currentIndex < calculatedIndex && current !== null) {
+          current = current.next
+          ++currentIndex
+        }
+        return currentIndex === calculatedIndex ? current : null
+      }
+
+      /**
+   * Be able to run forEach on this LinkedList to iterate over the linkers.
+   * @param {forEachCallback} callback The function to call for-each linker
+   * @param {LinkedList} thisArg Optional, 'this' reference
+   * @returns {LinkedList}
+   */
+      forEach (callback) {
+        const thisArg = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this
+        let index = 0
+        let current = thisArg.first
+        while (current !== null) {
+          callback(current, index, thisArg)
+          current = current.next
+          ++index
+        }
+        return thisArg
+      }
+
+      /**
+   * Be able to iterate over this class.
+   * @returns {Iterator}
+   */
+      [Symbol.iterator] () {
+        return new _LinkerIterator.default(this.first)
+      }
+    }
+    /**
+ * Convert an array to a LinkedList.
+ * @param {Array} values An array of values which will be converted to linkers in this linked-list
+ * @param {IsLinker} linkerClass The class to use for each linker
+ * @param {IsArrayable<Linker>} [classType=LinkedList] Provide the type of IsArrayable to use.
+ * @returns {LinkedList}
+ */
+    LinkedList.fromArray = function () {
+      const values = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : []
+      const linkerClass = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _Linker.default
+      const classType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : LinkedList
+      const list = new classType(linkerClass)
+      return list.initialize(linkerClass.fromArray(values).head)
+    }
+    var _default = exports.default = LinkedList
+  }, { '../../recipes/LinkerIterator': 26, '../arrayable/Arrayable': 15, './Linker': 19 }],
+  19: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.default = void 0
+    require('core-js/modules/esnext.async-iterator.reduce.js')
+    require('core-js/modules/esnext.iterator.constructor.js')
+    require('core-js/modules/esnext.iterator.reduce.js')
+    var _ArrayElement = _interopRequireDefault(require('../arrayable/ArrayElement'))
+    function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
+    /**
+ * Linker represents a node in a LinkedList.
+ * @extends ArrayElement
+ */
+    class Linker {
+      /**
+   * Create the new Linker instance, provide the data and optionally give the next Linker.
+   * @param {Object} [nodeData={}]
+   * @param {*} [nodeData.data=null] The data to be stored in this linker
+   * @param {Linker|null} [nodeData.next=null] The reference to the next linker if any
+   */
+      constructor () {
+        const {
+          data = null,
+          next = null
+        } = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {}
+        this.classType = Linker
+        this.data = null
+        this.next = null
+        this.data = data
+        this.next = next
+      }
+    }
+    /**
+ * Make a new Linker from the data given if it is not already a valid Linker.
+ * @param {Linker|*} linker Return a valid Linker instance from given data, or even an already valid one.
+ * @param {IsLinker} [classType=Linker] Provide the type of IsLinker to use.
+ * @return {Linker}
+ */
+    Linker.make = function (linker) {
+      const classType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Linker
+      if (typeof linker !== 'object') {
+        // It is not an object, so instantiate the Linker with element as the data
+        return new classType({
+          data: linker
+        })
+      }
+      if (linker.classType) {
+        // Already valid Linker, return as-is
+        return linker
+      }
+      if (!linker.data) {
+        linker = {
+          data: linker
+        }
+      }
+      // Create the new node as the configured #classType
+      return _ArrayElement.default.make(linker, classType)
+    }
+    /**
+ * Convert an array into Linker instances, return the head and tail Linkers.
+ * @param {Array} [values=[]] Provide an array of data that will be converted to a chain of linkers.
+ * @param {IsLinker} [classType=Linker] Provide the type of IsLinker to use.
+ * @returns {{head: Linker, tail: Linker}}
+ */
+    Linker.fromArray = function (values) {
+      const classType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Linker
+      return values.reduce((references, linker) => {
+        const newLinker = classType.make(linker, classType)
+        if (references.head === null) {
+          // Initialize the head and tail with the new node
+          return {
+            head: newLinker,
+            tail: newLinker
+          }
+        }
+        // Only update the tail once head has been set, tail is always the most recent node
+        references.tail.next = newLinker
+        references.tail = newLinker
+        return references
+      }, {
+        head: null,
+        tail: null
+      })
+    }
+    var _default = exports.default = Linker
+  }, { '../arrayable/ArrayElement': 14, 'core-js/modules/esnext.async-iterator.reduce.js': 129, 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.reduce.js': 134 }],
+  20: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.default = void 0
+    var _TreeLinker = _interopRequireDefault(require('./TreeLinker'))
+    var _TreeLinkerIterator = _interopRequireDefault(require('../../recipes/TreeLinkerIterator'))
+    var _DoublyLinkedList = _interopRequireDefault(require('../doubly-linked-list/DoublyLinkedList'))
+    function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
+    /**
+ * @file doubly linked tree list.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @version 1.1.0
+ * @memberOf module:collect-your-stuff
+ */
+
+    /**
+ * LinkedTreeList represents a collection stored with a root and spreading in branching (tree) formation.
+ * @extends DoublyLinkedList
+ */
+    class LinkedTreeList {
+      /**
+   * Create the new LinkedTreeList instance, configure the list class.
+   */
+      constructor () {
+        const linkerClass = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _TreeLinker.default
+        this.classType = LinkedTreeList
+        this.innerList = null
+        this.initialized = false
+        this.linkerClass = linkerClass
+      }
+
+      /**
+   * Initialize the inner list, should only run once.
+   * @param {TreeLinker} initialList Give the list of tree-linkers to start in this linked-tree-list.
+   * @return {LinkedTreeList}
+   */
+      initialize (initialList) {
+        if (this.initialized) {
+          console.warn('Attempt to initialize LinkedTreeList which is not empty.')
+          return this
+        }
+        this.initialized = true
+        this.innerList = initialList
+        return this
+      }
+
+      /**
+   * Retrieve a copy of the innerList used.
+   * @returns {TreeLinker}
+   */
+      get list () {
+        return this.innerList
+      }
+
+      /**
+   * Retrieve the first TreeLinker in the list.
+   * @returns {TreeLinker}
+   */
+      get first () {
+        return this.reset()
+      }
+
+      /**
+   * Retrieve the last TreeLinker in the list.
+   * @returns {TreeLinker}
+   */
+      get last () {
+        let tail = this.innerList
+        if (tail === null) {
+          return null
+        }
+        let next = tail.next
+        while (next !== null) {
+          tail = next
+          next = tail.next
+        }
+        return tail
+      }
+
+      /**
+   * Return the length of the list.
+   * @returns {number}
+   */
+      get length () {
+        let current = this.first
+        let length = 0
+        while (current !== null) {
+          ++length
+          current = current.next
+        }
+        return length
+      }
+
+      /**
+   * Get the parent of this tree list.
+   * @return {TreeLinker}
+   */
+      get parent () {
+        const first = this.first
+        if (first === null) {
+          return null
+        }
+        return this.first.parent
+      }
+
+      /**
+   * Set the parent of this tree list
+   * @param {TreeLinker} parent The new node to use as the parent for this group of children
+   */
+      set parent (parent) {
+        let current = this.first
+        while (current !== null) {
+          current.parent = parent
+          current = current.next
+        }
+        if (parent) {
+          parent.children = this
+        }
+      }
+
+      /**
+   * Return the root parent of the entire tree.
+   * @return {TreeLinker}
+   */
+      get rootParent () {
+        let current = this.first
+        if (!current) {
+          return null
+        }
+        let parent = this.first.parent
+        while (parent !== null) {
+          current = parent
+          parent = current.parent
+        }
+        return current
+      }
+
+      /**
+   * Set the children on a parent item.
+   * @param {TreeLinker} item The TreeLinker node that will be the parent of the children
+   * @param {LinkedTreeList} children The LinkedTreeList which has the child nodes to use
+   */
+      setChildren (item) {
+        const children = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null
+        if (Array.from(this).indexOf(item) < 0) {
+          console.error('item is not a child of this')
+        }
+        children.parent = item
+      }
+
+      /**
+   * Insert a new node (or data) after a node.
+   * @param {TreeLinker|*} node The existing node as reference
+   * @param {TreeLinker|*} newNode The new node to go after the existing node
+   * @returns {LinkedTreeList}
+   */
+      insertAfter (node, newNode) {
+        return _DoublyLinkedList.default.prototype.insertAfter.call(this, node, newNode)
+      }
+
+      /**
+   * Insert a new node (or data) before a node.
+   * @param {TreeLinker|*} node The existing node as reference
+   * @param {TreeLinker|*} newNode The new node to go before the existing node
+   * @returns {LinkedTreeList}
+   */
+      insertBefore (node, newNode) {
+        return _DoublyLinkedList.default.prototype.insertBefore.call(this, node, newNode)
+      }
+
+      /**
+   * Add a node (or data) after the given (or last) node in the list.
+   * @param {TreeLinker|*} node The new node to add to the end of the list
+   * @param {TreeLinker} after The existing last node
+   * @returns {TreeLinker}
+   */
+      append (node) {
+        const after = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.last
+        return _DoublyLinkedList.default.prototype.append.call(this, node, after)
+      }
+
+      /**
+   * Add a node (or data) before the given (or first) node in the list.
+   * @param {TreeLinker|*} node The new node to add to the start of the list
+   * @param {TreeLinker} before The existing first node
+   * @returns {TreeLinker}
+   */
+      prepend (node) {
+        const before = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.first
+        return _DoublyLinkedList.default.prototype.prepend.call(this, node, before)
+      }
+
+      /**
+   * Remove a linker from this linked list.
+   * @param {TreeLinker} node The node we wish to remove (and it will be returned after removal)
+   * @return {TreeLinker}
+   */
+      remove (node) {
+        return _DoublyLinkedList.default.prototype.remove.call(this, node)
+      }
+
+      /**
+   * Refresh all references and return head reference.
+   * @return {TreeLinker}
+   */
+      reset () {
+        return _DoublyLinkedList.default.prototype.reset.call(this)
+      }
+
+      /**
+   * Retrieve a TreeLinker item from this list by numeric index, otherwise return null.
+   * @param {number} index The integer number for retrieving a node by position.
+   * @returns {TreeLinker|null}
+   */
+      item (index) {
+        return _DoublyLinkedList.default.prototype.item.call(this, index)
+      }
+
+      /**
+   * Be able to run forEach on this LinkedTreeList to iterate over the TreeLinker Items.
+   * @param {forEachCallback} callback The function to call for-each tree node
+   * @param {LinkedTreeList} thisArg Optional, 'this' reference
+   */
+      forEach (callback) {
+        const thisArg = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this
+        let index = 0
+        let current = thisArg.first
+        while (current !== null) {
+          callback(current, index, thisArg)
+          current = current.next
+          ++index
+        }
+        return thisArg
+      }
+
+      /**
+   * Be able to iterate over this class.
+   * @returns {Iterator}
+   */
+      [Symbol.iterator] () {
+        const root = this.rootParent
+        return new _TreeLinkerIterator.default(root)
+      }
+    }
+    /**
+ * Convert an array into a LinkedTreeList instance, return the new instance.
+ * @param {Array} [values=[]] An array of values which will be converted to nodes in this tree-list
+ * @param {TreeLinker} [linkerClass=TreeLinker] The class to use for each node
+ * @param {IsArrayable<TreeLinker>} [classType=LinkedTreeList] Provide the type of IsArrayable to use.
+ * @returns {LinkedTreeList}
+ */
+    LinkedTreeList.fromArray = function () {
+      const values = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : []
+      const linkerClass = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _TreeLinker.default
+      const classType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : LinkedTreeList
+      const list = new classType(linkerClass)
+      return list.initialize(linkerClass.fromArray(values).head)
+    }
+    var _default = exports.default = LinkedTreeList
+  }, { '../../recipes/TreeLinkerIterator': 27, '../doubly-linked-list/DoublyLinkedList': 17, './TreeLinker': 21 }],
+  21: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.default = void 0
+    require('core-js/modules/esnext.async-iterator.map.js')
+    require('core-js/modules/esnext.iterator.map.js')
+    var _DoubleLinker = _interopRequireDefault(require('../doubly-linked-list/DoubleLinker'))
+    function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
+    /**
+ * TreeLinker represents a node in a LinkedTreeList having a parent (or root) and child nodes.
+ * @extends DoubleLinker
+ */
+    class TreeLinker {
+      /**
+   * Create the new TreeLinker instance, provide the data and optionally set references for next, prev, parent, or children.
+   * @param {Object} [settings={}]
+   * @param {*} [settings.data=null] The data to be stored in this tree node
+   * @param {TreeLinker} [settings.next=null] The reference to the next linker if any
+   * @param {TreeLinker} [settings.prev=null] The reference to the previous linker if any
+   * @param {LinkedTreeList} [settings.children=null] The references to child linkers if any
+   * @param {TreeLinker} [settings.parent=null] The reference to a parent linker if any
+   */
+      constructor () {
+        const {
+          data = null,
+          next = null,
+          prev = null,
+          children = null,
+          parent = null
+        } = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {}
+        this.classType = TreeLinker
+        this.data = null
+        this.next = null
+        this.prev = null
+        this.parent = null
+        this.children = null
+        this.data = data
+        this.next = next
+        this.prev = prev
+        this.parent = parent
+        this.children = this.childrenFromArray(children)
+      }
+
+      /**
+   * Create the children for this tree from an array.
+   * @param {Array|null} children Provide an array of data / linker references to be children of this tree node.
+   * @param {IsTree} classType Provide the type of IsElement to use.
+   * @return {LinkedTreeList|null}
+   */
+      childrenFromArray () {
+        const children = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null
+        const classType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : TreeLinker
+        if (children === null) {
+          return null
+        }
+        // Creates a linked-tree-list to store the children.
+        return classType.fromArray(children.map(child => Object.assign({}, child, {
+          parent: this
+        })), classType)
+      }
+    }
+    /**
+ * Make a new DoubleLinker from the data given if it is not already a valid Linker.
+ * @param {TreeLinker|*} linker Return a valid TreeLinker instance from given data, or even an already valid one.
+ * @param {IsTreeNode} [classType=TreeLinker] Provide the type of IsTreeNode to use.
+ * @return {TreeLinker}
+ */
+    TreeLinker.make = function (linker) {
+      const classType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : TreeLinker
+      return _DoubleLinker.default.make(linker, classType)
+    }
+    /**
+ * Convert an array into DoubleLinker instances, return the head and tail DoubleLinkers.
+ * @param {Array} [values=[]] Provide an array of data that will be converted to a chain of tree-linkers.
+ * @param {IsTreeNode} [classType=TreeLinker] Provide the type of IsTreeNode to use.
+ * @returns {{head: TreeLinker, tail: TreeLinker}}
+ */
+    TreeLinker.fromArray = function () {
+      const values = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : []
+      const classType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : TreeLinker
+      return _DoubleLinker.default.fromArray(values, classType)
+    }
+    var _default = exports.default = TreeLinker
+  }, { '../doubly-linked-list/DoubleLinker': 16, 'core-js/modules/esnext.async-iterator.map.js': 128, 'core-js/modules/esnext.iterator.map.js': 133 }],
+  22: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.default = void 0
+    var _Stackable = _interopRequireDefault(require('./Stackable'))
+    var _LinkedList = _interopRequireDefault(require('../linked-list/LinkedList'))
+    function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
+    /**
+ * @file stack.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @version 1.0.0
+ * @memberOf module:collect-your-stuff
+ */
+
+    /**
+ * Store a collection of items which can only be inserted and removed from the top.
+ */
+    class Stack {
+      /**
+   * Instantiate the state with the starter stacked list.
+   * @param {Iterable|LinkedList} stackedList
+   * @param {IsArrayable} listClass
+   * @param {Stackable} stackableClass
+   */
+      constructor () {
+        let stackedList = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null
+        const listClass = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _LinkedList.default
+        const stackableClass = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : _Stackable.default
+        this.listClass = listClass
+        this.stackableClass = stackableClass
+        if (stackedList === null) {
+          stackedList = new listClass(stackableClass)
+        }
+        this.stackedList = stackedList
+      }
+
+      /**
+   * Return true if the stack is empty (there are no tasks in the stacked list)
+   * @return {boolean}
+   */
+      empty () {
+        return this.size() <= 0
+      }
+
+      /**
+   * Take a look at the next stacked task
+   * @return {Stackable}
+   */
+      top () {
+        return this.stackedList.first
+      }
+
+      /**
+   * Remove the next stacked task and return it.
+   * @return {Stackable|null}
+   */
+      pop () {
+        const next = this.remove()
+        if (!next) {
+          return {
+            success: 'No more stackable tasks in the stack',
+            error: false,
+            context: this.stackedList
+          }
+        }
+        return next.run()
+      }
+
+      /**
+   * Push a stackable task to the top of the stack.
+   * @param {Stackable|*} stackable Add a new stackable to the top of the stack
+   */
+      push (stackable) {
+        this.stackedList.prepend(stackable)
+      }
+
+      /**
+   * Remove the next stacked task and return it.
+   * @return {Stackable|null}
+   */
+      remove () {
+        if (this.empty()) {
+          return null
+        }
+        return this.stackedList.remove(this.stackedList.first)
+      }
+
+      /**
+   * Get the size of the current stack.
+   * @return {number}
+   */
+      size () {
+        return this.stackedList.length
+      }
+    }
+    /**
+ * Convert an array to a Stack.
+ * @param {Array} values An array of values which will be converted to stackables in this queue
+ * @param {Stackable} stackableClass The class to use for each stackable
+ * @param {Stack|Iterable} listClass The class to use to manage the stackables
+ * @returns {Stack}
+ */
+    Stack.fromArray = function () {
+      const values = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : []
+      const stackableClass = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _Stackable.default
+      const listClass = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : _LinkedList.default
+      const list = new listClass(stackableClass)
+      list.initialize(stackableClass.fromArray(values, stackableClass).head)
+      return new Stack(list)
+    }
+    var _default = exports.default = Stack
+  }, { '../linked-list/LinkedList': 18, './Stackable': 23 }],
+  23: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.default = void 0
+    var _Linker = _interopRequireDefault(require('../linked-list/Linker'))
+    function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
+    /**
+ * Stackable represents a runnable entry in stack.
+ * @extends Linker
+ */
+    class Stackable {
+      /**
+   * Create a stackable item that can be used in a stack.
+   * @param {Object} [stackData={}]
+   * @param {*} [stackData.task=null] The data to be stored in this stackable
+   * @param {Stackable|null} [stackData.next=null] The reference to the next stackable if any
+   * @param {boolean|Function} [stackData.ready=false] Indicate if the stackable is ready to run
+   */
+      constructor () {
+        const {
+          task = null,
+          next = null,
+          ready = false
+        } = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {}
+        this.data = null
+        this.next = null
+        this.classType = Stackable
+        this.data = task
+        this.next = next
+      }
+
+      /**
+   * Retrieve the data which should be formed as a task.
+   * @return {*}
+   */
+      get task () {
+        if (typeof this.data === 'function') {
+          return this.data
+        }
+        return () => this.data
+      }
+
+      /**
+   * Run the stacked task.
+   * @return {*}
+   */
+      run () {
+        return this.task()
+      }
+    }
+    /**
+ * Make a new Stackable from the data given if it is not already a valid Stackable.
+ * @param {Stackable|*} stackable Return a valid Stackable instance from given data, or even an already valid one.
+ * @param {IsLinker} [classType=Stackable] Provide the type of IsLinker to use.
+ * @return {Stackable}
+ */
+    Stackable.make = function (stackable) {
+      const classType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Stackable
+      if (typeof stackable !== 'object') {
+        // It is not an object, so instantiate the Stackable with stackable as the data
+        return new classType({
+          task: stackable
+        })
+      }
+      if (stackable.classType) {
+        // Already valid Stackable, return as-is
+        return stackable
+      }
+      if (!stackable.task) {
+        stackable = {
+          task: stackable
+        }
+      }
+      // Create the new node as the configured stackableClass
+      return new Stackable(stackable)
+    }
+    /**
+ * Convert an array into Stackable instances, return the head and tail Stackables.
+ * @param {Array} [values=[]] Provide an array of data that will be converted to a chain of stackable linkers.
+ * @param {IsLinker} [classType=Stackable] Provide the type of IsLinker to use.
+ * @returns {{head: Stackable, tail: Stackable}}
+ */
+    Stackable.fromArray = function () {
+      const values = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : []
+      const classType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Stackable
+      return _Linker.default.fromArray(values, classType)
+    }
+    var _default = exports.default = Stackable
+  }, { '../linked-list/Linker': 19 }],
+  24: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.default = void 0
+    /**
+ * Class ArrayIterator returns the next value when using elements of array type list.
+ */
+    class ArrayIterator {
+      constructor (innerList) {
+        const index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0
+        this.innerList = innerList
+        this.index = index
+      }
+
+      next (value) {
+        if (this.index < this.innerList.length) {
+          return {
+            value: this.innerList[this.index++],
+            done: false
+          }
+        }
+        return {
+          value: undefined,
+          done: true
+        }
+      }
+    }
+    var _default = exports.default = ArrayIterator
+  }, {}],
+  25: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.default = void 0
+    /**
+ * Class DoubleLinkerIterator returns the next value when using linkers of linked type lists.
+ */
+    class DoubleLinkerIterator {
+      constructor (current) {
+        this.current = current
+      }
+
+      next (value) {
+        const result = {
+          value: this.current,
+          done: !this.current
+        }
+        this.current = this.current ? this.current.next : null
+        return result
+      }
+    }
+    var _default = exports.default = DoubleLinkerIterator
+  }, {}],
+  26: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.default = void 0
+    /**
+ * Class LinkerIterator returns the next value when using linkers of linked type lists.
+ */
+    class LinkerIterator {
+      constructor (current) {
+        this.current = current
+      }
+
+      next (value) {
+        const result = {
+          value: this.current,
+          done: !this.current
+        }
+        this.current = this.current ? this.current.next : null
+        return result
+      }
+    }
+    var _default = exports.default = LinkerIterator
+  }, {}],
+  27: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.default = void 0
+    var _parseTreeNext = _interopRequireDefault(require('../services/parseTreeNext'))
+    function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
+    /**
+ * Class TreeLinkerIterator returns the next value taking a left-first approach down a tree.
+ */
+    class TreeLinkerIterator {
+      constructor (current) {
+        this.current = current
+      }
+
+      next (value) {
+        const result = {
+          value: this.current,
+          done: !this.current
+        }
+        this.current = (0, _parseTreeNext.default)(this.current)
+        return result
+      }
+    }
+    var _default = exports.default = TreeLinkerIterator
+  }, { '../services/parseTreeNext': 28 }],
+  28: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.default = void 0
+    /**
+ * Be able to parse over every node in a tree.
+ * 1. Start at root (get root parent)
+ * 2. Get first child (repeat until no children)
+ * 3. Check next child
+ * 4. Repeat 2
+ * 5. Repeat 3
+ * 6. If no next child, return to parent and repeat 3
+ * 7. Stop at root (next is null and parent is null
+ * @param {IsTreeNode} treeNode Provide a node in a tree and get the next node (left-first approach)
+ * @returns {IsTreeNode|null}
+ */
+    const parseTreeNext = treeNode => {
+      if (!treeNode) {
+        return null
+      }
+      let test = null
+      if (treeNode.children && treeNode.children.length) {
+        // Go down the left side of the tree
+        test = treeNode.children.first
+      }
+      if (!test) {
+        // Reached the bottom, go the next node on the right
+        test = treeNode.next
+      }
+      if (!test && treeNode.parent) {
+        // No more child nodes, return to parent and check parent sibling on the right
+        let parentNext = treeNode.parent.next
+        let parent = treeNode.parent
+        while (parent && !parentNext) {
+          parentNext = parent.next
+          // Keep checking parent next, until there are no more parents, or we find the parent sibling
+          parent = parent.parent
+        }
+        // This may be the parent sibling, or it could be null indicating we are done
+        test = parentNext
+      }
+      // Finally, either use the node we found, or it may be null
+      return test
+    }
+    var _default = exports.default = parseTreeNext
+  }, {}],
+  29: [function (require, module, exports) {
     'use strict'
     var isCallable = require('../internals/is-callable')
     var tryToString = require('../internals/try-to-string')
@@ -1116,8 +2920,8 @@
       if (isCallable(argument)) return argument
       throw new $TypeError(tryToString(argument) + ' is not a function')
     }
-  }, { '../internals/is-callable': 59, '../internals/try-to-string': 101 }],
-  11: [function (require, module, exports) {
+  }, { '../internals/is-callable': 78, '../internals/try-to-string': 120 }],
+  30: [function (require, module, exports) {
     'use strict'
     var isPrototypeOf = require('../internals/object-is-prototype-of')
 
@@ -1127,8 +2931,8 @@
       if (isPrototypeOf(Prototype, it)) return it
       throw new $TypeError('Incorrect invocation')
     }
-  }, { '../internals/object-is-prototype-of': 81 }],
-  12: [function (require, module, exports) {
+  }, { '../internals/object-is-prototype-of': 100 }],
+  31: [function (require, module, exports) {
     'use strict'
     var isObject = require('../internals/is-object')
 
@@ -1140,8 +2944,8 @@
       if (isObject(argument)) return argument
       throw new $TypeError($String(argument) + ' is not an object')
     }
-  }, { '../internals/is-object': 62 }],
-  13: [function (require, module, exports) {
+  }, { '../internals/is-object': 81 }],
+  32: [function (require, module, exports) {
     'use strict'
     var toIndexedObject = require('../internals/to-indexed-object')
     var toAbsoluteIndex = require('../internals/to-absolute-index')
@@ -1179,8 +2983,8 @@
       // https://tc39.es/ecma262/#sec-array.prototype.indexof
       indexOf: createMethod(false)
     }
-  }, { '../internals/length-of-array-like': 71, '../internals/to-absolute-index': 93, '../internals/to-indexed-object': 94 }],
-  14: [function (require, module, exports) {
+  }, { '../internals/length-of-array-like': 90, '../internals/to-absolute-index': 112, '../internals/to-indexed-object': 113 }],
+  33: [function (require, module, exports) {
     'use strict'
     var call = require('../internals/function-call')
     var getBuiltIn = require('../internals/get-built-in')
@@ -1200,8 +3004,8 @@
         return reject(error2)
       } method(argument)
     }
-  }, { '../internals/function-call': 41, '../internals/get-built-in': 45, '../internals/get-method': 49 }],
-  15: [function (require, module, exports) {
+  }, { '../internals/function-call': 60, '../internals/get-built-in': 64, '../internals/get-method': 68 }],
+  34: [function (require, module, exports) {
     'use strict'
     var call = require('../internals/function-call')
     var perform = require('../internals/perform')
@@ -1309,8 +3113,8 @@
 
       return AsyncIteratorProxy
     }
-  }, { '../internals/an-object': 12, '../internals/async-iterator-prototype': 18, '../internals/create-iter-result-object': 24, '../internals/create-non-enumerable-property': 25, '../internals/define-built-ins': 28, '../internals/function-call': 41, '../internals/get-built-in': 45, '../internals/get-method': 49, '../internals/internal-state': 57, '../internals/iterator-close': 66, '../internals/object-create': 74, '../internals/perform': 87, '../internals/well-known-symbol': 106 }],
-  16: [function (require, module, exports) {
+  }, { '../internals/an-object': 31, '../internals/async-iterator-prototype': 37, '../internals/create-iter-result-object': 43, '../internals/create-non-enumerable-property': 44, '../internals/define-built-ins': 47, '../internals/function-call': 60, '../internals/get-built-in': 64, '../internals/get-method': 68, '../internals/internal-state': 76, '../internals/iterator-close': 85, '../internals/object-create': 93, '../internals/perform': 106, '../internals/well-known-symbol': 125 }],
+  35: [function (require, module, exports) {
     'use strict'
     // https://github.com/tc39/proposal-iterator-helpers
     // https://github.com/tc39/proposal-array-from-async
@@ -1403,8 +3207,8 @@
       some: createMethod(3),
       find: createMethod(4)
     }
-  }, { '../internals/a-callable': 10, '../internals/an-object': 12, '../internals/async-iterator-close': 14, '../internals/does-not-exceed-safe-integer': 33, '../internals/function-call': 41, '../internals/get-built-in': 45, '../internals/get-iterator-direct': 46, '../internals/is-object': 62 }],
-  17: [function (require, module, exports) {
+  }, { '../internals/a-callable': 29, '../internals/an-object': 31, '../internals/async-iterator-close': 33, '../internals/does-not-exceed-safe-integer': 52, '../internals/function-call': 60, '../internals/get-built-in': 64, '../internals/get-iterator-direct': 65, '../internals/is-object': 81 }],
+  36: [function (require, module, exports) {
     'use strict'
     var call = require('../internals/function-call')
     var aCallable = require('../internals/a-callable')
@@ -1462,8 +3266,8 @@
         mapper: mapper
       })
     }
-  }, { '../internals/a-callable': 10, '../internals/an-object': 12, '../internals/async-iterator-close': 14, '../internals/async-iterator-create-proxy': 15, '../internals/create-iter-result-object': 24, '../internals/function-call': 41, '../internals/get-iterator-direct': 46, '../internals/is-object': 62 }],
-  18: [function (require, module, exports) {
+  }, { '../internals/a-callable': 29, '../internals/an-object': 31, '../internals/async-iterator-close': 33, '../internals/async-iterator-create-proxy': 34, '../internals/create-iter-result-object': 43, '../internals/function-call': 60, '../internals/get-iterator-direct': 65, '../internals/is-object': 81 }],
+  37: [function (require, module, exports) {
     'use strict'
     var global = require('../internals/global')
     var shared = require('../internals/shared-store')
@@ -1502,8 +3306,8 @@
     }
 
     module.exports = AsyncIteratorPrototype
-  }, { '../internals/define-built-in': 27, '../internals/global': 50, '../internals/is-callable': 59, '../internals/is-pure': 63, '../internals/object-create': 74, '../internals/object-get-prototype-of': 80, '../internals/shared-store': 90, '../internals/well-known-symbol': 106 }],
-  19: [function (require, module, exports) {
+  }, { '../internals/define-built-in': 46, '../internals/global': 69, '../internals/is-callable': 78, '../internals/is-pure': 82, '../internals/object-create': 93, '../internals/object-get-prototype-of': 99, '../internals/shared-store': 109, '../internals/well-known-symbol': 125 }],
+  38: [function (require, module, exports) {
     'use strict'
     var anObject = require('../internals/an-object')
     var iteratorClose = require('../internals/iterator-close')
@@ -1516,8 +3320,8 @@
         iteratorClose(iterator, 'throw', error)
       }
     }
-  }, { '../internals/an-object': 12, '../internals/iterator-close': 66 }],
-  20: [function (require, module, exports) {
+  }, { '../internals/an-object': 31, '../internals/iterator-close': 85 }],
+  39: [function (require, module, exports) {
     'use strict'
     var uncurryThis = require('../internals/function-uncurry-this')
 
@@ -1527,8 +3331,8 @@
     module.exports = function (it) {
       return stringSlice(toString(it), 8, -1)
     }
-  }, { '../internals/function-uncurry-this': 44 }],
-  21: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 63 }],
+  40: [function (require, module, exports) {
     'use strict'
     var TO_STRING_TAG_SUPPORT = require('../internals/to-string-tag-support')
     var isCallable = require('../internals/is-callable')
@@ -1559,8 +3363,8 @@
           // ES3 arguments fallback
             : (result = classofRaw(O)) === 'Object' && isCallable(O.callee) ? 'Arguments' : result
     }
-  }, { '../internals/classof-raw': 20, '../internals/is-callable': 59, '../internals/to-string-tag-support': 100, '../internals/well-known-symbol': 106 }],
-  22: [function (require, module, exports) {
+  }, { '../internals/classof-raw': 39, '../internals/is-callable': 78, '../internals/to-string-tag-support': 119, '../internals/well-known-symbol': 125 }],
+  41: [function (require, module, exports) {
     'use strict'
     var hasOwn = require('../internals/has-own-property')
     var ownKeys = require('../internals/own-keys')
@@ -1578,8 +3382,8 @@
         }
       }
     }
-  }, { '../internals/has-own-property': 51, '../internals/object-define-property': 76, '../internals/object-get-own-property-descriptor': 77, '../internals/own-keys': 86 }],
-  23: [function (require, module, exports) {
+  }, { '../internals/has-own-property': 70, '../internals/object-define-property': 95, '../internals/object-get-own-property-descriptor': 96, '../internals/own-keys': 105 }],
+  42: [function (require, module, exports) {
     'use strict'
     var fails = require('../internals/fails')
 
@@ -1589,8 +3393,8 @@
       // eslint-disable-next-line es/no-object-getprototypeof -- required for testing
       return Object.getPrototypeOf(new F()) !== F.prototype
     })
-  }, { '../internals/fails': 38 }],
-  24: [function (require, module, exports) {
+  }, { '../internals/fails': 57 }],
+  43: [function (require, module, exports) {
     'use strict'
     // `CreateIterResultObject` abstract operation
     // https://tc39.es/ecma262/#sec-createiterresultobject
@@ -1598,7 +3402,7 @@
       return { value: value, done: done }
     }
   }, {}],
-  25: [function (require, module, exports) {
+  44: [function (require, module, exports) {
     'use strict'
     var DESCRIPTORS = require('../internals/descriptors')
     var definePropertyModule = require('../internals/object-define-property')
@@ -1610,8 +3414,8 @@
       object[key] = value
       return object
     }
-  }, { '../internals/create-property-descriptor': 26, '../internals/descriptors': 30, '../internals/object-define-property': 76 }],
-  26: [function (require, module, exports) {
+  }, { '../internals/create-property-descriptor': 45, '../internals/descriptors': 49, '../internals/object-define-property': 95 }],
+  45: [function (require, module, exports) {
     'use strict'
     module.exports = function (bitmap, value) {
       return {
@@ -1622,7 +3426,7 @@
       }
     }
   }, {}],
-  27: [function (require, module, exports) {
+  46: [function (require, module, exports) {
     'use strict'
     var isCallable = require('../internals/is-callable')
     var definePropertyModule = require('../internals/object-define-property')
@@ -1653,8 +3457,8 @@
         }
       } return O
     }
-  }, { '../internals/define-global-property': 29, '../internals/is-callable': 59, '../internals/make-built-in': 72, '../internals/object-define-property': 76 }],
-  28: [function (require, module, exports) {
+  }, { '../internals/define-global-property': 48, '../internals/is-callable': 78, '../internals/make-built-in': 91, '../internals/object-define-property': 95 }],
+  47: [function (require, module, exports) {
     'use strict'
     var defineBuiltIn = require('../internals/define-built-in')
 
@@ -1662,8 +3466,8 @@
       for (var key in src) defineBuiltIn(target, key, src[key], options)
       return target
     }
-  }, { '../internals/define-built-in': 27 }],
-  29: [function (require, module, exports) {
+  }, { '../internals/define-built-in': 46 }],
+  48: [function (require, module, exports) {
     'use strict'
     var global = require('../internals/global')
 
@@ -1677,8 +3481,8 @@
         global[key] = value
       } return value
     }
-  }, { '../internals/global': 50 }],
-  30: [function (require, module, exports) {
+  }, { '../internals/global': 69 }],
+  49: [function (require, module, exports) {
     'use strict'
     var fails = require('../internals/fails')
 
@@ -1687,8 +3491,8 @@
       // eslint-disable-next-line es/no-object-defineproperty -- required for testing
       return Object.defineProperty({}, 1, { get: function () { return 7 } })[1] !== 7
     })
-  }, { '../internals/fails': 38 }],
-  31: [function (require, module, exports) {
+  }, { '../internals/fails': 57 }],
+  50: [function (require, module, exports) {
     'use strict'
     var documentAll = typeof document === 'object' && document.all
 
@@ -1701,7 +3505,7 @@
       IS_HTMLDDA: IS_HTMLDDA
     }
   }, {}],
-  32: [function (require, module, exports) {
+  51: [function (require, module, exports) {
     'use strict'
     var global = require('../internals/global')
     var isObject = require('../internals/is-object')
@@ -1713,8 +3517,8 @@
     module.exports = function (it) {
       return EXISTS ? document.createElement(it) : {}
     }
-  }, { '../internals/global': 50, '../internals/is-object': 62 }],
-  33: [function (require, module, exports) {
+  }, { '../internals/global': 69, '../internals/is-object': 81 }],
+  52: [function (require, module, exports) {
     'use strict'
     var $TypeError = TypeError
     var MAX_SAFE_INTEGER = 0x1FFFFFFFFFFFFF // 2 ** 53 - 1 == 9007199254740991
@@ -1724,11 +3528,11 @@
       return it
     }
   }, {}],
-  34: [function (require, module, exports) {
+  53: [function (require, module, exports) {
     'use strict'
     module.exports = typeof navigator !== 'undefined' && String(navigator.userAgent) || ''
   }, {}],
-  35: [function (require, module, exports) {
+  54: [function (require, module, exports) {
     'use strict'
     var global = require('../internals/global')
     var userAgent = require('../internals/engine-user-agent')
@@ -1757,8 +3561,8 @@
     }
 
     module.exports = version
-  }, { '../internals/engine-user-agent': 34, '../internals/global': 50 }],
-  36: [function (require, module, exports) {
+  }, { '../internals/engine-user-agent': 53, '../internals/global': 69 }],
+  55: [function (require, module, exports) {
     'use strict'
     // IE8- don't enum bug keys
     module.exports = [
@@ -1771,7 +3575,7 @@
       'valueOf'
     ]
   }, {}],
-  37: [function (require, module, exports) {
+  56: [function (require, module, exports) {
     'use strict'
     var global = require('../internals/global')
     var getOwnPropertyDescriptor = require('../internals/object-get-own-property-descriptor').f
@@ -1829,8 +3633,8 @@
         }
       }
     }
-  }, { '../internals/copy-constructor-properties': 22, '../internals/create-non-enumerable-property': 25, '../internals/define-built-in': 27, '../internals/define-global-property': 29, '../internals/global': 50, '../internals/is-forced': 60, '../internals/object-get-own-property-descriptor': 77 }],
-  38: [function (require, module, exports) {
+  }, { '../internals/copy-constructor-properties': 41, '../internals/create-non-enumerable-property': 44, '../internals/define-built-in': 46, '../internals/define-global-property': 48, '../internals/global': 69, '../internals/is-forced': 79, '../internals/object-get-own-property-descriptor': 96 }],
+  57: [function (require, module, exports) {
     'use strict'
     module.exports = function (exec) {
       try {
@@ -1840,7 +3644,7 @@
       }
     }
   }, {}],
-  39: [function (require, module, exports) {
+  58: [function (require, module, exports) {
     'use strict'
     var uncurryThis = require('../internals/function-uncurry-this-clause')
     var aCallable = require('../internals/a-callable')
@@ -1855,8 +3659,8 @@
         return fn.apply(that, arguments)
       }
     }
-  }, { '../internals/a-callable': 10, '../internals/function-bind-native': 40, '../internals/function-uncurry-this-clause': 43 }],
-  40: [function (require, module, exports) {
+  }, { '../internals/a-callable': 29, '../internals/function-bind-native': 59, '../internals/function-uncurry-this-clause': 62 }],
+  59: [function (require, module, exports) {
     'use strict'
     var fails = require('../internals/fails')
 
@@ -1866,8 +3670,8 @@
       // eslint-disable-next-line no-prototype-builtins -- safe
       return typeof test !== 'function' || test.hasOwnProperty('prototype')
     })
-  }, { '../internals/fails': 38 }],
-  41: [function (require, module, exports) {
+  }, { '../internals/fails': 57 }],
+  60: [function (require, module, exports) {
     'use strict'
     var NATIVE_BIND = require('../internals/function-bind-native')
 
@@ -1876,8 +3680,8 @@
     module.exports = NATIVE_BIND ? call.bind(call) : function () {
       return call.apply(call, arguments)
     }
-  }, { '../internals/function-bind-native': 40 }],
-  42: [function (require, module, exports) {
+  }, { '../internals/function-bind-native': 59 }],
+  61: [function (require, module, exports) {
     'use strict'
     var DESCRIPTORS = require('../internals/descriptors')
     var hasOwn = require('../internals/has-own-property')
@@ -1896,8 +3700,8 @@
       PROPER: PROPER,
       CONFIGURABLE: CONFIGURABLE
     }
-  }, { '../internals/descriptors': 30, '../internals/has-own-property': 51 }],
-  43: [function (require, module, exports) {
+  }, { '../internals/descriptors': 49, '../internals/has-own-property': 70 }],
+  62: [function (require, module, exports) {
     'use strict'
     var classofRaw = require('../internals/classof-raw')
     var uncurryThis = require('../internals/function-uncurry-this')
@@ -1908,8 +3712,8 @@
       //   https://github.com/zloirock/core-js/issues/1130
       if (classofRaw(fn) === 'Function') return uncurryThis(fn)
     }
-  }, { '../internals/classof-raw': 20, '../internals/function-uncurry-this': 44 }],
-  44: [function (require, module, exports) {
+  }, { '../internals/classof-raw': 39, '../internals/function-uncurry-this': 63 }],
+  63: [function (require, module, exports) {
     'use strict'
     var NATIVE_BIND = require('../internals/function-bind-native')
 
@@ -1922,8 +3726,8 @@
         return call.apply(fn, arguments)
       }
     }
-  }, { '../internals/function-bind-native': 40 }],
-  45: [function (require, module, exports) {
+  }, { '../internals/function-bind-native': 59 }],
+  64: [function (require, module, exports) {
     'use strict'
     var global = require('../internals/global')
     var isCallable = require('../internals/is-callable')
@@ -1935,8 +3739,8 @@
     module.exports = function (namespace, method) {
       return arguments.length < 2 ? aFunction(global[namespace]) : global[namespace] && global[namespace][method]
     }
-  }, { '../internals/global': 50, '../internals/is-callable': 59 }],
-  46: [function (require, module, exports) {
+  }, { '../internals/global': 69, '../internals/is-callable': 78 }],
+  65: [function (require, module, exports) {
     'use strict'
     // `GetIteratorDirect(obj)` abstract operation
     // https://tc39.es/proposal-iterator-helpers/#sec-getiteratordirect
@@ -1948,7 +3752,7 @@
       }
     }
   }, {}],
-  47: [function (require, module, exports) {
+  66: [function (require, module, exports) {
     'use strict'
     var classof = require('../internals/classof')
     var getMethod = require('../internals/get-method')
@@ -1965,8 +3769,8 @@
     Iterators[classof(it)]
       }
     }
-  }, { '../internals/classof': 21, '../internals/get-method': 49, '../internals/is-null-or-undefined': 61, '../internals/iterators': 70, '../internals/well-known-symbol': 106 }],
-  48: [function (require, module, exports) {
+  }, { '../internals/classof': 40, '../internals/get-method': 68, '../internals/is-null-or-undefined': 80, '../internals/iterators': 89, '../internals/well-known-symbol': 125 }],
+  67: [function (require, module, exports) {
     'use strict'
     var call = require('../internals/function-call')
     var aCallable = require('../internals/a-callable')
@@ -1981,8 +3785,8 @@
       if (aCallable(iteratorMethod)) return anObject(call(iteratorMethod, argument))
       throw new $TypeError(tryToString(argument) + ' is not iterable')
     }
-  }, { '../internals/a-callable': 10, '../internals/an-object': 12, '../internals/function-call': 41, '../internals/get-iterator-method': 47, '../internals/try-to-string': 101 }],
-  49: [function (require, module, exports) {
+  }, { '../internals/a-callable': 29, '../internals/an-object': 31, '../internals/function-call': 60, '../internals/get-iterator-method': 66, '../internals/try-to-string': 120 }],
+  68: [function (require, module, exports) {
     'use strict'
     var aCallable = require('../internals/a-callable')
     var isNullOrUndefined = require('../internals/is-null-or-undefined')
@@ -1993,8 +3797,8 @@
       var func = V[P]
       return isNullOrUndefined(func) ? undefined : aCallable(func)
     }
-  }, { '../internals/a-callable': 10, '../internals/is-null-or-undefined': 61 }],
-  50: [function (require, module, exports) {
+  }, { '../internals/a-callable': 29, '../internals/is-null-or-undefined': 80 }],
+  69: [function (require, module, exports) {
     (function (global) {
       (function () {
         'use strict'
@@ -2015,7 +3819,7 @@
       }).call(this)
     }).call(this, typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : typeof window !== 'undefined' ? window : {})
   }, {}],
-  51: [function (require, module, exports) {
+  70: [function (require, module, exports) {
     'use strict'
     var uncurryThis = require('../internals/function-uncurry-this')
     var toObject = require('../internals/to-object')
@@ -2028,18 +3832,18 @@
     module.exports = Object.hasOwn || function hasOwn (it, key) {
       return hasOwnProperty(toObject(it), key)
     }
-  }, { '../internals/function-uncurry-this': 44, '../internals/to-object': 97 }],
-  52: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 63, '../internals/to-object': 116 }],
+  71: [function (require, module, exports) {
     'use strict'
     module.exports = {}
   }, {}],
-  53: [function (require, module, exports) {
+  72: [function (require, module, exports) {
     'use strict'
     var getBuiltIn = require('../internals/get-built-in')
 
     module.exports = getBuiltIn('document', 'documentElement')
-  }, { '../internals/get-built-in': 45 }],
-  54: [function (require, module, exports) {
+  }, { '../internals/get-built-in': 64 }],
+  73: [function (require, module, exports) {
     'use strict'
     var DESCRIPTORS = require('../internals/descriptors')
     var fails = require('../internals/fails')
@@ -2052,8 +3856,8 @@
         get: function () { return 7 }
       }).a !== 7
     })
-  }, { '../internals/descriptors': 30, '../internals/document-create-element': 32, '../internals/fails': 38 }],
-  55: [function (require, module, exports) {
+  }, { '../internals/descriptors': 49, '../internals/document-create-element': 51, '../internals/fails': 57 }],
+  74: [function (require, module, exports) {
     'use strict'
     var uncurryThis = require('../internals/function-uncurry-this')
     var fails = require('../internals/fails')
@@ -2070,8 +3874,8 @@
     }) ? function (it) {
         return classof(it) === 'String' ? split(it, '') : $Object(it)
       } : $Object
-  }, { '../internals/classof-raw': 20, '../internals/fails': 38, '../internals/function-uncurry-this': 44 }],
-  56: [function (require, module, exports) {
+  }, { '../internals/classof-raw': 39, '../internals/fails': 57, '../internals/function-uncurry-this': 63 }],
+  75: [function (require, module, exports) {
     'use strict'
     var uncurryThis = require('../internals/function-uncurry-this')
     var isCallable = require('../internals/is-callable')
@@ -2087,8 +3891,8 @@
     }
 
     module.exports = store.inspectSource
-  }, { '../internals/function-uncurry-this': 44, '../internals/is-callable': 59, '../internals/shared-store': 90 }],
-  57: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 63, '../internals/is-callable': 78, '../internals/shared-store': 109 }],
+  76: [function (require, module, exports) {
     'use strict'
     var NATIVE_WEAK_MAP = require('../internals/weak-map-basic-detection')
     var global = require('../internals/global')
@@ -2160,8 +3964,8 @@
       enforce: enforce,
       getterFor: getterFor
     }
-  }, { '../internals/create-non-enumerable-property': 25, '../internals/global': 50, '../internals/has-own-property': 51, '../internals/hidden-keys': 52, '../internals/is-object': 62, '../internals/shared-key': 89, '../internals/shared-store': 90, '../internals/weak-map-basic-detection': 105 }],
-  58: [function (require, module, exports) {
+  }, { '../internals/create-non-enumerable-property': 44, '../internals/global': 69, '../internals/has-own-property': 70, '../internals/hidden-keys': 71, '../internals/is-object': 81, '../internals/shared-key': 108, '../internals/shared-store': 109, '../internals/weak-map-basic-detection': 124 }],
+  77: [function (require, module, exports) {
     'use strict'
     var wellKnownSymbol = require('../internals/well-known-symbol')
     var Iterators = require('../internals/iterators')
@@ -2173,8 +3977,8 @@
     module.exports = function (it) {
       return it !== undefined && (Iterators.Array === it || ArrayPrototype[ITERATOR] === it)
     }
-  }, { '../internals/iterators': 70, '../internals/well-known-symbol': 106 }],
-  59: [function (require, module, exports) {
+  }, { '../internals/iterators': 89, '../internals/well-known-symbol': 125 }],
+  78: [function (require, module, exports) {
     'use strict'
     var $documentAll = require('../internals/document-all')
 
@@ -2187,8 +3991,8 @@
     } : function (argument) {
       return typeof argument === 'function'
     }
-  }, { '../internals/document-all': 31 }],
-  60: [function (require, module, exports) {
+  }, { '../internals/document-all': 50 }],
+  79: [function (require, module, exports) {
     'use strict'
     var fails = require('../internals/fails')
     var isCallable = require('../internals/is-callable')
@@ -2212,8 +4016,8 @@
     var POLYFILL = isForced.POLYFILL = 'P'
 
     module.exports = isForced
-  }, { '../internals/fails': 38, '../internals/is-callable': 59 }],
-  61: [function (require, module, exports) {
+  }, { '../internals/fails': 57, '../internals/is-callable': 78 }],
+  80: [function (require, module, exports) {
     'use strict'
     // we can't use just `it == null` since of `document.all` special case
     // https://tc39.es/ecma262/#sec-IsHTMLDDA-internal-slot-aec
@@ -2221,7 +4025,7 @@
       return it === null || it === undefined
     }
   }, {}],
-  62: [function (require, module, exports) {
+  81: [function (require, module, exports) {
     'use strict'
     var isCallable = require('../internals/is-callable')
     var $documentAll = require('../internals/document-all')
@@ -2233,12 +4037,12 @@
     } : function (it) {
       return typeof it === 'object' ? it !== null : isCallable(it)
     }
-  }, { '../internals/document-all': 31, '../internals/is-callable': 59 }],
-  63: [function (require, module, exports) {
+  }, { '../internals/document-all': 50, '../internals/is-callable': 78 }],
+  82: [function (require, module, exports) {
     'use strict'
     module.exports = false
   }, {}],
-  64: [function (require, module, exports) {
+  83: [function (require, module, exports) {
     'use strict'
     var getBuiltIn = require('../internals/get-built-in')
     var isCallable = require('../internals/is-callable')
@@ -2253,8 +4057,8 @@
       var $Symbol = getBuiltIn('Symbol')
       return isCallable($Symbol) && isPrototypeOf($Symbol.prototype, $Object(it))
     }
-  }, { '../internals/get-built-in': 45, '../internals/is-callable': 59, '../internals/object-is-prototype-of': 81, '../internals/use-symbol-as-uid': 103 }],
-  65: [function (require, module, exports) {
+  }, { '../internals/get-built-in': 64, '../internals/is-callable': 78, '../internals/object-is-prototype-of': 100, '../internals/use-symbol-as-uid': 122 }],
+  84: [function (require, module, exports) {
     'use strict'
     var bind = require('../internals/function-bind-context')
     var call = require('../internals/function-call')
@@ -2324,8 +4128,8 @@
         if (typeof result === 'object' && result && isPrototypeOf(ResultPrototype, result)) return result
       } return new Result(false)
     }
-  }, { '../internals/an-object': 12, '../internals/function-bind-context': 39, '../internals/function-call': 41, '../internals/get-iterator': 48, '../internals/get-iterator-method': 47, '../internals/is-array-iterator-method': 58, '../internals/iterator-close': 66, '../internals/length-of-array-like': 71, '../internals/object-is-prototype-of': 81, '../internals/try-to-string': 101 }],
-  66: [function (require, module, exports) {
+  }, { '../internals/an-object': 31, '../internals/function-bind-context': 58, '../internals/function-call': 60, '../internals/get-iterator': 67, '../internals/get-iterator-method': 66, '../internals/is-array-iterator-method': 77, '../internals/iterator-close': 85, '../internals/length-of-array-like': 90, '../internals/object-is-prototype-of': 100, '../internals/try-to-string': 120 }],
+  85: [function (require, module, exports) {
     'use strict'
     var call = require('../internals/function-call')
     var anObject = require('../internals/an-object')
@@ -2350,8 +4154,8 @@
       anObject(innerResult)
       return value
     }
-  }, { '../internals/an-object': 12, '../internals/function-call': 41, '../internals/get-method': 49 }],
-  67: [function (require, module, exports) {
+  }, { '../internals/an-object': 31, '../internals/function-call': 60, '../internals/get-method': 68 }],
+  86: [function (require, module, exports) {
     'use strict'
     var call = require('../internals/function-call')
     var create = require('../internals/object-create')
@@ -2430,8 +4234,8 @@
 
       return IteratorProxy
     }
-  }, { '../internals/create-iter-result-object': 24, '../internals/create-non-enumerable-property': 25, '../internals/define-built-ins': 28, '../internals/function-call': 41, '../internals/get-method': 49, '../internals/internal-state': 57, '../internals/iterator-close': 66, '../internals/iterators-core': 69, '../internals/object-create': 74, '../internals/well-known-symbol': 106 }],
-  68: [function (require, module, exports) {
+  }, { '../internals/create-iter-result-object': 43, '../internals/create-non-enumerable-property': 44, '../internals/define-built-ins': 47, '../internals/function-call': 60, '../internals/get-method': 68, '../internals/internal-state': 76, '../internals/iterator-close': 85, '../internals/iterators-core': 88, '../internals/object-create': 93, '../internals/well-known-symbol': 125 }],
+  87: [function (require, module, exports) {
     'use strict'
     var call = require('../internals/function-call')
     var aCallable = require('../internals/a-callable')
@@ -2456,8 +4260,8 @@
         mapper: mapper
       })
     }
-  }, { '../internals/a-callable': 10, '../internals/an-object': 12, '../internals/call-with-safe-iteration-closing': 19, '../internals/function-call': 41, '../internals/get-iterator-direct': 46, '../internals/iterator-create-proxy': 67 }],
-  69: [function (require, module, exports) {
+  }, { '../internals/a-callable': 29, '../internals/an-object': 31, '../internals/call-with-safe-iteration-closing': 38, '../internals/function-call': 60, '../internals/get-iterator-direct': 65, '../internals/iterator-create-proxy': 86 }],
+  88: [function (require, module, exports) {
     'use strict'
     var fails = require('../internals/fails')
     var isCallable = require('../internals/is-callable')
@@ -2507,11 +4311,11 @@
       IteratorPrototype: IteratorPrototype,
       BUGGY_SAFARI_ITERATORS: BUGGY_SAFARI_ITERATORS
     }
-  }, { '../internals/define-built-in': 27, '../internals/fails': 38, '../internals/is-callable': 59, '../internals/is-object': 62, '../internals/is-pure': 63, '../internals/object-create': 74, '../internals/object-get-prototype-of': 80, '../internals/well-known-symbol': 106 }],
-  70: [function (require, module, exports) {
-    arguments[4][52][0].apply(exports, arguments)
-  }, { dup: 52 }],
-  71: [function (require, module, exports) {
+  }, { '../internals/define-built-in': 46, '../internals/fails': 57, '../internals/is-callable': 78, '../internals/is-object': 81, '../internals/is-pure': 82, '../internals/object-create': 93, '../internals/object-get-prototype-of': 99, '../internals/well-known-symbol': 125 }],
+  89: [function (require, module, exports) {
+    arguments[4][71][0].apply(exports, arguments)
+  }, { dup: 71 }],
+  90: [function (require, module, exports) {
     'use strict'
     var toLength = require('../internals/to-length')
 
@@ -2520,8 +4324,8 @@
     module.exports = function (obj) {
       return toLength(obj.length)
     }
-  }, { '../internals/to-length': 96 }],
-  72: [function (require, module, exports) {
+  }, { '../internals/to-length': 115 }],
+  91: [function (require, module, exports) {
     'use strict'
     var uncurryThis = require('../internals/function-uncurry-this')
     var fails = require('../internals/fails')
@@ -2577,8 +4381,8 @@
     Function.prototype.toString = makeBuiltIn(function toString () {
       return isCallable(this) && getInternalState(this).source || inspectSource(this)
     }, 'toString')
-  }, { '../internals/descriptors': 30, '../internals/fails': 38, '../internals/function-name': 42, '../internals/function-uncurry-this': 44, '../internals/has-own-property': 51, '../internals/inspect-source': 56, '../internals/internal-state': 57, '../internals/is-callable': 59 }],
-  73: [function (require, module, exports) {
+  }, { '../internals/descriptors': 49, '../internals/fails': 57, '../internals/function-name': 61, '../internals/function-uncurry-this': 63, '../internals/has-own-property': 70, '../internals/inspect-source': 75, '../internals/internal-state': 76, '../internals/is-callable': 78 }],
+  92: [function (require, module, exports) {
     'use strict'
     var ceil = Math.ceil
     var floor = Math.floor
@@ -2591,7 +4395,7 @@
       return (n > 0 ? floor : ceil)(n)
     }
   }, {}],
-  74: [function (require, module, exports) {
+  93: [function (require, module, exports) {
     'use strict'
     /* global ActiveXObject -- old IE, WSH */
     var anObject = require('../internals/an-object')
@@ -2676,8 +4480,8 @@
       } else result = NullProtoObject()
       return Properties === undefined ? result : definePropertiesModule.f(result, Properties)
     }
-  }, { '../internals/an-object': 12, '../internals/document-create-element': 32, '../internals/enum-bug-keys': 36, '../internals/hidden-keys': 52, '../internals/html': 53, '../internals/object-define-properties': 75, '../internals/shared-key': 89 }],
-  75: [function (require, module, exports) {
+  }, { '../internals/an-object': 31, '../internals/document-create-element': 51, '../internals/enum-bug-keys': 55, '../internals/hidden-keys': 71, '../internals/html': 72, '../internals/object-define-properties': 94, '../internals/shared-key': 108 }],
+  94: [function (require, module, exports) {
     'use strict'
     var DESCRIPTORS = require('../internals/descriptors')
     var V8_PROTOTYPE_DEFINE_BUG = require('../internals/v8-prototype-define-bug')
@@ -2699,8 +4503,8 @@
       while (length > index) definePropertyModule.f(O, key = keys[index++], props[key])
       return O
     }
-  }, { '../internals/an-object': 12, '../internals/descriptors': 30, '../internals/object-define-property': 76, '../internals/object-keys': 83, '../internals/to-indexed-object': 94, '../internals/v8-prototype-define-bug': 104 }],
-  76: [function (require, module, exports) {
+  }, { '../internals/an-object': 31, '../internals/descriptors': 49, '../internals/object-define-property': 95, '../internals/object-keys': 102, '../internals/to-indexed-object': 113, '../internals/v8-prototype-define-bug': 123 }],
+  95: [function (require, module, exports) {
     'use strict'
     var DESCRIPTORS = require('../internals/descriptors')
     var IE8_DOM_DEFINE = require('../internals/ie8-dom-define')
@@ -2747,8 +4551,8 @@
       if ('value' in Attributes) O[P] = Attributes.value
       return O
     }
-  }, { '../internals/an-object': 12, '../internals/descriptors': 30, '../internals/ie8-dom-define': 54, '../internals/to-property-key': 99, '../internals/v8-prototype-define-bug': 104 }],
-  77: [function (require, module, exports) {
+  }, { '../internals/an-object': 31, '../internals/descriptors': 49, '../internals/ie8-dom-define': 73, '../internals/to-property-key': 118, '../internals/v8-prototype-define-bug': 123 }],
+  96: [function (require, module, exports) {
     'use strict'
     var DESCRIPTORS = require('../internals/descriptors')
     var call = require('../internals/function-call')
@@ -2774,8 +4578,8 @@
       }
       if (hasOwn(O, P)) return createPropertyDescriptor(!call(propertyIsEnumerableModule.f, O, P), O[P])
     }
-  }, { '../internals/create-property-descriptor': 26, '../internals/descriptors': 30, '../internals/function-call': 41, '../internals/has-own-property': 51, '../internals/ie8-dom-define': 54, '../internals/object-property-is-enumerable': 84, '../internals/to-indexed-object': 94, '../internals/to-property-key': 99 }],
-  78: [function (require, module, exports) {
+  }, { '../internals/create-property-descriptor': 45, '../internals/descriptors': 49, '../internals/function-call': 60, '../internals/has-own-property': 70, '../internals/ie8-dom-define': 73, '../internals/object-property-is-enumerable': 103, '../internals/to-indexed-object': 113, '../internals/to-property-key': 118 }],
+  97: [function (require, module, exports) {
     'use strict'
     var internalObjectKeys = require('../internals/object-keys-internal')
     var enumBugKeys = require('../internals/enum-bug-keys')
@@ -2788,13 +4592,13 @@
     exports.f = Object.getOwnPropertyNames || function getOwnPropertyNames (O) {
       return internalObjectKeys(O, hiddenKeys)
     }
-  }, { '../internals/enum-bug-keys': 36, '../internals/object-keys-internal': 82 }],
-  79: [function (require, module, exports) {
+  }, { '../internals/enum-bug-keys': 55, '../internals/object-keys-internal': 101 }],
+  98: [function (require, module, exports) {
     'use strict'
     // eslint-disable-next-line es/no-object-getownpropertysymbols -- safe
     exports.f = Object.getOwnPropertySymbols
   }, {}],
-  80: [function (require, module, exports) {
+  99: [function (require, module, exports) {
     'use strict'
     var hasOwn = require('../internals/has-own-property')
     var isCallable = require('../internals/is-callable')
@@ -2817,14 +4621,14 @@
         return constructor.prototype
       } return object instanceof $Object ? ObjectPrototype : null
     }
-  }, { '../internals/correct-prototype-getter': 23, '../internals/has-own-property': 51, '../internals/is-callable': 59, '../internals/shared-key': 89, '../internals/to-object': 97 }],
-  81: [function (require, module, exports) {
+  }, { '../internals/correct-prototype-getter': 42, '../internals/has-own-property': 70, '../internals/is-callable': 78, '../internals/shared-key': 108, '../internals/to-object': 116 }],
+  100: [function (require, module, exports) {
     'use strict'
     var uncurryThis = require('../internals/function-uncurry-this')
 
     module.exports = uncurryThis({}.isPrototypeOf)
-  }, { '../internals/function-uncurry-this': 44 }],
-  82: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 63 }],
+  101: [function (require, module, exports) {
     'use strict'
     var uncurryThis = require('../internals/function-uncurry-this')
     var hasOwn = require('../internals/has-own-property')
@@ -2848,8 +4652,8 @@
       }
       return result
     }
-  }, { '../internals/array-includes': 13, '../internals/function-uncurry-this': 44, '../internals/has-own-property': 51, '../internals/hidden-keys': 52, '../internals/to-indexed-object': 94 }],
-  83: [function (require, module, exports) {
+  }, { '../internals/array-includes': 32, '../internals/function-uncurry-this': 63, '../internals/has-own-property': 70, '../internals/hidden-keys': 71, '../internals/to-indexed-object': 113 }],
+  102: [function (require, module, exports) {
     'use strict'
     var internalObjectKeys = require('../internals/object-keys-internal')
     var enumBugKeys = require('../internals/enum-bug-keys')
@@ -2860,8 +4664,8 @@
     module.exports = Object.keys || function keys (O) {
       return internalObjectKeys(O, enumBugKeys)
     }
-  }, { '../internals/enum-bug-keys': 36, '../internals/object-keys-internal': 82 }],
-  84: [function (require, module, exports) {
+  }, { '../internals/enum-bug-keys': 55, '../internals/object-keys-internal': 101 }],
+  103: [function (require, module, exports) {
     'use strict'
     var $propertyIsEnumerable = {}.propertyIsEnumerable
     // eslint-disable-next-line es/no-object-getownpropertydescriptor -- safe
@@ -2877,7 +4681,7 @@
       return !!descriptor && descriptor.enumerable
     } : $propertyIsEnumerable
   }, {}],
-  85: [function (require, module, exports) {
+  104: [function (require, module, exports) {
     'use strict'
     var call = require('../internals/function-call')
     var isCallable = require('../internals/is-callable')
@@ -2894,8 +4698,8 @@
       if (pref !== 'string' && isCallable(fn = input.toString) && !isObject(val = call(fn, input))) return val
       throw new $TypeError("Can't convert object to primitive value")
     }
-  }, { '../internals/function-call': 41, '../internals/is-callable': 59, '../internals/is-object': 62 }],
-  86: [function (require, module, exports) {
+  }, { '../internals/function-call': 60, '../internals/is-callable': 78, '../internals/is-object': 81 }],
+  105: [function (require, module, exports) {
     'use strict'
     var getBuiltIn = require('../internals/get-built-in')
     var uncurryThis = require('../internals/function-uncurry-this')
@@ -2911,8 +4715,8 @@
       var getOwnPropertySymbols = getOwnPropertySymbolsModule.f
       return getOwnPropertySymbols ? concat(keys, getOwnPropertySymbols(it)) : keys
     }
-  }, { '../internals/an-object': 12, '../internals/function-uncurry-this': 44, '../internals/get-built-in': 45, '../internals/object-get-own-property-names': 78, '../internals/object-get-own-property-symbols': 79 }],
-  87: [function (require, module, exports) {
+  }, { '../internals/an-object': 31, '../internals/function-uncurry-this': 63, '../internals/get-built-in': 64, '../internals/object-get-own-property-names': 97, '../internals/object-get-own-property-symbols': 98 }],
+  106: [function (require, module, exports) {
     'use strict'
     module.exports = function (exec) {
       try {
@@ -2922,7 +4726,7 @@
       }
     }
   }, {}],
-  88: [function (require, module, exports) {
+  107: [function (require, module, exports) {
     'use strict'
     var isNullOrUndefined = require('../internals/is-null-or-undefined')
 
@@ -2934,8 +4738,8 @@
       if (isNullOrUndefined(it)) throw new $TypeError("Can't call method on " + it)
       return it
     }
-  }, { '../internals/is-null-or-undefined': 61 }],
-  89: [function (require, module, exports) {
+  }, { '../internals/is-null-or-undefined': 80 }],
+  108: [function (require, module, exports) {
     'use strict'
     var shared = require('../internals/shared')
     var uid = require('../internals/uid')
@@ -2945,8 +4749,8 @@
     module.exports = function (key) {
       return keys[key] || (keys[key] = uid(key))
     }
-  }, { '../internals/shared': 91, '../internals/uid': 102 }],
-  90: [function (require, module, exports) {
+  }, { '../internals/shared': 110, '../internals/uid': 121 }],
+  109: [function (require, module, exports) {
     'use strict'
     var global = require('../internals/global')
     var defineGlobalProperty = require('../internals/define-global-property')
@@ -2955,8 +4759,8 @@
     var store = global[SHARED] || defineGlobalProperty(SHARED, {})
 
     module.exports = store
-  }, { '../internals/define-global-property': 29, '../internals/global': 50 }],
-  91: [function (require, module, exports) {
+  }, { '../internals/define-global-property': 48, '../internals/global': 69 }],
+  110: [function (require, module, exports) {
     'use strict'
     var IS_PURE = require('../internals/is-pure')
     var store = require('../internals/shared-store');
@@ -2970,8 +4774,8 @@
       license: 'https://github.com/zloirock/core-js/blob/v3.33.2/LICENSE',
       source: 'https://github.com/zloirock/core-js'
     })
-  }, { '../internals/is-pure': 63, '../internals/shared-store': 90 }],
-  92: [function (require, module, exports) {
+  }, { '../internals/is-pure': 82, '../internals/shared-store': 109 }],
+  111: [function (require, module, exports) {
     'use strict'
     /* eslint-disable es/no-symbol -- required for testing */
     var V8_VERSION = require('../internals/engine-v8-version')
@@ -2991,8 +4795,8 @@
     // Chrome 38-40 symbols are not inherited from DOM collections prototypes to instances
     !Symbol.sham && V8_VERSION && V8_VERSION < 41
     })
-  }, { '../internals/engine-v8-version': 35, '../internals/fails': 38, '../internals/global': 50 }],
-  93: [function (require, module, exports) {
+  }, { '../internals/engine-v8-version': 54, '../internals/fails': 57, '../internals/global': 69 }],
+  112: [function (require, module, exports) {
     'use strict'
     var toIntegerOrInfinity = require('../internals/to-integer-or-infinity')
 
@@ -3006,8 +4810,8 @@
       var integer = toIntegerOrInfinity(index)
       return integer < 0 ? max(integer + length, 0) : min(integer, length)
     }
-  }, { '../internals/to-integer-or-infinity': 95 }],
-  94: [function (require, module, exports) {
+  }, { '../internals/to-integer-or-infinity': 114 }],
+  113: [function (require, module, exports) {
     'use strict'
     // toObject with fallback for non-array-like ES3 strings
     var IndexedObject = require('../internals/indexed-object')
@@ -3016,8 +4820,8 @@
     module.exports = function (it) {
       return IndexedObject(requireObjectCoercible(it))
     }
-  }, { '../internals/indexed-object': 55, '../internals/require-object-coercible': 88 }],
-  95: [function (require, module, exports) {
+  }, { '../internals/indexed-object': 74, '../internals/require-object-coercible': 107 }],
+  114: [function (require, module, exports) {
     'use strict'
     var trunc = require('../internals/math-trunc')
 
@@ -3028,8 +4832,8 @@
       // eslint-disable-next-line no-self-compare -- NaN check
       return number !== number || number === 0 ? 0 : trunc(number)
     }
-  }, { '../internals/math-trunc': 73 }],
-  96: [function (require, module, exports) {
+  }, { '../internals/math-trunc': 92 }],
+  115: [function (require, module, exports) {
     'use strict'
     var toIntegerOrInfinity = require('../internals/to-integer-or-infinity')
 
@@ -3040,8 +4844,8 @@
     module.exports = function (argument) {
       return argument > 0 ? min(toIntegerOrInfinity(argument), 0x1FFFFFFFFFFFFF) : 0 // 2 ** 53 - 1 == 9007199254740991
     }
-  }, { '../internals/to-integer-or-infinity': 95 }],
-  97: [function (require, module, exports) {
+  }, { '../internals/to-integer-or-infinity': 114 }],
+  116: [function (require, module, exports) {
     'use strict'
     var requireObjectCoercible = require('../internals/require-object-coercible')
 
@@ -3052,8 +4856,8 @@
     module.exports = function (argument) {
       return $Object(requireObjectCoercible(argument))
     }
-  }, { '../internals/require-object-coercible': 88 }],
-  98: [function (require, module, exports) {
+  }, { '../internals/require-object-coercible': 107 }],
+  117: [function (require, module, exports) {
     'use strict'
     var call = require('../internals/function-call')
     var isObject = require('../internals/is-object')
@@ -3080,8 +4884,8 @@
       if (pref === undefined) pref = 'number'
       return ordinaryToPrimitive(input, pref)
     }
-  }, { '../internals/function-call': 41, '../internals/get-method': 49, '../internals/is-object': 62, '../internals/is-symbol': 64, '../internals/ordinary-to-primitive': 85, '../internals/well-known-symbol': 106 }],
-  99: [function (require, module, exports) {
+  }, { '../internals/function-call': 60, '../internals/get-method': 68, '../internals/is-object': 81, '../internals/is-symbol': 83, '../internals/ordinary-to-primitive': 104, '../internals/well-known-symbol': 125 }],
+  118: [function (require, module, exports) {
     'use strict'
     var toPrimitive = require('../internals/to-primitive')
     var isSymbol = require('../internals/is-symbol')
@@ -3092,8 +4896,8 @@
       var key = toPrimitive(argument, 'string')
       return isSymbol(key) ? key : key + ''
     }
-  }, { '../internals/is-symbol': 64, '../internals/to-primitive': 98 }],
-  100: [function (require, module, exports) {
+  }, { '../internals/is-symbol': 83, '../internals/to-primitive': 117 }],
+  119: [function (require, module, exports) {
     'use strict'
     var wellKnownSymbol = require('../internals/well-known-symbol')
 
@@ -3103,8 +4907,8 @@
     test[TO_STRING_TAG] = 'z'
 
     module.exports = String(test) === '[object z]'
-  }, { '../internals/well-known-symbol': 106 }],
-  101: [function (require, module, exports) {
+  }, { '../internals/well-known-symbol': 125 }],
+  120: [function (require, module, exports) {
     'use strict'
     var $String = String
 
@@ -3116,7 +4920,7 @@
       }
     }
   }, {}],
-  102: [function (require, module, exports) {
+  121: [function (require, module, exports) {
     'use strict'
     var uncurryThis = require('../internals/function-uncurry-this')
 
@@ -3127,8 +4931,8 @@
     module.exports = function (key) {
       return 'Symbol(' + (key === undefined ? '' : key) + ')_' + toString(++id + postfix, 36)
     }
-  }, { '../internals/function-uncurry-this': 44 }],
-  103: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 63 }],
+  122: [function (require, module, exports) {
     'use strict'
     /* eslint-disable es/no-symbol -- required for testing */
     var NATIVE_SYMBOL = require('../internals/symbol-constructor-detection')
@@ -3136,8 +4940,8 @@
     module.exports = NATIVE_SYMBOL &&
   !Symbol.sham &&
   typeof Symbol.iterator === 'symbol'
-  }, { '../internals/symbol-constructor-detection': 92 }],
-  104: [function (require, module, exports) {
+  }, { '../internals/symbol-constructor-detection': 111 }],
+  123: [function (require, module, exports) {
     'use strict'
     var DESCRIPTORS = require('../internals/descriptors')
     var fails = require('../internals/fails')
@@ -3151,8 +4955,8 @@
         writable: false
       }).prototype !== 42
     })
-  }, { '../internals/descriptors': 30, '../internals/fails': 38 }],
-  105: [function (require, module, exports) {
+  }, { '../internals/descriptors': 49, '../internals/fails': 57 }],
+  124: [function (require, module, exports) {
     'use strict'
     var global = require('../internals/global')
     var isCallable = require('../internals/is-callable')
@@ -3160,8 +4964,8 @@
     var WeakMap = global.WeakMap
 
     module.exports = isCallable(WeakMap) && /native code/.test(String(WeakMap))
-  }, { '../internals/global': 50, '../internals/is-callable': 59 }],
-  106: [function (require, module, exports) {
+  }, { '../internals/global': 69, '../internals/is-callable': 78 }],
+  125: [function (require, module, exports) {
     'use strict'
     var global = require('../internals/global')
     var shared = require('../internals/shared')
@@ -3181,8 +4985,8 @@
           : createWellKnownSymbol('Symbol.' + name)
       } return WellKnownSymbolsStore[name]
     }
-  }, { '../internals/global': 50, '../internals/has-own-property': 51, '../internals/shared': 91, '../internals/symbol-constructor-detection': 92, '../internals/uid': 102, '../internals/use-symbol-as-uid': 103 }],
-  107: [function (require, module, exports) {
+  }, { '../internals/global': 69, '../internals/has-own-property': 70, '../internals/shared': 110, '../internals/symbol-constructor-detection': 111, '../internals/uid': 121, '../internals/use-symbol-as-uid': 122 }],
+  126: [function (require, module, exports) {
     'use strict'
     var $ = require('../internals/export')
     var $find = require('../internals/async-iterator-iteration').find
@@ -3194,8 +4998,8 @@
         return $find(this, predicate)
       }
     })
-  }, { '../internals/async-iterator-iteration': 16, '../internals/export': 37 }],
-  108: [function (require, module, exports) {
+  }, { '../internals/async-iterator-iteration': 35, '../internals/export': 56 }],
+  127: [function (require, module, exports) {
     'use strict'
     var $ = require('../internals/export')
     var $forEach = require('../internals/async-iterator-iteration').forEach
@@ -3207,8 +5011,8 @@
         return $forEach(this, fn)
       }
     })
-  }, { '../internals/async-iterator-iteration': 16, '../internals/export': 37 }],
-  109: [function (require, module, exports) {
+  }, { '../internals/async-iterator-iteration': 35, '../internals/export': 56 }],
+  128: [function (require, module, exports) {
     'use strict'
     var $ = require('../internals/export')
     var map = require('../internals/async-iterator-map')
@@ -3219,8 +5023,8 @@
     $({ target: 'AsyncIterator', proto: true, real: true, forced: IS_PURE }, {
       map: map
     })
-  }, { '../internals/async-iterator-map': 17, '../internals/export': 37, '../internals/is-pure': 63 }],
-  110: [function (require, module, exports) {
+  }, { '../internals/async-iterator-map': 36, '../internals/export': 56, '../internals/is-pure': 82 }],
+  129: [function (require, module, exports) {
     'use strict'
     var $ = require('../internals/export')
     var call = require('../internals/function-call')
@@ -3288,8 +5092,8 @@
         })
       }
     })
-  }, { '../internals/a-callable': 10, '../internals/an-object': 12, '../internals/async-iterator-close': 14, '../internals/export': 37, '../internals/function-call': 41, '../internals/get-built-in': 45, '../internals/get-iterator-direct': 46, '../internals/is-object': 62 }],
-  111: [function (require, module, exports) {
+  }, { '../internals/a-callable': 29, '../internals/an-object': 31, '../internals/async-iterator-close': 33, '../internals/export': 56, '../internals/function-call': 60, '../internals/get-built-in': 64, '../internals/get-iterator-direct': 65, '../internals/is-object': 81 }],
+  130: [function (require, module, exports) {
     'use strict'
     var $ = require('../internals/export')
     var global = require('../internals/global')
@@ -3335,8 +5139,8 @@
     $({ global: true, constructor: true, forced: FORCED }, {
       Iterator: IteratorConstructor
     })
-  }, { '../internals/an-instance': 11, '../internals/create-non-enumerable-property': 25, '../internals/export': 37, '../internals/fails': 38, '../internals/global': 50, '../internals/has-own-property': 51, '../internals/is-callable': 59, '../internals/is-pure': 63, '../internals/iterators-core': 69, '../internals/object-get-prototype-of': 80, '../internals/well-known-symbol': 106 }],
-  112: [function (require, module, exports) {
+  }, { '../internals/an-instance': 30, '../internals/create-non-enumerable-property': 44, '../internals/export': 56, '../internals/fails': 57, '../internals/global': 69, '../internals/has-own-property': 70, '../internals/is-callable': 78, '../internals/is-pure': 82, '../internals/iterators-core': 88, '../internals/object-get-prototype-of': 99, '../internals/well-known-symbol': 125 }],
+  131: [function (require, module, exports) {
     'use strict'
     var $ = require('../internals/export')
     var iterate = require('../internals/iterate')
@@ -3357,8 +5161,8 @@
         }, { IS_RECORD: true, INTERRUPTED: true }).result
       }
     })
-  }, { '../internals/a-callable': 10, '../internals/an-object': 12, '../internals/export': 37, '../internals/get-iterator-direct': 46, '../internals/iterate': 65 }],
-  113: [function (require, module, exports) {
+  }, { '../internals/a-callable': 29, '../internals/an-object': 31, '../internals/export': 56, '../internals/get-iterator-direct': 65, '../internals/iterate': 84 }],
+  132: [function (require, module, exports) {
     'use strict'
     var $ = require('../internals/export')
     var iterate = require('../internals/iterate')
@@ -3379,8 +5183,8 @@
         }, { IS_RECORD: true })
       }
     })
-  }, { '../internals/a-callable': 10, '../internals/an-object': 12, '../internals/export': 37, '../internals/get-iterator-direct': 46, '../internals/iterate': 65 }],
-  114: [function (require, module, exports) {
+  }, { '../internals/a-callable': 29, '../internals/an-object': 31, '../internals/export': 56, '../internals/get-iterator-direct': 65, '../internals/iterate': 84 }],
+  133: [function (require, module, exports) {
     'use strict'
     var $ = require('../internals/export')
     var map = require('../internals/iterator-map')
@@ -3391,8 +5195,8 @@
     $({ target: 'Iterator', proto: true, real: true, forced: IS_PURE }, {
       map: map
     })
-  }, { '../internals/export': 37, '../internals/is-pure': 63, '../internals/iterator-map': 68 }],
-  115: [function (require, module, exports) {
+  }, { '../internals/export': 56, '../internals/is-pure': 82, '../internals/iterator-map': 87 }],
+  134: [function (require, module, exports) {
     'use strict'
     var $ = require('../internals/export')
     var iterate = require('../internals/iterate')
@@ -3425,5 +5229,5 @@
         return accumulator
       }
     })
-  }, { '../internals/a-callable': 10, '../internals/an-object': 12, '../internals/export': 37, '../internals/get-iterator-direct': 46, '../internals/iterate': 65 }]
-}, {}, [9])
+  }, { '../internals/a-callable': 29, '../internals/an-object': 31, '../internals/export': 56, '../internals/get-iterator-direct': 65, '../internals/iterate': 84 }]
+}, {}, [13])

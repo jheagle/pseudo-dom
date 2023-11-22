@@ -4,99 +4,126 @@
  * @version 1.0.0
  */
 import PseudoEvent from './PseudoEvent'
+import { listenerOptions } from './PseudoEventTarget'
 
 /**
  * Handle events as they are stored and implemented.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @class
- * @property {string} eventTypes
+ * @property {string} eventType
  * @property {Object} eventOptions
  * @property {boolean} isDefault
  */
-const PseudoEventListener = {
-  eventType: '',
-  eventOptions: { capture: false, once: false, passive: false },
-  isDefault: false,
+class PseudoEventListener {
+  private eventOptions: listenerOptions = {
+    capture: false,
+    once: false,
+    passive: false
+  }
+  private eventType: string = ''
+  private handler: Function
+  private isDefault: boolean = false
+
+  constructor (eventType: string, { capture = false, once = false, passive = false } = {}, handleEvent: Function) {
+    this.eventOptions = { capture, once, passive }
+    this.eventType = eventType
+    this.handler = handleEvent
+  }
+
+  get once (): boolean {
+    return this.eventOptions.once
+  }
+
   /**
    * @method
    * @name PseudoEventListener#handleEvent
    * @param {PseudoEvent} event
-   * @returns {undefined}
+   * @returns {*}
    */
-  handleEvent: event => undefined,
+  handleEvent (event: PseudoEvent): any {
+    return this.handler(event)
+  }
+
   /**
    * @method
    * @name PseudoEventListener#doCapturePhase
    * @param {PseudoEvent} event
    * @returns {boolean}
    */
-  doCapturePhase (event) {
+  doCapturePhase (event: PseudoEvent): boolean {
     return event.eventPhase === PseudoEvent.CAPTURING_PHASE && this.eventOptions.capture
-  },
+  }
+
   /**
    * @method
    * @name PseudoEventListener#doTargetPhase
    * @param {PseudoEvent} event
    * @returns {boolean}
    */
-  doTargetPhase (event) {
+  doTargetPhase (event: PseudoEvent): boolean {
     return event.eventPhase === PseudoEvent.AT_TARGET
-  },
+  }
+
   /**
    * @method
    * @name PseudoEventListener#doBubblePhase
    * @param {PseudoEvent} event
    * @returns {boolean|*}
    */
-  doBubblePhase (event) {
+  doBubblePhase (event: PseudoEvent): boolean | any {
     return event.eventPhase === PseudoEvent.BUBBLING_PHASE && (event.bubbles || !this.eventOptions.capture)
-  },
+  }
+
   /**
    * @method
    * @name PseudoEventListener#skipPhase
    * @param {PseudoEvent} event
    * @returns {boolean}
    */
-  skipPhase (event) {
+  skipPhase (event: PseudoEvent): boolean {
     return !this.doCapturePhase(event) && !this.doTargetPhase(event) && !this.doBubblePhase(event)
-  },
+  }
+
   /**
    * @method
    * @name PseudoEventListener#skipDefault
    * @param {PseudoEvent} event
    * @returns {boolean|*}
    */
-  skipDefault (event) {
+  skipDefault (event: PseudoEvent): boolean | any {
     return this.isDefault && event.defaultPrevented
-  },
+  }
+
   /**
    * @method
    * @name PseudoEventListener#stopPropagation
    * @param {PseudoEvent} event
    * @returns {boolean}
    */
-  stopPropagation (event) {
-    return !this.doTargetPhase(event) && event.propagationStopped
-  },
+  stopPropagation (event: PseudoEvent): boolean {
+    return !this.doTargetPhase(event) && event.inner.propagationStopped
+  }
+
   /**
    * @method
    * @name PseudoEventListener#nonPassiveHalt
    * @param {PseudoEvent} event
    * @returns {boolean|*}
    */
-  nonPassiveHalt (event) {
+  nonPassiveHalt (event: PseudoEvent): boolean | any {
     return !this.eventOptions.passive && (this.skipDefault(event) ||
-      event.immediatePropagationStopped ||
+      event.inner.immediatePropagationStopped ||
       this.stopPropagation(event)
     )
-  },
+  }
+
   /**
    * @method
    * @name PseudoEventListener#rejectEvent
    * @param {PseudoEvent} event
    * @returns {*|boolean}
    */
-  rejectEvent (event) {
+  rejectEvent (event: PseudoEvent): any | boolean {
     return this.nonPassiveHalt(event) || this.skipPhase(event)
   }
 }

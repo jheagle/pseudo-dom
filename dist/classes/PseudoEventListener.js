@@ -16,25 +16,48 @@ function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { d
  * Handle events as they are stored and implemented.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @class
- * @property {string} eventTypes
+ * @property {string} eventType
  * @property {Object} eventOptions
  * @property {boolean} isDefault
  */
-const PseudoEventListener = {
-  eventType: '',
-  eventOptions: {
-    capture: false,
-    once: false,
-    passive: false
-  },
-  isDefault: false,
+class PseudoEventListener {
+  constructor (eventType) {
+    const {
+      capture = false,
+      once = false,
+      passive = false
+    } = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {}
+    const handleEvent = arguments.length > 2 ? arguments[2] : undefined
+    this.eventOptions = {
+      capture: false,
+      once: false,
+      passive: false
+    }
+    this.eventType = ''
+    this.isDefault = false
+    this.eventOptions = {
+      capture,
+      once,
+      passive
+    }
+    this.eventType = eventType
+    this.handler = handleEvent
+  }
+
+  get once () {
+    return this.eventOptions.once
+  }
+
   /**
    * @method
    * @name PseudoEventListener#handleEvent
    * @param {PseudoEvent} event
-   * @returns {undefined}
+   * @returns {*}
    */
-  handleEvent: event => undefined,
+  handleEvent (event) {
+    return this.handler(event)
+  }
+
   /**
    * @method
    * @name PseudoEventListener#doCapturePhase
@@ -43,7 +66,8 @@ const PseudoEventListener = {
    */
   doCapturePhase (event) {
     return event.eventPhase === _PseudoEvent.default.CAPTURING_PHASE && this.eventOptions.capture
-  },
+  }
+
   /**
    * @method
    * @name PseudoEventListener#doTargetPhase
@@ -52,7 +76,8 @@ const PseudoEventListener = {
    */
   doTargetPhase (event) {
     return event.eventPhase === _PseudoEvent.default.AT_TARGET
-  },
+  }
+
   /**
    * @method
    * @name PseudoEventListener#doBubblePhase
@@ -61,7 +86,8 @@ const PseudoEventListener = {
    */
   doBubblePhase (event) {
     return event.eventPhase === _PseudoEvent.default.BUBBLING_PHASE && (event.bubbles || !this.eventOptions.capture)
-  },
+  }
+
   /**
    * @method
    * @name PseudoEventListener#skipPhase
@@ -70,7 +96,8 @@ const PseudoEventListener = {
    */
   skipPhase (event) {
     return !this.doCapturePhase(event) && !this.doTargetPhase(event) && !this.doBubblePhase(event)
-  },
+  }
+
   /**
    * @method
    * @name PseudoEventListener#skipDefault
@@ -79,7 +106,8 @@ const PseudoEventListener = {
    */
   skipDefault (event) {
     return this.isDefault && event.defaultPrevented
-  },
+  }
+
   /**
    * @method
    * @name PseudoEventListener#stopPropagation
@@ -87,8 +115,9 @@ const PseudoEventListener = {
    * @returns {boolean}
    */
   stopPropagation (event) {
-    return !this.doTargetPhase(event) && event.propagationStopped
-  },
+    return !this.doTargetPhase(event) && event.inner.propagationStopped
+  }
+
   /**
    * @method
    * @name PseudoEventListener#nonPassiveHalt
@@ -96,8 +125,9 @@ const PseudoEventListener = {
    * @returns {boolean|*}
    */
   nonPassiveHalt (event) {
-    return !this.eventOptions.passive && (this.skipDefault(event) || event.immediatePropagationStopped || this.stopPropagation(event))
-  },
+    return !this.eventOptions.passive && (this.skipDefault(event) || event.inner.immediatePropagationStopped || this.stopPropagation(event))
+  }
+
   /**
    * @method
    * @name PseudoEventListener#rejectEvent

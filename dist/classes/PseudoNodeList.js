@@ -1,61 +1,30 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.default = void 0;
-require("core-js/modules/esnext.async-iterator.map.js");
-require("core-js/modules/esnext.iterator.map.js");
-require("core-js/modules/esnext.async-iterator.for-each.js");
-require("core-js/modules/esnext.iterator.constructor.js");
-require("core-js/modules/esnext.iterator.for-each.js");
+})
+exports.default = void 0
+require('core-js/modules/esnext.async-iterator.map.js')
+require('core-js/modules/esnext.iterator.map.js')
+var _LinkedTreeList = _interopRequireDefault(require('collect-your-stuff/dist/collections/linked-tree-list/LinkedTreeList'))
+function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
 /**
  * @file Substitute for the NodeList interface.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @version 1.0.0
  */
-class PseudoNodeList {
-  #innerList = [];
-  #initialized = false;
-  initialize() {
-    let innerList = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-    if (this.#initialized) {
-      return this;
-    }
-    this.#innerList = innerList;
-    this.#initialized = true;
-    return this;
+
+class PseudoNodeList extends _LinkedTreeList.default {
+  get entries () {
+    return Array.from(this)
   }
-  get length() {
-    return this.#innerList.length;
+
+  get keys () {
+    return Array.from(this.innerList).keys
   }
-  get entries() {
-    return Array.from(this);
-  }
-  get keys() {
-    return Array.from(this.#innerList).keys;
-  }
-  get values() {
-    return Array.from(this.#innerList).map(item => item.data).values;
-  }
-  item(index) {
-    return this.#innerList.item(index);
-  }
-  forEach(callback) {
-    return Array.from(this.#innerList).map(item => item.data).forEach(callback);
-  }
-  [Symbol.iterator]() {
-    let current = this.#innerList.first;
-    return {
-      next: () => {
-        const result = {
-          value: current ? current.data : null,
-          done: !current
-        };
-        current = current ? current.next : null;
-        return result;
-      }
-    };
+
+  get values () {
+    return Array.from(this.innerList).map(item => item.data).values
   }
 }
-var _default = exports.default = PseudoNodeList;
+var _default = exports.default = PseudoNodeList

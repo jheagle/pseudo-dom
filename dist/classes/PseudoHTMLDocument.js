@@ -5,6 +5,8 @@ Object.defineProperty(exports, '__esModule', {
 })
 exports.default = void 0
 var _PseudoHTMLElement = _interopRequireDefault(require('./PseudoHTMLElement'))
+var _generateNodeList = _interopRequireDefault(require('../factories/generateNodeList'))
+var _TreeLinker = _interopRequireDefault(require('collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'))
 function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
 /**
  * @file Substitute for the DOM HTMLDocument Class.
@@ -28,7 +30,6 @@ function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { d
 class PseudoHTMLDocument extends _PseudoHTMLElement.default {
   /**
    * The root HTML element is acts as the parent to all HTML elements in the document.
-   * @returns {PseudoHTMLDocument}
    * @constructor
    */
   constructor () {
@@ -45,7 +46,6 @@ class PseudoHTMLDocument extends _PseudoHTMLElement.default {
       tagName: 'head',
       parent: html
     })
-
     /**
      * Create document body element
      * @type {PseudoHTMLElement}
@@ -54,13 +54,7 @@ class PseudoHTMLDocument extends _PseudoHTMLElement.default {
       tagName: 'body',
       parent: html
     })
-    html.children = [this.head, this.body]
-
-    /**
-     * Create document child element
-     * @type {PseudoHTMLElement[]}
-     */
-    this.children = [html]
+    html.children = (0, _generateNodeList.default)(_TreeLinker.default.fromArray([this.head, this.body]).head)
   }
 
   /**

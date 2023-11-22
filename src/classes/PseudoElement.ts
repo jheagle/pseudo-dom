@@ -4,6 +4,9 @@
  * @version 1.0.0
  */
 import PseudoNode from './PseudoNode'
+import generateNodeList from '../factories/generateNodeList'
+import TreeLinker from 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'
+import PseudoEvent from './PseudoEvent'
 
 /**
  * Simulate the behaviour of the Element Class when there is no DOM available.
@@ -21,16 +24,30 @@ import PseudoNode from './PseudoNode'
  * @property {function} removeAttribute
  */
 class PseudoElement extends PseudoNode {
+  private readonly tagName: string
+  private attributes: any[]
+  private classList: any
+  private className: any
+  private type: string
+
   /**
    * Simulate the Element object when the Dom is not available
-   * @param {string} [tagName=''] - The
-   * @param {array} [attributes=[]]
-   * @param {PseudoNode|Object} [parent={}]
-   * @param {Array} [children=[]]
+   * @param {Object} [elementOptions={}]
+   * @param {string} [elementOptions.tagName='']
+   * @param {array} [elementOptions.attributes=[]]
+   * @param {PseudoNode|Object} [elementOptions.parent={}]
+   * @param {Array} [elementOptions.children=[]]
    * @constructor
    */
-  constructor ({ tagName = '', attributes = [], parent = {}, children = [] } = {}) {
-    super({ parent, children })
+  constructor ({ tagName = '', attributes = [], parent = null, children = [] }: {
+    tagName?: string;
+    attributes?: Array<any>;
+    parent?: PseudoNode | null;
+    children?: Array<any>
+  } = {}) {
+    super()
+    this.parent = parent
+    this.children = generateNodeList(TreeLinker.fromArray(children).head)
     this.tagName = tagName
     this.attributes = attributes.concat([
       { name: 'className', value: '' },
@@ -39,9 +56,10 @@ class PseudoElement extends PseudoNode {
     ])
 
     /**
-     * Map all incoming attributes to the attributes array and attach each as a property of this element
+     * Map all incoming attributes to the attribute array and attach each as a property of this element
      */
-    this.attributes.map(({ name, value }) => {
+    this.attributes.map(({ name, value }): { name: keyof PseudoElement, value: any } => {
+      // @ts-ignore
       this[name] = value
       return { name, value }
     })
@@ -50,12 +68,16 @@ class PseudoElement extends PseudoNode {
     this.classList = this.className
   }
 
+  get nodeType () {
+    return PseudoNode.ELEMENT_NODE
+  }
+
   /**
    *
    * @returns {Function}
    */
-  applyDefaultEvent () {
-    let callback = event => undefined
+  applyDefaultEvent (): Function {
+    let callback: (event: PseudoEvent) => void = (event: PseudoEvent): undefined => undefined
     switch (this.tagName) {
       case 'form':
         this.addEventListener('submit', callback)
@@ -63,7 +85,7 @@ class PseudoElement extends PseudoNode {
       case 'button':
       case 'input':
         if (/^(submit|image)$/i.test(this.type || '')) {
-          callback = event => {
+          callback = (event: PseudoEvent): void => {
             const forms = require('./PseudoEvent').getParentNodesFromAttribute('tagName', 'form', this)
             if (forms) {
               forms[0].submit()
@@ -80,7 +102,7 @@ class PseudoElement extends PseudoNode {
    * @param {PseudoNode|PseudoElement} childElement
    * @returns {PseudoNode}
    */
-  appendChild (childElement) {
+  appendChild (childElement: PseudoElement): PseudoNode {
     super.appendChild(childElement)
     childElement.applyDefaultEvent()
     return childElement
@@ -91,7 +113,7 @@ class PseudoElement extends PseudoNode {
    * @param {string} attributeName - The attribute name to check
    * @returns {boolean}
    */
-  hasAttribute (attributeName) {
+  hasAttribute (attributeName: string): boolean {
     return this.getAttribute(attributeName) !== 'undefined'
   }
 
@@ -101,8 +123,9 @@ class PseudoElement extends PseudoNode {
    * @param {string|Object} attributeValue - The value of the attribute to append
    * @returns {undefined}
    */
-  setAttribute (attributeName, attributeValue) {
+  setAttribute (attributeName: keyof PseudoElement, attributeValue: string | object): undefined {
     if (this.hasAttribute(attributeName) || this[attributeName] === 'undefined') {
+      // @ts-ignore
       this[attributeName] = attributeValue
       this.attributes.push({ name: attributeName, value: attributeValue })
     }
@@ -114,20 +137,19 @@ class PseudoElement extends PseudoNode {
    * @param {string} attributeName - A string representing the name of the attribute to be retrieved
    * @returns {string|Object}
    */
-  getAttribute (attributeName) {
+  getAttribute (attributeName: string): string | object {
     return this.attributes.find(attribute => attribute.name === attributeName)
   }
 
-  // noinspection JSUnusedGlobalSymbols
   /**
    * Remove an assigned attribute from the Element
    * @param {string} attributeName - The string name of the attribute to be removed
    * @returns {null}
    */
-  removeAttribute (attributeName) {
+  removeAttribute (attributeName: keyof PseudoElement): null {
     if (this.hasAttribute(attributeName)) {
       delete this[attributeName]
-      delete this.getAttribute(attributeName)
+      // TODO: how do we delete it as an attribute?
     }
     return null
   }

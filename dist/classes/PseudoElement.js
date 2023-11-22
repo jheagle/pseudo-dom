@@ -10,6 +10,8 @@ require('core-js/modules/esnext.async-iterator.find.js')
 require('core-js/modules/esnext.iterator.constructor.js')
 require('core-js/modules/esnext.iterator.find.js')
 var _PseudoNode = _interopRequireDefault(require('./PseudoNode'))
+var _generateNodeList = _interopRequireDefault(require('../factories/generateNodeList'))
+var _TreeLinker = _interopRequireDefault(require('collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'))
 function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
 /**
  * @file Substitute for the DOM Element Class.
@@ -35,23 +37,23 @@ function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { d
 class PseudoElement extends _PseudoNode.default {
   /**
    * Simulate the Element object when the Dom is not available
-   * @param {string} [tagName=''] - The
-   * @param {array} [attributes=[]]
-   * @param {PseudoNode|Object} [parent={}]
-   * @param {Array} [children=[]]
+   * @param {Object} [elementOptions={}]
+   * @param {string} [elementOptions.tagName='']
+   * @param {array} [elementOptions.attributes=[]]
+   * @param {PseudoNode|Object} [elementOptions.parent={}]
+   * @param {Array} [elementOptions.children=[]]
    * @constructor
    */
   constructor () {
     const {
       tagName = '',
       attributes = [],
-      parent = {},
+      parent = null,
       children = []
     } = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {}
-    super({
-      parent,
-      children
-    })
+    super()
+    this.parent = parent
+    this.children = (0, _generateNodeList.default)(_TreeLinker.default.fromArray(children).head)
     this.tagName = tagName
     this.attributes = attributes.concat([{
       name: 'className',
@@ -63,24 +65,27 @@ class PseudoElement extends _PseudoNode.default {
       name: 'innerHTML',
       value: ''
     }])
-
     /**
-     * Map all incoming attributes to the attributes array and attach each as a property of this element
+     * Map all incoming attributes to the attribute array and attach each as a property of this element
      */
     this.attributes.map(_ref => {
       const {
         name,
         value
       } = _ref
+      // @ts-ignore
       this[name] = value
       return {
         name,
         value
       }
     })
-
     // this.classList = new DOMSettableTokenList(this.className)
     this.classList = this.className
+  }
+
+  get nodeType () {
+    return _PseudoNode.default.ELEMENT_NODE
   }
 
   /**
@@ -136,6 +141,7 @@ class PseudoElement extends _PseudoNode.default {
    */
   setAttribute (attributeName, attributeValue) {
     if (this.hasAttribute(attributeName) || this[attributeName] === 'undefined') {
+      // @ts-ignore
       this[attributeName] = attributeValue
       this.attributes.push({
         name: attributeName,
@@ -154,7 +160,6 @@ class PseudoElement extends _PseudoNode.default {
     return this.attributes.find(attribute => attribute.name === attributeName)
   }
 
-  // noinspection JSUnusedGlobalSymbols
   /**
    * Remove an assigned attribute from the Element
    * @param {string} attributeName - The string name of the attribute to be removed
@@ -163,8 +168,9 @@ class PseudoElement extends _PseudoNode.default {
   removeAttribute (attributeName) {
     if (this.hasAttribute(attributeName)) {
       delete this[attributeName]
-      delete this.getAttribute(attributeName)
+      // TODO: how do we delete it as an attribute?
     }
+
     return null
   }
 }

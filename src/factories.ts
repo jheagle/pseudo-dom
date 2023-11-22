@@ -4,9 +4,9 @@
  * @version 1.0.0
  */
 import generateNode from './factories/generateNode'
-import nodeListFactory from './factories/nodeListFactory'
+import generateNodeList from './factories/generateNodeList'
 
 export default {
   generateNode,
-  nodeListFactory
+  nodeListFactory: generateNodeList
 }

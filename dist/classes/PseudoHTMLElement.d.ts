@@ -3,8 +3,8 @@
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @version 1.0.0
  */
-import PseudoElement from './PseudoElement'
-
+import PseudoElement from './PseudoElement';
+import PseudoNode from './PseudoNode';
 /**
  * Simulate the behaviour of the HTMLElement Class when there is no DOM available.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -19,32 +19,19 @@ import PseudoElement from './PseudoElement'
  * @property {Object} style - A container to define all applied inline-styles
  * @property {string} title - The title attribute which affects the text visible on hover
  */
-class PseudoHTMLElement extends PseudoElement {
-  /**
-   * Simulate the HTMLELement object when the Dom is not available
-   * @param {string} [tagName=''] - The
-   * @param {PseudoNode|Object} [parent={}]
-   * @param {Array} [children=[]]
-   * @returns {PseudoHTMLElement}
-   * @constructor
-   */
-  constructor ({ tagName = '', parent = {}, children = [] } = {}) {
-    super({
-      tagName,
-      attributes: [
-        { name: 'hidden', value: false },
-        { name: 'offsetHeight', value: 0 },
-        { name: 'offsetLeft', value: 0 },
-        { name: 'offsetParent', value: null },
-        { name: 'offsetTop', value: 0 },
-        { name: 'offsetWidth', value: 0 },
-        { name: 'style', value: {} },
-        { name: 'title', value: '' }
-      ],
-      parent,
-      children
-    })
-  }
+declare class PseudoHTMLElement extends PseudoElement {
+    /**
+     * Simulate the HTMLElement object when the Dom is not available
+     * @param {Object} [elementOptions={}]
+     * @param {string} [elementOptions.tagName='']
+     * @param {PseudoNode|Object} [elementOptions.parent={}]
+     * @param {Array} [elementOptions.children=[]]
+     * @constructor
+     */
+    constructor({ tagName, parent, children }?: {
+        tagName?: string;
+        parent?: PseudoNode | null;
+        children?: Array<any>;
+    });
 }
-
-export default PseudoHTMLElement
+export default PseudoHTMLElement;

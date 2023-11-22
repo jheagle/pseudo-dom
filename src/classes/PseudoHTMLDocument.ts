@@ -8,6 +8,8 @@
  * @type {PseudoHTMLElement}
  */
 import PseudoHTMLElement from './PseudoHTMLElement'
+import generateNodeList from '../factories/generateNodeList'
+import TreeLinker from 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'
 
 /**
  * Simulate the behaviour of the HTMLDocument Class when there is no DOM available.
@@ -19,9 +21,11 @@ import PseudoHTMLElement from './PseudoHTMLElement'
  * @property {function} createElement - Generate a new PseudoHTMLElement with parent of document
  */
 class PseudoHTMLDocument extends PseudoHTMLElement {
+  private head: PseudoHTMLElement
+  private body: PseudoHTMLElement
+
   /**
    * The root HTML element is acts as the parent to all HTML elements in the document.
-   * @returns {PseudoHTMLDocument}
    * @constructor
    */
   constructor () {
@@ -40,13 +44,8 @@ class PseudoHTMLDocument extends PseudoHTMLElement {
      */
     this.body = new PseudoHTMLElement({ tagName: 'body', parent: html })
 
-    html.children = [this.head, this.body]
+    html.children = generateNodeList(TreeLinker.fromArray([this.head, this.body]).head)
 
-    /**
-     * Create document child element
-     * @type {PseudoHTMLElement[]}
-     */
-    this.children = [html]
   }
 
   /**
@@ -54,7 +53,7 @@ class PseudoHTMLDocument extends PseudoHTMLElement {
    * @param {string} tagName - Tag Name is a string representing the type of Dom element this represents
    * @returns {PseudoHTMLElement}
    */
-  createElement (tagName = 'div') {
+  createElement (tagName: string = 'div'): PseudoHTMLElement {
     const returnElement = new PseudoHTMLElement({ tagName })
     returnElement.parent = this
     return returnElement

@@ -25,7 +25,6 @@ const generateNode = () => {
       const newElement = new LinkerClass(Object.assign({}, element, {
         prev: list.tail
       }))
-
       /**
        * Simulate the behaviour of the Node Class when there is no DOM available.
        * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -103,6 +102,7 @@ const generateNode = () => {
          */
         appendChild (childNode) {
           newElement.next = childNode
+          // @ts-ignore
           childNode.prev = newElement
           return childNode
         }
@@ -114,7 +114,10 @@ const generateNode = () => {
           return newElement.rootParent
         }
 
-        hasChildNodes () {}
+        hasChildNodes () {
+          return false
+        }
+
         insertBefore () {}
         isDefaultNamespace () {}
         isEqualNode () {}
@@ -122,14 +125,14 @@ const generateNode = () => {
         lookupPrefix () {}
         lookupNamespaceURI () {}
         normalize () {}
-
         /**
          *
          * @param {PseudoNode} childElement
          * @returns {PseudoNode}
          */
         removeChild (childElement) {
-          return this.children.splice(this.children.indexOf(childElement), 1)[0]
+          // @ts-ignore
+          return this.children.remove(childElement)
         }
 
         replaceChild () {}

@@ -15,5 +15,6 @@ exports.default = defaultCmd
 exports.readme = readme
 exports.testFull = testFull
 exports.testQuick = testQuick
+exports.typescript = typescript
 exports.watchFull = watchFull
 exports.watchTest = watchTest

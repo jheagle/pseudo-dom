@@ -5,7 +5,7 @@ Object.defineProperty(exports, '__esModule', {
 })
 exports.default = void 0
 var _generateNode = _interopRequireDefault(require('./factories/generateNode'))
-var _nodeListFactory = _interopRequireDefault(require('./factories/nodeListFactory'))
+var _generateNodeList = _interopRequireDefault(require('./factories/generateNodeList'))
 function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
 /**
  * @file All of the Pseudo Dom Helper functions for generating DOM objects.
@@ -14,5 +14,5 @@ function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { d
  */
 var _default = exports.default = {
   generateNode: _generateNode.default,
-  nodeListFactory: _nodeListFactory.default
+  nodeListFactory: _generateNodeList.default
 }

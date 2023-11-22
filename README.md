@@ -28,7 +28,8 @@ Mock the DOM for server side-side DOM state and in tests.
 <dd><p>Simulate the behaviour of the EventTarget Class when there is no DOM available.</p>
 </dd>
 <dt><a href="#PseudoEventListener">PseudoEventListener</a></dt>
-<dd></dd>
+<dd><p>Handle events as they are stored and implemented.</p>
+</dd>
 <dt><a href="#PseudoEvent">PseudoEvent</a></dt>
 <dd><p>Simulate the behaviour of the Event Class when there is no DOM available.</p>
 </dd>
@@ -37,14 +38,12 @@ Mock the DOM for server side-side DOM state and in tests.
 </dd>
 </dl>
 
-## Constants
+## Functions
 
 <dl>
-<dt><a href="#root">root</a></dt>
-<dd><p>Store a reference to this scope which will be Window if rendered via browser</p>
-</dd>
-<dt><a href="#previousPseudoDom">previousPseudoDom</a> : <code>module</code> | <code>*</code></dt>
-<dd><p>Store reference to any pre-existing module of the same name</p>
+<dt><a href="#generateDocument">generateDocument(root, context)</a> ⇒ <code>Window</code> | <code><a href="#PseudoEventTarget">PseudoEventTarget</a></code></dt>
+<dd><p>Construct the Pseudo Dom to provide access to Dom objects which are otherwise not available outside the browser
+context.</p>
 </dd>
 </dl>
 
@@ -54,29 +53,6 @@ Mock the DOM for server side-side DOM state and in tests.
 All methods exported from this module are encapsulated within pseudoDom.
 
 **Author**: Joshua Heagle <joshuaheagle@gmail.com>  
-
-* [pseudoDom/objects](#module_pseudoDom/objects) : <code>Object</code>
-    * [~generate(root, context)](#module_pseudoDom/objects..generate) ⇒ <code>Window</code> \| [<code>PseudoEventTarget</code>](#PseudoEventTarget)
-    * [~noConflict()](#module_pseudoDom/objects..noConflict) ⇒ <code>pseudoDom</code>
-
-<a name="module_pseudoDom/objects..generate"></a>
-
-### pseudoDom/objects~generate(root, context) ⇒ <code>Window</code> \| [<code>PseudoEventTarget</code>](#PseudoEventTarget)
-Construct the Pseudo Dom to provide access to Dom objects which are otherwise not available outside of the browsercontext.
-
-**Kind**: inner method of [<code>pseudoDom/objects</code>](#module_pseudoDom/objects)  
-
-| Param | Type |
-| --- | --- |
-| root | <code>Object</code> | 
-| context | <code>Object</code> | 
-
-<a name="module_pseudoDom/objects..noConflict"></a>
-
-### pseudoDom/objects~noConflict() ⇒ <code>pseudoDom</code>
-Return a reference to this library while preserving the original same-named library
-
-**Kind**: inner method of [<code>pseudoDom/objects</code>](#module_pseudoDom/objects)  
 <a name="PseudoNodeAttached"></a>
 
 ## PseudoNodeAttached ⇐ [<code>PseudoEventTarget</code>](#PseudoEventTarget)
@@ -342,7 +318,7 @@ Simulate the behaviour of the HTMLElement Class when there is no DOM available.
 
 
 * [PseudoHTMLElement](#PseudoHTMLElement) ⇐ [<code>PseudoElement</code>](#PseudoElement)
-    * [new PseudoHTMLElement([tagName], [parent], [children])](#new_PseudoHTMLElement_new)
+    * [new PseudoHTMLElement([elementOptions])](#new_PseudoHTMLElement_new)
     * [.applyDefaultEvent()](#PseudoElement+applyDefaultEvent) ⇒ <code>function</code>
     * [.appendChild(childElement)](#PseudoElement+appendChild) ⇒ [<code>PseudoNode</code>](#PseudoNode)
     * [.hasAttribute(attributeName)](#PseudoElement+hasAttribute) ⇒ <code>boolean</code>
@@ -360,15 +336,16 @@ Simulate the behaviour of the HTMLElement Class when there is no DOM available.
 
 <a name="new_PseudoHTMLElement_new"></a>
 
-### new PseudoHTMLElement([tagName], [parent], [children])
-Simulate the HTMLELement object when the Dom is not available
+### new PseudoHTMLElement([elementOptions])
+Simulate the HTMLElement object when the Dom is not available
 
 
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| [tagName] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | The |
-| [parent] | [<code>PseudoNode</code>](#PseudoNode) \| <code>Object</code> | <code>{}</code> |  |
-| [children] | <code>Array</code> | <code>[]</code> |  |
+| Param | Type | Default |
+| --- | --- | --- |
+| [elementOptions] | <code>Object</code> | <code>{}</code> | 
+| [elementOptions.tagName] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | 
+| [elementOptions.parent] | [<code>PseudoNode</code>](#PseudoNode) \| <code>Object</code> | <code>{}</code> | 
+| [elementOptions.children] | <code>Array</code> | <code>[]</code> | 
 
 <a name="PseudoElement+applyDefaultEvent"></a>
 
@@ -540,7 +517,6 @@ Simulate the behaviour of the HTMLDocument Class when there is no DOM available.
     * [new PseudoHTMLDocument()](#new_PseudoHTMLDocument_new)
     * [.head](#PseudoHTMLDocument+head) : [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)
     * [.body](#PseudoHTMLDocument+body) : [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)
-    * [.children](#PseudoHTMLDocument+children) : [<code>Array.&lt;PseudoHTMLElement&gt;</code>](#PseudoHTMLElement)
     * [.createElement(tagName)](#PseudoHTMLDocument+createElement) ⇒ [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)
     * [.applyDefaultEvent()](#PseudoElement+applyDefaultEvent) ⇒ <code>function</code>
     * [.appendChild(childElement)](#PseudoElement+appendChild) ⇒ [<code>PseudoNode</code>](#PseudoNode)
@@ -574,12 +550,6 @@ Create document head element
 Create document body element
 
 **Kind**: instance property of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
-<a name="PseudoHTMLDocument+children"></a>
-
-### pseudoHTMLDocument.children : [<code>Array.&lt;PseudoHTMLElement&gt;</code>](#PseudoHTMLElement)
-Create document child element
-
-**Kind**: instance property of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
 <a name="PseudoHTMLDocument+createElement"></a>
 
 ### pseudoHTMLDocument.createElement(tagName) ⇒ [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)
@@ -587,9 +557,9 @@ Create and return a PseudoHTMLElement
 
 **Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
 
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| tagName | <code>string</code> | <code>&quot;div&quot;</code> | Tag Name is a string representing the type of Dom element this represents |
+| Param | Type | Description |
+| --- | --- | --- |
+| tagName | <code>string</code> | Tag Name is a string representing the type of Dom element this represents |
 
 <a name="PseudoElement+applyDefaultEvent"></a>
 
@@ -837,20 +807,21 @@ Simulate the behaviour of the EventTarget Class when there is no DOM available.
 <a name="PseudoEventListener"></a>
 
 ## PseudoEventListener
+Handle events as they are stored and implemented.
+
 **Kind**: global class  
 **Author**: Joshua Heagle <joshuaheagle@gmail.com>  
 **Properties**
 
 | Name | Type |
 | --- | --- |
-| eventTypes | <code>string</code> | 
+| eventType | <code>string</code> | 
 | eventOptions | <code>Object</code> | 
 | isDefault | <code>boolean</code> | 
 
 
 * [PseudoEventListener](#PseudoEventListener)
-    * [new PseudoEventListener()](#new_PseudoEventListener_new)
-    * [.handleEvent(event)](#PseudoEventListener+handleEvent) ⇒ <code>undefined</code>
+    * [.handleEvent(event)](#PseudoEventListener+handleEvent) ⇒ <code>\*</code>
     * [.doCapturePhase(event)](#PseudoEventListener+doCapturePhase) ⇒ <code>boolean</code>
     * [.doTargetPhase(event)](#PseudoEventListener+doTargetPhase) ⇒ <code>boolean</code>
     * [.doBubblePhase(event)](#PseudoEventListener+doBubblePhase) ⇒ <code>boolean</code> \| <code>\*</code>
@@ -860,14 +831,9 @@ Simulate the behaviour of the EventTarget Class when there is no DOM available.
     * [.nonPassiveHalt(event)](#PseudoEventListener+nonPassiveHalt) ⇒ <code>boolean</code> \| <code>\*</code>
     * [.rejectEvent(event)](#PseudoEventListener+rejectEvent) ⇒ <code>\*</code> \| <code>boolean</code>
 
-<a name="new_PseudoEventListener_new"></a>
-
-### new PseudoEventListener()
-Handle events as they are stored and implemented.
-
 <a name="PseudoEventListener+handleEvent"></a>
 
-### pseudoEventListener.handleEvent(event) ⇒ <code>undefined</code>
+### pseudoEventListener.handleEvent(event) ⇒ <code>\*</code>
 **Kind**: instance method of [<code>PseudoEventListener</code>](#PseudoEventListener)  
 
 | Param | Type |
@@ -963,40 +929,44 @@ Simulate the behaviour of the Event Class when there is no DOM available.
 | BUBBLING_PHASE | <code>number</code> |  |
 | bubbles | <code>boolean</code> | A Boolean indicating whether the event bubbles up through the Dom or not. |
 | cancelable | <code>boolean</code> | A Boolean indicating whether the event is cancelable. |
-| composed | <code>boolean</code> | A Boolean value indicating whether or not the event can bubble across the boundary between the shadow Dom and the regular Dom. |
+| composed | <code>boolean</code> | A Boolean value indicating whether the event can bubble across the boundary between the shadow Dom and the regular Dom. |
 | currentTarget | <code>function</code> \| [<code>PseudoEventTarget</code>](#PseudoEventTarget) | A reference to the currently registered target for the event. This is the object to which the event is currently slated to be sent; it's possible this has been changed along the way through re-targeting. |
-| defaultPrevented | <code>boolean</code> | Indicates whether or not event.preventDefault() has been called on the event. |
+| defaultPrevented | <code>boolean</code> | Indicates whether event.preventDefault() has been called on the event. |
 | immediatePropagationStopped | <code>boolean</code> | Flag that no further propagation should occur, including on current target. |
 | propagationStopped | <code>boolean</code> | Flag that no further propagation should occur. |
 | eventPhase | <code>int</code> | Indicates which phase of the event flow is being processed. Uses PseudoEvent constants. |
 | target | <code>EventTarget</code> \| [<code>PseudoEventTarget</code>](#PseudoEventTarget) | A reference to the target to which the event was originally dispatched. |
 | timeStamp | <code>int</code> | The time at which the event was created (in milliseconds). By specification, this value is time since epoch, but in reality browsers' definitions vary; in addition, work is underway to change this to be a DomHighResTimeStamp instead. |
 | type | <code>string</code> | The name of the event (case-insensitive). |
-| isTrusted | <code>boolean</code> | Indicates whether or not the event was initiated by the browser (after a user click for instance) or by a script (using an event creation method, like event.initEvent) |
+| isTrusted | <code>boolean</code> | Indicates whether the event was initiated by the browser (after a user click for instance) or by a script (using an event creation method, like event.initEvent) |
 
 
 * [PseudoEvent](#PseudoEvent)
-    * [new PseudoEvent(typeArg, bubbles, cancelable, composed)](#new_PseudoEvent_new)
-    * _instance_
-        * [.composedPath()](#PseudoEvent+composedPath) ⇒ [<code>Array.&lt;PseudoEventTarget&gt;</code>](#PseudoEventTarget)
-        * [.preventDefault()](#PseudoEvent+preventDefault) ⇒ <code>null</code>
-        * [.stopImmediatePropagation()](#PseudoEvent+stopImmediatePropagation) ⇒ <code>null</code>
-        * [.stopPropagation()](#PseudoEvent+stopPropagation) ⇒ <code>null</code>
-    * _static_
-        * [.getParentNodesFromAttribute(attr, value, node)](#PseudoEvent.getParentNodesFromAttribute) ⇒ [<code>Array.&lt;PseudoNode&gt;</code>](#PseudoNode)
-        * [.getParentNodes(node)](#PseudoEvent.getParentNodes) ⇒ [<code>Array.&lt;PseudoNode&gt;</code>](#PseudoNode)
+    * [new PseudoEvent(typeArg, [eventOptions])](#new_PseudoEvent_new)
+    * [.inner](#PseudoEvent+inner) ⇒ <code>EventInner</code>
+    * [.composedPath()](#PseudoEvent+composedPath) ⇒ [<code>Array.&lt;PseudoEventTarget&gt;</code>](#PseudoEventTarget)
+    * [.preventDefault()](#PseudoEvent+preventDefault) ⇒ <code>null</code>
+    * [.stopImmediatePropagation()](#PseudoEvent+stopImmediatePropagation) ⇒ <code>null</code>
+    * [.stopPropagation()](#PseudoEvent+stopPropagation) ⇒ <code>null</code>
 
 <a name="new_PseudoEvent_new"></a>
 
-### new PseudoEvent(typeArg, bubbles, cancelable, composed)
+### new PseudoEvent(typeArg, [eventOptions])
 
-| Param |
-| --- |
-| typeArg | 
-| bubbles | 
-| cancelable | 
-| composed | 
+| Param | Type | Default |
+| --- | --- | --- |
+| typeArg | <code>string</code> |  | 
+| [eventOptions] | <code>Object</code> | <code>{}</code> | 
+| [eventOptions.bubbles] | <code>boolean</code> | <code>true</code> | 
+| [eventOptions.cancelable] | <code>boolean</code> | <code>true</code> | 
+| [eventOptions.composed] | <code>boolean</code> | <code>true</code> | 
 
+<a name="PseudoEvent+inner"></a>
+
+### pseudoEvent.inner ⇒ <code>EventInner</code>
+Scope several accessors inside the inner object. These are only intended for usage by other DOM classes.
+
+**Kind**: instance property of [<code>PseudoEvent</code>](#PseudoEvent)  
 <a name="PseudoEvent+composedPath"></a>
 
 ### pseudoEvent.composedPath() ⇒ [<code>Array.&lt;PseudoEventTarget&gt;</code>](#PseudoEventTarget)
@@ -1012,7 +982,9 @@ Cancels the event (if it is cancelable).
 <a name="PseudoEvent+stopImmediatePropagation"></a>
 
 ### pseudoEvent.stopImmediatePropagation() ⇒ <code>null</code>
-For this particular event, no other listener will be called.Neither those attached on the same element, nor those attached on elements which will be traversed later (incapture phase, for instance)
+For this particular event, no other listener will be called.
+Neither those attached on the same element, nor those attached on elements which will be traversed later (in
+capture phase, for instance)
 
 **Kind**: instance method of [<code>PseudoEvent</code>](#PseudoEvent)  
 <a name="PseudoEvent+stopPropagation"></a>
@@ -1021,30 +993,6 @@ For this particular event, no other listener will be called.Neither those attac
 Stops the propagation of events further along in the Dom.
 
 **Kind**: instance method of [<code>PseudoEvent</code>](#PseudoEvent)  
-<a name="PseudoEvent.getParentNodesFromAttribute"></a>
-
-### PseudoEvent.getParentNodesFromAttribute(attr, value, node) ⇒ [<code>Array.&lt;PseudoNode&gt;</code>](#PseudoNode)
-A selector function for retrieving existing parent PseudoNode from the given child item.This function will check all the parents starting from node, and scan the attributesproperty for matches. The return array contains all matching parent ancestors.WARNING: This is a recursive function.
-
-**Kind**: static method of [<code>PseudoEvent</code>](#PseudoEvent)  
-
-| Param | Type |
-| --- | --- |
-| attr | <code>string</code> | 
-| value | <code>number</code> \| <code>string</code> | 
-| node | [<code>PseudoNode</code>](#PseudoNode) | 
-
-<a name="PseudoEvent.getParentNodes"></a>
-
-### PseudoEvent.getParentNodes(node) ⇒ [<code>Array.&lt;PseudoNode&gt;</code>](#PseudoNode)
-A helper selector function for retrieving all parent PseudoNode for the given child node.
-
-**Kind**: static method of [<code>PseudoEvent</code>](#PseudoEvent)  
-
-| Param | Type |
-| --- | --- |
-| node | [<code>PseudoNode</code>](#PseudoNode) | 
-
 <a name="PseudoElement"></a>
 
 ## PseudoElement ⇐ [<code>PseudoNode</code>](#PseudoNode)
@@ -1069,7 +1017,7 @@ Simulate the behaviour of the Element Class when there is no DOM available.
 
 
 * [PseudoElement](#PseudoElement) ⇐ [<code>PseudoNode</code>](#PseudoNode)
-    * [new PseudoElement([tagName], [attributes], [parent], [children])](#new_PseudoElement_new)
+    * [new PseudoElement([elementOptions])](#new_PseudoElement_new)
     * [.applyDefaultEvent()](#PseudoElement+applyDefaultEvent) ⇒ <code>function</code>
     * [.appendChild(childElement)](#PseudoElement+appendChild) ⇒ [<code>PseudoNode</code>](#PseudoNode)
     * [.hasAttribute(attributeName)](#PseudoElement+hasAttribute) ⇒ <code>boolean</code>
@@ -1087,16 +1035,17 @@ Simulate the behaviour of the Element Class when there is no DOM available.
 
 <a name="new_PseudoElement_new"></a>
 
-### new PseudoElement([tagName], [attributes], [parent], [children])
+### new PseudoElement([elementOptions])
 Simulate the Element object when the Dom is not available
 
 
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| [tagName] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | The |
-| [attributes] | <code>array</code> | <code>[]</code> |  |
-| [parent] | [<code>PseudoNode</code>](#PseudoNode) \| <code>Object</code> | <code>{}</code> |  |
-| [children] | <code>Array</code> | <code>[]</code> |  |
+| Param | Type | Default |
+| --- | --- | --- |
+| [elementOptions] | <code>Object</code> | <code>{}</code> | 
+| [elementOptions.tagName] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | 
+| [elementOptions.attributes] | <code>array</code> | <code>[]</code> | 
+| [elementOptions.parent] | [<code>PseudoNode</code>](#PseudoNode) \| <code>Object</code> | <code>{}</code> | 
+| [elementOptions.children] | <code>Array</code> | <code>[]</code> | 
 
 <a name="PseudoElement+applyDefaultEvent"></a>
 
@@ -1242,15 +1191,48 @@ Remove an assigned attribute from the Element
 | event | <code>Event</code> \| [<code>PseudoEvent</code>](#PseudoEvent) | 
 | target | <code>EventTarget</code> \| [<code>PseudoEventTarget</code>](#PseudoEventTarget) | 
 
-<a name="root"></a>
+<a name="generateDocument"></a>
 
-## root
-Store a reference to this scope which will be Window if rendered via browser
+## generateDocument(root, context) ⇒ <code>Window</code> \| [<code>PseudoEventTarget</code>](#PseudoEventTarget)
+Construct the Pseudo Dom to provide access to Dom objects which are otherwise not available outside the browser
+context.
 
-**Kind**: global constant  
-<a name="previousPseudoDom"></a>
+**Kind**: global function  
 
-## previousPseudoDom : <code>module</code> \| <code>\*</code>
-Store reference to any pre-existing module of the same name
+| Param | Type |
+| --- | --- |
+| root | <code>Object</code> | 
+| context | <code>Object</code> | 
 
-**Kind**: global constant  
+
+* [generateDocument(root, context)](#generateDocument) ⇒ <code>Window</code> \| [<code>PseudoEventTarget</code>](#PseudoEventTarget)
+    * [~newWindow](#generateDocument..newWindow) : <code>Window</code> \| [<code>PseudoEventTarget</code>](#PseudoEventTarget)
+    * [~Node](#generateDocument..Node) : <code>Node</code> \| [<code>PseudoNode</code>](#PseudoNode)
+    * [~Element](#generateDocument..Element) : <code>Element</code> \| [<code>PseudoElement</code>](#PseudoElement)
+    * [~HTMLElement](#generateDocument..HTMLElement) : <code>HTMLElement</code> \| [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)
+    * [~document](#generateDocument..document) : <code>Document</code> \| [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)
+
+<a name="generateDocument..newWindow"></a>
+
+### generateDocument~newWindow : <code>Window</code> \| [<code>PseudoEventTarget</code>](#PseudoEventTarget)
+**Kind**: inner constant of [<code>generateDocument</code>](#generateDocument)  
+<a name="generateDocument..Node"></a>
+
+### generateDocument~Node : <code>Node</code> \| [<code>PseudoNode</code>](#PseudoNode)
+**Kind**: inner constant of [<code>generateDocument</code>](#generateDocument)  
+<a name="generateDocument..Element"></a>
+
+### generateDocument~Element : <code>Element</code> \| [<code>PseudoElement</code>](#PseudoElement)
+**Kind**: inner constant of [<code>generateDocument</code>](#generateDocument)  
+<a name="generateDocument..HTMLElement"></a>
+
+### generateDocument~HTMLElement : <code>HTMLElement</code> \| [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)
+Create an instance of HTMLElement if not available
+
+**Kind**: inner constant of [<code>generateDocument</code>](#generateDocument)  
+<a name="generateDocument..document"></a>
+
+### generateDocument~document : <code>Document</code> \| [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)
+Define document when not available
+
+**Kind**: inner constant of [<code>generateDocument</code>](#generateDocument)  

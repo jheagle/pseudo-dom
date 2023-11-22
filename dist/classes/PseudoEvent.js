@@ -4,8 +4,8 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 })
 exports.default = void 0
-require('core-js/modules/esnext.async-iterator.map.js')
-require('core-js/modules/esnext.iterator.map.js')
+var _getParentNodes = _interopRequireDefault(require('../functions/getParentNodes'))
+function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
 /**
  * @file Substitute for the DOM Event Class.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -22,12 +22,12 @@ require('core-js/modules/esnext.iterator.map.js')
  * @property {number} BUBBLING_PHASE
  * @property {boolean} bubbles - A Boolean indicating whether the event bubbles up through the Dom or not.
  * @property {boolean} cancelable - A Boolean indicating whether the event is cancelable.
- * @property {boolean} composed - A Boolean value indicating whether or not the event can bubble across the boundary
+ * @property {boolean} composed - A Boolean value indicating whether the event can bubble across the boundary
  * between the shadow Dom and the regular Dom.
  * @property {function|PseudoEventTarget} currentTarget - A reference to the currently registered target for the event. This
  * is the object to which the event is currently slated to be sent; it's possible this has been changed along the way
  * through re-targeting.
- * @property {boolean} defaultPrevented - Indicates whether or not event.preventDefault() has been called on the event.
+ * @property {boolean} defaultPrevented - Indicates whether event.preventDefault() has been called on the event.
  * @property {boolean} immediatePropagationStopped - Flag that no further propagation should occur, including on current
  * target.
  * @property {boolean} propagationStopped - Flag that no further propagation should occur.
@@ -38,78 +38,111 @@ require('core-js/modules/esnext.iterator.map.js')
  * value is time since epoch, but in reality browsers' definitions vary; in addition, work is underway to change this
  * to be a DomHighResTimeStamp instead.
  * @property {string} type - The name of the event (case-insensitive).
- * @property {boolean} isTrusted - Indicates whether or not the event was initiated by the browser (after a user
+ * @property {boolean} isTrusted - Indicates whether the event was initiated by the browser (after a user
  * click for instance) or by a script (using an event creation method, like event.initEvent)
  */
 class PseudoEvent {
   /**
    *
-   * @param typeArg
-   * @param bubbles
-   * @param cancelable
-   * @param composed
-   * @returns {PseudoEvent}
+   * @param {string} typeArg
+   * @param {Object} [eventOptions={}]
+   * @param {boolean} [eventOptions.bubbles=true]
+   * @param {boolean} [eventOptions.cancelable=true]
+   * @param {boolean} [eventOptions.composed=true]
    * @constructor
    */
   constructor () {
-    var _this = this
     const typeArg = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : ''
     const {
       bubbles = true,
       cancelable = true,
       composed = true
     } = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {}
-    let properties = {
-      bubbles,
-      cancelable,
-      composed,
-      currentTarget: () => undefined,
+    this.properties = {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      currentTarget: null,
       defaultPrevented: false,
       immediatePropagationStopped: false,
       propagationStopped: false,
-      eventPhase: '',
-      target: () => undefined,
+      eventPhase: 0,
+      target: null,
       timeStamp: Math.floor(Date.now() / 1000),
-      type: typeArg,
+      type: '',
       isTrusted: true
     }
-    this.setReadOnlyProperties = function () {
-      const updateProps = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {}
-      properties = Object.assign({}, properties, updateProps)
-      _this.getReadOnlyProperties = (properties => function () {
-        const name = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : ''
-        return properties[name]
-      })(properties)
-      return properties
+    this.setReadOnlyProperties({
+      type: typeArg,
+      bubbles: bubbles,
+      cancelable: cancelable,
+      composed: composed
+    })
+  }
+
+  get bubbles () {
+    return this.properties.bubbles
+  }
+
+  get cancelable () {
+    return this.properties.cancelable
+  }
+
+  get composed () {
+    return this.properties.composed
+  }
+
+  get currentTarget () {
+    return this.properties.currentTarget
+  }
+
+  get defaultPrevented () {
+    return this.properties.defaultPrevented
+  }
+
+  get eventPhase () {
+    return this.properties.eventPhase
+  }
+
+  get isTrusted () {
+    return this.properties.isTrusted
+  }
+
+  get target () {
+    return this.properties.target
+  }
+
+  get timeStamp () {
+    return this.properties.timeStamp
+  }
+
+  get type () {
+    return this.properties.type
+  }
+
+  /**
+   * Scope several accessors inside the inner object. These are only intended for usage by other DOM classes.
+   * @returns {EventInner}
+   */
+  get inner () {
+    const self = this
+    return {
+      set currentTarget (target) {
+        self.properties.currentTarget = target
+      },
+      set eventPhase (phase) {
+        self.properties.eventPhase = phase
+      },
+      set target (target) {
+        self.properties.target = target
+      },
+      get immediatePropagationStopped () {
+        return self.properties.immediatePropagationStopped
+      },
+      get propagationStopped () {
+        return self.properties.propagationStopped
+      }
     }
-    this.setReadOnlyProperties()
-    Object.keys(properties).map(propKey => Object.defineProperty(this, propKey, {
-      enumerable: true,
-      get: () => this.getReadOnlyProperties(propKey)
-    }))
-  }
-
-  /**
-   * A selector function for retrieving existing parent PseudoNode from the given child item.
-   * This function will check all the parents starting from node, and scan the attributes
-   * property for matches. The return array contains all matching parent ancestors.
-   * WARNING: This is a recursive function.
-   * @param {string} attr
-   * @param {number|string} value
-   * @param {PseudoNode} node
-   * @returns {Array.<PseudoNode>}
-   */
-  static getParentNodesFromAttribute (attr, value, node) {
-    return Object.keys(node.parentNode).length ? (node.parentNode[attr] || false) === value ? PseudoEvent.getParentNodesFromAttribute(attr, value, node.parentNode).concat([node.parentNode]) : PseudoEvent.getParentNodesFromAttribute(attr, value, node.parentNode) : []
-  }
-
-  /**
-   * A helper selector function for retrieving all parent PseudoNode for the given child node.
-   * @param {PseudoNode} node
-   * @returns {Array.<PseudoNode>}
-   */
-  static getParentNodes (node) {
-    return PseudoEvent.getParentNodesFromAttribute('', false, node)
   }
 
   /**
@@ -120,9 +153,9 @@ class PseudoEvent {
   composedPath () {
     switch (this.eventPhase) {
       case PseudoEvent.CAPTURING_PHASE:
-        return PseudoEvent.getParentNodes(this.target)
+        return (0, _getParentNodes.default)(this.target)
       case PseudoEvent.BUBBLING_PHASE:
-        return PseudoEvent.getParentNodes(this.target).slice().reverse()
+        return (0, _getParentNodes.default)(this.target).slice().reverse()
       case PseudoEvent.AT_TARGET:
         return [this.target]
       default:
@@ -167,19 +200,15 @@ class PseudoEvent {
     })
     return null
   }
-}
 
-// Set up the class constants
-['NONE', 'CAPTURING_PHASE', 'AT_TARGET', 'BUBBLING_PHASE'].reduce((phases, phase, key) => {
-  Object.defineProperty(PseudoEvent, phase, {
-    value: key,
-    writable: false,
-    static: {
-      get: () => key
-    }
-  })
-  return Object.assign({}, phases, {
-    [`${phase}`]: key
-  })
-}, {})
+  setReadOnlyProperties () {
+    const updateProps = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {}
+    this.properties = Object.assign({}, this.properties, updateProps)
+    return this
+  }
+}
+PseudoEvent.NONE = 0
+PseudoEvent.CAPTURING_PHASE = 1
+PseudoEvent.AT_TARGET = 2
+PseudoEvent.BUBBLING_PHASE = 3
 var _default = exports.default = PseudoEvent

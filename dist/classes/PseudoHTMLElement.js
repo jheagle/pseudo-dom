@@ -28,17 +28,17 @@ function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { d
  */
 class PseudoHTMLElement extends _PseudoElement.default {
   /**
-   * Simulate the HTMLELement object when the Dom is not available
-   * @param {string} [tagName=''] - The
-   * @param {PseudoNode|Object} [parent={}]
-   * @param {Array} [children=[]]
-   * @returns {PseudoHTMLElement}
+   * Simulate the HTMLElement object when the Dom is not available
+   * @param {Object} [elementOptions={}]
+   * @param {string} [elementOptions.tagName='']
+   * @param {PseudoNode|Object} [elementOptions.parent={}]
+   * @param {Array} [elementOptions.children=[]]
    * @constructor
    */
   constructor () {
     const {
       tagName = '',
-      parent = {},
+      parent = null,
       children = []
     } = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {}
     super({

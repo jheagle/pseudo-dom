@@ -36,19 +36,19 @@ describe('PseudoEvent', () => {
   })
 
   test('event has immediatePropagationStopped, which can be updated with stopImmediatePropagation()', () => {
-    expect(testEvent.immediatePropagationStopped).toBe(false)
+    expect(testEvent.inner.immediatePropagationStopped).toBe(false)
     testEvent.stopImmediatePropagation()
-    expect(testEvent.immediatePropagationStopped).toBe(true)
+    expect(testEvent.inner.immediatePropagationStopped).toBe(true)
   })
 
   test('event has propagationStopped, which can be updated with stopPropagation()', () => {
-    expect(testEvent.propagationStopped).toBe(false)
+    expect(testEvent.inner.propagationStopped).toBe(false)
     testEvent.stopPropagation()
-    expect(testEvent.propagationStopped).toBe(true)
+    expect(testEvent.inner.propagationStopped).toBe(true)
   })
 
   test('event has eventPhase', () => {
-    expect(testEvent.eventPhase).toBe('')
+    expect(testEvent.eventPhase).toBe(PseudoEvent.NONE)
   })
 
   test('event has target', () => {
