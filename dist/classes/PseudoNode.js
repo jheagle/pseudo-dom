@@ -5,7 +5,6 @@ Object.defineProperty(exports, '__esModule', {
 })
 exports.default = void 0
 var _PseudoEventTarget = _interopRequireDefault(require('./PseudoEventTarget'))
-var _generateNodeList = _interopRequireDefault(require('../factories/generateNodeList'))
 function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
 /**
  * @file Substitute for the DOM Node Class.
@@ -31,8 +30,6 @@ class PseudoNode extends _PseudoEventTarget.default {
     super()
     this.nodeValue = ''
     this.textContext = ''
-    this.children = (0, _generateNodeList.default)()
-    this.parent = undefined
   }
 
   get baseURI () {

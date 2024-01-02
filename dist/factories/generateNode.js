@@ -7,24 +7,48 @@ exports.default = exports.NodeFactory = void 0
 require('core-js/modules/esnext.async-iterator.reduce.js')
 require('core-js/modules/esnext.iterator.constructor.js')
 require('core-js/modules/esnext.iterator.reduce.js')
-var _TreeLinker = _interopRequireDefault(require('collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'))
 var _PseudoNode = _interopRequireDefault(require('../classes/PseudoNode'))
+var _PseudoNodeList = _interopRequireDefault(require('../classes/PseudoNodeList'))
+var _TreeLinker = _interopRequireDefault(require('collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'))
 function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
-class NodeFactory extends _TreeLinker.default {}
+class NodeFactory extends _TreeLinker.default {
+  /**
+   * Create the new TreeLinker instance, provide the data and optionally set references for next, prev, parent, or children.
+   * @param {Object} [settings={}]
+   * @param {*} [settings.data=null] The data to be stored in this tree node
+   * @param {TreeLinker} [settings.next=null] The reference to the next linker if any
+   * @param {TreeLinker} [settings.prev=null] The reference to the previous linker if any
+   * @param {LinkedTreeList} [settings.children=null] The references to child linkers if any
+   * @param {TreeLinker} [settings.parent=null] The reference to a parent linker if any
+   * @param {IsArrayable<IsTreeNode>} listClass Give the type of list to use for storing the children
+   */
+  constructor () {
+    const {
+      data = null,
+      next = null,
+      prev = null,
+      children = null,
+      parent = null,
+      listClass = _PseudoNodeList.default
+    } = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {}
+    super({
+      data: data,
+      next: next,
+      prev: prev,
+      parent: parent
+    })
+    this.classType = NodeFactory
+    this.children = this.childrenFromArray(children, listClass)
+  }
+}
 exports.NodeFactory = NodeFactory
 const generateNode = () => {
+  NodeFactory.make = (node, nodeClass) => _TreeLinker.default.make(node, nodeClass)
   NodeFactory.fromArray = function () {
     const values = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : []
-    const LinkerClass = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : NodeFactory
+    const linkerClass = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : NodeFactory
     return values.reduce((list, element) => {
-      if (typeof element !== 'object') {
-        element = {
-          data: element
-        }
-      }
-      const newElement = new LinkerClass(Object.assign({}, element, {
-        prev: list.tail
-      }))
+      const newElement = linkerClass.make(element, linkerClass)
       /**
        * Simulate the behaviour of the Node Class when there is no DOM available.
        * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -41,7 +65,7 @@ const generateNode = () => {
          */
         constructor () {
           super()
-          this.nodeValue = element.data
+          this.nodeValue = newElement.data
           this.textContext = ''
         }
 

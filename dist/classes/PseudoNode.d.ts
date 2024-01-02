@@ -32,7 +32,7 @@ declare class PseudoNode extends PseudoEventTarget {
     static readonly NOTATION_NODE = 12;
     children: PseudoNodeList | LinkedTreeList;
     parent: PseudoNode | undefined;
-    protected nodeValue: string;
+    nodeValue: string;
     protected textContext: string;
     protected name: string;
     private next;

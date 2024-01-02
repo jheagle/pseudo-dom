@@ -170,7 +170,6 @@ class PseudoElement extends _PseudoNode.default {
       delete this[attributeName]
       // TODO: how do we delete it as an attribute?
     }
-
     return null
   }
 }

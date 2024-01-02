@@ -3,10 +3,11 @@
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @version 1.0.0
  */
-import PseudoEvent from './PseudoEvent'
-import PseudoEventListener from './PseudoEventListener'
+import PseudoEvent from '../classes/PseudoEvent'
+import PseudoEventListener from '../classes/PseudoEventListener'
 import Stack from 'collect-your-stuff/dist/collections/stack/Stack'
 import Stackable from 'collect-your-stuff/dist/collections/stack/Stackable'
+import PseudoEventTarget from '../recipes/PseudoEventTarget'
 
 export type listenerOptions = { capture: boolean, once: boolean, passive: boolean }
 
@@ -23,7 +24,7 @@ type defaultEvents = { [key: string]: Function }
  * @property {function} removeEventListener
  * @property {function} dispatchEvent
  */
-class PseudoEventTarget {
+class ListenerList implements PseudoEventTarget {
   private readonly listeners: registeredListeners
   private readonly defaultEvent: defaultEvents
 
@@ -152,7 +153,7 @@ class PseudoEventTarget {
    */
   public addEventListener (type: string, callback: Function | {
     handleEvent: Function
-  } | any, useCapture: listenerOptions | boolean = false) {
+  } | any, useCapture: listenerOptions | boolean = false): undefined {
     let options: listenerOptions = { capture: false, once: false, passive: false }
     if (typeof useCapture === 'object') {
       // Originally useCapture was a single boolean flag, later optional other flags can be used
@@ -188,7 +189,7 @@ class PseudoEventTarget {
    * @param {string} type
    * @param {function} callback
    */
-  public removeEventListener (type: string, callback: Function) {
+  public removeEventListener (type: string, callback: Function): undefined {
     if (!(type in this.listeners)) {
       return
     }
@@ -221,4 +222,12 @@ class PseudoEventTarget {
   }
 }
 
-export default PseudoEventTarget
+export type ListenerListInstance = ListenerList
+
+const generateListenerList = (): ListenerListInstance => {
+  return new ListenerList()
+}
+
+export default generateListenerList
+
+

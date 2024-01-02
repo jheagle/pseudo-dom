@@ -3,11 +3,14 @@
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @version 1.0.0
  */
-import PseudoEventTarget from './PseudoEventTarget'
-import generateNodeList from '../factories/generateNodeList'
+import PseudoEventTarget, { listenerOptions } from '../recipes/PseudoEventTarget'
 import PseudoNodeList from './PseudoNodeList'
 import LinkedTreeList from 'collect-your-stuff/dist/collections/linked-tree-list/LinkedTreeList'
 import TreeLinker from 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'
+import generateNodeList from '../factories/generateNodeList'
+import PseudoElement from './PseudoElement'
+import PseudoEvent from './PseudoEvent'
+import generateListenerList, { ListenerListInstance } from '../factories/generateListenerList'
 
 /**
  * Simulate the behaviour of the Node Class when there is no DOM available.
@@ -18,7 +21,7 @@ import TreeLinker from 'collect-your-stuff/dist/collections/linked-tree-list/Tre
  * @property {function} appendChild
  * @property {function} removeChild
  */
-class PseudoNode extends PseudoEventTarget {
+abstract class PseudoNode implements PseudoEventTarget {
   public static readonly DEFAULT_NODE = 0
   public static readonly ELEMENT_NODE = 1
   public static readonly ATTRIBUTE_NODE = 2
@@ -32,76 +35,45 @@ class PseudoNode extends PseudoEventTarget {
   public static readonly DOCUMENT_TYPE_NODE = 10
   public static readonly DOCUMENT_FRAGMENT_NODE = 11
   public static readonly NOTATION_NODE = 12
-  public children: PseudoNodeList | LinkedTreeList
-  public parent: PseudoNode | undefined
-  protected nodeValue: string
-  protected textContext: string
-  protected name: string
-  private next: PseudoNode | null
-  private prev: PseudoNode | null
+
+  public readonly baseURI: Location | string
+  public readonly childNodes: PseudoNodeList | LinkedTreeList
+  public readonly firstChild: PseudoNode
+  public readonly isConnected: boolean
+  public readonly lastChild: PseudoNode
+  public readonly nextSibling: PseudoNode
+  public readonly nodeName: string
+  public readonly nodeType: number
+  public nodeValue: string
+  public ownerDocument: Document | null
+  public parentNode: PseudoNode
+  public parentElement: PseudoElement
+  public previousSibling: PseudoNode
+  protected textContent: string
+
+  private listenerList: ListenerListInstance
 
   /**
    *
    * @constructor
    */
   constructor () {
-    super()
+    this.baseURI = typeof window !== 'undefined' ? window.location : '/'
+    this.childNodes = generateNodeList()
+    this.firstChild = this.childNodes.first ? this.childNodes.first.data : null
+    this.isConnected = false
+    this.lastChild = this.childNodes.last ? this.childNodes.last.data : null
+    this.nextSibling = this.next ? this.next.data : null
+    this.nodeName = ''
+    this.nodeType = PseudoNode.DEFAULT_NODE
     this.nodeValue = ''
-    this.textContext = ''
-    this.children = generateNodeList()
-    this.parent = undefined
-  }
+    this.ownerDocument = null
+    this.parentNode = this.childNodes.parent ? this.childNodes.parent.data : null
+    this.parentElement = this.nodeType === PseudoNode.ELEMENT_NODE && this.childNodes.parent ? this.childNodes.parent.data : null
+    this.previousSibling = this.prev ? this.prev.data : null
+    this.textContent = ''
 
-  get baseURI (): Location | string {
-    return window.location || '/'
-  }
-
-  get childNodes (): PseudoNodeList | LinkedTreeList {
-    return this.children
-  }
-
-  get firstChild () {
-    return this.children.first
-  }
-
-  get isConnected () {
-    return !!this.parent
-  }
-
-  get lastChild () {
-    return this.children.last
-  }
-
-  get nextSibling () {
-    return this.isConnected
-      ? this.next
-      : null
-  }
-
-  get nodeName () {
-    return this.name || ''
-  }
-
-  get nodeType () {
-    return PseudoNode.DEFAULT_NODE
-  }
-
-  get ownerDocument (): any | undefined {
-    return undefined
-  }
-
-  get parentNode () {
-    return this.parent
-  }
-
-  get parentElement () {
-    return this.parent.nodeType === PseudoNode.ELEMENT_NODE ? this.parent : null
-  }
-
-  get previousSibling () {
-    return this.isConnected
-      ? this.prev
-      : null
+    this.listenerList = generateListenerList()
   }
 
   /**
@@ -110,7 +82,7 @@ class PseudoNode extends PseudoEventTarget {
    * @returns {PseudoNode}
    */
   appendChild (childNode: PseudoNode): PseudoNode {
-    this.children.append(childNode)
+    this.childNodes.append(childNode)
     return childNode
   }
 
@@ -121,11 +93,11 @@ class PseudoNode extends PseudoEventTarget {
   contains () {}
 
   getRootNode (): PseudoNode {
-    return this.parent.getRootNode() || this.parent
+    return this.parentNode.getRootNode() || this.parentNode
   }
 
   hasChildNodes () {
-    return this.children.length > 0
+    return this.childNodes.length > 0
   }
 
   insertBefore () {}
@@ -148,10 +120,22 @@ class PseudoNode extends PseudoEventTarget {
    * @returns {PseudoNode}
    */
   removeChild (childElement: TreeLinker): TreeLinker {
-    return this.children.remove(childElement)
+    return this.childNodes.remove(childElement)
   }
 
   replaceChild () {}
+
+  addEventListener (type: string, callback: any, useCapture: listenerOptions | boolean): undefined {
+    return this.listenerList.addEventListener(type, callback, useCapture)
+  }
+
+  removeEventListener (type: string, callback: Function): undefined {
+    return this.listenerList.removeEventListener(type, callback)
+  }
+
+  dispatchEvent (event: PseudoEvent, target: PseudoEventTarget): boolean {
+    return this.listenerList.dispatchEvent(event, target)
+  }
 }
 
 export default PseudoNode

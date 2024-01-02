@@ -12,6 +12,11 @@ Mock the DOM for server side-side DOM state and in tests.
 ## Classes
 
 <dl>
+<dt><a href="#AttachedNodeIterator">AttachedNodeIterator</a></dt>
+<dd><p>Class TreeLinkerIterator returns the next value taking a left-first approach down a tree.</p>
+</dd>
+<dt><a href="#NodeFactory">NodeFactory</a></dt>
+<dd></dd>
 <dt><a href="#PseudoNodeAttached">PseudoNodeAttached</a> ⇐ <code><a href="#PseudoEventTarget">PseudoEventTarget</a></code></dt>
 <dd><p>Simulate the behaviour of the Node Class when there is no DOM available.</p>
 </dd>
@@ -53,6 +58,32 @@ context.</p>
 All methods exported from this module are encapsulated within pseudoDom.
 
 **Author**: Joshua Heagle <joshuaheagle@gmail.com>  
+<a name="AttachedNodeIterator"></a>
+
+## AttachedNodeIterator
+Class TreeLinkerIterator returns the next value taking a left-first approach down a tree.
+
+**Kind**: global class  
+<a name="NodeFactory"></a>
+
+## NodeFactory
+**Kind**: global class  
+<a name="new_NodeFactory_new"></a>
+
+### new NodeFactory([settings], listClass)
+Create the new TreeLinker instance, provide the data and optionally set references for next, prev, parent, or children.
+
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [settings] | <code>Object</code> | <code>{}</code> |  |
+| [settings.data] | <code>\*</code> | <code></code> | The data to be stored in this tree node |
+| [settings.next] | <code>TreeLinker</code> | <code></code> | The reference to the next linker if any |
+| [settings.prev] | <code>TreeLinker</code> | <code></code> | The reference to the previous linker if any |
+| [settings.children] | <code>LinkedTreeList</code> | <code></code> | The references to child linkers if any |
+| [settings.parent] | <code>TreeLinker</code> | <code></code> | The reference to a parent linker if any |
+| listClass | <code>IsArrayable.&lt;IsTreeNode&gt;</code> |  | Give the type of list to use for storing the children |
+
 <a name="PseudoNodeAttached"></a>
 
 ## PseudoNodeAttached ⇐ [<code>PseudoEventTarget</code>](#PseudoEventTarget)
