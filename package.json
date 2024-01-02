@@ -16,11 +16,10 @@
     "watch:test": "gulp watchTest"
   },
   "dependencies": {
-    "collect-your-stuff": "^1.1.1",
-    "npm": "^10.2.4"
+    "collect-your-stuff": "^1.1.5"
   },
   "devDependencies": {
-    "js-build-tools": "^2.2.10",
+    "js-build-tools": "^2.2.12",
     "jsdoc": "^4.0.2",
     "standard": "^17.1.0"
   },
