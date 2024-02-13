@@ -1,5 +1,5 @@
 import PseudoNode from './PseudoNode'
-import { logObject } from 'js-build-tools/functions/testHelpers'
+import { logObject } from 'test-filesystem'
 
 describe('PseudoNode', () => {
   test('what does it even do', () => {

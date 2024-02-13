@@ -1,4 +1,4 @@
-import { logObject } from 'js-build-tools/functions/testHelpers'
+import { logObject } from 'test-filesystem'
 import generateNode from './generateNode'
 
 describe('generateNode', () => {

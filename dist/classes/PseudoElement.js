@@ -4,11 +4,11 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 })
 exports.default = void 0
-require('core-js/modules/esnext.async-iterator.map.js')
-require('core-js/modules/esnext.iterator.map.js')
 require('core-js/modules/esnext.async-iterator.find.js')
+require('core-js/modules/esnext.async-iterator.map.js')
 require('core-js/modules/esnext.iterator.constructor.js')
 require('core-js/modules/esnext.iterator.find.js')
+require('core-js/modules/esnext.iterator.map.js')
 var _PseudoNode = _interopRequireDefault(require('./PseudoNode'))
 var _generateNodeList = _interopRequireDefault(require('../factories/generateNodeList'))
 var _TreeLinker = _interopRequireDefault(require('collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'))
@@ -170,7 +170,6 @@ class PseudoElement extends _PseudoNode.default {
       delete this[attributeName]
       // TODO: how do we delete it as an attribute?
     }
-
     return null
   }
 }

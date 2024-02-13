@@ -5,9 +5,9 @@ Object.defineProperty(exports, '__esModule', {
 })
 exports.default = void 0
 require('core-js/modules/esnext.async-iterator.for-each.js')
+require('core-js/modules/esnext.async-iterator.reduce.js')
 require('core-js/modules/esnext.iterator.constructor.js')
 require('core-js/modules/esnext.iterator.for-each.js')
-require('core-js/modules/esnext.async-iterator.reduce.js')
 require('core-js/modules/esnext.iterator.reduce.js')
 var _PseudoEvent = _interopRequireDefault(require('./PseudoEvent'))
 var _PseudoEventListener = _interopRequireDefault(require('./PseudoEventListener'))
