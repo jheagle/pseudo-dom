@@ -1311,6 +1311,7 @@
       value: true
     })
     exports.default = void 0
+    require('core-js/modules/web.dom-collections.iterator.js')
     var _ArrayElement = _interopRequireDefault(require('./ArrayElement'))
     var _ArrayIterator = _interopRequireDefault(require('../../recipes/ArrayIterator'))
     function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
@@ -1501,7 +1502,7 @@
       return list.initialize(elementClass.fromArray(values).head)
     }
     var _default = exports.default = Arrayable
-  }, { '../../recipes/ArrayIterator': 24, './ArrayElement': 14 }],
+  }, { '../../recipes/ArrayIterator': 24, './ArrayElement': 14, 'core-js/modules/web.dom-collections.iterator.js': 147 }],
   16: [function (require, module, exports) {
     'use strict'
 
@@ -1588,6 +1589,7 @@
       value: true
     })
     exports.default = void 0
+    require('core-js/modules/web.dom-collections.iterator.js')
     var _DoubleLinker = _interopRequireDefault(require('./DoubleLinker'))
     var _DoubleLinkerIterator = _interopRequireDefault(require('../../recipes/DoubleLinkerIterator'))
     var _LinkedList = _interopRequireDefault(require('../linked-list/LinkedList'))
@@ -1857,7 +1859,7 @@
       return _LinkedList.default.fromArray(values, linkerClass, classType)
     }
     var _default = exports.default = DoublyLinkedList
-  }, { '../../recipes/DoubleLinkerIterator': 25, '../linked-list/LinkedList': 18, './DoubleLinker': 16 }],
+  }, { '../../recipes/DoubleLinkerIterator': 25, '../linked-list/LinkedList': 18, './DoubleLinker': 16, 'core-js/modules/web.dom-collections.iterator.js': 147 }],
   18: [function (require, module, exports) {
     'use strict'
 
@@ -1865,6 +1867,7 @@
       value: true
     })
     exports.default = void 0
+    require('core-js/modules/web.dom-collections.iterator.js')
     var _Linker = _interopRequireDefault(require('./Linker'))
     var _LinkerIterator = _interopRequireDefault(require('../../recipes/LinkerIterator'))
     var _Arrayable = _interopRequireDefault(require('../arrayable/Arrayable'))
@@ -2100,7 +2103,7 @@
       return list.initialize(linkerClass.fromArray(values).head)
     }
     var _default = exports.default = LinkedList
-  }, { '../../recipes/LinkerIterator': 26, '../arrayable/Arrayable': 15, './Linker': 19 }],
+  }, { '../../recipes/LinkerIterator': 26, '../arrayable/Arrayable': 15, './Linker': 19, 'core-js/modules/web.dom-collections.iterator.js': 147 }],
   19: [function (require, module, exports) {
     'use strict'
 
@@ -2197,6 +2200,7 @@
       value: true
     })
     exports.default = void 0
+    require('core-js/modules/web.dom-collections.iterator.js')
     var _TreeLinker = _interopRequireDefault(require('./TreeLinker'))
     var _TreeLinkerIterator = _interopRequireDefault(require('../../recipes/TreeLinkerIterator'))
     var _DoublyLinkedList = _interopRequireDefault(require('../doubly-linked-list/DoublyLinkedList'))
@@ -2452,7 +2456,7 @@
       return list.initialize(linkerClass.fromArray(values).head)
     }
     var _default = exports.default = LinkedTreeList
-  }, { '../../recipes/TreeLinkerIterator': 27, '../doubly-linked-list/DoublyLinkedList': 17, './TreeLinker': 21 }],
+  }, { '../../recipes/TreeLinkerIterator': 27, '../doubly-linked-list/DoublyLinkedList': 17, './TreeLinker': 21, 'core-js/modules/web.dom-collections.iterator.js': 147 }],
   21: [function (require, module, exports) {
     'use strict'
 
@@ -2994,6 +2998,7 @@
       return function ($this, el, fromIndex) {
         var O = toIndexedObject($this)
         var length = lengthOfArrayLike(O)
+        if (length === 0) return !IS_INCLUDES && -1
         var index = toAbsoluteIndex(fromIndex, length)
         var value
         // Array#includes uses SameValueZero equality algorithm
@@ -3466,16 +3471,15 @@
   }, {}],
   48: [function (require, module, exports) {
     'use strict'
-    var toPropertyKey = require('../internals/to-property-key')
+    var DESCRIPTORS = require('../internals/descriptors')
     var definePropertyModule = require('../internals/object-define-property')
     var createPropertyDescriptor = require('../internals/create-property-descriptor')
 
     module.exports = function (object, key, value) {
-      var propertyKey = toPropertyKey(key)
-      if (propertyKey in object) definePropertyModule.f(object, propertyKey, createPropertyDescriptor(0, value))
-      else object[propertyKey] = value
+      if (DESCRIPTORS) definePropertyModule.f(object, key, createPropertyDescriptor(0, value))
+      else object[key] = value
     }
-  }, { '../internals/create-property-descriptor': 47, '../internals/object-define-property': 104, '../internals/to-property-key': 129 }],
+  }, { '../internals/create-property-descriptor': 47, '../internals/descriptors': 53, '../internals/object-define-property': 104 }],
   49: [function (require, module, exports) {
     'use strict'
     var makeBuiltIn = require('../internals/make-built-in')
@@ -5032,29 +5036,29 @@
   }, { '../internals/shared': 121, '../internals/uid': 132 }],
   120: [function (require, module, exports) {
     'use strict'
-    var global = require('../internals/global')
+    var IS_PURE = require('../internals/is-pure')
+    var globalThis = require('../internals/global')
     var defineGlobalProperty = require('../internals/define-global-property')
 
     var SHARED = '__core-js_shared__'
-    var store = global[SHARED] || defineGlobalProperty(SHARED, {})
+    var store = module.exports = globalThis[SHARED] || defineGlobalProperty(SHARED, {});
 
-    module.exports = store
-  }, { '../internals/define-global-property': 52, '../internals/global': 75 }],
-  121: [function (require, module, exports) {
-    'use strict'
-    var IS_PURE = require('../internals/is-pure')
-    var store = require('../internals/shared-store');
-
-    (module.exports = function (key, value) {
-      return store[key] || (store[key] = value !== undefined ? value : {})
-    })('versions', []).push({
-      version: '3.35.1',
+    (store.versions || (store.versions = [])).push({
+      version: '3.36.0',
       mode: IS_PURE ? 'pure' : 'global',
       copyright: '© 2014-2024 Denis Pushkarev (zloirock.ru)',
-      license: 'https://github.com/zloirock/core-js/blob/v3.35.1/LICENSE',
+      license: 'https://github.com/zloirock/core-js/blob/v3.36.0/LICENSE',
       source: 'https://github.com/zloirock/core-js'
     })
-  }, { '../internals/is-pure': 89, '../internals/shared-store': 120 }],
+  }, { '../internals/define-global-property': 52, '../internals/global': 75, '../internals/is-pure': 89 }],
+  121: [function (require, module, exports) {
+    'use strict'
+    var store = require('../internals/shared-store')
+
+    module.exports = function (key, value) {
+      return store[key] || (store[key] = value || {})
+    }
+  }, { '../internals/shared-store': 120 }],
   122: [function (require, module, exports) {
     'use strict'
     /* eslint-disable es/no-symbol -- required for testing */
