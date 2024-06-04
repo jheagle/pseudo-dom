@@ -3,9 +3,9 @@
  * @param {PseudoNode} node
  * @returns {Array.<PseudoNode>}
  */
-import PseudoNode from '../classes/PseudoNode'
+import PseudoNode from '../interfaces/PseudoNode'
 import getParentNodesFromAttribute from './getParentNodesFromAttribute'
-import PseudoEventTarget from '../classes/PseudoEventTarget'
+import PseudoEventTarget from '../interfaces/PseudoEventTarget'
 
 const getParentNodes = (node: PseudoEventTarget): Array<PseudoNode> => getParentNodesFromAttribute('', false, node)
 

@@ -1,7 +1,7 @@
-import PseudoEventTarget from '../classes/PseudoEventTarget'
-import PseudoNode from '../classes/PseudoNode'
-import PseudoElement from '../classes/PseudoElement'
-import PseudoHTMLElement from '../classes/PseudoHTMLElement'
+import PseudoEventTarget from '../interfaces/PseudoEventTarget'
+import PseudoNode from '../interfaces/PseudoNode'
+import PseudoElement from '../interfaces/PseudoElement'
+import PseudoHTMLElement from '../interfaces/PseudoHTMLElement'
 import PseudoHTMLDocument from '../classes/PseudoHTMLDocument'
 
 /**

@@ -7,7 +7,7 @@
  *
  * @type {PseudoHTMLElement}
  */
-import PseudoHTMLElement from './PseudoHTMLElement'
+import PseudoHTMLElement from '../interfaces/PseudoHTMLElement'
 import generateNodeList from '../factories/generateNodeList'
 import TreeLinker from 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'
 

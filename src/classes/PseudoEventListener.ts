@@ -3,8 +3,8 @@
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @version 1.0.0
  */
-import PseudoEvent from './PseudoEvent'
-import { listenerOptions } from './PseudoEventTarget'
+import PseudoEvent from '../interfaces/PseudoEvent'
+import { listenerOptions } from '../interfaces/PseudoEventTarget'
 
 /**
  * Handle events as they are stored and implemented.

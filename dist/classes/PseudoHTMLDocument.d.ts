@@ -7,7 +7,7 @@
  *
  * @type {PseudoHTMLElement}
  */
-import PseudoHTMLElement from './PseudoHTMLElement';
+import PseudoHTMLElement from '../interfaces/PseudoHTMLElement';
 /**
  * Simulate the behaviour of the HTMLDocument Class when there is no DOM available.
  * @author Joshua Heagle <joshuaheagle@gmail.com>

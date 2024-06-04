@@ -3,11 +3,11 @@
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @version 1.0.0
  */
-import LinkedTreeList from 'collect-your-stuff/dist/collections/linked-tree-list/LinkedTreeList'
-import TreeLinker from 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'
-import PseudoNode from './PseudoNode'
+import { LinkedTreeList } from 'collect-your-stuff/dist/collections/linked-tree-list/LinkedTreeList'
+import { TreeLinker } from 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'
+import { PseudoNode } from '../interfaces/PseudoNode'
 
-class PseudoNodeList extends LinkedTreeList {
+export class PseudoNodeList extends LinkedTreeList {
   get entries () {
     return Array.from(this)
   }
@@ -20,5 +20,3 @@ class PseudoNodeList extends LinkedTreeList {
     return Array.from(this.innerList).map((item: TreeLinker): PseudoNode => item.data).values
   }
 }
-
-export default PseudoNodeList

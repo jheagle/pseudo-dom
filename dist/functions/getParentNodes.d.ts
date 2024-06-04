@@ -3,7 +3,6 @@
  * @param {PseudoNode} node
  * @returns {Array.<PseudoNode>}
  */
-import PseudoNode from '../classes/PseudoNode';
-import PseudoEventTarget from '../classes/PseudoEventTarget';
+import PseudoNode from '../interfaces/PseudoNode';
 declare const getParentNodes: (node: PseudoEventTarget) => Array<PseudoNode>;
 export default getParentNodes;

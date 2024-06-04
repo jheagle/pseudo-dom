@@ -1,4 +1,4 @@
-import LinkedTreeList from 'collect-your-stuff/dist/collections/linked-tree-list/LinkedTreeList'
+import { LinkedTreeList } from 'collect-your-stuff/dist/collections/linked-tree-list/LinkedTreeList'
 import generateNode from '../factories/generateNode'
 import generateNodeList from '../factories/generateNodeList'
 

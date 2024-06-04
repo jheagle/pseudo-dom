@@ -3,7 +3,7 @@
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @version 1.0.0
  */
-import PseudoEvent from './PseudoEvent';
+import PseudoEvent from '../interfaces/PseudoEvent';
 /**
  * Handle events as they are stored and implemented.
  * @author Joshua Heagle <joshuaheagle@gmail.com>

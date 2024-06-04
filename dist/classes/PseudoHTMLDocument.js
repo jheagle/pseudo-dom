@@ -4,10 +4,10 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 })
 exports.default = void 0
-var _PseudoHTMLElement = _interopRequireDefault(require('./PseudoHTMLElement'))
+var _PseudoHTMLElement = _interopRequireDefault(require('../interfaces/PseudoHTMLElement'))
 var _generateNodeList = _interopRequireDefault(require('../factories/generateNodeList'))
 var _TreeLinker = _interopRequireDefault(require('collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'))
-function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
+function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: e } }
 /**
  * @file Substitute for the DOM HTMLDocument Class.
  * @author Joshua Heagle <joshuaheagle@gmail.com>

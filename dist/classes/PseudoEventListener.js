@@ -4,8 +4,8 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 })
 exports.default = void 0
-var _PseudoEvent = _interopRequireDefault(require('./PseudoEvent'))
-function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
+var _PseudoEvent = _interopRequireDefault(require('../interfaces/PseudoEvent'))
+function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: e } }
 /**
  * @file Substitute for the DOM EventEventListener Class.
  * @author Joshua Heagle <joshuaheagle@gmail.com>

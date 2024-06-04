@@ -8,8 +8,8 @@ require('core-js/modules/esnext.async-iterator.reduce.js')
 require('core-js/modules/esnext.iterator.constructor.js')
 require('core-js/modules/esnext.iterator.reduce.js')
 var _TreeLinker = _interopRequireDefault(require('collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'))
-var _PseudoNode = _interopRequireDefault(require('../classes/PseudoNode'))
-function _interopRequireDefault (obj) { return obj && obj.__esModule ? obj : { default: obj } }
+var _PseudoNode = _interopRequireDefault(require('../interfaces/PseudoNode'))
+function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: e } }
 class NodeFactory extends _TreeLinker.default {}
 exports.NodeFactory = NodeFactory
 const generateNode = () => {

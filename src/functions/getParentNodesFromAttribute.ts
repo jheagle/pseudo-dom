@@ -8,8 +8,8 @@
  * @param {PseudoNode} node
  * @returns {Array.<PseudoNode>}
  */
-import PseudoNode from '../classes/PseudoNode'
-import PseudoEventTarget from '../classes/PseudoEventTarget'
+import PseudoNode from '../interfaces/PseudoNode'
+import PseudoEventTarget from '../interfaces/PseudoEventTarget'
 
 const getParentNodesFromAttribute = (attr: string, value: boolean | number | string, node: PseudoEventTarget | PseudoNode | any): Array<PseudoNode> => {
   return Object.keys(node.parentNode).length

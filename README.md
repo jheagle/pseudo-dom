@@ -12,36 +12,36 @@ Mock the DOM for server side-side DOM state and in tests.
 ## Classes
 
 <dl>
-<dt><a href="#PseudoNodeAttached">PseudoNodeAttached</a> ⇐ <code><a href="#PseudoEventTarget">PseudoEventTarget</a></code></dt>
+<dt><a href="#NodeService">NodeService</a> ⇐ <code>PseudoEventTarget</code></dt>
 <dd><p>Simulate the behaviour of the Node Class when there is no DOM available.</p>
 </dd>
-<dt><a href="#PseudoNode">PseudoNode</a> ⇐ <code><a href="#PseudoEventTarget">PseudoEventTarget</a></code></dt>
-<dd><p>Simulate the behaviour of the Node Class when there is no DOM available.</p>
-</dd>
-<dt><a href="#PseudoHTMLElement">PseudoHTMLElement</a> ⇐ <code><a href="#PseudoElement">PseudoElement</a></code></dt>
+<dt><a href="#HTMLElementService">HTMLElementService</a> ⇐ <code>PseudoElement</code></dt>
 <dd><p>Simulate the behaviour of the HTMLElement Class when there is no DOM available.</p>
 </dd>
-<dt><a href="#PseudoHTMLDocument">PseudoHTMLDocument</a> ⇐ <code><a href="#PseudoHTMLElement">PseudoHTMLElement</a></code></dt>
-<dd><p>Simulate the behaviour of the HTMLDocument Class when there is no DOM available.</p>
-</dd>
-<dt><a href="#PseudoEventTarget">PseudoEventTarget</a></dt>
+<dt><a href="#EventTargetService">EventTargetService</a></dt>
 <dd><p>Simulate the behaviour of the EventTarget Class when there is no DOM available.</p>
+</dd>
+<dt><a href="#EventService">EventService</a></dt>
+<dd><p>Simulate the behaviour of the Event Class when there is no DOM available.</p>
+</dd>
+<dt><a href="#ElementService">ElementService</a> ⇐ <code>PseudoNode</code></dt>
+<dd><p>Simulate the behaviour of the Element Class when there is no DOM available.</p>
+</dd>
+<dt><a href="#PseudoNodeAttached">PseudoNodeAttached</a> ⇐ <code>PseudoEventTarget</code></dt>
+<dd><p>Simulate the behaviour of the Node Class when there is no DOM available.</p>
+</dd>
+<dt><a href="#PseudoHTMLDocument">PseudoHTMLDocument</a> ⇐ <code>PseudoHTMLElement</code></dt>
+<dd><p>Simulate the behaviour of the HTMLDocument Class when there is no DOM available.</p>
 </dd>
 <dt><a href="#PseudoEventListener">PseudoEventListener</a></dt>
 <dd><p>Handle events as they are stored and implemented.</p>
-</dd>
-<dt><a href="#PseudoEvent">PseudoEvent</a></dt>
-<dd><p>Simulate the behaviour of the Event Class when there is no DOM available.</p>
-</dd>
-<dt><a href="#PseudoElement">PseudoElement</a> ⇐ <code><a href="#PseudoNode">PseudoNode</a></code></dt>
-<dd><p>Simulate the behaviour of the Element Class when there is no DOM available.</p>
 </dd>
 </dl>
 
 ## Functions
 
 <dl>
-<dt><a href="#generateDocument">generateDocument(root, context)</a> ⇒ <code>Window</code> | <code><a href="#PseudoEventTarget">PseudoEventTarget</a></code></dt>
+<dt><a href="#generateDocument">generateDocument(root, context)</a> ⇒ <code>Window</code> | <code>PseudoEventTarget</code></dt>
 <dd><p>Construct the Pseudo Dom to provide access to Dom objects which are otherwise not available outside the browser
 context.</p>
 </dd>
@@ -53,13 +53,13 @@ context.</p>
 All methods exported from this module are encapsulated within pseudoDom.
 
 **Author**: Joshua Heagle <joshuaheagle@gmail.com>  
-<a name="PseudoNodeAttached"></a>
+<a name="NodeService"></a>
 
-## PseudoNodeAttached ⇐ [<code>PseudoEventTarget</code>](#PseudoEventTarget)
+## NodeService ⇐ <code>PseudoEventTarget</code>
 Simulate the behaviour of the Node Class when there is no DOM available.
 
 **Kind**: global class  
-**Extends**: [<code>PseudoEventTarget</code>](#PseudoEventTarget)  
+**Extends**: <code>PseudoEventTarget</code>  
 **Author**: Joshua Heagle <joshuaheagle@gmail.com>  
 **Properties**
 
@@ -70,238 +70,35 @@ Simulate the behaviour of the Node Class when there is no DOM available.
 | removeChild | <code>function</code> | 
 
 
-* [PseudoNodeAttached](#PseudoNodeAttached) ⇐ [<code>PseudoEventTarget</code>](#PseudoEventTarget)
-    * [.appendChild(childNode)](#PseudoNodeAttached+appendChild) ⇒ [<code>PseudoNode</code>](#PseudoNode)
-    * [.removeChild(childElement)](#PseudoNodeAttached+removeChild) ⇒ [<code>PseudoNode</code>](#PseudoNode)
-    * [.runEvents(event)](#PseudoEventTarget+runEvents) ⇒ <code>boolean</code>
-    * [.setDefaultEvent(type, callback)](#PseudoEventTarget+setDefaultEvent)
-    * [.runDefaultEvent(event)](#PseudoEventTarget+runDefaultEvent) ⇒ <code>boolean</code>
-    * [.startEvents(eventType)](#PseudoEventTarget+startEvents) ⇒ <code>boolean</code>
-    * [.addEventListener(type, callback, [useCapture])](#PseudoEventTarget+addEventListener)
-    * [.removeEventListener(type, callback)](#PseudoEventTarget+removeEventListener)
-    * [.dispatchEvent(event, target)](#PseudoEventTarget+dispatchEvent) ⇒ <code>boolean</code>
+* [NodeService](#NodeService) ⇐ <code>PseudoEventTarget</code>
+    * [.appendChild(childNode)](#NodeService+appendChild) ⇒ [<code>NodeService</code>](#NodeService)
+    * [.removeChild(childElement)](#NodeService+removeChild) ⇒ [<code>NodeService</code>](#NodeService)
 
-<a name="PseudoNodeAttached+appendChild"></a>
+<a name="NodeService+appendChild"></a>
 
-### pseudoNodeAttached.appendChild(childNode) ⇒ [<code>PseudoNode</code>](#PseudoNode)
-**Kind**: instance method of [<code>PseudoNodeAttached</code>](#PseudoNodeAttached)  
+### nodeService.appendChild(childNode) ⇒ [<code>NodeService</code>](#NodeService)
+**Kind**: instance method of [<code>NodeService</code>](#NodeService)  
 
 | Param | Type |
 | --- | --- |
-| childNode | [<code>PseudoNode</code>](#PseudoNode) | 
+| childNode | [<code>NodeService</code>](#NodeService) | 
 
-<a name="PseudoNodeAttached+removeChild"></a>
+<a name="NodeService+removeChild"></a>
 
-### pseudoNodeAttached.removeChild(childElement) ⇒ [<code>PseudoNode</code>](#PseudoNode)
-**Kind**: instance method of [<code>PseudoNodeAttached</code>](#PseudoNodeAttached)  
-
-| Param | Type |
-| --- | --- |
-| childElement | [<code>PseudoNode</code>](#PseudoNode) | 
-
-<a name="PseudoEventTarget+runEvents"></a>
-
-### pseudoNodeAttached.runEvents(event) ⇒ <code>boolean</code>
-**Kind**: instance method of [<code>PseudoNodeAttached</code>](#PseudoNodeAttached)  
-**Overrides**: [<code>runEvents</code>](#PseudoEventTarget+runEvents)  
+### nodeService.removeChild(childElement) ⇒ [<code>NodeService</code>](#NodeService)
+**Kind**: instance method of [<code>NodeService</code>](#NodeService)  
 
 | Param | Type |
 | --- | --- |
-| event | [<code>PseudoEvent</code>](#PseudoEvent) | 
+| childElement | [<code>NodeService</code>](#NodeService) | 
 
-<a name="PseudoEventTarget+setDefaultEvent"></a>
+<a name="HTMLElementService"></a>
 
-### pseudoNodeAttached.setDefaultEvent(type, callback)
-**Kind**: instance method of [<code>PseudoNodeAttached</code>](#PseudoNodeAttached)  
-**Overrides**: [<code>setDefaultEvent</code>](#PseudoEventTarget+setDefaultEvent)  
-
-| Param | Type |
-| --- | --- |
-| type | <code>string</code> | 
-| callback | <code>function</code> | 
-
-<a name="PseudoEventTarget+runDefaultEvent"></a>
-
-### pseudoNodeAttached.runDefaultEvent(event) ⇒ <code>boolean</code>
-**Kind**: instance method of [<code>PseudoNodeAttached</code>](#PseudoNodeAttached)  
-**Overrides**: [<code>runDefaultEvent</code>](#PseudoEventTarget+runDefaultEvent)  
-
-| Param | Type |
-| --- | --- |
-| event | [<code>PseudoEvent</code>](#PseudoEvent) | 
-
-<a name="PseudoEventTarget+startEvents"></a>
-
-### pseudoNodeAttached.startEvents(eventType) ⇒ <code>boolean</code>
-**Kind**: instance method of [<code>PseudoNodeAttached</code>](#PseudoNodeAttached)  
-**Overrides**: [<code>startEvents</code>](#PseudoEventTarget+startEvents)  
-
-| Param | Type |
-| --- | --- |
-| eventType | [<code>PseudoEvent</code>](#PseudoEvent) | 
-
-<a name="PseudoEventTarget+addEventListener"></a>
-
-### pseudoNodeAttached.addEventListener(type, callback, [useCapture])
-**Kind**: instance method of [<code>PseudoNodeAttached</code>](#PseudoNodeAttached)  
-**Overrides**: [<code>addEventListener</code>](#PseudoEventTarget+addEventListener)  
-
-| Param | Type | Default |
-| --- | --- | --- |
-| type | <code>string</code> |  | 
-| callback | <code>function</code> \| <code>Object</code> |  | 
-| [useCapture] | <code>boolean</code> \| <code>Object</code> | <code>false</code> | 
-
-<a name="PseudoEventTarget+removeEventListener"></a>
-
-### pseudoNodeAttached.removeEventListener(type, callback)
-**Kind**: instance method of [<code>PseudoNodeAttached</code>](#PseudoNodeAttached)  
-**Overrides**: [<code>removeEventListener</code>](#PseudoEventTarget+removeEventListener)  
-
-| Param | Type |
-| --- | --- |
-| type | <code>string</code> | 
-| callback | <code>function</code> | 
-
-<a name="PseudoEventTarget+dispatchEvent"></a>
-
-### pseudoNodeAttached.dispatchEvent(event, target) ⇒ <code>boolean</code>
-**Kind**: instance method of [<code>PseudoNodeAttached</code>](#PseudoNodeAttached)  
-**Overrides**: [<code>dispatchEvent</code>](#PseudoEventTarget+dispatchEvent)  
-
-| Param | Type |
-| --- | --- |
-| event | <code>Event</code> \| [<code>PseudoEvent</code>](#PseudoEvent) | 
-| target | <code>EventTarget</code> \| [<code>PseudoEventTarget</code>](#PseudoEventTarget) | 
-
-<a name="PseudoNode"></a>
-
-## PseudoNode ⇐ [<code>PseudoEventTarget</code>](#PseudoEventTarget)
-Simulate the behaviour of the Node Class when there is no DOM available.
-
-**Kind**: global class  
-**Extends**: [<code>PseudoEventTarget</code>](#PseudoEventTarget)  
-**Author**: Joshua Heagle <joshuaheagle@gmail.com>  
-**Properties**
-
-| Name | Type |
-| --- | --- |
-| name | <code>string</code> | 
-| appendChild | <code>function</code> | 
-| removeChild | <code>function</code> | 
-
-
-* [PseudoNode](#PseudoNode) ⇐ [<code>PseudoEventTarget</code>](#PseudoEventTarget)
-    * [.appendChild(childNode)](#PseudoNode+appendChild) ⇒ [<code>PseudoNode</code>](#PseudoNode)
-    * [.removeChild(childElement)](#PseudoNode+removeChild) ⇒ [<code>PseudoNode</code>](#PseudoNode)
-    * [.runEvents(event)](#PseudoEventTarget+runEvents) ⇒ <code>boolean</code>
-    * [.setDefaultEvent(type, callback)](#PseudoEventTarget+setDefaultEvent)
-    * [.runDefaultEvent(event)](#PseudoEventTarget+runDefaultEvent) ⇒ <code>boolean</code>
-    * [.startEvents(eventType)](#PseudoEventTarget+startEvents) ⇒ <code>boolean</code>
-    * [.addEventListener(type, callback, [useCapture])](#PseudoEventTarget+addEventListener)
-    * [.removeEventListener(type, callback)](#PseudoEventTarget+removeEventListener)
-    * [.dispatchEvent(event, target)](#PseudoEventTarget+dispatchEvent) ⇒ <code>boolean</code>
-
-<a name="PseudoNode+appendChild"></a>
-
-### pseudoNode.appendChild(childNode) ⇒ [<code>PseudoNode</code>](#PseudoNode)
-**Kind**: instance method of [<code>PseudoNode</code>](#PseudoNode)  
-
-| Param | Type |
-| --- | --- |
-| childNode | [<code>PseudoNode</code>](#PseudoNode) | 
-
-<a name="PseudoNode+removeChild"></a>
-
-### pseudoNode.removeChild(childElement) ⇒ [<code>PseudoNode</code>](#PseudoNode)
-**Kind**: instance method of [<code>PseudoNode</code>](#PseudoNode)  
-
-| Param | Type |
-| --- | --- |
-| childElement | [<code>PseudoNode</code>](#PseudoNode) | 
-
-<a name="PseudoEventTarget+runEvents"></a>
-
-### pseudoNode.runEvents(event) ⇒ <code>boolean</code>
-**Kind**: instance method of [<code>PseudoNode</code>](#PseudoNode)  
-**Overrides**: [<code>runEvents</code>](#PseudoEventTarget+runEvents)  
-
-| Param | Type |
-| --- | --- |
-| event | [<code>PseudoEvent</code>](#PseudoEvent) | 
-
-<a name="PseudoEventTarget+setDefaultEvent"></a>
-
-### pseudoNode.setDefaultEvent(type, callback)
-**Kind**: instance method of [<code>PseudoNode</code>](#PseudoNode)  
-**Overrides**: [<code>setDefaultEvent</code>](#PseudoEventTarget+setDefaultEvent)  
-
-| Param | Type |
-| --- | --- |
-| type | <code>string</code> | 
-| callback | <code>function</code> | 
-
-<a name="PseudoEventTarget+runDefaultEvent"></a>
-
-### pseudoNode.runDefaultEvent(event) ⇒ <code>boolean</code>
-**Kind**: instance method of [<code>PseudoNode</code>](#PseudoNode)  
-**Overrides**: [<code>runDefaultEvent</code>](#PseudoEventTarget+runDefaultEvent)  
-
-| Param | Type |
-| --- | --- |
-| event | [<code>PseudoEvent</code>](#PseudoEvent) | 
-
-<a name="PseudoEventTarget+startEvents"></a>
-
-### pseudoNode.startEvents(eventType) ⇒ <code>boolean</code>
-**Kind**: instance method of [<code>PseudoNode</code>](#PseudoNode)  
-**Overrides**: [<code>startEvents</code>](#PseudoEventTarget+startEvents)  
-
-| Param | Type |
-| --- | --- |
-| eventType | [<code>PseudoEvent</code>](#PseudoEvent) | 
-
-<a name="PseudoEventTarget+addEventListener"></a>
-
-### pseudoNode.addEventListener(type, callback, [useCapture])
-**Kind**: instance method of [<code>PseudoNode</code>](#PseudoNode)  
-**Overrides**: [<code>addEventListener</code>](#PseudoEventTarget+addEventListener)  
-
-| Param | Type | Default |
-| --- | --- | --- |
-| type | <code>string</code> |  | 
-| callback | <code>function</code> \| <code>Object</code> |  | 
-| [useCapture] | <code>boolean</code> \| <code>Object</code> | <code>false</code> | 
-
-<a name="PseudoEventTarget+removeEventListener"></a>
-
-### pseudoNode.removeEventListener(type, callback)
-**Kind**: instance method of [<code>PseudoNode</code>](#PseudoNode)  
-**Overrides**: [<code>removeEventListener</code>](#PseudoEventTarget+removeEventListener)  
-
-| Param | Type |
-| --- | --- |
-| type | <code>string</code> | 
-| callback | <code>function</code> | 
-
-<a name="PseudoEventTarget+dispatchEvent"></a>
-
-### pseudoNode.dispatchEvent(event, target) ⇒ <code>boolean</code>
-**Kind**: instance method of [<code>PseudoNode</code>](#PseudoNode)  
-**Overrides**: [<code>dispatchEvent</code>](#PseudoEventTarget+dispatchEvent)  
-
-| Param | Type |
-| --- | --- |
-| event | <code>Event</code> \| [<code>PseudoEvent</code>](#PseudoEvent) | 
-| target | <code>EventTarget</code> \| [<code>PseudoEventTarget</code>](#PseudoEventTarget) | 
-
-<a name="PseudoHTMLElement"></a>
-
-## PseudoHTMLElement ⇐ [<code>PseudoElement</code>](#PseudoElement)
+## HTMLElementService ⇐ <code>PseudoElement</code>
 Simulate the behaviour of the HTMLElement Class when there is no DOM available.
 
 **Kind**: global class  
-**Extends**: [<code>PseudoElement</code>](#PseudoElement)  
+**Extends**: <code>PseudoElement</code>  
 **Author**: Joshua Heagle <joshuaheagle@gmail.com>  
 **Properties**
 
@@ -310,33 +107,15 @@ Simulate the behaviour of the HTMLElement Class when there is no DOM available.
 | hidden | <code>boolean</code> | State of whether element is visible |
 | offsetHeight | <code>number</code> | The height of the element as offset by the parent element |
 | offsetLeft | <code>number</code> | The position of the left side of the element based on the parent element |
-| offsetParent | [<code>PseudoHTMLElement</code>](#PseudoHTMLElement) | A reference to the closest positioned parent element |
+| offsetParent | <code>PseudoHTMLElement</code> | A reference to the closest positioned parent element |
 | offsetTop | <code>number</code> | The position of the top side of the element based on the parent element |
 | offsetWidth | <code>number</code> | The width of the element as offset by the parent element |
 | style | <code>Object</code> | A container to define all applied inline-styles |
 | title | <code>string</code> | The title attribute which affects the text visible on hover |
 
+<a name="new_HTMLElementService_new"></a>
 
-* [PseudoHTMLElement](#PseudoHTMLElement) ⇐ [<code>PseudoElement</code>](#PseudoElement)
-    * [new PseudoHTMLElement([elementOptions])](#new_PseudoHTMLElement_new)
-    * [.applyDefaultEvent()](#PseudoElement+applyDefaultEvent) ⇒ <code>function</code>
-    * [.appendChild(childElement)](#PseudoElement+appendChild) ⇒ [<code>PseudoNode</code>](#PseudoNode)
-    * [.hasAttribute(attributeName)](#PseudoElement+hasAttribute) ⇒ <code>boolean</code>
-    * [.setAttribute(attributeName, attributeValue)](#PseudoElement+setAttribute) ⇒ <code>undefined</code>
-    * [.getAttribute(attributeName)](#PseudoElement+getAttribute) ⇒ <code>string</code> \| <code>Object</code>
-    * [.removeAttribute(attributeName)](#PseudoElement+removeAttribute) ⇒ <code>null</code>
-    * [.removeChild(childElement)](#PseudoNode+removeChild) ⇒ [<code>PseudoNode</code>](#PseudoNode)
-    * [.runEvents(event)](#PseudoEventTarget+runEvents) ⇒ <code>boolean</code>
-    * [.setDefaultEvent(type, callback)](#PseudoEventTarget+setDefaultEvent)
-    * [.runDefaultEvent(event)](#PseudoEventTarget+runDefaultEvent) ⇒ <code>boolean</code>
-    * [.startEvents(eventType)](#PseudoEventTarget+startEvents) ⇒ <code>boolean</code>
-    * [.addEventListener(type, callback, [useCapture])](#PseudoEventTarget+addEventListener)
-    * [.removeEventListener(type, callback)](#PseudoEventTarget+removeEventListener)
-    * [.dispatchEvent(event, target)](#PseudoEventTarget+dispatchEvent) ⇒ <code>boolean</code>
-
-<a name="new_PseudoHTMLElement_new"></a>
-
-### new PseudoHTMLElement([elementOptions])
+### new HTMLElementService([elementOptions])
 Simulate the HTMLElement object when the Dom is not available
 
 
@@ -344,375 +123,12 @@ Simulate the HTMLElement object when the Dom is not available
 | --- | --- | --- |
 | [elementOptions] | <code>Object</code> | <code>{}</code> | 
 | [elementOptions.tagName] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | 
-| [elementOptions.parent] | [<code>PseudoNode</code>](#PseudoNode) \| <code>Object</code> | <code>{}</code> | 
+| [elementOptions.parent] | <code>PseudoNode</code> \| <code>Object</code> | <code>{}</code> | 
 | [elementOptions.children] | <code>Array</code> | <code>[]</code> | 
 
-<a name="PseudoElement+applyDefaultEvent"></a>
+<a name="EventTargetService"></a>
 
-### pseudoHTMLElement.applyDefaultEvent() ⇒ <code>function</code>
-**Kind**: instance method of [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)  
-**Overrides**: [<code>applyDefaultEvent</code>](#PseudoElement+applyDefaultEvent)  
-<a name="PseudoElement+appendChild"></a>
-
-### pseudoHTMLElement.appendChild(childElement) ⇒ [<code>PseudoNode</code>](#PseudoNode)
-**Kind**: instance method of [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)  
-**Overrides**: [<code>appendChild</code>](#PseudoElement+appendChild)  
-
-| Param | Type |
-| --- | --- |
-| childElement | [<code>PseudoNode</code>](#PseudoNode) \| [<code>PseudoElement</code>](#PseudoElement) | 
-
-<a name="PseudoElement+hasAttribute"></a>
-
-### pseudoHTMLElement.hasAttribute(attributeName) ⇒ <code>boolean</code>
-Check if an attribute is assigned to this element.
-
-**Kind**: instance method of [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)  
-**Overrides**: [<code>hasAttribute</code>](#PseudoElement+hasAttribute)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| attributeName | <code>string</code> | The attribute name to check |
-
-<a name="PseudoElement+setAttribute"></a>
-
-### pseudoHTMLElement.setAttribute(attributeName, attributeValue) ⇒ <code>undefined</code>
-Assign a new attribute or overwrite an assigned attribute with name and value.
-
-**Kind**: instance method of [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)  
-**Overrides**: [<code>setAttribute</code>](#PseudoElement+setAttribute)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| attributeName | <code>string</code> | The name key of the attribute to append |
-| attributeValue | <code>string</code> \| <code>Object</code> | The value of the attribute to append |
-
-<a name="PseudoElement+getAttribute"></a>
-
-### pseudoHTMLElement.getAttribute(attributeName) ⇒ <code>string</code> \| <code>Object</code>
-Retrieve the value of the specified attribute from the Element
-
-**Kind**: instance method of [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)  
-**Overrides**: [<code>getAttribute</code>](#PseudoElement+getAttribute)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| attributeName | <code>string</code> | A string representing the name of the attribute to be retrieved |
-
-<a name="PseudoElement+removeAttribute"></a>
-
-### pseudoHTMLElement.removeAttribute(attributeName) ⇒ <code>null</code>
-Remove an assigned attribute from the Element
-
-**Kind**: instance method of [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)  
-**Overrides**: [<code>removeAttribute</code>](#PseudoElement+removeAttribute)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| attributeName | <code>string</code> | The string name of the attribute to be removed |
-
-<a name="PseudoNode+removeChild"></a>
-
-### pseudoHTMLElement.removeChild(childElement) ⇒ [<code>PseudoNode</code>](#PseudoNode)
-**Kind**: instance method of [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)  
-**Overrides**: [<code>removeChild</code>](#PseudoNode+removeChild)  
-
-| Param | Type |
-| --- | --- |
-| childElement | [<code>PseudoNode</code>](#PseudoNode) | 
-
-<a name="PseudoEventTarget+runEvents"></a>
-
-### pseudoHTMLElement.runEvents(event) ⇒ <code>boolean</code>
-**Kind**: instance method of [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)  
-**Overrides**: [<code>runEvents</code>](#PseudoEventTarget+runEvents)  
-
-| Param | Type |
-| --- | --- |
-| event | [<code>PseudoEvent</code>](#PseudoEvent) | 
-
-<a name="PseudoEventTarget+setDefaultEvent"></a>
-
-### pseudoHTMLElement.setDefaultEvent(type, callback)
-**Kind**: instance method of [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)  
-**Overrides**: [<code>setDefaultEvent</code>](#PseudoEventTarget+setDefaultEvent)  
-
-| Param | Type |
-| --- | --- |
-| type | <code>string</code> | 
-| callback | <code>function</code> | 
-
-<a name="PseudoEventTarget+runDefaultEvent"></a>
-
-### pseudoHTMLElement.runDefaultEvent(event) ⇒ <code>boolean</code>
-**Kind**: instance method of [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)  
-**Overrides**: [<code>runDefaultEvent</code>](#PseudoEventTarget+runDefaultEvent)  
-
-| Param | Type |
-| --- | --- |
-| event | [<code>PseudoEvent</code>](#PseudoEvent) | 
-
-<a name="PseudoEventTarget+startEvents"></a>
-
-### pseudoHTMLElement.startEvents(eventType) ⇒ <code>boolean</code>
-**Kind**: instance method of [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)  
-**Overrides**: [<code>startEvents</code>](#PseudoEventTarget+startEvents)  
-
-| Param | Type |
-| --- | --- |
-| eventType | [<code>PseudoEvent</code>](#PseudoEvent) | 
-
-<a name="PseudoEventTarget+addEventListener"></a>
-
-### pseudoHTMLElement.addEventListener(type, callback, [useCapture])
-**Kind**: instance method of [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)  
-**Overrides**: [<code>addEventListener</code>](#PseudoEventTarget+addEventListener)  
-
-| Param | Type | Default |
-| --- | --- | --- |
-| type | <code>string</code> |  | 
-| callback | <code>function</code> \| <code>Object</code> |  | 
-| [useCapture] | <code>boolean</code> \| <code>Object</code> | <code>false</code> | 
-
-<a name="PseudoEventTarget+removeEventListener"></a>
-
-### pseudoHTMLElement.removeEventListener(type, callback)
-**Kind**: instance method of [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)  
-**Overrides**: [<code>removeEventListener</code>](#PseudoEventTarget+removeEventListener)  
-
-| Param | Type |
-| --- | --- |
-| type | <code>string</code> | 
-| callback | <code>function</code> | 
-
-<a name="PseudoEventTarget+dispatchEvent"></a>
-
-### pseudoHTMLElement.dispatchEvent(event, target) ⇒ <code>boolean</code>
-**Kind**: instance method of [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)  
-**Overrides**: [<code>dispatchEvent</code>](#PseudoEventTarget+dispatchEvent)  
-
-| Param | Type |
-| --- | --- |
-| event | <code>Event</code> \| [<code>PseudoEvent</code>](#PseudoEvent) | 
-| target | <code>EventTarget</code> \| [<code>PseudoEventTarget</code>](#PseudoEventTarget) | 
-
-<a name="PseudoHTMLDocument"></a>
-
-## PseudoHTMLDocument ⇐ [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)
-Simulate the behaviour of the HTMLDocument Class when there is no DOM available.
-
-**Kind**: global class  
-**Extends**: [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)  
-**Author**: Joshua Heagle <joshuaheagle@gmail.com>  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| head | [<code>PseudoHTMLElement</code>](#PseudoHTMLElement) | A reference to the Head child element |
-| body | [<code>PseudoHTMLElement</code>](#PseudoHTMLElement) | A reference to the Body child element |
-| createElement | <code>function</code> | Generate a new PseudoHTMLElement with parent of document |
-
-
-* [PseudoHTMLDocument](#PseudoHTMLDocument) ⇐ [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)
-    * [new PseudoHTMLDocument()](#new_PseudoHTMLDocument_new)
-    * [.head](#PseudoHTMLDocument+head) : [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)
-    * [.body](#PseudoHTMLDocument+body) : [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)
-    * [.createElement(tagName)](#PseudoHTMLDocument+createElement) ⇒ [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)
-    * [.applyDefaultEvent()](#PseudoElement+applyDefaultEvent) ⇒ <code>function</code>
-    * [.appendChild(childElement)](#PseudoElement+appendChild) ⇒ [<code>PseudoNode</code>](#PseudoNode)
-    * [.hasAttribute(attributeName)](#PseudoElement+hasAttribute) ⇒ <code>boolean</code>
-    * [.setAttribute(attributeName, attributeValue)](#PseudoElement+setAttribute) ⇒ <code>undefined</code>
-    * [.getAttribute(attributeName)](#PseudoElement+getAttribute) ⇒ <code>string</code> \| <code>Object</code>
-    * [.removeAttribute(attributeName)](#PseudoElement+removeAttribute) ⇒ <code>null</code>
-    * [.removeChild(childElement)](#PseudoNode+removeChild) ⇒ [<code>PseudoNode</code>](#PseudoNode)
-    * [.runEvents(event)](#PseudoEventTarget+runEvents) ⇒ <code>boolean</code>
-    * [.setDefaultEvent(type, callback)](#PseudoEventTarget+setDefaultEvent)
-    * [.runDefaultEvent(event)](#PseudoEventTarget+runDefaultEvent) ⇒ <code>boolean</code>
-    * [.startEvents(eventType)](#PseudoEventTarget+startEvents) ⇒ <code>boolean</code>
-    * [.addEventListener(type, callback, [useCapture])](#PseudoEventTarget+addEventListener)
-    * [.removeEventListener(type, callback)](#PseudoEventTarget+removeEventListener)
-    * [.dispatchEvent(event, target)](#PseudoEventTarget+dispatchEvent) ⇒ <code>boolean</code>
-
-<a name="new_PseudoHTMLDocument_new"></a>
-
-### new PseudoHTMLDocument()
-The root HTML element is acts as the parent to all HTML elements in the document.
-
-<a name="PseudoHTMLDocument+head"></a>
-
-### pseudoHTMLDocument.head : [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)
-Create document head element
-
-**Kind**: instance property of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
-<a name="PseudoHTMLDocument+body"></a>
-
-### pseudoHTMLDocument.body : [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)
-Create document body element
-
-**Kind**: instance property of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
-<a name="PseudoHTMLDocument+createElement"></a>
-
-### pseudoHTMLDocument.createElement(tagName) ⇒ [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)
-Create and return a PseudoHTMLElement
-
-**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| tagName | <code>string</code> | Tag Name is a string representing the type of Dom element this represents |
-
-<a name="PseudoElement+applyDefaultEvent"></a>
-
-### pseudoHTMLDocument.applyDefaultEvent() ⇒ <code>function</code>
-**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
-**Overrides**: [<code>applyDefaultEvent</code>](#PseudoElement+applyDefaultEvent)  
-<a name="PseudoElement+appendChild"></a>
-
-### pseudoHTMLDocument.appendChild(childElement) ⇒ [<code>PseudoNode</code>](#PseudoNode)
-**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
-**Overrides**: [<code>appendChild</code>](#PseudoElement+appendChild)  
-
-| Param | Type |
-| --- | --- |
-| childElement | [<code>PseudoNode</code>](#PseudoNode) \| [<code>PseudoElement</code>](#PseudoElement) | 
-
-<a name="PseudoElement+hasAttribute"></a>
-
-### pseudoHTMLDocument.hasAttribute(attributeName) ⇒ <code>boolean</code>
-Check if an attribute is assigned to this element.
-
-**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
-**Overrides**: [<code>hasAttribute</code>](#PseudoElement+hasAttribute)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| attributeName | <code>string</code> | The attribute name to check |
-
-<a name="PseudoElement+setAttribute"></a>
-
-### pseudoHTMLDocument.setAttribute(attributeName, attributeValue) ⇒ <code>undefined</code>
-Assign a new attribute or overwrite an assigned attribute with name and value.
-
-**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
-**Overrides**: [<code>setAttribute</code>](#PseudoElement+setAttribute)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| attributeName | <code>string</code> | The name key of the attribute to append |
-| attributeValue | <code>string</code> \| <code>Object</code> | The value of the attribute to append |
-
-<a name="PseudoElement+getAttribute"></a>
-
-### pseudoHTMLDocument.getAttribute(attributeName) ⇒ <code>string</code> \| <code>Object</code>
-Retrieve the value of the specified attribute from the Element
-
-**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
-**Overrides**: [<code>getAttribute</code>](#PseudoElement+getAttribute)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| attributeName | <code>string</code> | A string representing the name of the attribute to be retrieved |
-
-<a name="PseudoElement+removeAttribute"></a>
-
-### pseudoHTMLDocument.removeAttribute(attributeName) ⇒ <code>null</code>
-Remove an assigned attribute from the Element
-
-**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
-**Overrides**: [<code>removeAttribute</code>](#PseudoElement+removeAttribute)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| attributeName | <code>string</code> | The string name of the attribute to be removed |
-
-<a name="PseudoNode+removeChild"></a>
-
-### pseudoHTMLDocument.removeChild(childElement) ⇒ [<code>PseudoNode</code>](#PseudoNode)
-**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
-**Overrides**: [<code>removeChild</code>](#PseudoNode+removeChild)  
-
-| Param | Type |
-| --- | --- |
-| childElement | [<code>PseudoNode</code>](#PseudoNode) | 
-
-<a name="PseudoEventTarget+runEvents"></a>
-
-### pseudoHTMLDocument.runEvents(event) ⇒ <code>boolean</code>
-**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
-**Overrides**: [<code>runEvents</code>](#PseudoEventTarget+runEvents)  
-
-| Param | Type |
-| --- | --- |
-| event | [<code>PseudoEvent</code>](#PseudoEvent) | 
-
-<a name="PseudoEventTarget+setDefaultEvent"></a>
-
-### pseudoHTMLDocument.setDefaultEvent(type, callback)
-**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
-**Overrides**: [<code>setDefaultEvent</code>](#PseudoEventTarget+setDefaultEvent)  
-
-| Param | Type |
-| --- | --- |
-| type | <code>string</code> | 
-| callback | <code>function</code> | 
-
-<a name="PseudoEventTarget+runDefaultEvent"></a>
-
-### pseudoHTMLDocument.runDefaultEvent(event) ⇒ <code>boolean</code>
-**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
-**Overrides**: [<code>runDefaultEvent</code>](#PseudoEventTarget+runDefaultEvent)  
-
-| Param | Type |
-| --- | --- |
-| event | [<code>PseudoEvent</code>](#PseudoEvent) | 
-
-<a name="PseudoEventTarget+startEvents"></a>
-
-### pseudoHTMLDocument.startEvents(eventType) ⇒ <code>boolean</code>
-**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
-**Overrides**: [<code>startEvents</code>](#PseudoEventTarget+startEvents)  
-
-| Param | Type |
-| --- | --- |
-| eventType | [<code>PseudoEvent</code>](#PseudoEvent) | 
-
-<a name="PseudoEventTarget+addEventListener"></a>
-
-### pseudoHTMLDocument.addEventListener(type, callback, [useCapture])
-**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
-**Overrides**: [<code>addEventListener</code>](#PseudoEventTarget+addEventListener)  
-
-| Param | Type | Default |
-| --- | --- | --- |
-| type | <code>string</code> |  | 
-| callback | <code>function</code> \| <code>Object</code> |  | 
-| [useCapture] | <code>boolean</code> \| <code>Object</code> | <code>false</code> | 
-
-<a name="PseudoEventTarget+removeEventListener"></a>
-
-### pseudoHTMLDocument.removeEventListener(type, callback)
-**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
-**Overrides**: [<code>removeEventListener</code>](#PseudoEventTarget+removeEventListener)  
-
-| Param | Type |
-| --- | --- |
-| type | <code>string</code> | 
-| callback | <code>function</code> | 
-
-<a name="PseudoEventTarget+dispatchEvent"></a>
-
-### pseudoHTMLDocument.dispatchEvent(event, target) ⇒ <code>boolean</code>
-**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
-**Overrides**: [<code>dispatchEvent</code>](#PseudoEventTarget+dispatchEvent)  
-
-| Param | Type |
-| --- | --- |
-| event | <code>Event</code> \| [<code>PseudoEvent</code>](#PseudoEvent) | 
-| target | <code>EventTarget</code> \| [<code>PseudoEventTarget</code>](#PseudoEventTarget) | 
-
-<a name="PseudoEventTarget"></a>
-
-## PseudoEventTarget
+## EventTargetService
 Simulate the behaviour of the EventTarget Class when there is no DOM available.
 
 **Kind**: global class  
@@ -727,56 +143,56 @@ Simulate the behaviour of the EventTarget Class when there is no DOM available.
 | dispatchEvent | <code>function</code> | 
 
 
-* [PseudoEventTarget](#PseudoEventTarget)
-    * [.runEvents(event)](#PseudoEventTarget+runEvents) ⇒ <code>boolean</code>
-    * [.setDefaultEvent(type, callback)](#PseudoEventTarget+setDefaultEvent)
-    * [.runDefaultEvent(event)](#PseudoEventTarget+runDefaultEvent) ⇒ <code>boolean</code>
-    * [.startEvents(eventType)](#PseudoEventTarget+startEvents) ⇒ <code>boolean</code>
-    * [.addEventListener(type, callback, [useCapture])](#PseudoEventTarget+addEventListener)
-    * [.removeEventListener(type, callback)](#PseudoEventTarget+removeEventListener)
-    * [.dispatchEvent(event, target)](#PseudoEventTarget+dispatchEvent) ⇒ <code>boolean</code>
+* [EventTargetService](#EventTargetService)
+    * [.runEvents(event)](#EventTargetService+runEvents) ⇒ <code>boolean</code>
+    * [.setDefaultEvent(type, callback)](#EventTargetService+setDefaultEvent)
+    * [.runDefaultEvent(event)](#EventTargetService+runDefaultEvent) ⇒ <code>boolean</code>
+    * [.startEvents(eventType)](#EventTargetService+startEvents) ⇒ <code>boolean</code>
+    * [.addEventListener(type, callback, [useCapture])](#EventTargetService+addEventListener)
+    * [.removeEventListener(type, callback)](#EventTargetService+removeEventListener)
+    * [.dispatchEvent(event, target)](#EventTargetService+dispatchEvent) ⇒ <code>boolean</code>
 
-<a name="PseudoEventTarget+runEvents"></a>
+<a name="EventTargetService+runEvents"></a>
 
-### pseudoEventTarget.runEvents(event) ⇒ <code>boolean</code>
-**Kind**: instance method of [<code>PseudoEventTarget</code>](#PseudoEventTarget)  
+### eventTargetService.runEvents(event) ⇒ <code>boolean</code>
+**Kind**: instance method of [<code>EventTargetService</code>](#EventTargetService)  
 
 | Param | Type |
 | --- | --- |
-| event | [<code>PseudoEvent</code>](#PseudoEvent) | 
+| event | <code>PseudoEvent</code> | 
 
-<a name="PseudoEventTarget+setDefaultEvent"></a>
+<a name="EventTargetService+setDefaultEvent"></a>
 
-### pseudoEventTarget.setDefaultEvent(type, callback)
-**Kind**: instance method of [<code>PseudoEventTarget</code>](#PseudoEventTarget)  
+### eventTargetService.setDefaultEvent(type, callback)
+**Kind**: instance method of [<code>EventTargetService</code>](#EventTargetService)  
 
 | Param | Type |
 | --- | --- |
 | type | <code>string</code> | 
 | callback | <code>function</code> | 
 
-<a name="PseudoEventTarget+runDefaultEvent"></a>
+<a name="EventTargetService+runDefaultEvent"></a>
 
-### pseudoEventTarget.runDefaultEvent(event) ⇒ <code>boolean</code>
-**Kind**: instance method of [<code>PseudoEventTarget</code>](#PseudoEventTarget)  
-
-| Param | Type |
-| --- | --- |
-| event | [<code>PseudoEvent</code>](#PseudoEvent) | 
-
-<a name="PseudoEventTarget+startEvents"></a>
-
-### pseudoEventTarget.startEvents(eventType) ⇒ <code>boolean</code>
-**Kind**: instance method of [<code>PseudoEventTarget</code>](#PseudoEventTarget)  
+### eventTargetService.runDefaultEvent(event) ⇒ <code>boolean</code>
+**Kind**: instance method of [<code>EventTargetService</code>](#EventTargetService)  
 
 | Param | Type |
 | --- | --- |
-| eventType | [<code>PseudoEvent</code>](#PseudoEvent) | 
+| event | <code>PseudoEvent</code> | 
 
-<a name="PseudoEventTarget+addEventListener"></a>
+<a name="EventTargetService+startEvents"></a>
 
-### pseudoEventTarget.addEventListener(type, callback, [useCapture])
-**Kind**: instance method of [<code>PseudoEventTarget</code>](#PseudoEventTarget)  
+### eventTargetService.startEvents(eventType) ⇒ <code>boolean</code>
+**Kind**: instance method of [<code>EventTargetService</code>](#EventTargetService)  
+
+| Param | Type |
+| --- | --- |
+| eventType | <code>PseudoEvent</code> | 
+
+<a name="EventTargetService+addEventListener"></a>
+
+### eventTargetService.addEventListener(type, callback, [useCapture])
+**Kind**: instance method of [<code>EventTargetService</code>](#EventTargetService)  
 
 | Param | Type | Default |
 | --- | --- | --- |
@@ -784,25 +200,300 @@ Simulate the behaviour of the EventTarget Class when there is no DOM available.
 | callback | <code>function</code> \| <code>Object</code> |  | 
 | [useCapture] | <code>boolean</code> \| <code>Object</code> | <code>false</code> | 
 
-<a name="PseudoEventTarget+removeEventListener"></a>
+<a name="EventTargetService+removeEventListener"></a>
 
-### pseudoEventTarget.removeEventListener(type, callback)
-**Kind**: instance method of [<code>PseudoEventTarget</code>](#PseudoEventTarget)  
+### eventTargetService.removeEventListener(type, callback)
+**Kind**: instance method of [<code>EventTargetService</code>](#EventTargetService)  
 
 | Param | Type |
 | --- | --- |
 | type | <code>string</code> | 
 | callback | <code>function</code> | 
 
-<a name="PseudoEventTarget+dispatchEvent"></a>
+<a name="EventTargetService+dispatchEvent"></a>
 
-### pseudoEventTarget.dispatchEvent(event, target) ⇒ <code>boolean</code>
-**Kind**: instance method of [<code>PseudoEventTarget</code>](#PseudoEventTarget)  
+### eventTargetService.dispatchEvent(event, target) ⇒ <code>boolean</code>
+**Kind**: instance method of [<code>EventTargetService</code>](#EventTargetService)  
 
 | Param | Type |
 | --- | --- |
-| event | <code>Event</code> \| [<code>PseudoEvent</code>](#PseudoEvent) | 
-| target | <code>EventTarget</code> \| [<code>PseudoEventTarget</code>](#PseudoEventTarget) | 
+| event | <code>Event</code> \| <code>PseudoEvent</code> | 
+| target | <code>EventTarget</code> \| [<code>EventTargetService</code>](#EventTargetService) | 
+
+<a name="EventService"></a>
+
+## EventService
+Simulate the behaviour of the Event Class when there is no DOM available.
+
+**Kind**: global class  
+**Author**: Joshua Heagle <joshuaheagle@gmail.com>  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| NONE | <code>number</code> |  |
+| CAPTURING_PHASE | <code>number</code> |  |
+| AT_TARGET | <code>number</code> |  |
+| BUBBLING_PHASE | <code>number</code> |  |
+| bubbles | <code>boolean</code> | A Boolean indicating whether the event bubbles up through the Dom or not. |
+| cancelable | <code>boolean</code> | A Boolean indicating whether the event is cancelable. |
+| composed | <code>boolean</code> | A Boolean value indicating whether the event can bubble across the boundary between the shadow Dom and the regular Dom. |
+| currentTarget | <code>function</code> \| <code>PseudoEventTarget</code> | A reference to the currently registered target for the event. This is the object to which the event is currently slated to be sent; it's possible this has been changed along the way through re-targeting. |
+| defaultPrevented | <code>boolean</code> | Indicates whether event.preventDefault() has been called on the event. |
+| immediatePropagationStopped | <code>boolean</code> | Flag that no further propagation should occur, including on current target. |
+| propagationStopped | <code>boolean</code> | Flag that no further propagation should occur. |
+| eventPhase | <code>int</code> | Indicates which phase of the event flow is being processed. Uses EventService constants. |
+| target | <code>EventTarget</code> \| <code>PseudoEventTarget</code> | A reference to the target to which the event was originally dispatched. |
+| timeStamp | <code>int</code> | The time at which the event was created (in milliseconds). By specification, this value is time since epoch, but in reality browsers' definitions vary; in addition, work is underway to change this to be a DomHighResTimeStamp instead. |
+| type | <code>string</code> | The name of the event (case-insensitive). |
+| isTrusted | <code>boolean</code> | Indicates whether the event was initiated by the browser (after a user click for instance) or by a script (using an event creation method, like event.initEvent) |
+
+
+* [EventService](#EventService)
+    * [new EventService(typeArg, [eventOptions])](#new_EventService_new)
+    * [.inner](#EventService+inner) ⇒ <code>EventInner</code>
+    * [.composedPath()](#EventService+composedPath) ⇒ <code>Array.&lt;PseudoEventTarget&gt;</code>
+    * [.preventDefault()](#EventService+preventDefault) ⇒ <code>null</code>
+    * [.stopImmediatePropagation()](#EventService+stopImmediatePropagation) ⇒ <code>null</code>
+    * [.stopPropagation()](#EventService+stopPropagation) ⇒ <code>null</code>
+
+<a name="new_EventService_new"></a>
+
+### new EventService(typeArg, [eventOptions])
+
+| Param | Type | Default |
+| --- | --- | --- |
+| typeArg | <code>string</code> |  | 
+| [eventOptions] | <code>Object</code> | <code>{}</code> | 
+| [eventOptions.bubbles] | <code>boolean</code> | <code>true</code> | 
+| [eventOptions.cancelable] | <code>boolean</code> | <code>true</code> | 
+| [eventOptions.composed] | <code>boolean</code> | <code>true</code> | 
+
+<a name="EventService+inner"></a>
+
+### eventService.inner ⇒ <code>EventInner</code>
+Scope several accessors inside the inner object. These are only intended for usage by other DOM classes.
+
+**Kind**: instance property of [<code>EventService</code>](#EventService)  
+<a name="EventService+composedPath"></a>
+
+### eventService.composedPath() ⇒ <code>Array.&lt;PseudoEventTarget&gt;</code>
+Return an array of targets that will have the event executed open them. The order is based on the eventPhase
+
+**Kind**: instance method of [<code>EventService</code>](#EventService)  
+<a name="EventService+preventDefault"></a>
+
+### eventService.preventDefault() ⇒ <code>null</code>
+Cancels the event (if it is cancelable).
+
+**Kind**: instance method of [<code>EventService</code>](#EventService)  
+<a name="EventService+stopImmediatePropagation"></a>
+
+### eventService.stopImmediatePropagation() ⇒ <code>null</code>
+For this particular event, no other listener will be called.
+Neither those attached on the same element, nor those attached on elements which will be traversed later (in
+capture phase, for instance)
+
+**Kind**: instance method of [<code>EventService</code>](#EventService)  
+<a name="EventService+stopPropagation"></a>
+
+### eventService.stopPropagation() ⇒ <code>null</code>
+Stops the propagation of events further along in the Dom.
+
+**Kind**: instance method of [<code>EventService</code>](#EventService)  
+<a name="ElementService"></a>
+
+## ElementService ⇐ <code>PseudoNode</code>
+Simulate the behaviour of the Element Class when there is no DOM available.
+
+**Kind**: global class  
+**Extends**: <code>PseudoNode</code>  
+**Author**: Joshua Heagle <joshuaheagle@gmail.com>  
+**Properties**
+
+| Name | Type |
+| --- | --- |
+| tagName | <code>string</code> | 
+| className | <code>string</code> | 
+| id | <code>string</code> | 
+| innerHtml | <code>string</code> | 
+| attributes | <code>Array</code> | 
+| hasAttribute | <code>function</code> | 
+| setAttribute | <code>function</code> | 
+| getAttribute | <code>function</code> | 
+| removeAttribute | <code>function</code> | 
+
+
+* [ElementService](#ElementService) ⇐ <code>PseudoNode</code>
+    * [new ElementService([elementOptions])](#new_ElementService_new)
+    * [.applyDefaultEvent()](#ElementService+applyDefaultEvent) ⇒ <code>function</code>
+    * [.appendChild(childElement)](#ElementService+appendChild) ⇒ <code>PseudoNode</code>
+    * [.hasAttribute(attributeName)](#ElementService+hasAttribute) ⇒ <code>boolean</code>
+    * [.setAttribute(attributeName, attributeValue)](#ElementService+setAttribute) ⇒ <code>undefined</code>
+    * [.getAttribute(attributeName)](#ElementService+getAttribute) ⇒ <code>string</code> \| <code>Object</code>
+    * [.removeAttribute(attributeName)](#ElementService+removeAttribute) ⇒ <code>null</code>
+
+<a name="new_ElementService_new"></a>
+
+### new ElementService([elementOptions])
+Simulate the Element object when the Dom is not available
+
+
+| Param | Type | Default |
+| --- | --- | --- |
+| [elementOptions] | <code>Object</code> | <code>{}</code> | 
+| [elementOptions.tagName] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | 
+| [elementOptions.attributes] | <code>array</code> | <code>[]</code> | 
+| [elementOptions.parent] | <code>PseudoNode</code> \| <code>Object</code> | <code>{}</code> | 
+| [elementOptions.children] | <code>Array</code> | <code>[]</code> | 
+
+<a name="ElementService+applyDefaultEvent"></a>
+
+### elementService.applyDefaultEvent() ⇒ <code>function</code>
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+<a name="ElementService+appendChild"></a>
+
+### elementService.appendChild(childElement) ⇒ <code>PseudoNode</code>
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+
+| Param | Type |
+| --- | --- |
+| childElement | <code>PseudoNode</code> \| [<code>ElementService</code>](#ElementService) | 
+
+<a name="ElementService+hasAttribute"></a>
+
+### elementService.hasAttribute(attributeName) ⇒ <code>boolean</code>
+Check if an attribute is assigned to this element.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| attributeName | <code>string</code> | The attribute name to check |
+
+<a name="ElementService+setAttribute"></a>
+
+### elementService.setAttribute(attributeName, attributeValue) ⇒ <code>undefined</code>
+Assign a new attribute or overwrite an assigned attribute with name and value.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| attributeName | <code>string</code> | The name key of the attribute to append |
+| attributeValue | <code>string</code> \| <code>Object</code> | The value of the attribute to append |
+
+<a name="ElementService+getAttribute"></a>
+
+### elementService.getAttribute(attributeName) ⇒ <code>string</code> \| <code>Object</code>
+Retrieve the value of the specified attribute from the Element
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| attributeName | <code>string</code> | A string representing the name of the attribute to be retrieved |
+
+<a name="ElementService+removeAttribute"></a>
+
+### elementService.removeAttribute(attributeName) ⇒ <code>null</code>
+Remove an assigned attribute from the Element
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| attributeName | <code>string</code> | The string name of the attribute to be removed |
+
+<a name="PseudoNodeAttached"></a>
+
+## PseudoNodeAttached ⇐ <code>PseudoEventTarget</code>
+Simulate the behaviour of the Node Class when there is no DOM available.
+
+**Kind**: global class  
+**Extends**: <code>PseudoEventTarget</code>  
+**Author**: Joshua Heagle <joshuaheagle@gmail.com>  
+**Properties**
+
+| Name | Type |
+| --- | --- |
+| name | <code>string</code> | 
+| appendChild | <code>function</code> | 
+| removeChild | <code>function</code> | 
+
+
+* [PseudoNodeAttached](#PseudoNodeAttached) ⇐ <code>PseudoEventTarget</code>
+    * [.appendChild(childNode)](#PseudoNodeAttached+appendChild) ⇒ <code>PseudoNode</code>
+    * [.removeChild(childElement)](#PseudoNodeAttached+removeChild) ⇒ <code>PseudoNode</code>
+
+<a name="PseudoNodeAttached+appendChild"></a>
+
+### pseudoNodeAttached.appendChild(childNode) ⇒ <code>PseudoNode</code>
+**Kind**: instance method of [<code>PseudoNodeAttached</code>](#PseudoNodeAttached)  
+
+| Param | Type |
+| --- | --- |
+| childNode | <code>PseudoNode</code> | 
+
+<a name="PseudoNodeAttached+removeChild"></a>
+
+### pseudoNodeAttached.removeChild(childElement) ⇒ <code>PseudoNode</code>
+**Kind**: instance method of [<code>PseudoNodeAttached</code>](#PseudoNodeAttached)  
+
+| Param | Type |
+| --- | --- |
+| childElement | <code>PseudoNode</code> | 
+
+<a name="PseudoHTMLDocument"></a>
+
+## PseudoHTMLDocument ⇐ <code>PseudoHTMLElement</code>
+Simulate the behaviour of the HTMLDocument Class when there is no DOM available.
+
+**Kind**: global class  
+**Extends**: <code>PseudoHTMLElement</code>  
+**Author**: Joshua Heagle <joshuaheagle@gmail.com>  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| head | <code>PseudoHTMLElement</code> | A reference to the Head child element |
+| body | <code>PseudoHTMLElement</code> | A reference to the Body child element |
+| createElement | <code>function</code> | Generate a new PseudoHTMLElement with parent of document |
+
+
+* [PseudoHTMLDocument](#PseudoHTMLDocument) ⇐ <code>PseudoHTMLElement</code>
+    * [new PseudoHTMLDocument()](#new_PseudoHTMLDocument_new)
+    * [.head](#PseudoHTMLDocument+head) : <code>PseudoHTMLElement</code>
+    * [.body](#PseudoHTMLDocument+body) : <code>PseudoHTMLElement</code>
+    * [.createElement(tagName)](#PseudoHTMLDocument+createElement) ⇒ <code>PseudoHTMLElement</code>
+
+<a name="new_PseudoHTMLDocument_new"></a>
+
+### new PseudoHTMLDocument()
+The root HTML element is acts as the parent to all HTML elements in the document.
+
+<a name="PseudoHTMLDocument+head"></a>
+
+### pseudoHTMLDocument.head : <code>PseudoHTMLElement</code>
+Create document head element
+
+**Kind**: instance property of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+<a name="PseudoHTMLDocument+body"></a>
+
+### pseudoHTMLDocument.body : <code>PseudoHTMLElement</code>
+Create document body element
+
+**Kind**: instance property of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+<a name="PseudoHTMLDocument+createElement"></a>
+
+### pseudoHTMLDocument.createElement(tagName) ⇒ <code>PseudoHTMLElement</code>
+Create and return a PseudoHTMLElement
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| tagName | <code>string</code> | Tag Name is a string representing the type of Dom element this represents |
 
 <a name="PseudoEventListener"></a>
 
@@ -838,7 +529,7 @@ Handle events as they are stored and implemented.
 
 | Param | Type |
 | --- | --- |
-| event | [<code>PseudoEvent</code>](#PseudoEvent) | 
+| event | <code>PseudoEvent</code> | 
 
 <a name="PseudoEventListener+doCapturePhase"></a>
 
@@ -847,7 +538,7 @@ Handle events as they are stored and implemented.
 
 | Param | Type |
 | --- | --- |
-| event | [<code>PseudoEvent</code>](#PseudoEvent) | 
+| event | <code>PseudoEvent</code> | 
 
 <a name="PseudoEventListener+doTargetPhase"></a>
 
@@ -856,7 +547,7 @@ Handle events as they are stored and implemented.
 
 | Param | Type |
 | --- | --- |
-| event | [<code>PseudoEvent</code>](#PseudoEvent) | 
+| event | <code>PseudoEvent</code> | 
 
 <a name="PseudoEventListener+doBubblePhase"></a>
 
@@ -865,7 +556,7 @@ Handle events as they are stored and implemented.
 
 | Param | Type |
 | --- | --- |
-| event | [<code>PseudoEvent</code>](#PseudoEvent) | 
+| event | <code>PseudoEvent</code> | 
 
 <a name="PseudoEventListener+skipPhase"></a>
 
@@ -874,7 +565,7 @@ Handle events as they are stored and implemented.
 
 | Param | Type |
 | --- | --- |
-| event | [<code>PseudoEvent</code>](#PseudoEvent) | 
+| event | <code>PseudoEvent</code> | 
 
 <a name="PseudoEventListener+skipDefault"></a>
 
@@ -883,7 +574,7 @@ Handle events as they are stored and implemented.
 
 | Param | Type |
 | --- | --- |
-| event | [<code>PseudoEvent</code>](#PseudoEvent) | 
+| event | <code>PseudoEvent</code> | 
 
 <a name="PseudoEventListener+stopPropagation"></a>
 
@@ -892,7 +583,7 @@ Handle events as they are stored and implemented.
 
 | Param | Type |
 | --- | --- |
-| event | [<code>PseudoEvent</code>](#PseudoEvent) | 
+| event | <code>PseudoEvent</code> | 
 
 <a name="PseudoEventListener+nonPassiveHalt"></a>
 
@@ -901,7 +592,7 @@ Handle events as they are stored and implemented.
 
 | Param | Type |
 | --- | --- |
-| event | [<code>PseudoEvent</code>](#PseudoEvent) | 
+| event | <code>PseudoEvent</code> | 
 
 <a name="PseudoEventListener+rejectEvent"></a>
 
@@ -910,290 +601,11 @@ Handle events as they are stored and implemented.
 
 | Param | Type |
 | --- | --- |
-| event | [<code>PseudoEvent</code>](#PseudoEvent) | 
-
-<a name="PseudoEvent"></a>
-
-## PseudoEvent
-Simulate the behaviour of the Event Class when there is no DOM available.
-
-**Kind**: global class  
-**Author**: Joshua Heagle <joshuaheagle@gmail.com>  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| NONE | <code>number</code> |  |
-| CAPTURING_PHASE | <code>number</code> |  |
-| AT_TARGET | <code>number</code> |  |
-| BUBBLING_PHASE | <code>number</code> |  |
-| bubbles | <code>boolean</code> | A Boolean indicating whether the event bubbles up through the Dom or not. |
-| cancelable | <code>boolean</code> | A Boolean indicating whether the event is cancelable. |
-| composed | <code>boolean</code> | A Boolean value indicating whether the event can bubble across the boundary between the shadow Dom and the regular Dom. |
-| currentTarget | <code>function</code> \| [<code>PseudoEventTarget</code>](#PseudoEventTarget) | A reference to the currently registered target for the event. This is the object to which the event is currently slated to be sent; it's possible this has been changed along the way through re-targeting. |
-| defaultPrevented | <code>boolean</code> | Indicates whether event.preventDefault() has been called on the event. |
-| immediatePropagationStopped | <code>boolean</code> | Flag that no further propagation should occur, including on current target. |
-| propagationStopped | <code>boolean</code> | Flag that no further propagation should occur. |
-| eventPhase | <code>int</code> | Indicates which phase of the event flow is being processed. Uses PseudoEvent constants. |
-| target | <code>EventTarget</code> \| [<code>PseudoEventTarget</code>](#PseudoEventTarget) | A reference to the target to which the event was originally dispatched. |
-| timeStamp | <code>int</code> | The time at which the event was created (in milliseconds). By specification, this value is time since epoch, but in reality browsers' definitions vary; in addition, work is underway to change this to be a DomHighResTimeStamp instead. |
-| type | <code>string</code> | The name of the event (case-insensitive). |
-| isTrusted | <code>boolean</code> | Indicates whether the event was initiated by the browser (after a user click for instance) or by a script (using an event creation method, like event.initEvent) |
-
-
-* [PseudoEvent](#PseudoEvent)
-    * [new PseudoEvent(typeArg, [eventOptions])](#new_PseudoEvent_new)
-    * [.inner](#PseudoEvent+inner) ⇒ <code>EventInner</code>
-    * [.composedPath()](#PseudoEvent+composedPath) ⇒ [<code>Array.&lt;PseudoEventTarget&gt;</code>](#PseudoEventTarget)
-    * [.preventDefault()](#PseudoEvent+preventDefault) ⇒ <code>null</code>
-    * [.stopImmediatePropagation()](#PseudoEvent+stopImmediatePropagation) ⇒ <code>null</code>
-    * [.stopPropagation()](#PseudoEvent+stopPropagation) ⇒ <code>null</code>
-
-<a name="new_PseudoEvent_new"></a>
-
-### new PseudoEvent(typeArg, [eventOptions])
-
-| Param | Type | Default |
-| --- | --- | --- |
-| typeArg | <code>string</code> |  | 
-| [eventOptions] | <code>Object</code> | <code>{}</code> | 
-| [eventOptions.bubbles] | <code>boolean</code> | <code>true</code> | 
-| [eventOptions.cancelable] | <code>boolean</code> | <code>true</code> | 
-| [eventOptions.composed] | <code>boolean</code> | <code>true</code> | 
-
-<a name="PseudoEvent+inner"></a>
-
-### pseudoEvent.inner ⇒ <code>EventInner</code>
-Scope several accessors inside the inner object. These are only intended for usage by other DOM classes.
-
-**Kind**: instance property of [<code>PseudoEvent</code>](#PseudoEvent)  
-<a name="PseudoEvent+composedPath"></a>
-
-### pseudoEvent.composedPath() ⇒ [<code>Array.&lt;PseudoEventTarget&gt;</code>](#PseudoEventTarget)
-Return an array of targets that will have the event executed open them. The order is based on the eventPhase
-
-**Kind**: instance method of [<code>PseudoEvent</code>](#PseudoEvent)  
-<a name="PseudoEvent+preventDefault"></a>
-
-### pseudoEvent.preventDefault() ⇒ <code>null</code>
-Cancels the event (if it is cancelable).
-
-**Kind**: instance method of [<code>PseudoEvent</code>](#PseudoEvent)  
-<a name="PseudoEvent+stopImmediatePropagation"></a>
-
-### pseudoEvent.stopImmediatePropagation() ⇒ <code>null</code>
-For this particular event, no other listener will be called.
-Neither those attached on the same element, nor those attached on elements which will be traversed later (in
-capture phase, for instance)
-
-**Kind**: instance method of [<code>PseudoEvent</code>](#PseudoEvent)  
-<a name="PseudoEvent+stopPropagation"></a>
-
-### pseudoEvent.stopPropagation() ⇒ <code>null</code>
-Stops the propagation of events further along in the Dom.
-
-**Kind**: instance method of [<code>PseudoEvent</code>](#PseudoEvent)  
-<a name="PseudoElement"></a>
-
-## PseudoElement ⇐ [<code>PseudoNode</code>](#PseudoNode)
-Simulate the behaviour of the Element Class when there is no DOM available.
-
-**Kind**: global class  
-**Extends**: [<code>PseudoNode</code>](#PseudoNode)  
-**Author**: Joshua Heagle <joshuaheagle@gmail.com>  
-**Properties**
-
-| Name | Type |
-| --- | --- |
-| tagName | <code>string</code> | 
-| className | <code>string</code> | 
-| id | <code>string</code> | 
-| innerHtml | <code>string</code> | 
-| attributes | <code>Array</code> | 
-| hasAttribute | <code>function</code> | 
-| setAttribute | <code>function</code> | 
-| getAttribute | <code>function</code> | 
-| removeAttribute | <code>function</code> | 
-
-
-* [PseudoElement](#PseudoElement) ⇐ [<code>PseudoNode</code>](#PseudoNode)
-    * [new PseudoElement([elementOptions])](#new_PseudoElement_new)
-    * [.applyDefaultEvent()](#PseudoElement+applyDefaultEvent) ⇒ <code>function</code>
-    * [.appendChild(childElement)](#PseudoElement+appendChild) ⇒ [<code>PseudoNode</code>](#PseudoNode)
-    * [.hasAttribute(attributeName)](#PseudoElement+hasAttribute) ⇒ <code>boolean</code>
-    * [.setAttribute(attributeName, attributeValue)](#PseudoElement+setAttribute) ⇒ <code>undefined</code>
-    * [.getAttribute(attributeName)](#PseudoElement+getAttribute) ⇒ <code>string</code> \| <code>Object</code>
-    * [.removeAttribute(attributeName)](#PseudoElement+removeAttribute) ⇒ <code>null</code>
-    * [.removeChild(childElement)](#PseudoNode+removeChild) ⇒ [<code>PseudoNode</code>](#PseudoNode)
-    * [.runEvents(event)](#PseudoEventTarget+runEvents) ⇒ <code>boolean</code>
-    * [.setDefaultEvent(type, callback)](#PseudoEventTarget+setDefaultEvent)
-    * [.runDefaultEvent(event)](#PseudoEventTarget+runDefaultEvent) ⇒ <code>boolean</code>
-    * [.startEvents(eventType)](#PseudoEventTarget+startEvents) ⇒ <code>boolean</code>
-    * [.addEventListener(type, callback, [useCapture])](#PseudoEventTarget+addEventListener)
-    * [.removeEventListener(type, callback)](#PseudoEventTarget+removeEventListener)
-    * [.dispatchEvent(event, target)](#PseudoEventTarget+dispatchEvent) ⇒ <code>boolean</code>
-
-<a name="new_PseudoElement_new"></a>
-
-### new PseudoElement([elementOptions])
-Simulate the Element object when the Dom is not available
-
-
-| Param | Type | Default |
-| --- | --- | --- |
-| [elementOptions] | <code>Object</code> | <code>{}</code> | 
-| [elementOptions.tagName] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | 
-| [elementOptions.attributes] | <code>array</code> | <code>[]</code> | 
-| [elementOptions.parent] | [<code>PseudoNode</code>](#PseudoNode) \| <code>Object</code> | <code>{}</code> | 
-| [elementOptions.children] | <code>Array</code> | <code>[]</code> | 
-
-<a name="PseudoElement+applyDefaultEvent"></a>
-
-### pseudoElement.applyDefaultEvent() ⇒ <code>function</code>
-**Kind**: instance method of [<code>PseudoElement</code>](#PseudoElement)  
-<a name="PseudoElement+appendChild"></a>
-
-### pseudoElement.appendChild(childElement) ⇒ [<code>PseudoNode</code>](#PseudoNode)
-**Kind**: instance method of [<code>PseudoElement</code>](#PseudoElement)  
-**Overrides**: [<code>appendChild</code>](#PseudoNode+appendChild)  
-
-| Param | Type |
-| --- | --- |
-| childElement | [<code>PseudoNode</code>](#PseudoNode) \| [<code>PseudoElement</code>](#PseudoElement) | 
-
-<a name="PseudoElement+hasAttribute"></a>
-
-### pseudoElement.hasAttribute(attributeName) ⇒ <code>boolean</code>
-Check if an attribute is assigned to this element.
-
-**Kind**: instance method of [<code>PseudoElement</code>](#PseudoElement)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| attributeName | <code>string</code> | The attribute name to check |
-
-<a name="PseudoElement+setAttribute"></a>
-
-### pseudoElement.setAttribute(attributeName, attributeValue) ⇒ <code>undefined</code>
-Assign a new attribute or overwrite an assigned attribute with name and value.
-
-**Kind**: instance method of [<code>PseudoElement</code>](#PseudoElement)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| attributeName | <code>string</code> | The name key of the attribute to append |
-| attributeValue | <code>string</code> \| <code>Object</code> | The value of the attribute to append |
-
-<a name="PseudoElement+getAttribute"></a>
-
-### pseudoElement.getAttribute(attributeName) ⇒ <code>string</code> \| <code>Object</code>
-Retrieve the value of the specified attribute from the Element
-
-**Kind**: instance method of [<code>PseudoElement</code>](#PseudoElement)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| attributeName | <code>string</code> | A string representing the name of the attribute to be retrieved |
-
-<a name="PseudoElement+removeAttribute"></a>
-
-### pseudoElement.removeAttribute(attributeName) ⇒ <code>null</code>
-Remove an assigned attribute from the Element
-
-**Kind**: instance method of [<code>PseudoElement</code>](#PseudoElement)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| attributeName | <code>string</code> | The string name of the attribute to be removed |
-
-<a name="PseudoNode+removeChild"></a>
-
-### pseudoElement.removeChild(childElement) ⇒ [<code>PseudoNode</code>](#PseudoNode)
-**Kind**: instance method of [<code>PseudoElement</code>](#PseudoElement)  
-**Overrides**: [<code>removeChild</code>](#PseudoNode+removeChild)  
-
-| Param | Type |
-| --- | --- |
-| childElement | [<code>PseudoNode</code>](#PseudoNode) | 
-
-<a name="PseudoEventTarget+runEvents"></a>
-
-### pseudoElement.runEvents(event) ⇒ <code>boolean</code>
-**Kind**: instance method of [<code>PseudoElement</code>](#PseudoElement)  
-**Overrides**: [<code>runEvents</code>](#PseudoEventTarget+runEvents)  
-
-| Param | Type |
-| --- | --- |
-| event | [<code>PseudoEvent</code>](#PseudoEvent) | 
-
-<a name="PseudoEventTarget+setDefaultEvent"></a>
-
-### pseudoElement.setDefaultEvent(type, callback)
-**Kind**: instance method of [<code>PseudoElement</code>](#PseudoElement)  
-**Overrides**: [<code>setDefaultEvent</code>](#PseudoEventTarget+setDefaultEvent)  
-
-| Param | Type |
-| --- | --- |
-| type | <code>string</code> | 
-| callback | <code>function</code> | 
-
-<a name="PseudoEventTarget+runDefaultEvent"></a>
-
-### pseudoElement.runDefaultEvent(event) ⇒ <code>boolean</code>
-**Kind**: instance method of [<code>PseudoElement</code>](#PseudoElement)  
-**Overrides**: [<code>runDefaultEvent</code>](#PseudoEventTarget+runDefaultEvent)  
-
-| Param | Type |
-| --- | --- |
-| event | [<code>PseudoEvent</code>](#PseudoEvent) | 
-
-<a name="PseudoEventTarget+startEvents"></a>
-
-### pseudoElement.startEvents(eventType) ⇒ <code>boolean</code>
-**Kind**: instance method of [<code>PseudoElement</code>](#PseudoElement)  
-**Overrides**: [<code>startEvents</code>](#PseudoEventTarget+startEvents)  
-
-| Param | Type |
-| --- | --- |
-| eventType | [<code>PseudoEvent</code>](#PseudoEvent) | 
-
-<a name="PseudoEventTarget+addEventListener"></a>
-
-### pseudoElement.addEventListener(type, callback, [useCapture])
-**Kind**: instance method of [<code>PseudoElement</code>](#PseudoElement)  
-**Overrides**: [<code>addEventListener</code>](#PseudoEventTarget+addEventListener)  
-
-| Param | Type | Default |
-| --- | --- | --- |
-| type | <code>string</code> |  | 
-| callback | <code>function</code> \| <code>Object</code> |  | 
-| [useCapture] | <code>boolean</code> \| <code>Object</code> | <code>false</code> | 
-
-<a name="PseudoEventTarget+removeEventListener"></a>
-
-### pseudoElement.removeEventListener(type, callback)
-**Kind**: instance method of [<code>PseudoElement</code>](#PseudoElement)  
-**Overrides**: [<code>removeEventListener</code>](#PseudoEventTarget+removeEventListener)  
-
-| Param | Type |
-| --- | --- |
-| type | <code>string</code> | 
-| callback | <code>function</code> | 
-
-<a name="PseudoEventTarget+dispatchEvent"></a>
-
-### pseudoElement.dispatchEvent(event, target) ⇒ <code>boolean</code>
-**Kind**: instance method of [<code>PseudoElement</code>](#PseudoElement)  
-**Overrides**: [<code>dispatchEvent</code>](#PseudoEventTarget+dispatchEvent)  
-
-| Param | Type |
-| --- | --- |
-| event | <code>Event</code> \| [<code>PseudoEvent</code>](#PseudoEvent) | 
-| target | <code>EventTarget</code> \| [<code>PseudoEventTarget</code>](#PseudoEventTarget) | 
+| event | <code>PseudoEvent</code> | 
 
 <a name="generateDocument"></a>
 
-## generateDocument(root, context) ⇒ <code>Window</code> \| [<code>PseudoEventTarget</code>](#PseudoEventTarget)
+## generateDocument(root, context) ⇒ <code>Window</code> \| <code>PseudoEventTarget</code>
 Construct the Pseudo Dom to provide access to Dom objects which are otherwise not available outside the browser
 context.
 
@@ -1205,28 +617,28 @@ context.
 | context | <code>Object</code> | 
 
 
-* [generateDocument(root, context)](#generateDocument) ⇒ <code>Window</code> \| [<code>PseudoEventTarget</code>](#PseudoEventTarget)
-    * [~newWindow](#generateDocument..newWindow) : <code>Window</code> \| [<code>PseudoEventTarget</code>](#PseudoEventTarget)
-    * [~Node](#generateDocument..Node) : <code>Node</code> \| [<code>PseudoNode</code>](#PseudoNode)
-    * [~Element](#generateDocument..Element) : <code>Element</code> \| [<code>PseudoElement</code>](#PseudoElement)
-    * [~HTMLElement](#generateDocument..HTMLElement) : <code>HTMLElement</code> \| [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)
+* [generateDocument(root, context)](#generateDocument) ⇒ <code>Window</code> \| <code>PseudoEventTarget</code>
+    * [~newWindow](#generateDocument..newWindow) : <code>Window</code> \| <code>PseudoEventTarget</code>
+    * [~Node](#generateDocument..Node) : <code>Node</code> \| <code>PseudoNode</code>
+    * [~Element](#generateDocument..Element) : <code>Element</code> \| <code>PseudoElement</code>
+    * [~HTMLElement](#generateDocument..HTMLElement) : <code>HTMLElement</code> \| <code>PseudoHTMLElement</code>
     * [~document](#generateDocument..document) : <code>Document</code> \| [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)
 
 <a name="generateDocument..newWindow"></a>
 
-### generateDocument~newWindow : <code>Window</code> \| [<code>PseudoEventTarget</code>](#PseudoEventTarget)
+### generateDocument~newWindow : <code>Window</code> \| <code>PseudoEventTarget</code>
 **Kind**: inner constant of [<code>generateDocument</code>](#generateDocument)  
 <a name="generateDocument..Node"></a>
 
-### generateDocument~Node : <code>Node</code> \| [<code>PseudoNode</code>](#PseudoNode)
+### generateDocument~Node : <code>Node</code> \| <code>PseudoNode</code>
 **Kind**: inner constant of [<code>generateDocument</code>](#generateDocument)  
 <a name="generateDocument..Element"></a>
 
-### generateDocument~Element : <code>Element</code> \| [<code>PseudoElement</code>](#PseudoElement)
+### generateDocument~Element : <code>Element</code> \| <code>PseudoElement</code>
 **Kind**: inner constant of [<code>generateDocument</code>](#generateDocument)  
 <a name="generateDocument..HTMLElement"></a>
 
-### generateDocument~HTMLElement : <code>HTMLElement</code> \| [<code>PseudoHTMLElement</code>](#PseudoHTMLElement)
+### generateDocument~HTMLElement : <code>HTMLElement</code> \| <code>PseudoHTMLElement</code>
 Create an instance of HTMLElement if not available
 
 **Kind**: inner constant of [<code>generateDocument</code>](#generateDocument)  

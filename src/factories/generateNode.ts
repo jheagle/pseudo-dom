@@ -1,5 +1,5 @@
 import TreeLinker from 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'
-import PseudoNode from '../classes/PseudoNode'
+import PseudoNode from '../interfaces/PseudoNode'
 
 export class NodeFactory extends TreeLinker {}
 
