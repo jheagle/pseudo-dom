@@ -1975,7 +1975,7 @@
   }, { '../internals/a-callable': 24, '../internals/an-object': 26, '../internals/async-iterator-close': 28, '../internals/async-iterator-create-proxy': 29, '../internals/create-iter-result-object': 37, '../internals/function-call': 54, '../internals/get-iterator-direct': 59, '../internals/is-object': 75 }],
   31: [function (require, module, exports) {
     'use strict'
-    var global = require('../internals/global')
+    var globalThis = require('../internals/global-this')
     var shared = require('../internals/shared-store')
     var isCallable = require('../internals/is-callable')
     var create = require('../internals/object-create')
@@ -1986,7 +1986,7 @@
 
     var USE_FUNCTION_CONSTRUCTOR = 'USE_FUNCTION_CONSTRUCTOR'
     var ASYNC_ITERATOR = wellKnownSymbol('asyncIterator')
-    var AsyncIterator = global.AsyncIterator
+    var AsyncIterator = globalThis.AsyncIterator
     var PassedAsyncIteratorPrototype = shared.AsyncIteratorPrototype
     var AsyncIteratorPrototype, prototype
 
@@ -1994,7 +1994,7 @@
       AsyncIteratorPrototype = PassedAsyncIteratorPrototype
     } else if (isCallable(AsyncIterator)) {
       AsyncIteratorPrototype = AsyncIterator.prototype
-    } else if (shared[USE_FUNCTION_CONSTRUCTOR] || global[USE_FUNCTION_CONSTRUCTOR]) {
+    } else if (shared[USE_FUNCTION_CONSTRUCTOR] || globalThis[USE_FUNCTION_CONSTRUCTOR]) {
       try {
         // eslint-disable-next-line no-new-func -- we have no alternatives without usage of modern syntax
         prototype = getPrototypeOf(getPrototypeOf(getPrototypeOf(Function('return async function*(){}()')())))
@@ -2012,7 +2012,7 @@
     }
 
     module.exports = AsyncIteratorPrototype
-  }, { '../internals/define-built-in': 42, '../internals/global': 63, '../internals/is-callable': 72, '../internals/is-pure': 76, '../internals/object-create': 87, '../internals/object-get-prototype-of': 93, '../internals/shared-store': 103, '../internals/well-known-symbol': 119 }],
+  }, { '../internals/define-built-in': 42, '../internals/global-this': 63, '../internals/is-callable': 72, '../internals/is-pure': 76, '../internals/object-create': 87, '../internals/object-get-prototype-of': 93, '../internals/shared-store': 103, '../internals/well-known-symbol': 119 }],
   32: [function (require, module, exports) {
     'use strict'
     var anObject = require('../internals/an-object')
@@ -2197,19 +2197,19 @@
   }, { '../internals/define-built-in': 42 }],
   44: [function (require, module, exports) {
     'use strict'
-    var global = require('../internals/global')
+    var globalThis = require('../internals/global-this')
 
     // eslint-disable-next-line es/no-object-defineproperty -- safe
     var defineProperty = Object.defineProperty
 
     module.exports = function (key, value) {
       try {
-        defineProperty(global, key, { value: value, configurable: true, writable: true })
+        defineProperty(globalThis, key, { value: value, configurable: true, writable: true })
       } catch (error) {
-        global[key] = value
+        globalThis[key] = value
       } return value
     }
-  }, { '../internals/global': 63 }],
+  }, { '../internals/global-this': 63 }],
   45: [function (require, module, exports) {
     'use strict'
     var fails = require('../internals/fails')
@@ -2222,28 +2222,46 @@
   }, { '../internals/fails': 51 }],
   46: [function (require, module, exports) {
     'use strict'
-    var global = require('../internals/global')
+    var globalThis = require('../internals/global-this')
     var isObject = require('../internals/is-object')
 
-    var document = global.document
+    var document = globalThis.document
     // typeof document.createElement is 'object' in old IE
     var EXISTS = isObject(document) && isObject(document.createElement)
 
     module.exports = function (it) {
       return EXISTS ? document.createElement(it) : {}
     }
-  }, { '../internals/global': 63, '../internals/is-object': 75 }],
+  }, { '../internals/global-this': 63, '../internals/is-object': 75 }],
   47: [function (require, module, exports) {
     'use strict'
-    module.exports = typeof navigator !== 'undefined' && String(navigator.userAgent) || ''
+    // IE8- don't enum bug keys
+    module.exports = [
+      'constructor',
+      'hasOwnProperty',
+      'isPrototypeOf',
+      'propertyIsEnumerable',
+      'toLocaleString',
+      'toString',
+      'valueOf'
+    ]
   }, {}],
   48: [function (require, module, exports) {
     'use strict'
-    var global = require('../internals/global')
-    var userAgent = require('../internals/engine-user-agent')
+    var globalThis = require('../internals/global-this')
 
-    var process = global.process
-    var Deno = global.Deno
+    var navigator = globalThis.navigator
+    var userAgent = navigator && navigator.userAgent
+
+    module.exports = userAgent ? String(userAgent) : ''
+  }, { '../internals/global-this': 63 }],
+  49: [function (require, module, exports) {
+    'use strict'
+    var globalThis = require('../internals/global-this')
+    var userAgent = require('../internals/environment-user-agent')
+
+    var process = globalThis.process
+    var Deno = globalThis.Deno
     var versions = process && process.versions || Deno && Deno.version
     var v8 = versions && versions.v8
     var match, version
@@ -2266,23 +2284,10 @@
     }
 
     module.exports = version
-  }, { '../internals/engine-user-agent': 47, '../internals/global': 63 }],
-  49: [function (require, module, exports) {
-    'use strict'
-    // IE8- don't enum bug keys
-    module.exports = [
-      'constructor',
-      'hasOwnProperty',
-      'isPrototypeOf',
-      'propertyIsEnumerable',
-      'toLocaleString',
-      'toString',
-      'valueOf'
-    ]
-  }, {}],
+  }, { '../internals/environment-user-agent': 48, '../internals/global-this': 63 }],
   50: [function (require, module, exports) {
     'use strict'
-    var global = require('../internals/global')
+    var globalThis = require('../internals/global-this')
     var getOwnPropertyDescriptor = require('../internals/object-get-own-property-descriptor').f
     var createNonEnumerableProperty = require('../internals/create-non-enumerable-property')
     var defineBuiltIn = require('../internals/define-built-in')
@@ -2311,11 +2316,11 @@
       var STATIC = options.stat
       var FORCED, target, key, targetProperty, sourceProperty, descriptor
       if (GLOBAL) {
-        target = global
+        target = globalThis
       } else if (STATIC) {
-        target = global[TARGET] || defineGlobalProperty(TARGET, {})
+        target = globalThis[TARGET] || defineGlobalProperty(TARGET, {})
       } else {
-        target = global[TARGET] && global[TARGET].prototype
+        target = globalThis[TARGET] && globalThis[TARGET].prototype
       }
       if (target) {
         for (key in source) {
@@ -2338,7 +2343,7 @@
         }
       }
     }
-  }, { '../internals/copy-constructor-properties': 35, '../internals/create-non-enumerable-property': 38, '../internals/define-built-in': 42, '../internals/define-global-property': 44, '../internals/global': 63, '../internals/is-forced': 73, '../internals/object-get-own-property-descriptor': 90 }],
+  }, { '../internals/copy-constructor-properties': 35, '../internals/create-non-enumerable-property': 38, '../internals/define-built-in': 42, '../internals/define-global-property': 44, '../internals/global-this': 63, '../internals/is-forced': 73, '../internals/object-get-own-property-descriptor': 90 }],
   51: [function (require, module, exports) {
     'use strict'
     module.exports = function (exec) {
@@ -2434,7 +2439,7 @@
   }, { '../internals/function-bind-native': 53 }],
   58: [function (require, module, exports) {
     'use strict'
-    var global = require('../internals/global')
+    var globalThis = require('../internals/global-this')
     var isCallable = require('../internals/is-callable')
 
     var aFunction = function (argument) {
@@ -2442,9 +2447,9 @@
     }
 
     module.exports = function (namespace, method) {
-      return arguments.length < 2 ? aFunction(global[namespace]) : global[namespace] && global[namespace][method]
+      return arguments.length < 2 ? aFunction(globalThis[namespace]) : globalThis[namespace] && globalThis[namespace][method]
     }
-  }, { '../internals/global': 63, '../internals/is-callable': 72 }],
+  }, { '../internals/global-this': 63, '../internals/is-callable': 72 }],
   59: [function (require, module, exports) {
     'use strict'
     // `GetIteratorDirect(obj)` abstract operation
@@ -2601,7 +2606,7 @@
   70: [function (require, module, exports) {
     'use strict'
     var NATIVE_WEAK_MAP = require('../internals/weak-map-basic-detection')
-    var global = require('../internals/global')
+    var globalThis = require('../internals/global-this')
     var isObject = require('../internals/is-object')
     var createNonEnumerableProperty = require('../internals/create-non-enumerable-property')
     var hasOwn = require('../internals/has-own-property')
@@ -2610,8 +2615,8 @@
     var hiddenKeys = require('../internals/hidden-keys')
 
     var OBJECT_ALREADY_INITIALIZED = 'Object already initialized'
-    var TypeError = global.TypeError
-    var WeakMap = global.WeakMap
+    var TypeError = globalThis.TypeError
+    var WeakMap = globalThis.WeakMap
     var set, get, has
 
     var enforce = function (it) {
@@ -2670,7 +2675,7 @@
       enforce: enforce,
       getterFor: getterFor
     }
-  }, { '../internals/create-non-enumerable-property': 38, '../internals/global': 63, '../internals/has-own-property': 64, '../internals/hidden-keys': 65, '../internals/is-object': 75, '../internals/shared-key': 102, '../internals/shared-store': 103, '../internals/weak-map-basic-detection': 118 }],
+  }, { '../internals/create-non-enumerable-property': 38, '../internals/global-this': 63, '../internals/has-own-property': 64, '../internals/hidden-keys': 65, '../internals/is-object': 75, '../internals/shared-key': 102, '../internals/shared-store': 103, '../internals/weak-map-basic-detection': 118 }],
   71: [function (require, module, exports) {
     'use strict'
     var wellKnownSymbol = require('../internals/well-known-symbol')
@@ -3124,7 +3129,8 @@
       activeXDocument.write(scriptTag(''))
       activeXDocument.close()
       var temp = activeXDocument.parentWindow.Object
-      activeXDocument = null // avoid memory leak
+      // eslint-disable-next-line no-useless-assignment -- avoid memory leak
+      activeXDocument = null
       return temp
     }
 
@@ -3181,7 +3187,7 @@
       } else result = NullProtoObject()
       return Properties === undefined ? result : definePropertiesModule.f(result, Properties)
     }
-  }, { '../internals/an-object': 26, '../internals/document-create-element': 46, '../internals/enum-bug-keys': 49, '../internals/hidden-keys': 65, '../internals/html': 66, '../internals/object-define-properties': 88, '../internals/shared-key': 102 }],
+  }, { '../internals/an-object': 26, '../internals/document-create-element': 46, '../internals/enum-bug-keys': 47, '../internals/hidden-keys': 65, '../internals/html': 66, '../internals/object-define-properties': 88, '../internals/shared-key': 102 }],
   88: [function (require, module, exports) {
     'use strict'
     var DESCRIPTORS = require('../internals/descriptors')
@@ -3293,7 +3299,7 @@
     exports.f = Object.getOwnPropertyNames || function getOwnPropertyNames (O) {
       return internalObjectKeys(O, hiddenKeys)
     }
-  }, { '../internals/enum-bug-keys': 49, '../internals/object-keys-internal': 95 }],
+  }, { '../internals/enum-bug-keys': 47, '../internals/object-keys-internal': 95 }],
   92: [function (require, module, exports) {
     'use strict'
     // eslint-disable-next-line es/no-object-getownpropertysymbols -- safe
@@ -3365,7 +3371,7 @@
     module.exports = Object.keys || function keys (O) {
       return internalObjectKeys(O, enumBugKeys)
     }
-  }, { '../internals/enum-bug-keys': 49, '../internals/object-keys-internal': 95 }],
+  }, { '../internals/enum-bug-keys': 47, '../internals/object-keys-internal': 95 }],
   97: [function (require, module, exports) {
     'use strict'
     var $propertyIsEnumerable = {}.propertyIsEnumerable
@@ -3454,20 +3460,20 @@
   103: [function (require, module, exports) {
     'use strict'
     var IS_PURE = require('../internals/is-pure')
-    var globalThis = require('../internals/global')
+    var globalThis = require('../internals/global-this')
     var defineGlobalProperty = require('../internals/define-global-property')
 
     var SHARED = '__core-js_shared__'
     var store = module.exports = globalThis[SHARED] || defineGlobalProperty(SHARED, {});
 
     (store.versions || (store.versions = [])).push({
-      version: '3.37.1',
+      version: '3.38.1',
       mode: IS_PURE ? 'pure' : 'global',
       copyright: '© 2014-2024 Denis Pushkarev (zloirock.ru)',
-      license: 'https://github.com/zloirock/core-js/blob/v3.37.1/LICENSE',
+      license: 'https://github.com/zloirock/core-js/blob/v3.38.1/LICENSE',
       source: 'https://github.com/zloirock/core-js'
     })
-  }, { '../internals/define-global-property': 44, '../internals/global': 63, '../internals/is-pure': 76 }],
+  }, { '../internals/define-global-property': 44, '../internals/global-this': 63, '../internals/is-pure': 76 }],
   104: [function (require, module, exports) {
     'use strict'
     var store = require('../internals/shared-store')
@@ -3479,11 +3485,11 @@
   105: [function (require, module, exports) {
     'use strict'
     /* eslint-disable es/no-symbol -- required for testing */
-    var V8_VERSION = require('../internals/engine-v8-version')
+    var V8_VERSION = require('../internals/environment-v8-version')
     var fails = require('../internals/fails')
-    var global = require('../internals/global')
+    var globalThis = require('../internals/global-this')
 
-    var $String = global.String
+    var $String = globalThis.String
 
     // eslint-disable-next-line es/no-object-getownpropertysymbols -- required for testing
     module.exports = !!Object.getOwnPropertySymbols && !fails(function () {
@@ -3496,7 +3502,7 @@
     // Chrome 38-40 symbols are not inherited from DOM collections prototypes to instances
     !Symbol.sham && V8_VERSION && V8_VERSION < 41
     })
-  }, { '../internals/engine-v8-version': 48, '../internals/fails': 51, '../internals/global': 63 }],
+  }, { '../internals/environment-v8-version': 49, '../internals/fails': 51, '../internals/global-this': 63 }],
   106: [function (require, module, exports) {
     'use strict'
     var toIntegerOrInfinity = require('../internals/to-integer-or-infinity')
@@ -3660,23 +3666,23 @@
   }, { '../internals/descriptors': 45, '../internals/fails': 51 }],
   118: [function (require, module, exports) {
     'use strict'
-    var global = require('../internals/global')
+    var globalThis = require('../internals/global-this')
     var isCallable = require('../internals/is-callable')
 
-    var WeakMap = global.WeakMap
+    var WeakMap = globalThis.WeakMap
 
     module.exports = isCallable(WeakMap) && /native code/.test(String(WeakMap))
-  }, { '../internals/global': 63, '../internals/is-callable': 72 }],
+  }, { '../internals/global-this': 63, '../internals/is-callable': 72 }],
   119: [function (require, module, exports) {
     'use strict'
-    var global = require('../internals/global')
+    var globalThis = require('../internals/global-this')
     var shared = require('../internals/shared')
     var hasOwn = require('../internals/has-own-property')
     var uid = require('../internals/uid')
     var NATIVE_SYMBOL = require('../internals/symbol-constructor-detection')
     var USE_SYMBOL_AS_UID = require('../internals/use-symbol-as-uid')
 
-    var Symbol = global.Symbol
+    var Symbol = globalThis.Symbol
     var WellKnownSymbolsStore = shared('wks')
     var createWellKnownSymbol = USE_SYMBOL_AS_UID ? Symbol.for || Symbol : Symbol && Symbol.withoutSetter || uid
 
@@ -3687,7 +3693,7 @@
           : createWellKnownSymbol('Symbol.' + name)
       } return WellKnownSymbolsStore[name]
     }
-  }, { '../internals/global': 63, '../internals/has-own-property': 64, '../internals/shared': 104, '../internals/symbol-constructor-detection': 105, '../internals/uid': 115, '../internals/use-symbol-as-uid': 116 }],
+  }, { '../internals/global-this': 63, '../internals/has-own-property': 64, '../internals/shared': 104, '../internals/symbol-constructor-detection': 105, '../internals/uid': 115, '../internals/use-symbol-as-uid': 116 }],
   120: [function (require, module, exports) {
     'use strict'
     var $ = require('../internals/export')
@@ -3772,7 +3778,7 @@
   122: [function (require, module, exports) {
     'use strict'
     var $ = require('../internals/export')
-    var global = require('../internals/global')
+    var globalThis = require('../internals/global-this')
     var anInstance = require('../internals/an-instance')
     var anObject = require('../internals/an-object')
     var isCallable = require('../internals/is-callable')
@@ -3791,7 +3797,7 @@
     var TO_STRING_TAG = wellKnownSymbol('toStringTag')
 
     var $TypeError = TypeError
-    var NativeIterator = global[ITERATOR]
+    var NativeIterator = globalThis[ITERATOR]
 
     // FF56- have non-standard global helper `Iterator`
     var FORCED = IS_PURE ||
@@ -3835,7 +3841,7 @@
     $({ global: true, constructor: true, forced: FORCED }, {
       Iterator: IteratorConstructor
     })
-  }, { '../internals/an-instance': 25, '../internals/an-object': 26, '../internals/create-property': 40, '../internals/define-built-in-accessor': 41, '../internals/descriptors': 45, '../internals/export': 50, '../internals/fails': 51, '../internals/global': 63, '../internals/has-own-property': 64, '../internals/is-callable': 72, '../internals/is-pure': 76, '../internals/iterators-core': 82, '../internals/object-get-prototype-of': 93, '../internals/well-known-symbol': 119 }],
+  }, { '../internals/an-instance': 25, '../internals/an-object': 26, '../internals/create-property': 40, '../internals/define-built-in-accessor': 41, '../internals/descriptors': 45, '../internals/export': 50, '../internals/fails': 51, '../internals/global-this': 63, '../internals/has-own-property': 64, '../internals/is-callable': 72, '../internals/is-pure': 76, '../internals/iterators-core': 82, '../internals/object-get-prototype-of': 93, '../internals/well-known-symbol': 119 }],
   123: [function (require, module, exports) {
     'use strict'
     var $ = require('../internals/export')
