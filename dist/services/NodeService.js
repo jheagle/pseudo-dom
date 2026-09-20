@@ -4,8 +4,8 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 })
 exports.NodeService = void 0
-var _generateNodeList = _interopRequireDefault(require('../factories/generateNodeList'))
-var _EventTargetService = _interopRequireDefault(require('./EventTargetService'))
+const _generateNodeList = _interopRequireDefault(require('../factories/generateNodeList'))
+const _EventTargetService = _interopRequireDefault(require('./EventTargetService'))
 function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: e } }
 /**
  * @file Substitute for the DOM Node Class.

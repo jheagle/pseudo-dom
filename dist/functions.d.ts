@@ -1,5 +1,5 @@
 declare const _default: {
-    getParentNodes: (node: PseudoEventTarget) => PseudoNode[];
-    getParentNodesFromAttribute: (attr: string, value: string | number | boolean, node: any) => PseudoNode[];
+    getParentNodes: (node: PseudoEventTarget) => Array<PseudoNode>;
+    getParentNodesFromAttribute: (attr: string, value: boolean | number | string, node: PseudoEventTarget | PseudoNode | any) => Array<PseudoNode>;
 };
 export default _default;

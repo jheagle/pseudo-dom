@@ -4,14 +4,12 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 })
 exports.ElementService = void 0
-require('core-js/modules/esnext.async-iterator.find.js')
-require('core-js/modules/esnext.async-iterator.map.js')
 require('core-js/modules/esnext.iterator.constructor.js')
 require('core-js/modules/esnext.iterator.find.js')
 require('core-js/modules/esnext.iterator.map.js')
-var _generateNodeList = _interopRequireDefault(require('../factories/generateNodeList'))
-var _TreeLinker = _interopRequireDefault(require('collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'))
-var _NodeService = require('./NodeService')
+const _generateNodeList = _interopRequireDefault(require('../factories/generateNodeList'))
+const _TreeLinker = _interopRequireDefault(require('collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'))
+const _NodeService = require('./NodeService')
 function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: e } }
 /**
  * Simulate the behaviour of the Element Class when there is no DOM available.
@@ -38,13 +36,12 @@ class ElementService extends _NodeService.NodeService {
    * @param {Array} [elementOptions.children=[]]
    * @constructor
    */
-  constructor () {
-    const {
-      tagName = '',
-      attributes = [],
-      parent = null,
-      children = []
-    } = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {}
+  constructor ({
+    tagName = '',
+    attributes = [],
+    parent = null,
+    children = []
+  } = {}) {
     super()
     this.parent = parent
     this.children = (0, _generateNodeList.default)(_TreeLinker.default.fromArray(children).head)
@@ -62,11 +59,10 @@ class ElementService extends _NodeService.NodeService {
     /**
      * Map all incoming attributes to the attribute array and attach each as a property of this element
      */
-    this.attributes.map(_ref => {
-      const {
-        name,
-        value
-      } = _ref
+    this.attributes.map(({
+      name,
+      value
+    }) => {
       // @ts-ignore
       this[name] = value
       return {

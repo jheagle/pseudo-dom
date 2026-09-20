@@ -4,11 +4,11 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 })
 exports.default = void 0
-var _PseudoEventTarget = _interopRequireDefault(require('../interfaces/PseudoEventTarget'))
-var _PseudoNode = _interopRequireDefault(require('../interfaces/PseudoNode'))
-var _PseudoElement = _interopRequireDefault(require('../interfaces/PseudoElement'))
-var _PseudoHTMLElement = _interopRequireDefault(require('../interfaces/PseudoHTMLElement'))
-var _PseudoHTMLDocument = _interopRequireDefault(require('../classes/PseudoHTMLDocument'))
+const _PseudoEventTarget = _interopRequireDefault(require('../interfaces/PseudoEventTarget'))
+const _PseudoNode = _interopRequireDefault(require('../interfaces/PseudoNode'))
+const _PseudoElement = _interopRequireDefault(require('../interfaces/PseudoElement'))
+const _PseudoHTMLElement = _interopRequireDefault(require('../interfaces/PseudoHTMLElement'))
+const _PseudoHTMLDocument = _interopRequireDefault(require('../classes/PseudoHTMLDocument'))
 function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: e } }
 /**
  * Construct the Pseudo Dom to provide access to Dom objects which are otherwise not available outside the browser
@@ -18,8 +18,7 @@ function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: 
  * @param {Object} context
  * @returns {Window|PseudoEventTarget}
  */
-const generateDocument = function (root) {
-  const context = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {}
+const generateDocument = (root, context = {}) => {
   /**
    *
    * @type {Window|PseudoEventTarget}
@@ -58,4 +57,4 @@ const generateDocument = function (root) {
   }
   return context ? Object.assign(context, newWindow) : Object.assign(root, newWindow)
 }
-var _default = exports.default = generateDocument
+const _default = exports.default = generateDocument

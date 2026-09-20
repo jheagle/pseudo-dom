@@ -4,9 +4,9 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 })
 exports.PseudoNodeList = void 0
-require('core-js/modules/esnext.async-iterator.map.js')
+require('core-js/modules/esnext.iterator.constructor.js')
 require('core-js/modules/esnext.iterator.map.js')
-var _LinkedTreeList = require('collect-your-stuff/dist/collections/linked-tree-list/LinkedTreeList')
+const _LinkedTreeList = require('collect-your-stuff/dist/collections/linked-tree-list/LinkedTreeList')
 /**
  * @file Substitute for the NodeList interface.
  * @author Joshua Heagle <joshuaheagle@gmail.com>

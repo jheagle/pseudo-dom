@@ -4,7 +4,7 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 })
 exports.HTMLElementService = void 0
-var _ElementService = require('./ElementService')
+const _ElementService = require('./ElementService')
 /**
  * Simulate the behaviour of the HTMLElement Class when there is no DOM available.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -28,12 +28,11 @@ class HTMLElementService extends _ElementService.ElementService {
    * @param {Array} [elementOptions.children=[]]
    * @constructor
    */
-  constructor () {
-    const {
-      tagName = '',
-      parent = null,
-      children = []
-    } = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {}
+  constructor ({
+    tagName = '',
+    parent = null,
+    children = []
+  } = {}) {
     super({
       tagName,
       attributes: [{

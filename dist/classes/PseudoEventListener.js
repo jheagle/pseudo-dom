@@ -4,7 +4,7 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 })
 exports.default = void 0
-var _PseudoEvent = _interopRequireDefault(require('../interfaces/PseudoEvent'))
+const _PseudoEvent = _interopRequireDefault(require('../interfaces/PseudoEvent'))
 function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: e } }
 /**
  * @file Substitute for the DOM EventEventListener Class.
@@ -21,13 +21,11 @@ function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: 
  * @property {boolean} isDefault
  */
 class PseudoEventListener {
-  constructor (eventType) {
-    const {
-      capture = false,
-      once = false,
-      passive = false
-    } = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {}
-    const handleEvent = arguments.length > 2 ? arguments[2] : undefined
+  constructor (eventType, {
+    capture = false,
+    once = false,
+    passive = false
+  } = {}, handleEvent) {
     this.eventOptions = {
       capture: false,
       once: false,
@@ -138,4 +136,4 @@ class PseudoEventListener {
     return this.nonPassiveHalt(event) || this.skipPhase(event)
   }
 }
-var _default = exports.default = PseudoEventListener
+const _default = exports.default = PseudoEventListener

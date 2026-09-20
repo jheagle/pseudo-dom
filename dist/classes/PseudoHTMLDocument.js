@@ -4,9 +4,9 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 })
 exports.default = void 0
-var _PseudoHTMLElement = _interopRequireDefault(require('../interfaces/PseudoHTMLElement'))
-var _generateNodeList = _interopRequireDefault(require('../factories/generateNodeList'))
-var _TreeLinker = _interopRequireDefault(require('collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'))
+const _PseudoHTMLElement = _interopRequireDefault(require('../interfaces/PseudoHTMLElement'))
+const _generateNodeList = _interopRequireDefault(require('../factories/generateNodeList'))
+const _TreeLinker = _interopRequireDefault(require('collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'))
 function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: e } }
 /**
  * @file Substitute for the DOM HTMLDocument Class.
@@ -62,8 +62,7 @@ class PseudoHTMLDocument extends _PseudoHTMLElement.default {
    * @param {string} tagName - Tag Name is a string representing the type of Dom element this represents
    * @returns {PseudoHTMLElement}
    */
-  createElement () {
-    const tagName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'div'
+  createElement (tagName = 'div') {
     const returnElement = new _PseudoHTMLElement.default({
       tagName
     })
@@ -71,4 +70,4 @@ class PseudoHTMLDocument extends _PseudoHTMLElement.default {
     return returnElement
   }
 }
-var _default = exports.default = PseudoHTMLDocument
+const _default = exports.default = PseudoHTMLDocument

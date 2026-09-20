@@ -1,6 +1,4 @@
 import PseudoNodeList from '../classes/PseudoNodeList';
-import LinkedTreeList from 'collect-your-stuff/dist/collections/linked-tree-list/LinkedTreeList';
-import TreeLinker from 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker';
 import { PseudoNode } from '../interfaces/PseudoNode';
 import EventTargetService from './EventTargetService';
 /**
@@ -43,13 +41,13 @@ export declare class NodeService extends EventTargetService implements PseudoNod
     get firstChild(): any;
     get isConnected(): boolean;
     get lastChild(): any;
-    get nextSibling(): NodeService;
+    get nextSibling(): NodeService | null;
     get nodeName(): string;
     get nodeType(): number;
     get ownerDocument(): any | undefined;
-    get parentNode(): NodeService;
-    get parentElement(): NodeService;
-    get previousSibling(): NodeService;
+    get parentNode(): NodeService | undefined;
+    get parentElement(): NodeService | null | undefined;
+    get previousSibling(): NodeService | null;
     /**
      *
      * @param {NodeService} childNode

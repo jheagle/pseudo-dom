@@ -8,6 +8,6 @@ import { TreeLinker } from 'collect-your-stuff/dist/collections/linked-tree-list
 import { PseudoNode } from '../interfaces/PseudoNode';
 export declare class PseudoNodeList extends LinkedTreeList {
     get entries(): TreeLinker[];
-    get keys(): () => IterableIterator<number>;
-    get values(): () => IterableIterator<PseudoNode>;
+    get keys(): () => ArrayIterator<number>;
+    get values(): () => ArrayIterator<PseudoNode>;
 }

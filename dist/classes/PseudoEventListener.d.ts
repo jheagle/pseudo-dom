@@ -18,10 +18,10 @@ declare class PseudoEventListener {
     private handler;
     private isDefault;
     constructor(eventType: string, { capture, once, passive }: {
-        capture?: boolean;
-        once?: boolean;
-        passive?: boolean;
-    }, handleEvent: Function);
+        capture?: boolean | undefined;
+        once?: boolean | undefined;
+        passive?: boolean | undefined;
+    } | undefined, handleEvent: Function);
     get once(): boolean;
     /**
      * @method

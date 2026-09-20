@@ -4,13 +4,11 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 })
 exports.default = void 0
-require('core-js/modules/esnext.async-iterator.for-each.js')
-require('core-js/modules/esnext.async-iterator.reduce.js')
 require('core-js/modules/esnext.iterator.constructor.js')
 require('core-js/modules/esnext.iterator.for-each.js')
 require('core-js/modules/esnext.iterator.reduce.js')
-var _PseudoEventListener = _interopRequireDefault(require('../classes/PseudoEventListener'))
-var _Stack = _interopRequireDefault(require('collect-your-stuff/dist/collections/stack/Stack'))
+const _PseudoEventListener = _interopRequireDefault(require('../classes/PseudoEventListener'))
+const _Stack = _interopRequireDefault(require('collect-your-stuff/dist/collections/stack/Stack'))
 function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: e } }
 /**
  * Simulate the behaviour of the EventTarget Class when there is no DOM available.
@@ -141,8 +139,7 @@ class EventTargetService {
    * @param {function|Object} callback
    * @param {boolean|Object} [useCapture=false]
    */
-  addEventListener (type, callback) {
-    const useCapture = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false
+  addEventListener (type, callback, useCapture = false) {
     let options = {
       capture: false,
       once: false,
@@ -205,8 +202,7 @@ class EventTargetService {
    * @param {EventTarget|EventTargetService} target
    * @returns {boolean}
    */
-  dispatchEvent (event) {
-    const target = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this
+  dispatchEvent (event, target = this) {
     event.inner.target = target
     if (!(event.type in this.listeners)) {
       return true
@@ -215,4 +211,4 @@ class EventTargetService {
     return !event.defaultPrevented
   }
 }
-var _default = exports.default = EventTargetService
+const _default = exports.default = EventTargetService

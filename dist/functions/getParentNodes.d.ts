@@ -4,5 +4,6 @@
  * @returns {Array.<PseudoNode>}
  */
 import PseudoNode from '../interfaces/PseudoNode';
+import PseudoEventTarget from '../interfaces/PseudoEventTarget';
 declare const getParentNodes: (node: PseudoEventTarget) => Array<PseudoNode>;
 export default getParentNodes;

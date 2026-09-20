@@ -4,7 +4,7 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 })
 exports.EventService = void 0
-var _getParentNodes = _interopRequireDefault(require('../functions/getParentNodes'))
+const _getParentNodes = _interopRequireDefault(require('../functions/getParentNodes'))
 function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: e } }
 /**
  * @file Substitute for the DOM Event Class.
@@ -51,13 +51,11 @@ class EventService {
    * @param {boolean} [eventOptions.composed=true]
    * @constructor
    */
-  constructor () {
-    const typeArg = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : ''
-    const {
-      bubbles = true,
-      cancelable = true,
-      composed = true
-    } = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {}
+  constructor (typeArg = '', {
+    bubbles = true,
+    cancelable = true,
+    composed = true
+  } = {}) {
     this.properties = {
       bubbles: true,
       cancelable: true,
@@ -74,9 +72,9 @@ class EventService {
     }
     this.setReadOnlyProperties({
       type: typeArg,
-      bubbles: bubbles,
-      cancelable: cancelable,
-      composed: composed
+      bubbles,
+      cancelable,
+      composed
     })
   }
 
@@ -201,8 +199,7 @@ class EventService {
     return null
   }
 
-  setReadOnlyProperties () {
-    const updateProps = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {}
+  setReadOnlyProperties (updateProps = {}) {
     this.properties = Object.assign({}, this.properties, updateProps)
     return this
   }
