@@ -5,10 +5,18 @@
  */
 import { PseudoNode } from '../interfaces/PseudoNode'
 import generateNodeList from '../factories/generateNodeList'
-import TreeLinker from 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'
-import { PseudoEvent } from '../interfaces/PseudoEvent'
+import { TreeLinker } from 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'
+import { EventService } from './EventService'
 import { NodeService } from './NodeService'
 import { PseudoElement } from '../interfaces/PseudoElement'
+import { PseudoNamedNodeMap } from '../interfaces/PseudoNamedNodeMap'
+import { PseudoDOMTokenList } from '../interfaces/PseudoDOMTokenList'
+import { AttrService } from './AttrService'
+import { DOMTokenListService } from './DOMTokenListService'
+import { NamedNodeMapService } from './NamedNodeMapService'
+import getParentNodesFromAttribute from '../functions/getParentNodesFromAttribute'
+
+type attribute = { name: string, value: any }
 
 /**
  * Simulate the behaviour of the Element Class when there is no DOM available.
@@ -25,61 +33,75 @@ import { PseudoElement } from '../interfaces/PseudoElement'
  * @property {function} getAttribute
  * @property {function} removeAttribute
  */
-export class ElementService extends NodeService implements PseudoElement {
-  private readonly tagName: string
-  private attributes: any[]
-  private classList: any
-  private className: any
-  private type: string
+export class ElementService extends NodeService implements Partial<PseudoElement> {
+  public id: string
+  public innerHTML: string
+  public type: string
+  private readonly tag: string
+  private readonly attributeList: Array<attribute>
+  private readonly propertyAttributes: Array<string>
+  private readonly tokenList: DOMTokenListService
 
   /**
-   * Simulate the Element object when the Dom is not available
-   * @param {Object} [elementOptions={}]
-   * @param {string} [elementOptions.tagName='']
-   * @param {array} [elementOptions.attributes=[]]
-   * @param {PseudoNode|Object} [elementOptions.parent={}]
-   * @param {Array} [elementOptions.children=[]]
+   * @param {Object} [settings={}]
+   * @param {string} [settings.tagName=''] The name of the tag this element represents
+   * @param {Array<{name: string, value: *}>} [settings.attributes=[]] The attributes (also assigned as properties) to start with
+   * @param {PseudoNode|null} [settings.parent=null] The parent node
+   * @param {Array} [settings.children=[]] The values or nodes to start as children
    * @constructor
    */
   constructor ({ tagName = '', attributes = [], parent = null, children = [] }: {
     tagName?: string;
-    attributes?: Array<any>;
+    attributes?: Array<attribute>;
     parent?: PseudoNode | null;
     children?: Array<any>
   } = {}) {
     super()
+    this.tokenList = new DOMTokenListService()
     this.parent = parent
     this.children = generateNodeList(TreeLinker.fromArray(children).head)
-    this.tagName = tagName
-    this.attributes = attributes.concat([
+    this.tag = tagName
+    this.attributeList = attributes.concat([
       { name: 'className', value: '' },
       { name: 'id', value: '' },
       { name: 'innerHTML', value: '' }
     ])
-
-    /**
-     * Map all incoming attributes to the attribute array and attach each as a property of this element
-     */
-    this.attributes.map(({ name, value }): { name: keyof ElementService, value: any } => {
-      // @ts-ignore
-      this[name] = value
-      return { name, value }
+    this.propertyAttributes = this.attributeList.map(({ name }) => name)
+    this.attributeList.forEach(({ name, value }) => {
+      (this as any)[name] = value
     })
-
-    // this.classList = new DOMSettableTokenList(this.className)
-    this.classList = this.className
   }
 
-  get nodeType () {
-    return PseudoNode.ELEMENT_NODE
+  get tagName (): string {
+    return this.tag
+  }
+
+  get nodeType (): number {
+    return NodeService.ELEMENT_NODE
+  }
+
+  get attributes (): PseudoNamedNodeMap {
+    return new NamedNodeMapService(this.attributeList.map(({ name, value }) => new AttrService(name, String(value), this as unknown as PseudoElement)))
+  }
+
+  get classList (): PseudoDOMTokenList {
+    return this.tokenList
+  }
+
+  get className (): string {
+    return this.tokenList.value
+  }
+
+  set className (className: string) {
+    this.tokenList.value = className
   }
 
   /**
-   *
+   * Some elements have default behaviour, this registers it when the element is added.
    * @returns {Function}
    */
   applyDefaultEvent (): Function {
-    let callback: (event: PseudoEvent) => void = (event: PseudoEvent): undefined => undefined
+    let callback: (event: EventService) => void = (event: EventService): undefined => undefined
     switch (this.tagName) {
       case 'form':
         this.addEventListener('submit', callback)
@@ -87,9 +109,9 @@ export class ElementService extends NodeService implements PseudoElement {
       case 'button':
       case 'input':
         if (/^(submit|image)$/i.test(this.type || '')) {
-          callback = (event: PseudoEvent): void => {
-            const forms = require('./PseudoEvent').getParentNodesFromAttribute('tagName', 'form', this)
-            if (forms) {
+          callback = (event: EventService): void => {
+            const forms: Array<any> = getParentNodesFromAttribute('tagName', 'form', this)
+            if (forms.length) {
               forms[0].submit()
             }
           }
@@ -111,48 +133,51 @@ export class ElementService extends NodeService implements PseudoElement {
   }
 
   /**
-   * Check if an attribute is assigned to this element.
-   * @param {string} attributeName - The attribute name to check
+   * Check whether the element has an attribute by that name.
+   * @param {string} attributeName
    * @returns {boolean}
    */
   hasAttribute (attributeName: string): boolean {
-    return this.getAttribute(attributeName) !== 'undefined'
+    return this.attributeList.some(({ name }) => name === attributeName)
   }
 
   /**
-   * Assign a new attribute or overwrite an assigned attribute with name and value.
-   * @param {string} attributeName - The name key of the attribute to append
-   * @param {string|Object} attributeValue - The value of the attribute to append
+   * Set the value of an attribute, adding the attribute if it did not exist.
+   * @param {string} attributeName
+   * @param {string} attributeValue
    * @returns {undefined}
    */
-  setAttribute (attributeName: keyof ElementService, attributeValue: string | object): undefined {
-    if (this.hasAttribute(attributeName) || this[attributeName] === 'undefined') {
-      // @ts-ignore
-      this[attributeName] = attributeValue
-      this.attributes.push({ name: attributeName, value: attributeValue })
+  setAttribute (attributeName: string, attributeValue: string): void {
+    const existing = this.attributeList.find(({ name }) => name === attributeName)
+    if (existing) {
+      existing.value = attributeValue
+    } else {
+      this.attributeList.push({ name: attributeName, value: attributeValue })
     }
-    return undefined
+    if (this.propertyAttributes.indexOf(attributeName) >= 0) {
+      (this as any)[attributeName] = attributeValue
+    }
   }
 
   /**
-   * Retrieve the value of the specified attribute from the Element
-   * @param {string} attributeName - A string representing the name of the attribute to be retrieved
-   * @returns {string|Object}
+   * Retrieve the value of an attribute.
+   * @param {string} attributeName
+   * @returns {string|null} The value, or null when there is no such attribute
    */
-  getAttribute (attributeName: string): string | object {
-    return this.attributes.find(attribute => attribute.name === attributeName)
+  getAttribute (attributeName: string): string | null {
+    const found = this.attributeList.find(({ name }) => name === attributeName)
+    return found ? found.value : null
   }
 
   /**
-   * Remove an assigned attribute from the Element
-   * @param {string} attributeName - The string name of the attribute to be removed
-   * @returns {null}
+   * Remove an attribute from the element.
+   * @param {string} attributeName
+   * @returns {undefined}
    */
-  removeAttribute (attributeName: keyof ElementService): null {
-    if (this.hasAttribute(attributeName)) {
-      delete this[attributeName]
-      // TODO: how do we delete it as an attribute?
+  removeAttribute (attributeName: string): void {
+    const index = this.attributeList.findIndex(({ name }) => name === attributeName)
+    if (index >= 0) {
+      this.attributeList.splice(index, 1)
     }
-    return null
   }
 }

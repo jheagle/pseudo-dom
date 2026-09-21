@@ -3,13 +3,8 @@
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @version 1.0.0
  */
-import { PseudoEvent } from '../interfaces/PseudoEvent';
-import { PseudoEventTarget } from '../interfaces/PseudoEventTarget';
-export type listenerOptions = {
-    capture: boolean;
-    once: boolean;
-    passive: boolean;
-};
+import { EventService } from './EventService';
+import { listenerOptions, PseudoEventTarget } from '../interfaces/PseudoEventTarget';
 /**
  * Simulate the behaviour of the EventTarget Class when there is no DOM available.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -27,50 +22,23 @@ declare class EventTargetService implements PseudoEventTarget {
      */
     constructor();
     /**
-     *
-     * @param {PseudoEvent} event
-     * @returns {boolean}
+     * Run each of the listeners registered on this target for the type of the event.
+     * @param {EventService} event
+     * @returns {*} true when there was nothing registered, otherwise the last value returned from a handler (null when none ran)
      */
     private runEvents;
     /**
-     *
+     * Register the function to run when nothing else has prevented the default for this type of event.
      * @param {string} type
      * @param {Function} callback
      */
     protected setDefaultEvent(type: string, callback: Function): void;
-    /**
-     *
-     * @param {PseudoEvent} event
-     * @returns {boolean}
-     */
     private runDefaultEvent;
-    /**
-     *
-     * @param {PseudoEvent} eventType
-     * @returns {boolean}
-     */
     private startEvents;
-    /**
-     *
-     * @param {string} type
-     * @param {function|Object} callback
-     * @param {boolean|Object} [useCapture=false]
-     */
     addEventListener(type: string, callback: Function | {
         handleEvent: Function;
     } | any, useCapture?: listenerOptions | boolean): void;
-    /**
-     *
-     * @param {string} type
-     * @param {function} callback
-     */
     removeEventListener(type: string, callback: Function): void;
-    /**
-     *
-     * @param {Event|PseudoEvent} event
-     * @param {EventTarget|EventTargetService} target
-     * @returns {boolean}
-     */
-    dispatchEvent(event: PseudoEvent, target?: EventTargetService): boolean;
+    dispatchEvent(event: EventService, target?: EventTargetService): boolean;
 }
 export default EventTargetService;

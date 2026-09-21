@@ -3,7 +3,7 @@
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @version 1.0.0
  */
-import PseudoEvent from '../interfaces/PseudoEvent';
+import { EventService } from '../services/EventService';
 /**
  * Handle events as they are stored and implemented.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -16,12 +16,18 @@ declare class PseudoEventListener {
     private eventOptions;
     private eventType;
     private handler;
-    private isDefault;
+    private readonly originalCallback;
+    private readonly defaultListener;
     constructor(eventType: string, { capture, once, passive }: {
-        capture?: boolean | undefined;
-        once?: boolean | undefined;
-        passive?: boolean | undefined;
-    } | undefined, handleEvent: Function);
+        capture?: boolean;
+        once?: boolean;
+        passive?: boolean;
+    }, handleEvent: Function, originalCallback?: Function);
+    /**
+     * The function (or object with handleEvent) which was originally given when registering, used to find this listener again for removal.
+     */
+    get callback(): Function;
+    get isDefault(): boolean;
     get once(): boolean;
     /**
      * @method
@@ -29,62 +35,62 @@ declare class PseudoEventListener {
      * @param {PseudoEvent} event
      * @returns {*}
      */
-    handleEvent(event: PseudoEvent): any;
+    handleEvent(event: EventService): any;
     /**
      * @method
      * @name PseudoEventListener#doCapturePhase
      * @param {PseudoEvent} event
      * @returns {boolean}
      */
-    doCapturePhase(event: PseudoEvent): boolean;
+    doCapturePhase(event: EventService): boolean;
     /**
      * @method
      * @name PseudoEventListener#doTargetPhase
      * @param {PseudoEvent} event
      * @returns {boolean}
      */
-    doTargetPhase(event: PseudoEvent): boolean;
+    doTargetPhase(event: EventService): boolean;
     /**
      * @method
      * @name PseudoEventListener#doBubblePhase
      * @param {PseudoEvent} event
      * @returns {boolean|*}
      */
-    doBubblePhase(event: PseudoEvent): boolean | any;
+    doBubblePhase(event: EventService): boolean | any;
     /**
      * @method
      * @name PseudoEventListener#skipPhase
      * @param {PseudoEvent} event
      * @returns {boolean}
      */
-    skipPhase(event: PseudoEvent): boolean;
+    skipPhase(event: EventService): boolean;
     /**
      * @method
      * @name PseudoEventListener#skipDefault
      * @param {PseudoEvent} event
      * @returns {boolean|*}
      */
-    skipDefault(event: PseudoEvent): boolean | any;
+    skipDefault(event: EventService): boolean | any;
     /**
      * @method
      * @name PseudoEventListener#stopPropagation
      * @param {PseudoEvent} event
      * @returns {boolean}
      */
-    stopPropagation(event: PseudoEvent): boolean;
+    stopPropagation(event: EventService): boolean;
     /**
      * @method
      * @name PseudoEventListener#nonPassiveHalt
      * @param {PseudoEvent} event
      * @returns {boolean|*}
      */
-    nonPassiveHalt(event: PseudoEvent): boolean | any;
+    nonPassiveHalt(event: EventService): boolean | any;
     /**
      * @method
      * @name PseudoEventListener#rejectEvent
      * @param {PseudoEvent} event
      * @returns {*|boolean}
      */
-    rejectEvent(event: PseudoEvent): any | boolean;
+    rejectEvent(event: EventService): any | boolean;
 }
 export default PseudoEventListener;

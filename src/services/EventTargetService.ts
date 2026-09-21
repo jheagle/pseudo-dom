@@ -3,15 +3,12 @@
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @version 1.0.0
  */
-import { PseudoEvent } from '../interfaces/PseudoEvent'
+import { EventService } from './EventService'
 import PseudoEventListener from '../classes/PseudoEventListener'
-import Stack from 'collect-your-stuff/dist/collections/stack/Stack'
-import Stackable from 'collect-your-stuff/dist/collections/stack/Stackable'
-import { PseudoEventTarget } from '../interfaces/PseudoEventTarget'
+import { listenerOptions, PseudoEventTarget } from '../interfaces/PseudoEventTarget'
 
-export type listenerOptions = { capture: boolean, once: boolean, passive: boolean }
-
-type registeredListeners = { [key: string]: Stack }
+// The listeners for each event type, the first item is the next to run (the top of the stack).
+type registeredListeners = { [key: string]: Array<PseudoEventListener> }
 
 type defaultEvents = { [key: string]: Function }
 
@@ -37,182 +34,114 @@ class EventTargetService implements PseudoEventTarget {
   }
 
   /**
-   *
-   * @param {PseudoEvent} event
-   * @returns {boolean}
+   * Run each of the listeners registered on this target for the type of the event.
+   * @param {EventService} event
+   * @returns {*} true when there was nothing registered, otherwise the last value returned from a handler (null when none ran)
    */
-  private runEvents (event: PseudoEvent): boolean {
+  private runEvents (event: EventService): any {
     if (!(event.type in this.listeners)) {
       return true
     }
-    /**
-     *
-     * @type {Array<PseudoEventListener>}
-     */
-    const stack: Stack = this.listeners[event.type]
-    let eventReturn = null
-    if (this.listeners[event.type].empty()) {
+    const stack = this.listeners[event.type]
+    let eventReturn: any = null
+    if (stack.length === 0) {
       return eventReturn
     }
-    let currentListener: Stackable | any | null = this.listeners[event.type].top()
-    if (currentListener === null) {
+    if (event.inner.immediatePropagationStopped || stack[0].rejectEvent(event)) {
       return eventReturn
     }
-    if (event.inner.immediatePropagationStopped || currentListener.task.rejectEvent(event)) {
-      return eventReturn
+    // Temporarily hold the listeners which have run
+    const runningListeners: Array<PseudoEventListener> = []
+    let currentListener: PseudoEventListener | undefined = stack.shift()
+    while (currentListener) {
+      eventReturn = currentListener.handleEvent(event)
+      if (!currentListener.once) {
+        runningListeners.push(currentListener)
+      }
+      if (stack.length === 0 || event.inner.immediatePropagationStopped || stack[0].rejectEvent(event)) {
+        break
+      }
+      currentListener = stack.shift()
     }
-    // Temporary store the stack
-    const runningListeners: Stack = new Stack()
-    currentListener = this.listeners[event.type].pop()
-    while (currentListener !== null) {
-      eventReturn = currentListener.task.handleEvent(event)
-      if (currentListener.data.once) {
-        return currentListener.task
-      }
-      runningListeners.push(currentListener)
-      currentListener = this.listeners[event.type].top()
-      if (currentListener === null) {
-        return eventReturn
-      }
-      if (event.inner.immediatePropagationStopped || currentListener.task.rejectEvent(event)) {
-        return eventReturn
-      }
-      currentListener = this.listeners[event.type].pop()
-    }
-    if (!runningListeners.empty()) {
-      // Rebuild the stack
-      let completedListener = runningListeners.pop()
-      while (completedListener !== null) {
-        this.listeners[event.type].push(completedListener)
-      }
-    }
+    // Rebuild the stack, keeping the original order
+    stack.unshift(...runningListeners)
     return eventReturn
   }
 
   /**
-   *
+   * Register the function to run when nothing else has prevented the default for this type of event.
    * @param {string} type
    * @param {Function} callback
    */
-  protected setDefaultEvent (type: string, callback: Function) {
+  protected setDefaultEvent (type: string, callback: Function): void {
     if (!(type in this.listeners)) {
-      this.listeners[type] = new Stack()
+      this.listeners[type] = []
     }
     this.defaultEvent[type] = callback
   }
 
-  /**
-   *
-   * @param {PseudoEvent} event
-   * @returns {boolean}
-   */
-  private runDefaultEvent (event: PseudoEvent): boolean {
+  private runDefaultEvent (event: EventService): boolean {
     if (event.defaultPrevented) {
       return false
     }
     this.defaultEvent[event.type](event)
+    return true
   }
 
-  /**
-   *
-   * @param {PseudoEvent} eventType
-   * @returns {boolean}
-   */
   private startEvents (eventType: string): boolean {
-    /**
-     * type PseudoEvent
-     */
-    const event: PseudoEvent = new PseudoEvent(eventType)
+    const event: EventService = new EventService(eventType)
     event.inner.target = this
-    console.log('startEvents', event.type, event.target)
     ;[
-      PseudoEvent.CAPTURING_PHASE,
-      PseudoEvent.AT_TARGET,
-      PseudoEvent.BUBBLING_PHASE
+      EventService.CAPTURING_PHASE,
+      EventService.AT_TARGET,
+      EventService.BUBBLING_PHASE
     ].forEach(phase => {
-      let continueEvents = null
-      if (phase === PseudoEvent.AT_TARGET || !event.inner.propagationStopped) {
+      let continueEvents: any = null
+      if (phase === EventService.AT_TARGET || !event.inner.propagationStopped) {
         event.inner.eventPhase = phase
         event.composedPath().forEach(target => {
           event.inner.currentTarget = target
-          continueEvents = event.currentTarget.runEvents(event)
+          continueEvents = (event.currentTarget as EventTargetService).runEvents(event)
         })
       }
-      if (event.eventPhase === PseudoEvent.AT_TARGET && typeof continueEvents !== 'boolean' && this.defaultEvent[eventType]) {
+      if (event.eventPhase === EventService.AT_TARGET && typeof continueEvents !== 'boolean' && this.defaultEvent[eventType]) {
         this.runDefaultEvent(event)
       }
     })
     return true
   }
 
-  /**
-   *
-   * @param {string} type
-   * @param {function|Object} callback
-   * @param {boolean|Object} [useCapture=false]
-   */
   public addEventListener (type: string, callback: Function | {
     handleEvent: Function
-  } | any, useCapture: listenerOptions | boolean = false) {
+  } | any, useCapture: listenerOptions | boolean = false): void {
     let options: listenerOptions = { capture: false, once: false, passive: false }
     if (typeof useCapture === 'object') {
       // Originally useCapture was a single boolean flag, later optional other flags can be used
       // Here we take all the given flags from the object and assign them as the options
-      options = Object.keys(useCapture).reduce((opts, opt: keyof listenerOptions) => {
-        opts[opt] = useCapture[opt]
-        return opts
-      }, options)
+      options = Object.assign(options, useCapture)
     } else {
       options.capture = useCapture
     }
     if (!(type in this.listeners)) {
-      this.listeners[type] = new Stack()
+      this.listeners[type] = []
     }
-    const listener: PseudoEventListener = new PseudoEventListener(type, options, (callback.handleEvent || callback).bind(this))
+    const listener: PseudoEventListener = new PseudoEventListener(type, options, (callback.handleEvent || callback).bind(this), callback)
     this.listeners[type].push(listener)
-    const defaultListeners = []
-    const explicitListeners = []
-    let currentListener: Stackable | any = this.listeners[type].pop()
-    while (currentListener !== null) {
-      if (currentListener.task.isDefault) {
-        defaultListeners.push(currentListener)
-      } else {
-        explicitListeners.push(currentListener)
-      }
-      currentListener = this.listeners[type].pop()
-    }
-    this.listeners[type] = Stack.fromArray([].concat(explicitListeners, defaultListeners))
+    // Listeners run in the order they were added, except that listeners which are not defaults always come before the defaults
+    this.listeners[type] = [].concat(
+      this.listeners[type].filter(registered => !registered.isDefault),
+      this.listeners[type].filter(registered => registered.isDefault)
+    )
   }
 
-  /**
-   *
-   * @param {string} type
-   * @param {function} callback
-   */
-  public removeEventListener (type: string, callback: Function) {
+  public removeEventListener (type: string, callback: Function): void {
     if (!(type in this.listeners)) {
       return
     }
-    const stack: Stack = this.listeners[type]
-    let currentListener: Stackable | any = stack.pop()
-    const checkedListeners = []
-    while (currentListener !== null) {
-      const listener = currentListener.task
-      if (listener.handleEvent === callback && !listener.isDefault) {
-        continue
-      }
-      checkedListeners.push(currentListener)
-    }
-    this.listeners[type] = Stack.fromArray(checkedListeners)
+    this.listeners[type] = this.listeners[type].filter(listener => listener.isDefault || listener.callback !== callback)
   }
 
-  /**
-   *
-   * @param {Event|PseudoEvent} event
-   * @param {EventTarget|EventTargetService} target
-   * @returns {boolean}
-   */
-  public dispatchEvent (event: PseudoEvent, target: EventTargetService = this): boolean {
+  public dispatchEvent (event: EventService, target: EventTargetService = this): boolean {
     event.inner.target = target
     if (!(event.type in this.listeners)) {
       return true

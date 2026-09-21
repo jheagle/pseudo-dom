@@ -3,7 +3,7 @@ import { PseudoAttr } from './PseudoAttr'
 export interface PseudoNamedNodeMap {
   get length(): number
 
-  getNamedItem(name: string): PseudoAttr
+  getNamedItem(name: string): PseudoAttr | null
 
   setNamedItem(attr: PseudoAttr): PseudoAttr | null
 
@@ -15,5 +15,5 @@ export interface PseudoNamedNodeMap {
 
   setNamedItemNS(attr: PseudoAttr): PseudoAttr | null
 
-  removeNamedItem(namespace: string, localName: string): PseudoAttr
+  removeNamedItemNS(namespace: string, localName: string): PseudoAttr
 }

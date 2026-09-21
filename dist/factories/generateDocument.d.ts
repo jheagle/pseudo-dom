@@ -1,4 +1,4 @@
-import PseudoEventTarget from '../interfaces/PseudoEventTarget';
+import PseudoEventTarget from '../services/EventTargetService';
 /**
  * Construct the Pseudo Dom to provide access to Dom objects which are otherwise not available outside the browser
  * context.

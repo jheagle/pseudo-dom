@@ -637,7 +637,7 @@ export interface PseudoElement extends PseudoNode {
   /**
    * Retrieves the value of the named attribute from the current node and returns it as a string.
    */
-  getAttribute (): string
+  getAttribute (attributeName: string): string | null
 
   /**
    * Returns an array of attribute names from the current element.
@@ -687,7 +687,7 @@ export interface PseudoElement extends PseudoNode {
   /**
    * Returns a boolean value indicating if the element has the specified attribute or not.
    */
-  hasAttribute (): string
+  hasAttribute (attributeName: string): boolean
 
   /**
    * Returns a boolean value indicating if the element has the specified attribute, in the specified namespace, or not.
@@ -752,7 +752,7 @@ export interface PseudoElement extends PseudoNode {
   /**
    * Removes the named attribute from the current node.
    */
-  removeAttribute (): string
+  removeAttribute (attributeName: string): void
 
   /**
    * Removes the node representation of the named attribute from the current node.
@@ -807,7 +807,7 @@ export interface PseudoElement extends PseudoNode {
   /**
    * Sets the value of a named attribute of the current node.
    */
-  setAttribute (): string
+  setAttribute (attributeName: string, attributeValue: string): void
 
   /**
    * Sets the node representation of the named attribute from the current node.

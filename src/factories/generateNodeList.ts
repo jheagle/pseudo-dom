@@ -1,6 +1,11 @@
-import PseudoNodeList from '../classes/PseudoNodeList'
-import TreeLinker from 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'
+import { PseudoNodeList } from '../classes/PseudoNodeList'
+import { TreeLinker } from 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'
 
-const generateNodeList = (innerList: TreeLinker | null = null) => (new PseudoNodeList()).initialize(innerList)
+/**
+ * Create a PseudoNodeList, optionally starting from an existing chain of linkers.
+ * @param {TreeLinker|null} [innerList=null]
+ * @returns {PseudoNodeList}
+ */
+const generateNodeList = (innerList: TreeLinker | null = null): PseudoNodeList => (new PseudoNodeList()).initialize(innerList) as PseudoNodeList
 
 export default generateNodeList

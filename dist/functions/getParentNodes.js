@@ -1,10 +1,15 @@
 'use strict'
 
+const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+  return mod && mod.__esModule
+    ? mod
+    : {
+        default: mod
+      }
+}
 Object.defineProperty(exports, '__esModule', {
   value: true
 })
-exports.default = void 0
-const _getParentNodesFromAttribute = _interopRequireDefault(require('./getParentNodesFromAttribute'))
-function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: e } }
-const getParentNodes = node => (0, _getParentNodesFromAttribute.default)('', false, node)
-const _default = exports.default = getParentNodes
+const getParentNodesFromAttribute_1 = __importDefault(require('./getParentNodesFromAttribute'))
+const getParentNodes = node => (0, getParentNodesFromAttribute_1.default)('', false, node)
+exports.default = getParentNodes

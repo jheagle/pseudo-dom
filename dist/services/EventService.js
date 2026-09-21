@@ -1,17 +1,22 @@
 'use strict'
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-})
-exports.EventService = void 0
-const _getParentNodes = _interopRequireDefault(require('../functions/getParentNodes'))
-function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: e } }
 /**
  * @file Substitute for the DOM Event Class.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @version 1.0.0
  */
-
+const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+  return mod && mod.__esModule
+    ? mod
+    : {
+        default: mod
+      }
+}
+Object.defineProperty(exports, '__esModule', {
+  value: true
+})
+exports.EventService = void 0
+const getParentNodes_1 = __importDefault(require('../functions/getParentNodes'))
 /**
  * Simulate the behaviour of the Event Class when there is no DOM available.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -151,9 +156,9 @@ class EventService {
   composedPath () {
     switch (this.eventPhase) {
       case EventService.CAPTURING_PHASE:
-        return (0, _getParentNodes.default)(this.target)
+        return (0, getParentNodes_1.default)(this.target)
       case EventService.BUBBLING_PHASE:
-        return (0, _getParentNodes.default)(this.target).slice().reverse()
+        return (0, getParentNodes_1.default)(this.target).slice().reverse()
       case EventService.AT_TARGET:
         return [this.target]
       default:

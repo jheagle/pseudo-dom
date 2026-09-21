@@ -5,11 +5,163 @@
     Object.defineProperty(exports, '__esModule', {
       value: true
     })
-    exports.default = void 0
-    const _PseudoHTMLElement = _interopRequireDefault(require('../interfaces/PseudoHTMLElement'))
-    const _generateNodeList = _interopRequireDefault(require('../factories/generateNodeList'))
-    const _TreeLinker = _interopRequireDefault(require('collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'))
-    function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: e } }
+    /**
+ * @file Substitute for the DOM EventEventListener Class.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @version 1.0.0
+ */
+    const EventService_1 = require('../services/EventService')
+    /**
+ * Handle events as they are stored and implemented.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @class
+ * @property {string} eventType
+ * @property {Object} eventOptions
+ * @property {boolean} isDefault
+ */
+    class PseudoEventListener {
+      constructor (eventType, {
+        capture = false,
+        once = false,
+        passive = false
+      } = {}, handleEvent, originalCallback = handleEvent) {
+        this.eventOptions = {
+          capture: false,
+          once: false,
+          passive: false
+        }
+        this.eventType = ''
+        this.defaultListener = false
+        this.eventOptions = {
+          capture,
+          once,
+          passive
+        }
+        this.eventType = eventType
+        this.handler = handleEvent
+        this.originalCallback = originalCallback
+      }
+
+      /**
+   * The function (or object with handleEvent) which was originally given when registering, used to find this listener again for removal.
+   */
+      get callback () {
+        return this.originalCallback
+      }
+
+      get isDefault () {
+        return this.defaultListener
+      }
+
+      get once () {
+        return this.eventOptions.once
+      }
+
+      /**
+   * @method
+   * @name PseudoEventListener#handleEvent
+   * @param {PseudoEvent} event
+   * @returns {*}
+   */
+      handleEvent (event) {
+        return this.handler(event)
+      }
+
+      /**
+   * @method
+   * @name PseudoEventListener#doCapturePhase
+   * @param {PseudoEvent} event
+   * @returns {boolean}
+   */
+      doCapturePhase (event) {
+        return event.eventPhase === EventService_1.EventService.CAPTURING_PHASE && this.eventOptions.capture
+      }
+
+      /**
+   * @method
+   * @name PseudoEventListener#doTargetPhase
+   * @param {PseudoEvent} event
+   * @returns {boolean}
+   */
+      doTargetPhase (event) {
+        return event.eventPhase === EventService_1.EventService.AT_TARGET
+      }
+
+      /**
+   * @method
+   * @name PseudoEventListener#doBubblePhase
+   * @param {PseudoEvent} event
+   * @returns {boolean|*}
+   */
+      doBubblePhase (event) {
+        return event.eventPhase === EventService_1.EventService.BUBBLING_PHASE && (event.bubbles || !this.eventOptions.capture)
+      }
+
+      /**
+   * @method
+   * @name PseudoEventListener#skipPhase
+   * @param {PseudoEvent} event
+   * @returns {boolean}
+   */
+      skipPhase (event) {
+        return !this.doCapturePhase(event) && !this.doTargetPhase(event) && !this.doBubblePhase(event)
+      }
+
+      /**
+   * @method
+   * @name PseudoEventListener#skipDefault
+   * @param {PseudoEvent} event
+   * @returns {boolean|*}
+   */
+      skipDefault (event) {
+        return this.isDefault && event.defaultPrevented
+      }
+
+      /**
+   * @method
+   * @name PseudoEventListener#stopPropagation
+   * @param {PseudoEvent} event
+   * @returns {boolean}
+   */
+      stopPropagation (event) {
+        return !this.doTargetPhase(event) && event.inner.propagationStopped
+      }
+
+      /**
+   * @method
+   * @name PseudoEventListener#nonPassiveHalt
+   * @param {PseudoEvent} event
+   * @returns {boolean|*}
+   */
+      nonPassiveHalt (event) {
+        return !this.eventOptions.passive && (this.skipDefault(event) || event.inner.immediatePropagationStopped || this.stopPropagation(event))
+      }
+
+      /**
+   * @method
+   * @name PseudoEventListener#rejectEvent
+   * @param {PseudoEvent} event
+   * @returns {*|boolean}
+   */
+      rejectEvent (event) {
+        return this.nonPassiveHalt(event) || this.skipPhase(event)
+      }
+    }
+    exports.default = PseudoEventListener
+  }, { '../services/EventService': 12 }],
+  2: [function (require, module, exports) {
+    'use strict'
+
+    const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+      return mod && mod.__esModule
+        ? mod
+        : {
+            default: mod
+          }
+    }
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
     /**
  * @file Substitute for the DOM HTMLDocument Class.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -19,7 +171,9 @@
  *
  * @type {PseudoHTMLElement}
  */
-
+    const HTMLElementService_1 = require('../services/HTMLElementService')
+    const generateNodeList_1 = __importDefault(require('../factories/generateNodeList'))
+    const TreeLinker_1 = require('collect-your-stuff/dist/collections/linked-tree-list/TreeLinker')
     /**
  * Simulate the behaviour of the HTMLDocument Class when there is no DOM available.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -29,14 +183,14 @@
  * @property {PseudoHTMLElement} body - A reference to the Body child element
  * @property {function} createElement - Generate a new PseudoHTMLElement with parent of document
  */
-    class PseudoHTMLDocument extends _PseudoHTMLElement.default {
+    class PseudoHTMLDocument extends HTMLElementService_1.HTMLElementService {
       /**
    * The root HTML element is acts as the parent to all HTML elements in the document.
    * @constructor
    */
       constructor () {
         super()
-        const html = new _PseudoHTMLElement.default({
+        const html = new HTMLElementService_1.HTMLElementService({
           tagName: 'html',
           parent: this
         })
@@ -44,7 +198,7 @@
      * Create document head element
      * @type {PseudoHTMLElement}
      */
-        this.head = new _PseudoHTMLElement.default({
+        this.head = new HTMLElementService_1.HTMLElementService({
           tagName: 'head',
           parent: html
         })
@@ -52,11 +206,11 @@
      * Create document body element
      * @type {PseudoHTMLElement}
      */
-        this.body = new _PseudoHTMLElement.default({
+        this.body = new HTMLElementService_1.HTMLElementService({
           tagName: 'body',
           parent: html
         })
-        html.children = (0, _generateNodeList.default)(_TreeLinker.default.fromArray([this.head, this.body]).head)
+        html.children = (0, generateNodeList_1.default)(TreeLinker_1.TreeLinker.fromArray([this.head, this.body]).head)
       }
 
       /**
@@ -65,59 +219,100 @@
    * @returns {PseudoHTMLElement}
    */
       createElement (tagName = 'div') {
-        const returnElement = new _PseudoHTMLElement.default({
+        const returnElement = new HTMLElementService_1.HTMLElementService({
           tagName
         })
         returnElement.parent = this
         return returnElement
       }
     }
-    const _default = exports.default = PseudoHTMLDocument
-  }, { '../factories/generateNodeList': 4, '../interfaces/PseudoHTMLElement': 8, 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker': 18 }],
-  2: [function (require, module, exports) {
+    exports.default = PseudoHTMLDocument
+  }, { '../factories/generateNodeList': 5, '../services/HTMLElementService': 14, 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker': 24 }],
+  3: [function (require, module, exports) {
     'use strict'
 
+    require('core-js/modules/esnext.iterator.constructor.js')
+    require('core-js/modules/esnext.iterator.map.js')
     Object.defineProperty(exports, '__esModule', {
       value: true
     })
     exports.PseudoNodeList = void 0
-    require('core-js/modules/esnext.iterator.constructor.js')
-    require('core-js/modules/esnext.iterator.map.js')
-    const _LinkedTreeList = require('collect-your-stuff/dist/collections/linked-tree-list/LinkedTreeList')
     /**
  * @file Substitute for the NodeList interface.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @version 1.0.0
  */
-
-    class PseudoNodeList extends _LinkedTreeList.LinkedTreeList {
-      get entries () {
-        return Array.from(this)
+    const LinkedTreeList_1 = require('collect-your-stuff/dist/collections/linked-tree-list/LinkedTreeList')
+    /**
+ * A NodeList, like the DOM one, iterates over the nodes themselves (the data stored in each TreeLinker), rather than
+ * the linkers that hold them.
+ * @class
+ * @augments LinkedTreeList
+ */
+    class PseudoNodeList extends LinkedTreeList_1.LinkedTreeList {
+      /**
+   * Iterate over the nodes in this list.
+   * @returns {Iterator}
+   */
+      [Symbol.iterator] () {
+        const linkers = super[Symbol.iterator]()
+        return {
+          next: () => {
+            const result = linkers.next()
+            return result.done
+              ? result
+              : {
+                  done: false,
+                  value: result.value.data
+                }
+          }
+        }
       }
 
-      get keys () {
-        return Array.from(this.innerList).keys
+      /**
+   * Iterate over [index, node] pairs.
+   * @returns {Iterator}
+   */
+      entries () {
+        return Array.from(this).map((node, index) => [index, node])[Symbol.iterator]()
       }
 
-      get values () {
-        return Array.from(this.innerList).map(item => item.data).values
+      /**
+   * Iterate over the indexes.
+   * @returns {Iterator}
+   */
+      keys () {
+        return Array.from(this).map((node, index) => index)[Symbol.iterator]()
+      }
+
+      /**
+   * Iterate over the nodes.
+   * @returns {Iterator}
+   */
+      values () {
+        return Array.from(this)[Symbol.iterator]()
       }
     }
     exports.PseudoNodeList = PseudoNodeList
-  }, { 'collect-your-stuff/dist/collections/linked-tree-list/LinkedTreeList': 17, 'core-js/modules/esnext.iterator.constructor.js': 121, 'core-js/modules/esnext.iterator.map.js': 123 }],
-  3: [function (require, module, exports) {
+  }, { 'collect-your-stuff/dist/collections/linked-tree-list/LinkedTreeList': 23, 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.map.js': 134 }],
+  4: [function (require, module, exports) {
     'use strict'
 
+    const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+      return mod && mod.__esModule
+        ? mod
+        : {
+            default: mod
+          }
+    }
     Object.defineProperty(exports, '__esModule', {
       value: true
     })
-    exports.default = void 0
-    const _PseudoEventTarget = _interopRequireDefault(require('../interfaces/PseudoEventTarget'))
-    const _PseudoNode = _interopRequireDefault(require('../interfaces/PseudoNode'))
-    const _PseudoElement = _interopRequireDefault(require('../interfaces/PseudoElement'))
-    const _PseudoHTMLElement = _interopRequireDefault(require('../interfaces/PseudoHTMLElement'))
-    const _PseudoHTMLDocument = _interopRequireDefault(require('../classes/PseudoHTMLDocument'))
-    function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: e } }
+    const EventTargetService_1 = __importDefault(require('../services/EventTargetService'))
+    const NodeService_1 = require('../services/NodeService')
+    const ElementService_1 = require('../services/ElementService')
+    const HTMLElementService_1 = require('../services/HTMLElementService')
+    const PseudoHTMLDocument_1 = __importDefault(require('../classes/PseudoHTMLDocument'))
     /**
  * Construct the Pseudo Dom to provide access to Dom objects which are otherwise not available outside the browser
  * context.
@@ -131,11 +326,11 @@
    *
    * @type {Window|PseudoEventTarget}
    */
-      const newWindow = typeof root.document === 'undefined' ? root : new _PseudoEventTarget.default()
+      const newWindow = typeof root.document === 'undefined' ? root : new EventTargetService_1.default()
       /**
    * @type {Node|PseudoNode}
    */
-      const Node = root.Node || new _PseudoNode.default()
+      const Node = root.Node || new NodeService_1.NodeService()
       if (typeof newWindow.Node === 'undefined') {
         newWindow.Node = Node
       }
@@ -143,7 +338,7 @@
    *
    * @type {Element|PseudoElement}
    */
-      const Element = root.Element || new _PseudoElement.default()
+      const Element = root.Element || new ElementService_1.ElementService()
       if (typeof newWindow.Element === 'undefined') {
         newWindow.Element = Element
       }
@@ -151,7 +346,7 @@
    * Create an instance of HTMLElement if not available
    * @type {HTMLElement|PseudoHTMLElement}
    */
-      const HTMLElement = root.HTMLElement || new _PseudoHTMLElement.default()
+      const HTMLElement = root.HTMLElement || new HTMLElementService_1.HTMLElementService()
       if (typeof newWindow.HTMLElement === 'undefined') {
         newWindow.HTMLElement = HTMLElement
       }
@@ -159,76 +354,98 @@
    * Define document when not available
    * @type {Document|PseudoHTMLDocument}
    */
-      const document = root.document || new _PseudoHTMLDocument.default()
+      const document = root.document || new PseudoHTMLDocument_1.default()
       if (typeof newWindow.document === 'undefined') {
         newWindow.document = document
       }
       return context ? Object.assign(context, newWindow) : Object.assign(root, newWindow)
     }
-    const _default = exports.default = generateDocument
-  }, { '../classes/PseudoHTMLDocument': 1, '../interfaces/PseudoElement': 5, '../interfaces/PseudoEventTarget': 7, '../interfaces/PseudoHTMLElement': 8, '../interfaces/PseudoNode': 9 }],
-  4: [function (require, module, exports) {
-    'use strict'
-
-    Object.defineProperty(exports, '__esModule', {
-      value: true
-    })
-    exports.default = void 0
-    const _PseudoNodeList = _interopRequireDefault(require('../classes/PseudoNodeList'))
-    function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: e } }
-    const generateNodeList = (innerList = null) => new _PseudoNodeList.default().initialize(innerList)
-    const _default = exports.default = generateNodeList
-  }, { '../classes/PseudoNodeList': 2 }],
+    exports.default = generateDocument
+  }, { '../classes/PseudoHTMLDocument': 2, '../services/ElementService': 11, '../services/EventTargetService': 13, '../services/HTMLElementService': 14, '../services/NodeService': 16 }],
   5: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
       value: true
     })
-  }, {}],
+    const PseudoNodeList_1 = require('../classes/PseudoNodeList')
+    /**
+ * Create a PseudoNodeList, optionally starting from an existing chain of linkers.
+ * @param {TreeLinker|null} [innerList=null]
+ * @returns {PseudoNodeList}
+ */
+    const generateNodeList = (innerList = null) => new PseudoNodeList_1.PseudoNodeList().initialize(innerList)
+    exports.default = generateNodeList
+  }, { '../classes/PseudoNodeList': 3 }],
   6: [function (require, module, exports) {
-    arguments[4][5][0].apply(exports, arguments)
-  }, { dup: 5 }],
+    'use strict'
+
+    const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+      return mod && mod.__esModule
+        ? mod
+        : {
+            default: mod
+          }
+    }
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    const getParentNodesFromAttribute_1 = __importDefault(require('./getParentNodesFromAttribute'))
+    const getParentNodes = node => (0, getParentNodesFromAttribute_1.default)('', false, node)
+    exports.default = getParentNodes
+  }, { './getParentNodesFromAttribute': 7 }],
   7: [function (require, module, exports) {
-    arguments[4][5][0].apply(exports, arguments)
-  }, { dup: 5 }],
-  8: [function (require, module, exports) {
-    arguments[4][5][0].apply(exports, arguments)
-  }, { dup: 5 }],
-  9: [function (require, module, exports) {
-    arguments[4][5][0].apply(exports, arguments)
-  }, { dup: 5 }],
-  10: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
       value: true
     })
-    exports.default = void 0
-    const _PseudoEvent = _interopRequireDefault(require('./interfaces/PseudoEvent'))
-    const _PseudoEventTarget = _interopRequireDefault(require('./interfaces/PseudoEventTarget'))
-    const _PseudoNode = _interopRequireDefault(require('./interfaces/PseudoNode'))
-    const _PseudoElement = _interopRequireDefault(require('./interfaces/PseudoElement'))
-    const _PseudoHTMLElement = _interopRequireDefault(require('./interfaces/PseudoHTMLElement'))
-    const _PseudoHTMLDocument = _interopRequireDefault(require('./classes/PseudoHTMLDocument'))
-    const _generateDocument = _interopRequireDefault(require('./factories/generateDocument'))
-    function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: e } }
+    const getParentNodesFromAttribute = (attr, value, node) => {
+      return Object.keys(node.parentNode).length ? (node.parentNode[attr] || false) === value ? getParentNodesFromAttribute(attr, value, node.parentNode).concat([node.parentNode]) : getParentNodesFromAttribute(attr, value, node.parentNode) : []
+    }
+    exports.default = getParentNodesFromAttribute
+  }, {}],
+  8: [function (require, module, exports) {
+    'use strict'
+
     /**
  * @file All of the Pseudo Dom Helper Objects functions for simulating parts of the DOM when running scripts in NodeJs.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @version 1.0.0
  */
-
+    const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+      return mod && mod.__esModule
+        ? mod
+        : {
+            default: mod
+          }
+    }
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    const EventService_1 = require('./services/EventService')
+    const EventTargetService_1 = __importDefault(require('./services/EventTargetService'))
+    const NodeService_1 = require('./services/NodeService')
+    const ElementService_1 = require('./services/ElementService')
+    const HTMLElementService_1 = require('./services/HTMLElementService')
+    const PseudoHTMLDocument_1 = __importDefault(require('./classes/PseudoHTMLDocument'))
+    const generateDocument_1 = __importDefault(require('./factories/generateDocument'))
     /**
  * All methods exported from this module are encapsulated within pseudoDom.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @typedef {Object} pseudoDom
  * @module pseudoDom/objects
  */
-    const pseudoDom = Object.assign({
-      generateDocument: _generateDocument.default
-    }, _PseudoEvent.default, _PseudoEventTarget.default, _PseudoNode.default, _PseudoElement.default, _PseudoHTMLElement.default, _PseudoHTMLDocument.default)
-    const _default = exports.default = pseudoDom
+    const pseudoDom = {
+      generateDocument: generateDocument_1.default,
+      PseudoEvent: EventService_1.EventService,
+      PseudoEventTarget: EventTargetService_1.default,
+      PseudoNode: NodeService_1.NodeService,
+      PseudoElement: ElementService_1.ElementService,
+      PseudoHTMLElement: HTMLElementService_1.HTMLElementService,
+      PseudoHTMLDocument: PseudoHTMLDocument_1.default
+    }
+    exports.default = pseudoDom
     if (void 0) {
       // @ts-ignore
       (void 0).pseudoDom = pseudoDom
@@ -236,8 +453,1147 @@
       // @ts-ignore
       window.pseudoDom = pseudoDom
     }
-  }, { './classes/PseudoHTMLDocument': 1, './factories/generateDocument': 3, './interfaces/PseudoElement': 5, './interfaces/PseudoEvent': 6, './interfaces/PseudoEventTarget': 7, './interfaces/PseudoHTMLElement': 8, './interfaces/PseudoNode': 9 }],
+  }, { './classes/PseudoHTMLDocument': 2, './factories/generateDocument': 4, './services/ElementService': 11, './services/EventService': 12, './services/EventTargetService': 13, './services/HTMLElementService': 14, './services/NodeService': 16 }],
+  9: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.AttrService = void 0
+    const NodeService_1 = require('./NodeService')
+    /**
+ * Simulate the behaviour of the Attr Class when there is no DOM available.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @class
+ * @augments NodeService
+ */
+    class AttrService extends NodeService_1.NodeService {
+      /**
+   * @param {string} name The name of the attribute
+   * @param {string} [value=''] The value of the attribute
+   * @param {PseudoElement|null} [ownerElement=null] The element which has this attribute
+   * @param {string} [namespaceURI=''] The namespace of the attribute
+   * @param {string|null} [prefix=null] The namespace prefix of the attribute
+   * @constructor
+   */
+      constructor (name = '', value = '', ownerElement = null, namespaceURI = '', prefix = null) {
+        super()
+        this.attributeName = name
+        this.value = value
+        this.element = ownerElement
+        this.namespace = namespaceURI
+        this.namespacePrefix = prefix
+        this.nodeNameValue = name
+      }
+
+      get nodeType () {
+        return NodeService_1.NodeService.ATTRIBUTE_NODE
+      }
+
+      get localName () {
+        return this.attributeName
+      }
+
+      get name () {
+        return this.namespacePrefix ? `${this.namespacePrefix}:${this.attributeName}` : this.attributeName
+      }
+
+      get namespaceURI () {
+        return this.namespace
+      }
+
+      get ownerElement () {
+        return this.element
+      }
+
+      get prefix () {
+        return this.namespacePrefix
+      }
+    }
+    exports.AttrService = AttrService
+  }, { './NodeService': 16 }],
+  10: [function (require, module, exports) {
+    'use strict'
+
+    require('core-js/modules/esnext.iterator.constructor.js')
+    require('core-js/modules/esnext.iterator.filter.js')
+    require('core-js/modules/esnext.iterator.for-each.js')
+    require('core-js/modules/esnext.iterator.map.js')
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.DOMTokenListService = void 0
+    /**
+ * Simulate the behaviour of the DOMTokenList Class when there is no DOM available.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @class
+ */
+    class DOMTokenListService {
+      /**
+   * @param {string} [value=''] The space separated tokens to start with
+   * @param {function(string): void} [onChange] Called with the new value whenever the tokens change
+   * @constructor
+   */
+      constructor (value = '', onChange = () => undefined) {
+        this.tokens = DOMTokenListService.parse(value)
+        this.onChange = onChange
+      }
+
+      static parse (value) {
+        return (value || '').split(/\s+/).filter((token, index, tokens) => token !== '' && tokens.indexOf(token) === index)
+      }
+
+      update (tokens) {
+        this.tokens = tokens
+        this.onChange(this.value)
+      }
+
+      static validate (token) {
+        if (token === '') {
+          throw new SyntaxError('The token provided must not be empty.')
+        }
+        if (/\s/.test(token)) {
+          throw new Error('The token provided contains whitespace.')
+        }
+      }
+
+      get length () {
+        return this.tokens.length
+      }
+
+      get value () {
+        return this.tokens.join(' ')
+      }
+
+      set value (value) {
+        this.update(DOMTokenListService.parse(value))
+      }
+
+      item (index) {
+        return index >= 0 && index < this.tokens.length ? this.tokens[index] : null
+      }
+
+      contains (token) {
+        return this.tokens.indexOf(token) >= 0
+      }
+
+      add (...tokens) {
+        tokens.forEach(DOMTokenListService.validate)
+        this.update(this.tokens.concat(tokens).filter((token, index, all) => all.indexOf(token) === index))
+      }
+
+      remove (...tokens) {
+        tokens.forEach(DOMTokenListService.validate)
+        this.update(this.tokens.filter(token => tokens.indexOf(token) < 0))
+      }
+
+      replace (oldToken, newToken) {
+        DOMTokenListService.validate(oldToken)
+        DOMTokenListService.validate(newToken)
+        if (!this.contains(oldToken)) {
+          return false
+        }
+        this.update(this.tokens.map(token => token === oldToken ? newToken : token).filter((token, index, all) => all.indexOf(token) === index))
+        return true
+      }
+
+      supports (token) {
+        // There is no list of supported tokens for arbitrary attributes, so like the DOM (for those) this is unsupported
+        throw new TypeError(`Failed to execute 'supports' on 'DOMTokenList': DOMTokenList has no supported tokens (${token}).`)
+      }
+
+      toggle (token, force) {
+        DOMTokenListService.validate(token)
+        const shouldHave = typeof force === 'boolean' ? force : !this.contains(token)
+        if (shouldHave) {
+          this.add(token)
+        } else {
+          this.remove(token)
+        }
+        return shouldHave
+      }
+
+      entries () {
+        return this.tokens.map((token, index) => [index, token])[Symbol.iterator]()
+      }
+
+      forEach (callback, thisArg) {
+        this.tokens.forEach((token, index) => callback.call(thisArg, token, index, this))
+      }
+
+      keys () {
+        return this.tokens.map((token, index) => index)[Symbol.iterator]()
+      }
+
+      values () {
+        return this.tokens.slice()[Symbol.iterator]()
+      }
+    }
+    exports.DOMTokenListService = DOMTokenListService
+  }, { 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.filter.js': 131, 'core-js/modules/esnext.iterator.for-each.js': 133, 'core-js/modules/esnext.iterator.map.js': 134 }],
   11: [function (require, module, exports) {
+    'use strict'
+
+    require('core-js/modules/esnext.iterator.constructor.js')
+    require('core-js/modules/esnext.iterator.find.js')
+    require('core-js/modules/esnext.iterator.for-each.js')
+    require('core-js/modules/esnext.iterator.map.js')
+    require('core-js/modules/esnext.iterator.some.js')
+    const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+      return mod && mod.__esModule
+        ? mod
+        : {
+            default: mod
+          }
+    }
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.ElementService = void 0
+    const generateNodeList_1 = __importDefault(require('../factories/generateNodeList'))
+    const TreeLinker_1 = require('collect-your-stuff/dist/collections/linked-tree-list/TreeLinker')
+    const NodeService_1 = require('./NodeService')
+    const AttrService_1 = require('./AttrService')
+    const DOMTokenListService_1 = require('./DOMTokenListService')
+    const NamedNodeMapService_1 = require('./NamedNodeMapService')
+    const getParentNodesFromAttribute_1 = __importDefault(require('../functions/getParentNodesFromAttribute'))
+    /**
+ * Simulate the behaviour of the Element Class when there is no DOM available.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @class
+ * @augments PseudoNode
+ * @property {string} tagName
+ * @property {string} className
+ * @property {string} id
+ * @property {string} innerHtml
+ * @property {Array} attributes
+ * @property {function} hasAttribute
+ * @property {function} setAttribute
+ * @property {function} getAttribute
+ * @property {function} removeAttribute
+ */
+    class ElementService extends NodeService_1.NodeService {
+      /**
+   * @param {Object} [settings={}]
+   * @param {string} [settings.tagName=''] The name of the tag this element represents
+   * @param {Array<{name: string, value: *}>} [settings.attributes=[]] The attributes (also assigned as properties) to start with
+   * @param {PseudoNode|null} [settings.parent=null] The parent node
+   * @param {Array} [settings.children=[]] The values or nodes to start as children
+   * @constructor
+   */
+      constructor ({
+        tagName = '',
+        attributes = [],
+        parent = null,
+        children = []
+      } = {}) {
+        super()
+        this.tokenList = new DOMTokenListService_1.DOMTokenListService()
+        this.parent = parent
+        this.children = (0, generateNodeList_1.default)(TreeLinker_1.TreeLinker.fromArray(children).head)
+        this.tag = tagName
+        this.attributeList = attributes.concat([{
+          name: 'className',
+          value: ''
+        }, {
+          name: 'id',
+          value: ''
+        }, {
+          name: 'innerHTML',
+          value: ''
+        }])
+        this.propertyAttributes = this.attributeList.map(({
+          name
+        }) => name)
+        this.attributeList.forEach(({
+          name,
+          value
+        }) => {
+          this[name] = value
+        })
+      }
+
+      get tagName () {
+        return this.tag
+      }
+
+      get nodeType () {
+        return NodeService_1.NodeService.ELEMENT_NODE
+      }
+
+      get attributes () {
+        return new NamedNodeMapService_1.NamedNodeMapService(this.attributeList.map(({
+          name,
+          value
+        }) => new AttrService_1.AttrService(name, String(value), this)))
+      }
+
+      get classList () {
+        return this.tokenList
+      }
+
+      get className () {
+        return this.tokenList.value
+      }
+
+      set className (className) {
+        this.tokenList.value = className
+      }
+
+      /**
+   * Some elements have default behaviour, this registers it when the element is added.
+   * @returns {Function}
+   */
+      applyDefaultEvent () {
+        let callback = event => undefined
+        switch (this.tagName) {
+          case 'form':
+            this.addEventListener('submit', callback)
+            break
+          case 'button':
+          case 'input':
+            if (/^(submit|image)$/i.test(this.type || '')) {
+              callback = event => {
+                const forms = (0, getParentNodesFromAttribute_1.default)('tagName', 'form', this)
+                if (forms.length) {
+                  forms[0].submit()
+                }
+              }
+              super.setDefaultEvent('click', callback)
+            }
+        }
+        return callback
+      }
+
+      /**
+   *
+   * @param {PseudoNode|ElementService} childElement
+   * @returns {PseudoNode}
+   */
+      appendChild (childElement) {
+        super.appendChild(childElement)
+        childElement.applyDefaultEvent()
+        return childElement
+      }
+
+      /**
+   * Check whether the element has an attribute by that name.
+   * @param {string} attributeName
+   * @returns {boolean}
+   */
+      hasAttribute (attributeName) {
+        return this.attributeList.some(({
+          name
+        }) => name === attributeName)
+      }
+
+      /**
+   * Set the value of an attribute, adding the attribute if it did not exist.
+   * @param {string} attributeName
+   * @param {string} attributeValue
+   * @returns {undefined}
+   */
+      setAttribute (attributeName, attributeValue) {
+        const existing = this.attributeList.find(({
+          name
+        }) => name === attributeName)
+        if (existing) {
+          existing.value = attributeValue
+        } else {
+          this.attributeList.push({
+            name: attributeName,
+            value: attributeValue
+          })
+        }
+        if (this.propertyAttributes.indexOf(attributeName) >= 0) {
+          this[attributeName] = attributeValue
+        }
+      }
+
+      /**
+   * Retrieve the value of an attribute.
+   * @param {string} attributeName
+   * @returns {string|null} The value, or null when there is no such attribute
+   */
+      getAttribute (attributeName) {
+        const found = this.attributeList.find(({
+          name
+        }) => name === attributeName)
+        return found ? found.value : null
+      }
+
+      /**
+   * Remove an attribute from the element.
+   * @param {string} attributeName
+   * @returns {undefined}
+   */
+      removeAttribute (attributeName) {
+        const index = this.attributeList.findIndex(({
+          name
+        }) => name === attributeName)
+        if (index >= 0) {
+          this.attributeList.splice(index, 1)
+        }
+      }
+    }
+    exports.ElementService = ElementService
+  }, { '../factories/generateNodeList': 5, '../functions/getParentNodesFromAttribute': 7, './AttrService': 9, './DOMTokenListService': 10, './NamedNodeMapService': 15, './NodeService': 16, 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker': 24, 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.find.js': 132, 'core-js/modules/esnext.iterator.for-each.js': 133, 'core-js/modules/esnext.iterator.map.js': 134, 'core-js/modules/esnext.iterator.some.js': 136 }],
+  12: [function (require, module, exports) {
+    'use strict'
+
+    /**
+ * @file Substitute for the DOM Event Class.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @version 1.0.0
+ */
+    const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+      return mod && mod.__esModule
+        ? mod
+        : {
+            default: mod
+          }
+    }
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.EventService = void 0
+    const getParentNodes_1 = __importDefault(require('../functions/getParentNodes'))
+    /**
+ * Simulate the behaviour of the Event Class when there is no DOM available.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @class
+ * @property {number} NONE
+ * @property {number} CAPTURING_PHASE
+ * @property {number} AT_TARGET
+ * @property {number} BUBBLING_PHASE
+ * @property {boolean} bubbles - A Boolean indicating whether the event bubbles up through the Dom or not.
+ * @property {boolean} cancelable - A Boolean indicating whether the event is cancelable.
+ * @property {boolean} composed - A Boolean value indicating whether the event can bubble across the boundary
+ * between the shadow Dom and the regular Dom.
+ * @property {function|PseudoEventTarget} currentTarget - A reference to the currently registered target for the event. This
+ * is the object to which the event is currently slated to be sent; it's possible this has been changed along the way
+ * through re-targeting.
+ * @property {boolean} defaultPrevented - Indicates whether event.preventDefault() has been called on the event.
+ * @property {boolean} immediatePropagationStopped - Flag that no further propagation should occur, including on current
+ * target.
+ * @property {boolean} propagationStopped - Flag that no further propagation should occur.
+ * @property {int} eventPhase - Indicates which phase of the event flow is being processed. Uses EventService constants.
+ * @property {EventTarget|PseudoEventTarget} target - A reference to the target to which the event was originally
+ * dispatched.
+ * @property {int} timeStamp - The time at which the event was created (in milliseconds). By specification, this
+ * value is time since epoch, but in reality browsers' definitions vary; in addition, work is underway to change this
+ * to be a DomHighResTimeStamp instead.
+ * @property {string} type - The name of the event (case-insensitive).
+ * @property {boolean} isTrusted - Indicates whether the event was initiated by the browser (after a user
+ * click for instance) or by a script (using an event creation method, like event.initEvent)
+ */
+    class EventService {
+      /**
+   *
+   * @param {string} typeArg
+   * @param {Object} [eventOptions={}]
+   * @param {boolean} [eventOptions.bubbles=true]
+   * @param {boolean} [eventOptions.cancelable=true]
+   * @param {boolean} [eventOptions.composed=true]
+   * @constructor
+   */
+      constructor (typeArg = '', {
+        bubbles = true,
+        cancelable = true,
+        composed = true
+      } = {}) {
+        this.properties = {
+          bubbles: true,
+          cancelable: true,
+          composed: true,
+          currentTarget: null,
+          defaultPrevented: false,
+          immediatePropagationStopped: false,
+          propagationStopped: false,
+          eventPhase: 0,
+          target: null,
+          timeStamp: Math.floor(Date.now() / 1000),
+          type: '',
+          isTrusted: true
+        }
+        this.setReadOnlyProperties({
+          type: typeArg,
+          bubbles,
+          cancelable,
+          composed
+        })
+      }
+
+      get bubbles () {
+        return this.properties.bubbles
+      }
+
+      get cancelable () {
+        return this.properties.cancelable
+      }
+
+      get composed () {
+        return this.properties.composed
+      }
+
+      get currentTarget () {
+        return this.properties.currentTarget
+      }
+
+      get defaultPrevented () {
+        return this.properties.defaultPrevented
+      }
+
+      get eventPhase () {
+        return this.properties.eventPhase
+      }
+
+      get isTrusted () {
+        return this.properties.isTrusted
+      }
+
+      get target () {
+        return this.properties.target
+      }
+
+      get timeStamp () {
+        return this.properties.timeStamp
+      }
+
+      get type () {
+        return this.properties.type
+      }
+
+      /**
+   * Scope several accessors inside the inner object. These are only intended for usage by other DOM classes.
+   * @returns {EventInner}
+   */
+      get inner () {
+        const self = this
+        return {
+          set currentTarget (target) {
+            self.properties.currentTarget = target
+          },
+          set eventPhase (phase) {
+            self.properties.eventPhase = phase
+          },
+          set target (target) {
+            self.properties.target = target
+          },
+          get immediatePropagationStopped () {
+            return self.properties.immediatePropagationStopped
+          },
+          get propagationStopped () {
+            return self.properties.propagationStopped
+          }
+        }
+      }
+
+      /**
+   * Return an array of targets that will have the event executed open them. The order is based on the eventPhase
+   * @method
+   * @returns {Array.<PseudoEventTarget>}
+   */
+      composedPath () {
+        switch (this.eventPhase) {
+          case EventService.CAPTURING_PHASE:
+            return (0, getParentNodes_1.default)(this.target)
+          case EventService.BUBBLING_PHASE:
+            return (0, getParentNodes_1.default)(this.target).slice().reverse()
+          case EventService.AT_TARGET:
+            return [this.target]
+          default:
+            return []
+        }
+      }
+
+      /**
+   * Cancels the event (if it is cancelable).
+   * @method
+   * @returns {null}
+   */
+      preventDefault () {
+        this.setReadOnlyProperties({
+          defaultPrevented: true
+        })
+        return null
+      }
+
+      /**
+   * For this particular event, no other listener will be called.
+   * Neither those attached on the same element, nor those attached on elements which will be traversed later (in
+   * capture phase, for instance)
+   * @method
+   * @returns {null}
+   */
+      stopImmediatePropagation () {
+        this.setReadOnlyProperties({
+          immediatePropagationStopped: true
+        })
+        return null
+      }
+
+      /**
+   * Stops the propagation of events further along in the Dom.
+   * @method
+   * @returns {null}
+   */
+      stopPropagation () {
+        this.setReadOnlyProperties({
+          propagationStopped: true
+        })
+        return null
+      }
+
+      setReadOnlyProperties (updateProps = {}) {
+        this.properties = Object.assign({}, this.properties, updateProps)
+        return this
+      }
+    }
+    exports.EventService = EventService
+    EventService.NONE = 0
+    EventService.CAPTURING_PHASE = 1
+    EventService.AT_TARGET = 2
+    EventService.BUBBLING_PHASE = 3
+  }, { '../functions/getParentNodes': 6 }],
+  13: [function (require, module, exports) {
+    'use strict'
+
+    require('core-js/modules/esnext.iterator.constructor.js')
+    require('core-js/modules/esnext.iterator.filter.js')
+    require('core-js/modules/esnext.iterator.for-each.js')
+    const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+      return mod && mod.__esModule
+        ? mod
+        : {
+            default: mod
+          }
+    }
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    /**
+ * @file Substitute for the DOM EventTarget Class.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @version 1.0.0
+ */
+    const EventService_1 = require('./EventService')
+    const PseudoEventListener_1 = __importDefault(require('../classes/PseudoEventListener'))
+    /**
+ * Simulate the behaviour of the EventTarget Class when there is no DOM available.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @class
+ * @property {Object.<string, Array.<PseudoEventListener>>} listeners
+ * @property {function} addEventListener
+ * @property {function} removeEventListener
+ * @property {function} dispatchEvent
+ */
+    class EventTargetService {
+      /**
+   * @constructor
+   */
+      constructor () {
+        this.listeners = {}
+        this.defaultEvent = {}
+      }
+
+      /**
+   * Run each of the listeners registered on this target for the type of the event.
+   * @param {EventService} event
+   * @returns {*} true when there was nothing registered, otherwise the last value returned from a handler (null when none ran)
+   */
+      runEvents (event) {
+        if (!(event.type in this.listeners)) {
+          return true
+        }
+        const stack = this.listeners[event.type]
+        let eventReturn = null
+        if (stack.length === 0) {
+          return eventReturn
+        }
+        if (event.inner.immediatePropagationStopped || stack[0].rejectEvent(event)) {
+          return eventReturn
+        }
+        // Temporarily hold the listeners which have run
+        const runningListeners = []
+        let currentListener = stack.shift()
+        while (currentListener) {
+          eventReturn = currentListener.handleEvent(event)
+          if (!currentListener.once) {
+            runningListeners.push(currentListener)
+          }
+          if (stack.length === 0 || event.inner.immediatePropagationStopped || stack[0].rejectEvent(event)) {
+            break
+          }
+          currentListener = stack.shift()
+        }
+        // Rebuild the stack, keeping the original order
+        stack.unshift(...runningListeners)
+        return eventReturn
+      }
+
+      /**
+   * Register the function to run when nothing else has prevented the default for this type of event.
+   * @param {string} type
+   * @param {Function} callback
+   */
+      setDefaultEvent (type, callback) {
+        if (!(type in this.listeners)) {
+          this.listeners[type] = []
+        }
+        this.defaultEvent[type] = callback
+      }
+
+      runDefaultEvent (event) {
+        if (event.defaultPrevented) {
+          return false
+        }
+        this.defaultEvent[event.type](event)
+        return true
+      }
+
+      startEvents (eventType) {
+        const event = new EventService_1.EventService(eventType)
+        event.inner.target = this;
+        [EventService_1.EventService.CAPTURING_PHASE, EventService_1.EventService.AT_TARGET, EventService_1.EventService.BUBBLING_PHASE].forEach(phase => {
+          let continueEvents = null
+          if (phase === EventService_1.EventService.AT_TARGET || !event.inner.propagationStopped) {
+            event.inner.eventPhase = phase
+            event.composedPath().forEach(target => {
+              event.inner.currentTarget = target
+              continueEvents = event.currentTarget.runEvents(event)
+            })
+          }
+          if (event.eventPhase === EventService_1.EventService.AT_TARGET && typeof continueEvents !== 'boolean' && this.defaultEvent[eventType]) {
+            this.runDefaultEvent(event)
+          }
+        })
+        return true
+      }
+
+      addEventListener (type, callback, useCapture = false) {
+        let options = {
+          capture: false,
+          once: false,
+          passive: false
+        }
+        if (typeof useCapture === 'object') {
+          // Originally useCapture was a single boolean flag, later optional other flags can be used
+          // Here we take all the given flags from the object and assign them as the options
+          options = Object.assign(options, useCapture)
+        } else {
+          options.capture = useCapture
+        }
+        if (!(type in this.listeners)) {
+          this.listeners[type] = []
+        }
+        const listener = new PseudoEventListener_1.default(type, options, (callback.handleEvent || callback).bind(this), callback)
+        this.listeners[type].push(listener)
+        // Listeners run in the order they were added, except that listeners which are not defaults always come before the defaults
+        this.listeners[type] = [].concat(this.listeners[type].filter(registered => !registered.isDefault), this.listeners[type].filter(registered => registered.isDefault))
+      }
+
+      removeEventListener (type, callback) {
+        if (!(type in this.listeners)) {
+          return
+        }
+        this.listeners[type] = this.listeners[type].filter(listener => listener.isDefault || listener.callback !== callback)
+      }
+
+      dispatchEvent (event, target = this) {
+        event.inner.target = target
+        if (!(event.type in this.listeners)) {
+          return true
+        }
+        this.runEvents(event)
+        return !event.defaultPrevented
+      }
+    }
+    exports.default = EventTargetService
+  }, { '../classes/PseudoEventListener': 1, './EventService': 12, 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.filter.js': 131, 'core-js/modules/esnext.iterator.for-each.js': 133 }],
+  14: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.HTMLElementService = void 0
+    const ElementService_1 = require('./ElementService')
+    /**
+ * Simulate the behaviour of the HTMLElement Class when there is no DOM available.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @class
+ * @augments PseudoElement
+ * @property {boolean} hidden - State of whether element is visible
+ * @property {number} offsetHeight - The height of the element as offset by the parent element
+ * @property {number} offsetLeft - The position of the left side of the element based on the parent element
+ * @property {PseudoHTMLElement} offsetParent - A reference to the closest positioned parent element
+ * @property {number} offsetTop - The position of the top side of the element based on the parent element
+ * @property {number} offsetWidth - The width of the element as offset by the parent element
+ * @property {Object} style - A container to define all applied inline-styles
+ * @property {string} title - The title attribute which affects the text visible on hover
+ */
+    class HTMLElementService extends ElementService_1.ElementService {
+      /**
+   * Simulate the HTMLElement object when the Dom is not available
+   * @param {Object} [elementOptions={}]
+   * @param {string} [elementOptions.tagName='']
+   * @param {PseudoNode|Object} [elementOptions.parent={}]
+   * @param {Array} [elementOptions.children=[]]
+   * @constructor
+   */
+      constructor ({
+        tagName = '',
+        parent = null,
+        children = []
+      } = {}) {
+        super({
+          tagName,
+          attributes: [{
+            name: 'hidden',
+            value: false
+          }, {
+            name: 'offsetHeight',
+            value: 0
+          }, {
+            name: 'offsetLeft',
+            value: 0
+          }, {
+            name: 'offsetParent',
+            value: null
+          }, {
+            name: 'offsetTop',
+            value: 0
+          }, {
+            name: 'offsetWidth',
+            value: 0
+          }, {
+            name: 'style',
+            value: {}
+          }, {
+            name: 'title',
+            value: ''
+          }],
+          parent,
+          children
+        })
+      }
+    }
+    exports.HTMLElementService = HTMLElementService
+  }, { './ElementService': 11 }],
+  15: [function (require, module, exports) {
+    'use strict'
+
+    require('core-js/modules/esnext.iterator.constructor.js')
+    require('core-js/modules/esnext.iterator.find.js')
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.NamedNodeMapService = void 0
+    /**
+ * Simulate the behaviour of the NamedNodeMap Class when there is no DOM available.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @class
+ */
+    class NamedNodeMapService {
+      /**
+   * @param {Array<PseudoAttr>} [attributes=[]] The attributes to start with
+   * @constructor
+   */
+      constructor (attributes = []) {
+        this.attributes = attributes.slice()
+      }
+
+      get length () {
+        return this.attributes.length
+      }
+
+      getNamedItem (name) {
+        return this.attributes.find(attr => attr.name === name) || null
+      }
+
+      setNamedItem (attr) {
+        const index = this.attributes.findIndex(existing => existing.name === attr.name)
+        if (index < 0) {
+          this.attributes.push(attr)
+          return null
+        }
+        const replaced = this.attributes[index]
+        this.attributes[index] = attr
+        return replaced
+      }
+
+      removeNamedItem (attrName) {
+        const index = this.attributes.findIndex(attr => attr.name === attrName)
+        if (index < 0) {
+          throw new Error(`The attribute "${attrName}" was not found.`)
+        }
+        return this.attributes.splice(index, 1)[0]
+      }
+
+      item (index) {
+        return this.attributes[index] || null
+      }
+
+      getNamedItemNS (namespace, localName) {
+        return this.attributes.find(attr => attr.namespaceURI === namespace && attr.localName === localName) || null
+      }
+
+      setNamedItemNS (attr) {
+        const index = this.attributes.findIndex(existing => existing.namespaceURI === attr.namespaceURI && existing.localName === attr.localName)
+        if (index < 0) {
+          this.attributes.push(attr)
+          return null
+        }
+        const replaced = this.attributes[index]
+        this.attributes[index] = attr
+        return replaced
+      }
+
+      removeNamedItemNS (namespace, localName) {
+        const index = this.attributes.findIndex(attr => attr.namespaceURI === namespace && attr.localName === localName)
+        if (index < 0) {
+          throw new Error(`The attribute "${localName}" in the namespace "${namespace}" was not found.`)
+        }
+        return this.attributes.splice(index, 1)[0]
+      }
+    }
+    exports.NamedNodeMapService = NamedNodeMapService
+  }, { 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.find.js': 132 }],
+  16: [function (require, module, exports) {
+    'use strict'
+
+    require('core-js/modules/esnext.iterator.constructor.js')
+    require('core-js/modules/esnext.iterator.for-each.js')
+    const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+      return mod && mod.__esModule
+        ? mod
+        : {
+            default: mod
+          }
+    }
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.NodeService = void 0
+    /**
+ * @file Substitute for the DOM Node Class.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @version 1.0.0
+ */
+    const generateNodeList_1 = __importDefault(require('../factories/generateNodeList'))
+    const EventTargetService_1 = __importDefault(require('./EventTargetService'))
+    /**
+ * Simulate the behaviour of the Node Class when there is no DOM available.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @class
+ * @augments PseudoEventTarget
+ * @property {string} name
+ * @property {function} appendChild
+ * @property {function} removeChild
+ */
+    class NodeService extends EventTargetService_1.default {
+      /**
+   *
+   * @constructor
+   */
+      constructor () {
+        super()
+        this.nodeValueStore = ''
+        this.textContentStore = ''
+        this.nodeNameValue = ''
+        this.children = (0, generateNodeList_1.default)()
+        this.parent = null
+        this.next = null
+        this.prev = null
+      }
+
+      get baseURI () {
+        return window.location || '/'
+      }
+
+      get childNodes () {
+        return this.children
+      }
+
+      get firstChild () {
+        return this.children.first ? this.children.first.data : null
+      }
+
+      get isConnected () {
+        return !!this.parent
+      }
+
+      get lastChild () {
+        return this.children.last ? this.children.last.data : null
+      }
+
+      get nextSibling () {
+        return this.isConnected ? this.next : null
+      }
+
+      get nodeName () {
+        return this.nodeNameValue || ''
+      }
+
+      get nodeType () {
+        return NodeService.DEFAULT_NODE
+      }
+
+      get nodeValue () {
+        return this.nodeValueStore
+      }
+
+      set nodeValue (value) {
+        this.nodeValueStore = value
+      }
+
+      get ownerDocument () {
+        return null
+      }
+
+      get parentNode () {
+        return this.parent
+      }
+
+      get parentElement () {
+        return this.parent && this.parent.nodeType === NodeService.ELEMENT_NODE ? this.parent : null
+      }
+
+      get previousSibling () {
+        return this.isConnected ? this.prev : null
+      }
+
+      get textContent () {
+        return this.textContentStore
+      }
+
+      set textContent (text) {
+        this.textContentStore = text
+      }
+
+      /**
+   *
+   * @param {PseudoNode} childNode
+   * @returns {PseudoNode}
+   */
+      appendChild (childNode) {
+        this.children.append(childNode)
+        return childNode
+      }
+
+      /**
+   * Not implemented yet.
+   * @throws {Error}
+   */
+      cloneNode (deep = false) {
+        throw new Error(`NodeService.cloneNode(${deep}) is not implemented yet.`)
+      }
+
+      /**
+   * Not implemented yet.
+   * @throws {Error}
+   */
+      compareDocumentPosition (otherNode) {
+        throw new Error('NodeService.compareDocumentPosition() is not implemented yet.')
+      }
+
+      /**
+   * Not implemented yet.
+   * @throws {Error}
+   */
+      contains (otherNode) {
+        throw new Error('NodeService.contains() is not implemented yet.')
+      }
+
+      getRootNode (options = {
+        composed: false
+      }) {
+        return this.parent ? this.parent.getRootNode(options) : this
+      }
+
+      hasChildNodes () {
+        return this.children.length > 0
+      }
+
+      /**
+   * Not implemented yet.
+   * @throws {Error}
+   */
+      insertBefore (newNode, referenceNode) {
+        throw new Error('NodeService.insertBefore() is not implemented yet.')
+      }
+
+      isDefaultNamespace (namespaceURI) {
+        return namespaceURI === null
+      }
+
+      /**
+   * Not implemented yet.
+   * @throws {Error}
+   */
+      isEqualNode (otherNode) {
+        throw new Error('NodeService.isEqualNode() is not implemented yet.')
+      }
+
+      isSameNode (otherNode) {
+        return this === otherNode
+      }
+
+      lookupPrefix (namespace) {
+        return null
+      }
+
+      lookupNamespaceURI (prefix) {
+        return null
+      }
+
+      normalize () {}
+      /**
+   * Remove the given child from this node.
+   * @param {PseudoNode} childElement The child node, or its TreeLinker from the children list
+   * @returns {PseudoNode}
+   * @throws {Error} When the node is not a child of this node
+   */
+      removeChild (childElement) {
+        let found = null
+        this.children.forEach(linker => {
+          if (found === null && (linker === childElement || linker.data === childElement)) {
+            found = linker
+          }
+        })
+        if (found === null) {
+          throw new Error('The node to be removed is not a child of this node.')
+        }
+        this.children.remove(found)
+        return found.data
+      }
+
+      /**
+   * Not implemented yet.
+   * @throws {Error}
+   */
+      replaceChild (newChild, oldChild) {
+        throw new Error('NodeService.replaceChild() is not implemented yet.')
+      }
+    }
+    exports.NodeService = NodeService
+    NodeService.DEFAULT_NODE = 0
+    NodeService.ELEMENT_NODE = 1
+    NodeService.ATTRIBUTE_NODE = 2
+    NodeService.TEXT_NODE = 3
+    NodeService.CDATA_SECTION_NODE = 4
+    NodeService.ENTITY_REFERENCE_NODE = 5
+    NodeService.ENTITY_NODE = 6
+    NodeService.PROCESSING_INSTRUCTION_NODE = 7
+    NodeService.COMMENT_NODE = 8
+    NodeService.DOCUMENT_NODE = 9
+    NodeService.DOCUMENT_TYPE_NODE = 10
+    NodeService.DOCUMENT_FRAGMENT_NODE = 11
+    NodeService.NOTATION_NODE = 12
+  }, { '../factories/generateNodeList': 5, './EventTargetService': 13, 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.for-each.js': 133 }],
+  17: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -302,8 +1658,8 @@
       head: [],
       tail: null
     })
-  }, { 'core-js/modules/esnext.iterator.constructor.js': 121, 'core-js/modules/esnext.iterator.reduce.js': 124 }],
-  12: [function (require, module, exports) {
+  }, { 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.reduce.js': 135 }],
+  18: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -492,8 +1848,8 @@
       const list = new classType(elementClass)
       return list.initialize(elementClass.fromArray(values).head)
     }
-  }, { '../../recipes/ArrayIterator': 19, './ArrayElement': 11 }],
-  13: [function (require, module, exports) {
+  }, { '../../recipes/ArrayIterator': 25, './ArrayElement': 17 }],
+  19: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -563,8 +1919,8 @@
       head: null,
       tail: null
     })
-  }, { '../linked-list/Linker': 16, 'core-js/modules/esnext.iterator.constructor.js': 121, 'core-js/modules/esnext.iterator.reduce.js': 124 }],
-  14: [function (require, module, exports) {
+  }, { '../linked-list/Linker': 22, 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.reduce.js': 135 }],
+  20: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -834,8 +2190,8 @@
     DoublyLinkedList.fromArray = (values = [], linkerClass = _DoubleLinker.DoubleLinker, classType = DoublyLinkedList) => {
       return _LinkedList.LinkedList.fromArray(values, linkerClass, classType)
     }
-  }, { '../../recipes/DoubleLinkerIterator': 20, '../linked-list/LinkedList': 15, './DoubleLinker': 13, 'core-js/modules/esnext.iterator.constructor.js': 121, 'core-js/modules/esnext.iterator.for-each.js': 122 }],
-  15: [function (require, module, exports) {
+  }, { '../../recipes/DoubleLinkerIterator': 26, '../linked-list/LinkedList': 21, './DoubleLinker': 19, 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.for-each.js': 133 }],
+  21: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -1069,8 +2425,8 @@
       const list = new classType(linkerClass)
       return list.initialize(linkerClass.fromArray(values).head)
     }
-  }, { '../../recipes/LinkerIterator': 21, '../arrayable/Arrayable': 12, './Linker': 16 }],
-  16: [function (require, module, exports) {
+  }, { '../../recipes/LinkerIterator': 27, '../arrayable/Arrayable': 18, './Linker': 22 }],
+  22: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -1151,8 +2507,8 @@
       head: null,
       tail: null
     })
-  }, { '../arrayable/ArrayElement': 11, 'core-js/modules/esnext.iterator.constructor.js': 121, 'core-js/modules/esnext.iterator.reduce.js': 124 }],
-  17: [function (require, module, exports) {
+  }, { '../arrayable/ArrayElement': 17, 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.reduce.js': 135 }],
+  23: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -1405,8 +2761,8 @@
       const list = new classType(linkerClass)
       return list.initialize(linkerClass.fromArray(values).head)
     }
-  }, { '../../recipes/TreeLinkerIterator': 22, '../doubly-linked-list/DoublyLinkedList': 14, './TreeLinker': 18 }],
-  18: [function (require, module, exports) {
+  }, { '../../recipes/TreeLinkerIterator': 28, '../doubly-linked-list/DoublyLinkedList': 20, './TreeLinker': 24 }],
+  24: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -1486,8 +2842,8 @@
  * @returns {{head: TreeLinker, tail: TreeLinker}}
  */
     TreeLinker.fromArray = (values = [], classType = TreeLinker) => _DoubleLinker.DoubleLinker.fromArray(values, classType)
-  }, { '../doubly-linked-list/DoubleLinker': 13, './LinkedTreeList': 17, 'core-js/modules/esnext.iterator.constructor.js': 121, 'core-js/modules/esnext.iterator.map.js': 123 }],
-  19: [function (require, module, exports) {
+  }, { '../doubly-linked-list/DoubleLinker': 19, './LinkedTreeList': 23, 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.map.js': 134 }],
+  25: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -1518,7 +2874,7 @@
     }
     exports.ArrayIterator = ArrayIterator
   }, {}],
-  20: [function (require, module, exports) {
+  26: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -1544,7 +2900,7 @@
     }
     exports.DoubleLinkerIterator = DoubleLinkerIterator
   }, {}],
-  21: [function (require, module, exports) {
+  27: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -1570,7 +2926,7 @@
     }
     exports.LinkerIterator = LinkerIterator
   }, {}],
-  22: [function (require, module, exports) {
+  28: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -1596,8 +2952,8 @@
       }
     }
     exports.TreeLinkerIterator = TreeLinkerIterator
-  }, { '../services/parseTreeNext': 23 }],
-  23: [function (require, module, exports) {
+  }, { '../services/parseTreeNext': 29 }],
+  29: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -1646,7 +3002,7 @@
     }
     exports.parseTreeNext = parseTreeNext
   }, {}],
-  24: [function (require, module, exports) {
+  30: [function (require, module, exports) {
     'use strict'
     const isCallable = require('../internals/is-callable')
     const tryToString = require('../internals/try-to-string')
@@ -1658,8 +3014,8 @@
       if (isCallable(argument)) return argument
       throw new $TypeError(tryToString(argument) + ' is not a function')
     }
-  }, { '../internals/is-callable': 68, '../internals/try-to-string': 111 }],
-  25: [function (require, module, exports) {
+  }, { '../internals/is-callable': 74, '../internals/try-to-string': 117 }],
+  31: [function (require, module, exports) {
     'use strict'
     const isPrototypeOf = require('../internals/object-is-prototype-of')
 
@@ -1669,8 +3025,8 @@
       if (isPrototypeOf(Prototype, it)) return it
       throw new $TypeError('Incorrect invocation')
     }
-  }, { '../internals/object-is-prototype-of': 93 }],
-  26: [function (require, module, exports) {
+  }, { '../internals/object-is-prototype-of': 99 }],
+  32: [function (require, module, exports) {
     'use strict'
     const isObject = require('../internals/is-object')
 
@@ -1682,8 +3038,8 @@
       if (isObject(argument)) return argument
       throw new $TypeError($String(argument) + ' is not an object')
     }
-  }, { '../internals/is-object': 71 }],
-  27: [function (require, module, exports) {
+  }, { '../internals/is-object': 77 }],
+  33: [function (require, module, exports) {
     'use strict'
     const toIndexedObject = require('../internals/to-indexed-object')
     const toAbsoluteIndex = require('../internals/to-absolute-index')
@@ -1722,8 +3078,8 @@
       // https://tc39.es/ecma262/#sec-array.prototype.indexof
       indexOf: createMethod(false)
     }
-  }, { '../internals/length-of-array-like': 83, '../internals/to-absolute-index': 104, '../internals/to-indexed-object': 105 }],
-  28: [function (require, module, exports) {
+  }, { '../internals/length-of-array-like': 89, '../internals/to-absolute-index': 110, '../internals/to-indexed-object': 111 }],
+  34: [function (require, module, exports) {
     'use strict'
     const anObject = require('../internals/an-object')
     const iteratorClose = require('../internals/iterator-close')
@@ -1736,8 +3092,8 @@
         iteratorClose(iterator, 'throw', error)
       }
     }
-  }, { '../internals/an-object': 26, '../internals/iterator-close': 77 }],
-  29: [function (require, module, exports) {
+  }, { '../internals/an-object': 32, '../internals/iterator-close': 83 }],
+  35: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
 
@@ -1747,8 +3103,8 @@
     module.exports = function (it) {
       return stringSlice(toString(it), 8, -1)
     }
-  }, { '../internals/function-uncurry-this': 53 }],
-  30: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 59 }],
+  36: [function (require, module, exports) {
     'use strict'
     const hasOwn = require('../internals/has-own-property')
     const ownKeys = require('../internals/own-keys')
@@ -1766,8 +3122,8 @@
         }
       }
     }
-  }, { '../internals/has-own-property': 60, '../internals/object-define-property': 88, '../internals/object-get-own-property-descriptor': 89, '../internals/own-keys': 98 }],
-  31: [function (require, module, exports) {
+  }, { '../internals/has-own-property': 66, '../internals/object-define-property': 94, '../internals/object-get-own-property-descriptor': 95, '../internals/own-keys': 104 }],
+  37: [function (require, module, exports) {
     'use strict'
     const fails = require('../internals/fails')
 
@@ -1777,8 +3133,8 @@
       // eslint-disable-next-line es/no-object-getprototypeof -- required for testing
       return Object.getPrototypeOf(new F()) !== F.prototype
     })
-  }, { '../internals/fails': 46 }],
-  32: [function (require, module, exports) {
+  }, { '../internals/fails': 52 }],
+  38: [function (require, module, exports) {
     'use strict'
     // `CreateIterResultObject` abstract operation
     // https://tc39.es/ecma262/#sec-createiterresultobject
@@ -1786,7 +3142,7 @@
       return { value, done }
     }
   }, {}],
-  33: [function (require, module, exports) {
+  39: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const definePropertyModule = require('../internals/object-define-property')
@@ -1800,8 +3156,8 @@
         object[key] = value
         return object
       }
-  }, { '../internals/create-property-descriptor': 34, '../internals/descriptors': 40, '../internals/object-define-property': 88 }],
-  34: [function (require, module, exports) {
+  }, { '../internals/create-property-descriptor': 40, '../internals/descriptors': 46, '../internals/object-define-property': 94 }],
+  40: [function (require, module, exports) {
     'use strict'
     module.exports = function (bitmap, value) {
       return {
@@ -1812,7 +3168,7 @@
       }
     }
   }, {}],
-  35: [function (require, module, exports) {
+  41: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const definePropertyModule = require('../internals/object-define-property')
@@ -1822,8 +3178,8 @@
       if (DESCRIPTORS) definePropertyModule.f(object, key, createPropertyDescriptor(0, value))
       else object[key] = value
     }
-  }, { '../internals/create-property-descriptor': 34, '../internals/descriptors': 40, '../internals/object-define-property': 88 }],
-  36: [function (require, module, exports) {
+  }, { '../internals/create-property-descriptor': 40, '../internals/descriptors': 46, '../internals/object-define-property': 94 }],
+  42: [function (require, module, exports) {
     'use strict'
     const makeBuiltIn = require('../internals/make-built-in')
     const defineProperty = require('../internals/object-define-property')
@@ -1833,8 +3189,8 @@
       if (descriptor.set) makeBuiltIn(descriptor.set, name, { setter: true })
       return defineProperty.f(target, name, descriptor)
     }
-  }, { '../internals/make-built-in': 84, '../internals/object-define-property': 88 }],
-  37: [function (require, module, exports) {
+  }, { '../internals/make-built-in': 90, '../internals/object-define-property': 94 }],
+  43: [function (require, module, exports) {
     'use strict'
     const isCallable = require('../internals/is-callable')
     const definePropertyModule = require('../internals/object-define-property')
@@ -1865,8 +3221,8 @@
         }
       } return O
     }
-  }, { '../internals/define-global-property': 39, '../internals/is-callable': 68, '../internals/make-built-in': 84, '../internals/object-define-property': 88 }],
-  38: [function (require, module, exports) {
+  }, { '../internals/define-global-property': 45, '../internals/is-callable': 74, '../internals/make-built-in': 90, '../internals/object-define-property': 94 }],
+  44: [function (require, module, exports) {
     'use strict'
     const defineBuiltIn = require('../internals/define-built-in')
 
@@ -1874,8 +3230,8 @@
       for (const key in src) defineBuiltIn(target, key, src[key], options)
       return target
     }
-  }, { '../internals/define-built-in': 37 }],
-  39: [function (require, module, exports) {
+  }, { '../internals/define-built-in': 43 }],
+  45: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
 
@@ -1889,8 +3245,8 @@
         globalThis[key] = value
       } return value
     }
-  }, { '../internals/global-this': 59 }],
-  40: [function (require, module, exports) {
+  }, { '../internals/global-this': 65 }],
+  46: [function (require, module, exports) {
     'use strict'
     const fails = require('../internals/fails')
 
@@ -1899,8 +3255,8 @@
       // eslint-disable-next-line es/no-object-defineproperty -- required for testing
       return Object.defineProperty({}, 1, { get: function () { return 7 } })[1] !== 7
     })
-  }, { '../internals/fails': 46 }],
-  41: [function (require, module, exports) {
+  }, { '../internals/fails': 52 }],
+  47: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
     const isObject = require('../internals/is-object')
@@ -1912,8 +3268,8 @@
     module.exports = function (it) {
       return EXISTS ? document.createElement(it) : {}
     }
-  }, { '../internals/global-this': 59, '../internals/is-object': 71 }],
-  42: [function (require, module, exports) {
+  }, { '../internals/global-this': 65, '../internals/is-object': 77 }],
+  48: [function (require, module, exports) {
     'use strict'
     // IE8- don't enum bug keys
     module.exports = [
@@ -1926,7 +3282,7 @@
       'valueOf'
     ]
   }, {}],
-  43: [function (require, module, exports) {
+  49: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
 
@@ -1934,8 +3290,8 @@
     const userAgent = navigator && navigator.userAgent
 
     module.exports = userAgent ? String(userAgent) : ''
-  }, { '../internals/global-this': 59 }],
-  44: [function (require, module, exports) {
+  }, { '../internals/global-this': 65 }],
+  50: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
     const userAgent = require('../internals/environment-user-agent')
@@ -1964,8 +3320,8 @@
     }
 
     module.exports = version
-  }, { '../internals/environment-user-agent': 43, '../internals/global-this': 59 }],
-  45: [function (require, module, exports) {
+  }, { '../internals/environment-user-agent': 49, '../internals/global-this': 65 }],
+  51: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
     const getOwnPropertyDescriptor = require('../internals/object-get-own-property-descriptor').f
@@ -2023,8 +3379,8 @@
         }
       }
     }
-  }, { '../internals/copy-constructor-properties': 30, '../internals/create-non-enumerable-property': 33, '../internals/define-built-in': 37, '../internals/define-global-property': 39, '../internals/global-this': 59, '../internals/is-forced': 69, '../internals/object-get-own-property-descriptor': 89 }],
-  46: [function (require, module, exports) {
+  }, { '../internals/copy-constructor-properties': 36, '../internals/create-non-enumerable-property': 39, '../internals/define-built-in': 43, '../internals/define-global-property': 45, '../internals/global-this': 65, '../internals/is-forced': 75, '../internals/object-get-own-property-descriptor': 95 }],
+  52: [function (require, module, exports) {
     'use strict'
     module.exports = function (exec) {
       try {
@@ -2034,7 +3390,7 @@
       }
     }
   }, {}],
-  47: [function (require, module, exports) {
+  53: [function (require, module, exports) {
     'use strict'
     const NATIVE_BIND = require('../internals/function-bind-native')
 
@@ -2048,8 +3404,8 @@
       : function () {
         return call.apply(apply, arguments)
       })
-  }, { '../internals/function-bind-native': 49 }],
-  48: [function (require, module, exports) {
+  }, { '../internals/function-bind-native': 55 }],
+  54: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this-clause')
     const aCallable = require('../internals/a-callable')
@@ -2064,8 +3420,8 @@
         return fn.apply(that, arguments)
       }
     }
-  }, { '../internals/a-callable': 24, '../internals/function-bind-native': 49, '../internals/function-uncurry-this-clause': 52 }],
-  49: [function (require, module, exports) {
+  }, { '../internals/a-callable': 30, '../internals/function-bind-native': 55, '../internals/function-uncurry-this-clause': 58 }],
+  55: [function (require, module, exports) {
     'use strict'
     const fails = require('../internals/fails')
 
@@ -2075,8 +3431,8 @@
       // eslint-disable-next-line no-prototype-builtins -- safe
       return typeof test !== 'function' || test.hasOwnProperty('prototype')
     })
-  }, { '../internals/fails': 46 }],
-  50: [function (require, module, exports) {
+  }, { '../internals/fails': 52 }],
+  56: [function (require, module, exports) {
     'use strict'
     const NATIVE_BIND = require('../internals/function-bind-native')
 
@@ -2087,8 +3443,8 @@
       : function () {
         return call.apply(call, arguments)
       }
-  }, { '../internals/function-bind-native': 49 }],
-  51: [function (require, module, exports) {
+  }, { '../internals/function-bind-native': 55 }],
+  57: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const hasOwn = require('../internals/has-own-property')
@@ -2107,8 +3463,8 @@
       PROPER,
       CONFIGURABLE
     }
-  }, { '../internals/descriptors': 40, '../internals/has-own-property': 60 }],
-  52: [function (require, module, exports) {
+  }, { '../internals/descriptors': 46, '../internals/has-own-property': 66 }],
+  58: [function (require, module, exports) {
     'use strict'
     const classofRaw = require('../internals/classof-raw')
     const uncurryThis = require('../internals/function-uncurry-this')
@@ -2119,8 +3475,8 @@
       //   https://github.com/zloirock/core-js/issues/1130
       if (classofRaw(fn) === 'Function') return uncurryThis(fn)
     }
-  }, { '../internals/classof-raw': 29, '../internals/function-uncurry-this': 53 }],
-  53: [function (require, module, exports) {
+  }, { '../internals/classof-raw': 35, '../internals/function-uncurry-this': 59 }],
+  59: [function (require, module, exports) {
     'use strict'
     const NATIVE_BIND = require('../internals/function-bind-native')
 
@@ -2136,8 +3492,8 @@
           return call.apply(fn, arguments)
         }
       }
-  }, { '../internals/function-bind-native': 49 }],
-  54: [function (require, module, exports) {
+  }, { '../internals/function-bind-native': 55 }],
+  60: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
     const isCallable = require('../internals/is-callable')
@@ -2149,8 +3505,8 @@
     module.exports = function (namespace, method) {
       return arguments.length < 2 ? aFunction(globalThis[namespace]) : globalThis[namespace] && globalThis[namespace][method]
     }
-  }, { '../internals/global-this': 59, '../internals/is-callable': 68 }],
-  55: [function (require, module, exports) {
+  }, { '../internals/global-this': 65, '../internals/is-callable': 74 }],
+  61: [function (require, module, exports) {
     'use strict'
     // `GetIteratorDirect(obj)` abstract operation
     // https://tc39.es/ecma262/#sec-getiteratordirect
@@ -2162,7 +3518,7 @@
       }
     }
   }, {}],
-  56: [function (require, module, exports) {
+  62: [function (require, module, exports) {
     'use strict'
     const call = require('../internals/function-call')
     const isCallable = require('../internals/is-callable')
@@ -2177,8 +3533,8 @@
       if (isCallable(iteratorMethod)) return anObject(call(iteratorMethod, argument))
       throw new $TypeError(tryToString(argument) + ' is not iterable')
     }
-  }, { '../internals/an-object': 26, '../internals/function-call': 50, '../internals/get-iterator-method-internal': 57, '../internals/is-callable': 68, '../internals/try-to-string': 111 }],
-  57: [function (require, module, exports) {
+  }, { '../internals/an-object': 32, '../internals/function-call': 56, '../internals/get-iterator-method-internal': 63, '../internals/is-callable': 74, '../internals/try-to-string': 117 }],
+  63: [function (require, module, exports) {
     'use strict'
     const classof = require('../internals/classof-raw')
     const isNullOrUndefined = require('../internals/is-null-or-undefined')
@@ -2195,8 +3551,8 @@
     (classof(it) === 'Arguments' ? ArrayPrototype[ITERATOR] : undefined)
       }
     }
-  }, { '../internals/classof-raw': 29, '../internals/get-method': 58, '../internals/is-null-or-undefined': 70, '../internals/well-known-symbol': 116 }],
-  58: [function (require, module, exports) {
+  }, { '../internals/classof-raw': 35, '../internals/get-method': 64, '../internals/is-null-or-undefined': 76, '../internals/well-known-symbol': 122 }],
+  64: [function (require, module, exports) {
     'use strict'
     const aCallable = require('../internals/a-callable')
     const isNullOrUndefined = require('../internals/is-null-or-undefined')
@@ -2207,8 +3563,8 @@
       const func = V[P]
       return isNullOrUndefined(func) ? undefined : aCallable(func)
     }
-  }, { '../internals/a-callable': 24, '../internals/is-null-or-undefined': 70 }],
-  59: [function (require, module, exports) {
+  }, { '../internals/a-callable': 30, '../internals/is-null-or-undefined': 76 }],
+  65: [function (require, module, exports) {
     (function (global) {
       (function () {
         'use strict'
@@ -2230,7 +3586,7 @@
       }).call(this)
     }).call(this, typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : typeof window !== 'undefined' ? window : {})
   }, {}],
-  60: [function (require, module, exports) {
+  66: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
     const toObject = require('../internals/to-object')
@@ -2243,18 +3599,18 @@
     module.exports = Object.hasOwn || function hasOwn (it, key) {
       return hasOwnProperty(toObject(it), key)
     }
-  }, { '../internals/function-uncurry-this': 53, '../internals/to-object': 108 }],
-  61: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 59, '../internals/to-object': 114 }],
+  67: [function (require, module, exports) {
     'use strict'
     module.exports = {}
   }, {}],
-  62: [function (require, module, exports) {
+  68: [function (require, module, exports) {
     'use strict'
     const getBuiltIn = require('../internals/get-built-in')
 
     module.exports = getBuiltIn('document', 'documentElement')
-  }, { '../internals/get-built-in': 54 }],
-  63: [function (require, module, exports) {
+  }, { '../internals/get-built-in': 60 }],
+  69: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const fails = require('../internals/fails')
@@ -2267,8 +3623,8 @@
         get: function () { return 7 }
       }).a !== 7
     })
-  }, { '../internals/descriptors': 40, '../internals/document-create-element': 41, '../internals/fails': 46 }],
-  64: [function (require, module, exports) {
+  }, { '../internals/descriptors': 46, '../internals/document-create-element': 47, '../internals/fails': 52 }],
+  70: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
     const fails = require('../internals/fails')
@@ -2285,8 +3641,8 @@
     }) ? function (it) {
         return classof(it) === 'String' ? split(it, '') : $Object(it)
       } : $Object
-  }, { '../internals/classof-raw': 29, '../internals/fails': 46, '../internals/function-uncurry-this': 53 }],
-  65: [function (require, module, exports) {
+  }, { '../internals/classof-raw': 35, '../internals/fails': 52, '../internals/function-uncurry-this': 59 }],
+  71: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
     const isCallable = require('../internals/is-callable')
@@ -2302,8 +3658,8 @@
     }
 
     module.exports = store.inspectSource
-  }, { '../internals/function-uncurry-this': 53, '../internals/is-callable': 68, '../internals/shared-store': 101 }],
-  66: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 59, '../internals/is-callable': 74, '../internals/shared-store': 107 }],
+  72: [function (require, module, exports) {
     'use strict'
     const NATIVE_WEAK_MAP = require('../internals/weak-map-basic-detection')
     const globalThis = require('../internals/global-this')
@@ -2375,8 +3731,8 @@
       enforce,
       getterFor
     }
-  }, { '../internals/create-non-enumerable-property': 33, '../internals/global-this': 59, '../internals/has-own-property': 60, '../internals/hidden-keys': 61, '../internals/is-object': 71, '../internals/shared-key': 100, '../internals/shared-store': 101, '../internals/weak-map-basic-detection': 115 }],
-  67: [function (require, module, exports) {
+  }, { '../internals/create-non-enumerable-property': 39, '../internals/global-this': 65, '../internals/has-own-property': 66, '../internals/hidden-keys': 67, '../internals/is-object': 77, '../internals/shared-key': 106, '../internals/shared-store': 107, '../internals/weak-map-basic-detection': 121 }],
+  73: [function (require, module, exports) {
     'use strict'
     const wellKnownSymbol = require('../internals/well-known-symbol')
     const Iterators = require('../internals/iterators')
@@ -2388,8 +3744,8 @@
     module.exports = function (it) {
       return it !== undefined && (Iterators.Array === it || ArrayPrototype[ITERATOR] === it)
     }
-  }, { '../internals/iterators': 82, '../internals/well-known-symbol': 116 }],
-  68: [function (require, module, exports) {
+  }, { '../internals/iterators': 88, '../internals/well-known-symbol': 122 }],
+  74: [function (require, module, exports) {
     'use strict'
     // https://tc39.es/ecma262/#sec-IsHTMLDDA-internal-slot
     const documentAll = typeof document === 'object' && document.all
@@ -2405,7 +3761,7 @@
         return typeof argument === 'function'
       }
   }, {}],
-  69: [function (require, module, exports) {
+  75: [function (require, module, exports) {
     'use strict'
     const fails = require('../internals/fails')
     const isCallable = require('../internals/is-callable')
@@ -2432,8 +3788,8 @@
     var POLYFILL = isForced.POLYFILL = 'P'
 
     module.exports = isForced
-  }, { '../internals/fails': 46, '../internals/is-callable': 68 }],
-  70: [function (require, module, exports) {
+  }, { '../internals/fails': 52, '../internals/is-callable': 74 }],
+  76: [function (require, module, exports) {
     'use strict'
     // we can't use just `it == null` since of `document.all` special case
     // https://tc39.es/ecma262/#sec-IsHTMLDDA-internal-slot-aec
@@ -2441,19 +3797,19 @@
       return it === null || it === undefined
     }
   }, {}],
-  71: [function (require, module, exports) {
+  77: [function (require, module, exports) {
     'use strict'
     const isCallable = require('../internals/is-callable')
 
     module.exports = function (it) {
       return typeof it === 'object' ? it !== null : isCallable(it)
     }
-  }, { '../internals/is-callable': 68 }],
-  72: [function (require, module, exports) {
+  }, { '../internals/is-callable': 74 }],
+  78: [function (require, module, exports) {
     'use strict'
     module.exports = false
   }, {}],
-  73: [function (require, module, exports) {
+  79: [function (require, module, exports) {
     'use strict'
     const getBuiltIn = require('../internals/get-built-in')
     const isCallable = require('../internals/is-callable')
@@ -2470,8 +3826,8 @@
         const $Symbol = getBuiltIn('Symbol')
         return isCallable($Symbol) && isPrototypeOf($Symbol.prototype, $Object(it))
       }
-  }, { '../internals/get-built-in': 54, '../internals/is-callable': 68, '../internals/object-is-prototype-of': 93, '../internals/use-symbol-as-uid': 113 }],
-  74: [function (require, module, exports) {
+  }, { '../internals/get-built-in': 60, '../internals/is-callable': 74, '../internals/object-is-prototype-of': 99, '../internals/use-symbol-as-uid': 119 }],
+  80: [function (require, module, exports) {
     'use strict'
     const bind = require('../internals/function-bind-context')
     const call = require('../internals/function-call')
@@ -2546,8 +3902,8 @@
         if (typeof result === 'object' && result && isPrototypeOf(ResultPrototype, result)) return result
       } return new Result(false)
     }
-  }, { '../internals/an-object': 26, '../internals/function-bind-context': 48, '../internals/function-call': 50, '../internals/get-iterator-internal': 56, '../internals/get-iterator-method-internal': 57, '../internals/is-array-iterator-method': 67, '../internals/iterator-close': 77, '../internals/length-of-array-like': 83, '../internals/object-is-prototype-of': 93, '../internals/try-to-string': 111 }],
-  75: [function (require, module, exports) {
+  }, { '../internals/an-object': 32, '../internals/function-bind-context': 54, '../internals/function-call': 56, '../internals/get-iterator-internal': 62, '../internals/get-iterator-method-internal': 63, '../internals/is-array-iterator-method': 73, '../internals/iterator-close': 83, '../internals/length-of-array-like': 89, '../internals/object-is-prototype-of': 99, '../internals/try-to-string': 117 }],
+  81: [function (require, module, exports) {
     'use strict'
     // release references held by exhausted / closed iterator helpers to allow GC of the source chain
     module.exports = function (state) {
@@ -2555,7 +3911,7 @@
     state.iterables = state.iters = state.openIters = state.padding = state.finishResults = state.buffer = null
     }
   }, {}],
-  76: [function (require, module, exports) {
+  82: [function (require, module, exports) {
     'use strict'
     const iteratorClose = require('../internals/iterator-close')
 
@@ -2572,8 +3928,8 @@
       if (kind === 'throw') throw value
       return value
     }
-  }, { '../internals/iterator-close': 77 }],
-  77: [function (require, module, exports) {
+  }, { '../internals/iterator-close': 83 }],
+  83: [function (require, module, exports) {
     'use strict'
     const call = require('../internals/function-call')
     const anObject = require('../internals/an-object')
@@ -2598,8 +3954,8 @@
       anObject(innerResult)
       return value
     }
-  }, { '../internals/an-object': 26, '../internals/function-call': 50, '../internals/get-method': 58 }],
-  78: [function (require, module, exports) {
+  }, { '../internals/an-object': 32, '../internals/function-call': 56, '../internals/get-method': 64 }],
+  84: [function (require, module, exports) {
     'use strict'
     const call = require('../internals/function-call')
     const create = require('../internals/object-create')
@@ -2699,8 +4055,8 @@
 
       return IteratorProxy
     }
-  }, { '../internals/create-iter-result-object': 32, '../internals/create-non-enumerable-property': 33, '../internals/define-built-ins': 38, '../internals/function-call': 50, '../internals/get-method': 58, '../internals/internal-state': 66, '../internals/iterator-cleanup-state': 75, '../internals/iterator-close': 77, '../internals/iterator-close-all': 76, '../internals/iterators-core': 81, '../internals/object-create': 86, '../internals/well-known-symbol': 116 }],
-  79: [function (require, module, exports) {
+  }, { '../internals/create-iter-result-object': 38, '../internals/create-non-enumerable-property': 39, '../internals/define-built-ins': 44, '../internals/function-call': 56, '../internals/get-method': 64, '../internals/internal-state': 72, '../internals/iterator-cleanup-state': 81, '../internals/iterator-close': 83, '../internals/iterator-close-all': 82, '../internals/iterators-core': 87, '../internals/object-create': 92, '../internals/well-known-symbol': 122 }],
+  85: [function (require, module, exports) {
     'use strict'
     // Should throw an error on invalid iterator
     // https://issues.chromium.org/issues/336839115
@@ -2716,7 +4072,7 @@
       }
     }
   }, {}],
-  80: [function (require, module, exports) {
+  86: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
 
@@ -2742,8 +4098,8 @@
 
       if (!CLOSED) return method
     }
-  }, { '../internals/global-this': 59 }],
-  81: [function (require, module, exports) {
+  }, { '../internals/global-this': 65 }],
+  87: [function (require, module, exports) {
     'use strict'
     const fails = require('../internals/fails')
     const isCallable = require('../internals/is-callable')
@@ -2793,12 +4149,12 @@
       IteratorPrototype,
       BUGGY_SAFARI_ITERATORS
     }
-  }, { '../internals/define-built-in': 37, '../internals/fails': 46, '../internals/is-callable': 68, '../internals/is-object': 71, '../internals/is-pure': 72, '../internals/object-create': 86, '../internals/object-get-prototype-of': 92, '../internals/well-known-symbol': 116 }],
-  82: [function (require, module, exports) {
+  }, { '../internals/define-built-in': 43, '../internals/fails': 52, '../internals/is-callable': 74, '../internals/is-object': 77, '../internals/is-pure': 78, '../internals/object-create': 92, '../internals/object-get-prototype-of': 98, '../internals/well-known-symbol': 122 }],
+  88: [function (require, module, exports) {
     'use strict'
     module.exports = Object.create ? Object.create(null) : {}
   }, {}],
-  83: [function (require, module, exports) {
+  89: [function (require, module, exports) {
     'use strict'
     const toLength = require('../internals/to-length')
 
@@ -2807,8 +4163,8 @@
     module.exports = function (obj) {
       return toLength(obj.length)
     }
-  }, { '../internals/to-length': 107 }],
-  84: [function (require, module, exports) {
+  }, { '../internals/to-length': 113 }],
+  90: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
     const fails = require('../internals/fails')
@@ -2864,8 +4220,8 @@
     Function.prototype.toString = makeBuiltIn(function toString () {
       return isCallable(this) && getInternalState(this).source || inspectSource(this)
     }, 'toString')
-  }, { '../internals/descriptors': 40, '../internals/fails': 46, '../internals/function-name': 51, '../internals/function-uncurry-this': 53, '../internals/has-own-property': 60, '../internals/inspect-source': 65, '../internals/internal-state': 66, '../internals/is-callable': 68 }],
-  85: [function (require, module, exports) {
+  }, { '../internals/descriptors': 46, '../internals/fails': 52, '../internals/function-name': 57, '../internals/function-uncurry-this': 59, '../internals/has-own-property': 66, '../internals/inspect-source': 71, '../internals/internal-state': 72, '../internals/is-callable': 74 }],
+  91: [function (require, module, exports) {
     'use strict'
     const ceil = Math.ceil
     const floor = Math.floor
@@ -2878,7 +4234,7 @@
       return (n > 0 ? floor : ceil)(n)
     }
   }, {}],
-  86: [function (require, module, exports) {
+  92: [function (require, module, exports) {
     'use strict'
     /* global ActiveXObject -- old IE, WSH */
     const anObject = require('../internals/an-object')
@@ -2964,8 +4320,8 @@
       } else result = NullProtoObject()
       return Properties === undefined ? result : definePropertiesModule.f(result, Properties)
     }
-  }, { '../internals/an-object': 26, '../internals/document-create-element': 41, '../internals/enum-bug-keys': 42, '../internals/hidden-keys': 61, '../internals/html': 62, '../internals/object-define-properties': 87, '../internals/shared-key': 100 }],
-  87: [function (require, module, exports) {
+  }, { '../internals/an-object': 32, '../internals/document-create-element': 47, '../internals/enum-bug-keys': 48, '../internals/hidden-keys': 67, '../internals/html': 68, '../internals/object-define-properties': 93, '../internals/shared-key': 106 }],
+  93: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const V8_PROTOTYPE_DEFINE_BUG = require('../internals/v8-prototype-define-bug')
@@ -2989,8 +4345,8 @@
         while (length > index) definePropertyModule.f(O, key = keys[index++], props[key])
         return O
       }
-  }, { '../internals/an-object': 26, '../internals/descriptors': 40, '../internals/object-define-property': 88, '../internals/object-keys': 95, '../internals/to-indexed-object': 105, '../internals/v8-prototype-define-bug': 114 }],
-  88: [function (require, module, exports) {
+  }, { '../internals/an-object': 32, '../internals/descriptors': 46, '../internals/object-define-property': 94, '../internals/object-keys': 101, '../internals/to-indexed-object': 111, '../internals/v8-prototype-define-bug': 120 }],
+  94: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const IE8_DOM_DEFINE = require('../internals/ie8-dom-define')
@@ -3039,8 +4395,8 @@
       if ('value' in Attributes) O[P] = Attributes.value
       return O
     }
-  }, { '../internals/an-object': 26, '../internals/descriptors': 40, '../internals/ie8-dom-define': 63, '../internals/to-property-key': 110, '../internals/v8-prototype-define-bug': 114 }],
-  89: [function (require, module, exports) {
+  }, { '../internals/an-object': 32, '../internals/descriptors': 46, '../internals/ie8-dom-define': 69, '../internals/to-property-key': 116, '../internals/v8-prototype-define-bug': 120 }],
+  95: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const call = require('../internals/function-call')
@@ -3066,8 +4422,8 @@
       }
       if (hasOwn(O, P)) return createPropertyDescriptor(!call(propertyIsEnumerableModule.f, O, P), O[P])
     }
-  }, { '../internals/create-property-descriptor': 34, '../internals/descriptors': 40, '../internals/function-call': 50, '../internals/has-own-property': 60, '../internals/ie8-dom-define': 63, '../internals/object-property-is-enumerable': 96, '../internals/to-indexed-object': 105, '../internals/to-property-key': 110 }],
-  90: [function (require, module, exports) {
+  }, { '../internals/create-property-descriptor': 40, '../internals/descriptors': 46, '../internals/function-call': 56, '../internals/has-own-property': 66, '../internals/ie8-dom-define': 69, '../internals/object-property-is-enumerable': 102, '../internals/to-indexed-object': 111, '../internals/to-property-key': 116 }],
+  96: [function (require, module, exports) {
     'use strict'
     const internalObjectKeys = require('../internals/object-keys-internal')
     const enumBugKeys = require('../internals/enum-bug-keys')
@@ -3080,13 +4436,13 @@
     exports.f = Object.getOwnPropertyNames || function getOwnPropertyNames (O) {
       return internalObjectKeys(O, hiddenKeys)
     }
-  }, { '../internals/enum-bug-keys': 42, '../internals/object-keys-internal': 94 }],
-  91: [function (require, module, exports) {
+  }, { '../internals/enum-bug-keys': 48, '../internals/object-keys-internal': 100 }],
+  97: [function (require, module, exports) {
     'use strict'
     // eslint-disable-next-line es/no-object-getownpropertysymbols -- safe
     exports.f = Object.getOwnPropertySymbols
   }, {}],
-  92: [function (require, module, exports) {
+  98: [function (require, module, exports) {
     'use strict'
     const hasOwn = require('../internals/has-own-property')
     const isCallable = require('../internals/is-callable')
@@ -3111,14 +4467,14 @@
           return constructor.prototype
         } return object instanceof $Object ? ObjectPrototype : null
       }
-  }, { '../internals/correct-prototype-getter': 31, '../internals/has-own-property': 60, '../internals/is-callable': 68, '../internals/shared-key': 100, '../internals/to-object': 108 }],
-  93: [function (require, module, exports) {
+  }, { '../internals/correct-prototype-getter': 37, '../internals/has-own-property': 66, '../internals/is-callable': 74, '../internals/shared-key': 106, '../internals/to-object': 114 }],
+  99: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
 
     module.exports = uncurryThis({}.isPrototypeOf)
-  }, { '../internals/function-uncurry-this': 53 }],
-  94: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 59 }],
+  100: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
     const hasOwn = require('../internals/has-own-property')
@@ -3142,8 +4498,8 @@
       }
       return result
     }
-  }, { '../internals/array-includes': 27, '../internals/function-uncurry-this': 53, '../internals/has-own-property': 60, '../internals/hidden-keys': 61, '../internals/to-indexed-object': 105 }],
-  95: [function (require, module, exports) {
+  }, { '../internals/array-includes': 33, '../internals/function-uncurry-this': 59, '../internals/has-own-property': 66, '../internals/hidden-keys': 67, '../internals/to-indexed-object': 111 }],
+  101: [function (require, module, exports) {
     'use strict'
     const internalObjectKeys = require('../internals/object-keys-internal')
     const enumBugKeys = require('../internals/enum-bug-keys')
@@ -3154,8 +4510,8 @@
     module.exports = Object.keys || function keys (O) {
       return internalObjectKeys(O, enumBugKeys)
     }
-  }, { '../internals/enum-bug-keys': 42, '../internals/object-keys-internal': 94 }],
-  96: [function (require, module, exports) {
+  }, { '../internals/enum-bug-keys': 48, '../internals/object-keys-internal': 100 }],
+  102: [function (require, module, exports) {
     'use strict'
     const $propertyIsEnumerable = {}.propertyIsEnumerable
     // eslint-disable-next-line es/no-object-getownpropertydescriptor -- safe
@@ -3173,7 +4529,7 @@
       }
       : $propertyIsEnumerable
   }, {}],
-  97: [function (require, module, exports) {
+  103: [function (require, module, exports) {
     'use strict'
     const call = require('../internals/function-call')
     const isCallable = require('../internals/is-callable')
@@ -3190,8 +4546,8 @@
       if (pref !== 'string' && isCallable(fn = input.toString) && !isObject(val = call(fn, input))) return val
       throw new $TypeError("Can't convert object to primitive value")
     }
-  }, { '../internals/function-call': 50, '../internals/is-callable': 68, '../internals/is-object': 71 }],
-  98: [function (require, module, exports) {
+  }, { '../internals/function-call': 56, '../internals/is-callable': 74, '../internals/is-object': 77 }],
+  104: [function (require, module, exports) {
     'use strict'
     const getBuiltIn = require('../internals/get-built-in')
     const uncurryThis = require('../internals/function-uncurry-this')
@@ -3207,8 +4563,8 @@
       const getOwnPropertySymbols = getOwnPropertySymbolsModule.f
       return getOwnPropertySymbols ? concat(keys, getOwnPropertySymbols(it)) : keys
     }
-  }, { '../internals/an-object': 26, '../internals/function-uncurry-this': 53, '../internals/get-built-in': 54, '../internals/object-get-own-property-names': 90, '../internals/object-get-own-property-symbols': 91 }],
-  99: [function (require, module, exports) {
+  }, { '../internals/an-object': 32, '../internals/function-uncurry-this': 59, '../internals/get-built-in': 60, '../internals/object-get-own-property-names': 96, '../internals/object-get-own-property-symbols': 97 }],
+  105: [function (require, module, exports) {
     'use strict'
     const isNullOrUndefined = require('../internals/is-null-or-undefined')
 
@@ -3220,8 +4576,8 @@
       if (isNullOrUndefined(it)) throw new $TypeError("Can't call method on " + it)
       return it
     }
-  }, { '../internals/is-null-or-undefined': 70 }],
-  100: [function (require, module, exports) {
+  }, { '../internals/is-null-or-undefined': 76 }],
+  106: [function (require, module, exports) {
     'use strict'
     const shared = require('../internals/shared')
     const uid = require('../internals/uid')
@@ -3231,8 +4587,8 @@
     module.exports = function (key) {
       return keys[key] || (keys[key] = uid(key))
     }
-  }, { '../internals/shared': 102, '../internals/uid': 112 }],
-  101: [function (require, module, exports) {
+  }, { '../internals/shared': 108, '../internals/uid': 118 }],
+  107: [function (require, module, exports) {
     'use strict'
     const IS_PURE = require('../internals/is-pure')
     const globalThis = require('../internals/global-this')
@@ -3248,8 +4604,8 @@
       license: 'https://github.com/zloirock/core-js/blob/v3.50.0/LICENSE',
       source: 'https://github.com/zloirock/core-js'
     })
-  }, { '../internals/define-global-property': 39, '../internals/global-this': 59, '../internals/is-pure': 72 }],
-  102: [function (require, module, exports) {
+  }, { '../internals/define-global-property': 45, '../internals/global-this': 65, '../internals/is-pure': 78 }],
+  108: [function (require, module, exports) {
     'use strict'
     const store = require('../internals/shared-store')
     // eslint-disable-next-line es/no-object-create -- safe
@@ -3258,8 +4614,8 @@
     module.exports = function (key, value) {
       return store[key] || (store[key] = value || create(null))
     }
-  }, { '../internals/shared-store': 101 }],
-  103: [function (require, module, exports) {
+  }, { '../internals/shared-store': 107 }],
+  109: [function (require, module, exports) {
     'use strict'
     /* eslint-disable es/no-symbol -- required for testing */
     const V8_VERSION = require('../internals/environment-v8-version')
@@ -3279,8 +4635,8 @@
     // Chrome 38-40 symbols are not inherited from DOM collections prototypes to instances
     !Symbol.sham && V8_VERSION && V8_VERSION < 41
     })
-  }, { '../internals/environment-v8-version': 44, '../internals/fails': 46, '../internals/global-this': 59 }],
-  104: [function (require, module, exports) {
+  }, { '../internals/environment-v8-version': 50, '../internals/fails': 52, '../internals/global-this': 65 }],
+  110: [function (require, module, exports) {
     'use strict'
     const toIntegerOrInfinity = require('../internals/to-integer-or-infinity')
 
@@ -3294,8 +4650,8 @@
       const integer = toIntegerOrInfinity(index)
       return integer < 0 ? max(integer + length, 0) : min(integer, length)
     }
-  }, { '../internals/to-integer-or-infinity': 106 }],
-  105: [function (require, module, exports) {
+  }, { '../internals/to-integer-or-infinity': 112 }],
+  111: [function (require, module, exports) {
     'use strict'
     // toObject with fallback for non-array-like ES3 strings
     const IndexedObject = require('../internals/indexed-object')
@@ -3304,8 +4660,8 @@
     module.exports = function (it) {
       return IndexedObject(requireObjectCoercible(it))
     }
-  }, { '../internals/indexed-object': 64, '../internals/require-object-coercible': 99 }],
-  106: [function (require, module, exports) {
+  }, { '../internals/indexed-object': 70, '../internals/require-object-coercible': 105 }],
+  112: [function (require, module, exports) {
     'use strict'
     const trunc = require('../internals/math-trunc')
 
@@ -3316,8 +4672,8 @@
       // eslint-disable-next-line no-self-compare -- NaN check
       return number !== number || number === 0 ? 0 : trunc(number)
     }
-  }, { '../internals/math-trunc': 85 }],
-  107: [function (require, module, exports) {
+  }, { '../internals/math-trunc': 91 }],
+  113: [function (require, module, exports) {
     'use strict'
     const toIntegerOrInfinity = require('../internals/to-integer-or-infinity')
 
@@ -3329,8 +4685,8 @@
       const len = toIntegerOrInfinity(argument)
       return len > 0 ? min(len, 0x1FFFFFFFFFFFFF) : 0 // 2 ** 53 - 1 == 9007199254740991
     }
-  }, { '../internals/to-integer-or-infinity': 106 }],
-  108: [function (require, module, exports) {
+  }, { '../internals/to-integer-or-infinity': 112 }],
+  114: [function (require, module, exports) {
     'use strict'
     const requireObjectCoercible = require('../internals/require-object-coercible')
 
@@ -3341,8 +4697,8 @@
     module.exports = function (argument) {
       return $Object(requireObjectCoercible(argument))
     }
-  }, { '../internals/require-object-coercible': 99 }],
-  109: [function (require, module, exports) {
+  }, { '../internals/require-object-coercible': 105 }],
+  115: [function (require, module, exports) {
     'use strict'
     const call = require('../internals/function-call')
     const isObject = require('../internals/is-object')
@@ -3369,8 +4725,8 @@
       if (pref === undefined) pref = 'number'
       return ordinaryToPrimitive(input, pref)
     }
-  }, { '../internals/function-call': 50, '../internals/get-method': 58, '../internals/is-object': 71, '../internals/is-symbol': 73, '../internals/ordinary-to-primitive': 97, '../internals/well-known-symbol': 116 }],
-  110: [function (require, module, exports) {
+  }, { '../internals/function-call': 56, '../internals/get-method': 64, '../internals/is-object': 77, '../internals/is-symbol': 79, '../internals/ordinary-to-primitive': 103, '../internals/well-known-symbol': 122 }],
+  116: [function (require, module, exports) {
     'use strict'
     const toPrimitive = require('../internals/to-primitive')
     const isSymbol = require('../internals/is-symbol')
@@ -3381,8 +4737,8 @@
       const key = toPrimitive(argument, 'string')
       return isSymbol(key) ? key : key + ''
     }
-  }, { '../internals/is-symbol': 73, '../internals/to-primitive': 109 }],
-  111: [function (require, module, exports) {
+  }, { '../internals/is-symbol': 79, '../internals/to-primitive': 115 }],
+  117: [function (require, module, exports) {
     'use strict'
     const $String = String
 
@@ -3394,7 +4750,7 @@
       }
     }
   }, {}],
-  112: [function (require, module, exports) {
+  118: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
 
@@ -3405,8 +4761,8 @@
     module.exports = function (key) {
       return 'Symbol(' + (key === undefined ? '' : key) + ')_' + toString(++id + postfix, 36)
     }
-  }, { '../internals/function-uncurry-this': 53 }],
-  113: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 59 }],
+  119: [function (require, module, exports) {
     'use strict'
     /* eslint-disable es/no-symbol -- required for testing */
     const NATIVE_SYMBOL = require('../internals/symbol-constructor-detection')
@@ -3414,8 +4770,8 @@
     module.exports = NATIVE_SYMBOL &&
   !Symbol.sham &&
   typeof Symbol.iterator === 'symbol'
-  }, { '../internals/symbol-constructor-detection': 103 }],
-  114: [function (require, module, exports) {
+  }, { '../internals/symbol-constructor-detection': 109 }],
+  120: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const fails = require('../internals/fails')
@@ -3429,8 +4785,8 @@
         writable: false
       }).prototype !== 42
     })
-  }, { '../internals/descriptors': 40, '../internals/fails': 46 }],
-  115: [function (require, module, exports) {
+  }, { '../internals/descriptors': 46, '../internals/fails': 52 }],
+  121: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
     const isCallable = require('../internals/is-callable')
@@ -3438,8 +4794,8 @@
     const WeakMap = globalThis.WeakMap
 
     module.exports = isCallable(WeakMap) && /native code/.test(String(WeakMap))
-  }, { '../internals/global-this': 59, '../internals/is-callable': 68 }],
-  116: [function (require, module, exports) {
+  }, { '../internals/global-this': 65, '../internals/is-callable': 74 }],
+  122: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
     const shared = require('../internals/shared')
@@ -3459,8 +4815,8 @@
           : createWellKnownSymbol('Symbol.' + name)
       } return WellKnownSymbolsStore[name]
     }
-  }, { '../internals/global-this': 59, '../internals/has-own-property': 60, '../internals/shared': 102, '../internals/symbol-constructor-detection': 103, '../internals/uid': 112, '../internals/use-symbol-as-uid': 113 }],
-  117: [function (require, module, exports) {
+  }, { '../internals/global-this': 65, '../internals/has-own-property': 66, '../internals/shared': 108, '../internals/symbol-constructor-detection': 109, '../internals/uid': 118, '../internals/use-symbol-as-uid': 119 }],
+  123: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const globalThis = require('../internals/global-this')
@@ -3526,8 +4882,95 @@
     $({ global: true, constructor: true, forced: FORCED }, {
       Iterator: IteratorConstructor
     })
-  }, { '../internals/an-instance': 25, '../internals/an-object': 26, '../internals/create-property': 35, '../internals/define-built-in-accessor': 36, '../internals/descriptors': 40, '../internals/export': 45, '../internals/fails': 46, '../internals/global-this': 59, '../internals/has-own-property': 60, '../internals/is-callable': 68, '../internals/is-pure': 72, '../internals/iterators-core': 81, '../internals/object-get-prototype-of': 92, '../internals/well-known-symbol': 116 }],
-  118: [function (require, module, exports) {
+  }, { '../internals/an-instance': 31, '../internals/an-object': 32, '../internals/create-property': 41, '../internals/define-built-in-accessor': 42, '../internals/descriptors': 46, '../internals/export': 51, '../internals/fails': 52, '../internals/global-this': 65, '../internals/has-own-property': 66, '../internals/is-callable': 74, '../internals/is-pure': 78, '../internals/iterators-core': 87, '../internals/object-get-prototype-of': 98, '../internals/well-known-symbol': 122 }],
+  124: [function (require, module, exports) {
+    'use strict'
+    const $ = require('../internals/export')
+    const call = require('../internals/function-call')
+    const aCallable = require('../internals/a-callable')
+    const anObject = require('../internals/an-object')
+    const getIteratorDirect = require('../internals/get-iterator-direct')
+    const createIteratorProxy = require('../internals/iterator-create-proxy')
+    const callWithSafeIterationClosing = require('../internals/call-with-safe-iteration-closing')
+    const IS_PURE = require('../internals/is-pure')
+    const iteratorClose = require('../internals/iterator-close')
+    const iteratorHelperThrowsOnInvalidIterator = require('../internals/iterator-helper-throws-on-invalid-iterator')
+    const iteratorHelperWithoutClosingOnEarlyError = require('../internals/iterator-helper-without-closing-on-early-error')
+
+    const FILTER_WITHOUT_THROWING_ON_INVALID_ITERATOR = !IS_PURE && !iteratorHelperThrowsOnInvalidIterator('filter', function () { /* empty */ })
+    const filterWithoutClosingOnEarlyError = !IS_PURE && !FILTER_WITHOUT_THROWING_ON_INVALID_ITERATOR &&
+  iteratorHelperWithoutClosingOnEarlyError('filter', TypeError)
+
+    const FORCED = IS_PURE || FILTER_WITHOUT_THROWING_ON_INVALID_ITERATOR || filterWithoutClosingOnEarlyError
+
+    const IteratorProxy = createIteratorProxy(function () {
+      const iterator = this.iterator
+      const predicate = this.predicate
+      const next = this.next
+      let result, done, value
+      while (true) {
+        result = anObject(call(next, iterator))
+        done = this.done = !!result.done
+        if (done) return
+        value = result.value
+        if (callWithSafeIterationClosing(iterator, predicate, [value, this.counter++], true)) return value
+      }
+    })
+
+    // `Iterator.prototype.filter` method
+    // https://tc39.es/ecma262/#sec-iterator.prototype.filter
+    $({ target: 'Iterator', proto: true, real: true, forced: FORCED }, {
+      filter: function filter (predicate) {
+        anObject(this)
+        try {
+          aCallable(predicate)
+        } catch (error) {
+          iteratorClose(this, 'throw', error)
+        }
+
+        if (filterWithoutClosingOnEarlyError) return call(filterWithoutClosingOnEarlyError, this, predicate)
+
+        return new IteratorProxy(getIteratorDirect(this), {
+          predicate
+        })
+      }
+    })
+  }, { '../internals/a-callable': 30, '../internals/an-object': 32, '../internals/call-with-safe-iteration-closing': 34, '../internals/export': 51, '../internals/function-call': 56, '../internals/get-iterator-direct': 61, '../internals/is-pure': 78, '../internals/iterator-close': 83, '../internals/iterator-create-proxy': 84, '../internals/iterator-helper-throws-on-invalid-iterator': 85, '../internals/iterator-helper-without-closing-on-early-error': 86 }],
+  125: [function (require, module, exports) {
+    'use strict'
+    const $ = require('../internals/export')
+    const call = require('../internals/function-call')
+    const iterate = require('../internals/iterate')
+    const aCallable = require('../internals/a-callable')
+    const anObject = require('../internals/an-object')
+    const getIteratorDirect = require('../internals/get-iterator-direct')
+    const iteratorClose = require('../internals/iterator-close')
+    const iteratorHelperWithoutClosingOnEarlyError = require('../internals/iterator-helper-without-closing-on-early-error')
+
+    const findWithoutClosingOnEarlyError = iteratorHelperWithoutClosingOnEarlyError('find', TypeError)
+
+    // `Iterator.prototype.find` method
+    // https://tc39.es/ecma262/#sec-iterator.prototype.find
+    $({ target: 'Iterator', proto: true, real: true, forced: findWithoutClosingOnEarlyError }, {
+      find: function find (predicate) {
+        anObject(this)
+        try {
+          aCallable(predicate)
+        } catch (error) {
+          iteratorClose(this, 'throw', error)
+        }
+
+        if (findWithoutClosingOnEarlyError) return call(findWithoutClosingOnEarlyError, this, predicate)
+
+        const record = getIteratorDirect(this)
+        let counter = 0
+        return iterate(record, function (value, stop) {
+          if (predicate(value, counter++)) return stop(value)
+        }, { IS_RECORD: true, INTERRUPTED: true }).result
+      }
+    })
+  }, { '../internals/a-callable': 30, '../internals/an-object': 32, '../internals/export': 51, '../internals/function-call': 56, '../internals/get-iterator-direct': 61, '../internals/iterate': 80, '../internals/iterator-close': 83, '../internals/iterator-helper-without-closing-on-early-error': 86 }],
+  126: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -3560,8 +5003,8 @@
         }, { IS_RECORD: true })
       }
     })
-  }, { '../internals/a-callable': 24, '../internals/an-object': 26, '../internals/export': 45, '../internals/function-call': 50, '../internals/get-iterator-direct': 55, '../internals/iterate': 74, '../internals/iterator-close': 77, '../internals/iterator-helper-without-closing-on-early-error': 80 }],
-  119: [function (require, module, exports) {
+  }, { '../internals/a-callable': 30, '../internals/an-object': 32, '../internals/export': 51, '../internals/function-call': 56, '../internals/get-iterator-direct': 61, '../internals/iterate': 80, '../internals/iterator-close': 83, '../internals/iterator-helper-without-closing-on-early-error': 86 }],
+  127: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -3606,8 +5049,8 @@
         })
       }
     })
-  }, { '../internals/a-callable': 24, '../internals/an-object': 26, '../internals/call-with-safe-iteration-closing': 28, '../internals/export': 45, '../internals/function-call': 50, '../internals/get-iterator-direct': 55, '../internals/is-pure': 72, '../internals/iterator-close': 77, '../internals/iterator-create-proxy': 78, '../internals/iterator-helper-throws-on-invalid-iterator': 79, '../internals/iterator-helper-without-closing-on-early-error': 80 }],
-  120: [function (require, module, exports) {
+  }, { '../internals/a-callable': 30, '../internals/an-object': 32, '../internals/call-with-safe-iteration-closing': 34, '../internals/export': 51, '../internals/function-call': 56, '../internals/get-iterator-direct': 61, '../internals/is-pure': 78, '../internals/iterator-close': 83, '../internals/iterator-create-proxy': 84, '../internals/iterator-helper-throws-on-invalid-iterator': 85, '../internals/iterator-helper-without-closing-on-early-error': 86 }],
+  128: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const iterate = require('../internals/iterate')
@@ -3660,25 +5103,74 @@
         return accumulator
       }
     })
-  }, { '../internals/a-callable': 24, '../internals/an-object': 26, '../internals/export': 45, '../internals/fails': 46, '../internals/function-apply': 47, '../internals/get-iterator-direct': 55, '../internals/iterate': 74, '../internals/iterator-close': 77, '../internals/iterator-helper-without-closing-on-early-error': 80 }],
-  121: [function (require, module, exports) {
+  }, { '../internals/a-callable': 30, '../internals/an-object': 32, '../internals/export': 51, '../internals/fails': 52, '../internals/function-apply': 53, '../internals/get-iterator-direct': 61, '../internals/iterate': 80, '../internals/iterator-close': 83, '../internals/iterator-helper-without-closing-on-early-error': 86 }],
+  129: [function (require, module, exports) {
+    'use strict'
+    const $ = require('../internals/export')
+    const call = require('../internals/function-call')
+    const iterate = require('../internals/iterate')
+    const aCallable = require('../internals/a-callable')
+    const anObject = require('../internals/an-object')
+    const getIteratorDirect = require('../internals/get-iterator-direct')
+    const iteratorClose = require('../internals/iterator-close')
+    const iteratorHelperWithoutClosingOnEarlyError = require('../internals/iterator-helper-without-closing-on-early-error')
+
+    const someWithoutClosingOnEarlyError = iteratorHelperWithoutClosingOnEarlyError('some', TypeError)
+
+    // `Iterator.prototype.some` method
+    // https://tc39.es/ecma262/#sec-iterator.prototype.some
+    $({ target: 'Iterator', proto: true, real: true, forced: someWithoutClosingOnEarlyError }, {
+      some: function some (predicate) {
+        anObject(this)
+        try {
+          aCallable(predicate)
+        } catch (error) {
+          iteratorClose(this, 'throw', error)
+        }
+
+        if (someWithoutClosingOnEarlyError) return call(someWithoutClosingOnEarlyError, this, predicate)
+
+        const record = getIteratorDirect(this)
+        let counter = 0
+        return iterate(record, function (value, stop) {
+          if (predicate(value, counter++)) return stop()
+        }, { IS_RECORD: true, INTERRUPTED: true }).stopped
+      }
+    })
+  }, { '../internals/a-callable': 30, '../internals/an-object': 32, '../internals/export': 51, '../internals/function-call': 56, '../internals/get-iterator-direct': 61, '../internals/iterate': 80, '../internals/iterator-close': 83, '../internals/iterator-helper-without-closing-on-early-error': 86 }],
+  130: [function (require, module, exports) {
     'use strict'
     // TODO: Remove from `core-js@4`
     require('../modules/es.iterator.constructor')
-  }, { '../modules/es.iterator.constructor': 117 }],
-  122: [function (require, module, exports) {
+  }, { '../modules/es.iterator.constructor': 123 }],
+  131: [function (require, module, exports) {
+    'use strict'
+    // TODO: Remove from `core-js@4`
+    require('../modules/es.iterator.filter')
+  }, { '../modules/es.iterator.filter': 124 }],
+  132: [function (require, module, exports) {
+    'use strict'
+    // TODO: Remove from `core-js@4`
+    require('../modules/es.iterator.find')
+  }, { '../modules/es.iterator.find': 125 }],
+  133: [function (require, module, exports) {
     'use strict'
     // TODO: Remove from `core-js@4`
     require('../modules/es.iterator.for-each')
-  }, { '../modules/es.iterator.for-each': 118 }],
-  123: [function (require, module, exports) {
+  }, { '../modules/es.iterator.for-each': 126 }],
+  134: [function (require, module, exports) {
     'use strict'
     // TODO: Remove from `core-js@4`
     require('../modules/es.iterator.map')
-  }, { '../modules/es.iterator.map': 119 }],
-  124: [function (require, module, exports) {
+  }, { '../modules/es.iterator.map': 127 }],
+  135: [function (require, module, exports) {
     'use strict'
     // TODO: Remove from `core-js@4`
     require('../modules/es.iterator.reduce')
-  }, { '../modules/es.iterator.reduce': 120 }]
-}, {}, [10])
+  }, { '../modules/es.iterator.reduce': 128 }],
+  136: [function (require, module, exports) {
+    'use strict'
+    // TODO: Remove from `core-js@4`
+    require('../modules/es.iterator.some')
+  }, { '../modules/es.iterator.some': 129 }]
+}, {}, [8])
