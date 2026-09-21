@@ -16,6 +16,7 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 })
 exports.ElementService = void 0
+const EventService_1 = require('./EventService')
 const NodeService_1 = require('./NodeService')
 const AttrService_1 = require('./AttrService')
 const DOMTokenListService_1 = require('./DOMTokenListService')
@@ -52,6 +53,7 @@ class ElementService extends NodeService_1.NodeService {
     children = []
   } = {}) {
     super()
+    this.defaultEventApplied = false
     this.tokenList = new DOMTokenListService_1.DOMTokenListService()
     this.tag = tagName
     this.attributeList = attributes.concat([{
@@ -117,20 +119,25 @@ class ElementService extends NodeService_1.NodeService {
    */
   applyDefaultEvent () {
     let callback = event => undefined
+    if (this.defaultEventApplied) {
+      return callback
+    }
     switch (this.tagName) {
-      case 'form':
-        this.addEventListener('submit', callback)
-        break
       case 'button':
       case 'input':
         if (/^(submit|image)$/i.test(this.type || '')) {
+          // Clicking a submit button submits the form it is in: the form gets a submit event, which can be cancelled
           callback = event => {
             const forms = (0, getParentNodesFromAttribute_1.default)('tagName', 'form', this)
             if (forms.length) {
-              forms[0].submit()
+              forms[forms.length - 1].dispatchEvent(new EventService_1.EventService('submit', {
+                bubbles: true,
+                cancelable: true
+              }))
             }
           }
           super.setDefaultEvent('click', callback)
+          this.defaultEventApplied = true
         }
     }
     return callback

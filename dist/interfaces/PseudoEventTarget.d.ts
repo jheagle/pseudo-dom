@@ -35,12 +35,12 @@ export interface PseudoEventTarget {
      * @param {string} type
      * @param {function} callback
      */
-    removeEventListener(type: string, callback: Function): void;
+    removeEventListener(type: string, callback: Function, options?: listenerOptions | boolean): void;
     /**
      * Dispatches an event to this EventTarget.
      * @param {Event|PseudoEvent} event
      * @param {EventTarget|PseudoEventTarget} target
      * @returns {boolean}
      */
-    dispatchEvent(event: PseudoEvent, target: PseudoEventTarget): boolean;
+    dispatchEvent(event: PseudoEvent): boolean;
 }

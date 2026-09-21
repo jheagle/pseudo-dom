@@ -24,7 +24,15 @@ class PseudoEventListener {
   private handler: Function
   private readonly originalCallback: Function
   private readonly defaultListener: boolean = false
+  private isRemoved: boolean = false
 
+  /**
+   * @param {string} eventType The type of event this listens for
+   * @param {Object} [options] The capture, once and passive options
+   * @param {Function} handleEvent The function which is called with the event, already bound to what it should run as
+   * @param {Function} [originalCallback=handleEvent] The function (or object) which was given when registering, used to find this listener again
+   * @constructor
+   */
   constructor (eventType: string, { capture = false, once = false, passive = false } = {}, handleEvent: Function, originalCallback: Function = handleEvent) {
     this.eventOptions = { capture, once, passive }
     this.eventType = eventType
@@ -39,12 +47,31 @@ class PseudoEventListener {
     return this.originalCallback
   }
 
+  /** Whether this listener listens in the capture phase (and at the target) rather than in the bubble phase. */
+  get capture (): boolean {
+    return this.eventOptions.capture
+  }
+
   get isDefault (): boolean {
     return this.defaultListener
   }
 
   get once (): boolean {
     return this.eventOptions.once
+  }
+
+  /** Whether the listener promises not to prevent the default (preventDefault does nothing while it runs). */
+  get passive (): boolean {
+    return this.eventOptions.passive
+  }
+
+  /** Whether this listener has been removed, a removed listener does not run even if the event already started. */
+  get removed (): boolean {
+    return this.isRemoved
+  }
+
+  set removed (removed: boolean) {
+    this.isRemoved = removed
   }
 
   /**
@@ -58,6 +85,7 @@ class PseudoEventListener {
   }
 
   /**
+   * A capture listener runs while the event travels down to the target.
    * @method
    * @name PseudoEventListener#doCapturePhase
    * @param {PseudoEvent} event
@@ -68,6 +96,7 @@ class PseudoEventListener {
   }
 
   /**
+   * Every listener of the target itself runs, capture listeners first.
    * @method
    * @name PseudoEventListener#doTargetPhase
    * @param {PseudoEvent} event
@@ -78,13 +107,14 @@ class PseudoEventListener {
   }
 
   /**
+   * A listener which is not a capture listener runs while the event travels back up (when it bubbles).
    * @method
    * @name PseudoEventListener#doBubblePhase
    * @param {PseudoEvent} event
-   * @returns {boolean|*}
+   * @returns {boolean}
    */
-  doBubblePhase (event: EventService): boolean | any {
-    return event.eventPhase === EventService.BUBBLING_PHASE && (event.bubbles || !this.eventOptions.capture)
+  doBubblePhase (event: EventService): boolean {
+    return event.eventPhase === EventService.BUBBLING_PHASE && !this.eventOptions.capture
   }
 
   /**
@@ -98,46 +128,16 @@ class PseudoEventListener {
   }
 
   /**
-   * @method
-   * @name PseudoEventListener#skipDefault
-   * @param {PseudoEvent} event
-   * @returns {boolean|*}
-   */
-  skipDefault (event: EventService): boolean | any {
-    return this.isDefault && event.defaultPrevented
-  }
-
-  /**
-   * @method
-   * @name PseudoEventListener#stopPropagation
-   * @param {PseudoEvent} event
-   * @returns {boolean}
-   */
-  stopPropagation (event: EventService): boolean {
-    return !this.doTargetPhase(event) && event.inner.propagationStopped
-  }
-
-  /**
-   * @method
-   * @name PseudoEventListener#nonPassiveHalt
-   * @param {PseudoEvent} event
-   * @returns {boolean|*}
-   */
-  nonPassiveHalt (event: EventService): boolean | any {
-    return !this.eventOptions.passive && (this.skipDefault(event) ||
-      event.inner.immediatePropagationStopped ||
-      this.stopPropagation(event)
-    )
-  }
-
-  /**
+   * Whether this listener should not run for the event as it is now (it was removed, or it is for another phase).
+   * Stopping propagation is handled by the dispatching, since it stops other targets and not the listeners of the
+   * current one.
    * @method
    * @name PseudoEventListener#rejectEvent
    * @param {PseudoEvent} event
-   * @returns {*|boolean}
+   * @returns {boolean}
    */
-  rejectEvent (event: EventService): any | boolean {
-    return this.nonPassiveHalt(event) || this.skipPhase(event)
+  rejectEvent (event: EventService): boolean {
+    return this.isRemoved || this.skipPhase(event)
   }
 }
 

@@ -5,7 +5,6 @@
  */
 
 import { PseudoEventTarget } from '../interfaces/PseudoEventTarget'
-import getParentNodes from '../functions/getParentNodes'
 import { PseudoEvent } from '../interfaces/PseudoEvent'
 
 type innerProperties = {
@@ -20,15 +19,30 @@ type innerProperties = {
   target: PseudoEventTarget,
   timeStamp: number,
   type: string,
-  isTrusted: boolean
+  isTrusted: boolean,
+  dispatching: boolean,
+  inPassiveListener: boolean,
+  path: Array<PseudoEventTarget>
 }
 
+/**
+ * The parts of an event which the dispatching of it (EventTargetService) needs to change or read. Not part of the DOM's
+ * Event, which is why they are kept apart from the event's own properties.
+ */
 export type EventInner = {
-  currentTarget: PseudoEventTarget,
+  currentTarget: PseudoEventTarget | null,
   eventPhase: number,
   target: PseudoEventTarget,
   immediatePropagationStopped: boolean,
-  propagationStopped: boolean
+  propagationStopped: boolean,
+  /** True while the event is being dispatched. */
+  dispatching: boolean,
+  /** True while a passive listener is running, in which preventDefault does nothing. */
+  inPassiveListener: boolean,
+  /** The targets the event travels through, the target first and the root last, set while dispatching. */
+  path: Array<PseudoEventTarget>,
+  /** Finish the dispatch: no phase, no current target, no path and the stop flags are cleared so the event can be dispatched again. */
+  finishDispatch: () => void
 }
 
 /**
@@ -77,7 +91,10 @@ export class EventService implements PseudoEvent {
     target: null,
     timeStamp: Math.floor(Date.now() / 1000),
     type: '',
-    isTrusted: true
+    isTrusted: true,
+    dispatching: false,
+    inPassiveListener: false,
+    path: []
   }
 
   /**
@@ -144,11 +161,20 @@ export class EventService implements PseudoEvent {
   get inner (): EventInner {
     const self = this
     return {
-      set currentTarget (target: PseudoEventTarget) {
-        self.properties.currentTarget = target
+      get currentTarget (): PseudoEventTarget | null {
+        return self.properties.currentTarget
+      },
+      set currentTarget (target: PseudoEventTarget | null) {
+        self.properties.currentTarget = target as PseudoEventTarget
+      },
+      get eventPhase (): number {
+        return self.properties.eventPhase
       },
       set eventPhase (phase: number) {
         self.properties.eventPhase = phase
+      },
+      get target (): PseudoEventTarget {
+        return self.properties.target
       },
       set target (target: PseudoEventTarget) {
         self.properties.target = target
@@ -158,6 +184,35 @@ export class EventService implements PseudoEvent {
       },
       get propagationStopped (): boolean {
         return self.properties.propagationStopped
+      },
+      get dispatching (): boolean {
+        return self.properties.dispatching
+      },
+      set dispatching (dispatching: boolean) {
+        self.properties.dispatching = dispatching
+      },
+      get inPassiveListener (): boolean {
+        return self.properties.inPassiveListener
+      },
+      set inPassiveListener (passive: boolean) {
+        self.properties.inPassiveListener = passive
+      },
+      get path (): Array<PseudoEventTarget> {
+        return self.properties.path
+      },
+      set path (path: Array<PseudoEventTarget>) {
+        self.properties.path = path
+      },
+      finishDispatch (): void {
+        self.setReadOnlyProperties({
+          currentTarget: null,
+          eventPhase: EventService.NONE,
+          path: [],
+          dispatching: false,
+          inPassiveListener: false,
+          propagationStopped: false,
+          immediatePropagationStopped: false
+        })
       }
     }
   }
@@ -168,16 +223,8 @@ export class EventService implements PseudoEvent {
    * @returns {Array.<PseudoEventTarget>}
    */
   public composedPath (): Array<PseudoEventTarget> {
-    switch (this.eventPhase) {
-      case EventService.CAPTURING_PHASE:
-        return getParentNodes(this.target)
-      case EventService.BUBBLING_PHASE:
-        return getParentNodes(this.target).slice().reverse()
-      case EventService.AT_TARGET:
-        return [this.target]
-      default:
-        return []
-    }
+    // While the event is being dispatched this is every target it travels through, the target first and the root last
+    return this.properties.dispatching ? this.properties.path.slice() : []
   }
 
   /**
@@ -186,7 +233,10 @@ export class EventService implements PseudoEvent {
    * @returns {null}
    */
   public preventDefault (): null {
-    this.setReadOnlyProperties({ defaultPrevented: true })
+    // Only an event which can be cancelled can be prevented, and a passive listener cannot prevent the default
+    if (this.cancelable && !this.properties.inPassiveListener) {
+      this.setReadOnlyProperties({ defaultPrevented: true })
+    }
     return null
   }
 

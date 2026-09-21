@@ -5,18 +5,10 @@
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @version 1.0.0
  */
-const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
-  return mod && mod.__esModule
-    ? mod
-    : {
-        default: mod
-      }
-}
 Object.defineProperty(exports, '__esModule', {
   value: true
 })
 exports.EventService = void 0
-const getParentNodes_1 = __importDefault(require('../functions/getParentNodes'))
 /**
  * Simulate the behaviour of the Event Class when there is no DOM available.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -73,7 +65,10 @@ class EventService {
       target: null,
       timeStamp: Math.floor(Date.now() / 1000),
       type: '',
-      isTrusted: true
+      isTrusted: true,
+      dispatching: false,
+      inPassiveListener: false,
+      path: []
     }
     this.setReadOnlyProperties({
       type: typeArg,
@@ -130,11 +125,20 @@ class EventService {
   get inner () {
     const self = this
     return {
+      get currentTarget () {
+        return self.properties.currentTarget
+      },
       set currentTarget (target) {
         self.properties.currentTarget = target
       },
+      get eventPhase () {
+        return self.properties.eventPhase
+      },
       set eventPhase (phase) {
         self.properties.eventPhase = phase
+      },
+      get target () {
+        return self.properties.target
       },
       set target (target) {
         self.properties.target = target
@@ -144,6 +148,35 @@ class EventService {
       },
       get propagationStopped () {
         return self.properties.propagationStopped
+      },
+      get dispatching () {
+        return self.properties.dispatching
+      },
+      set dispatching (dispatching) {
+        self.properties.dispatching = dispatching
+      },
+      get inPassiveListener () {
+        return self.properties.inPassiveListener
+      },
+      set inPassiveListener (passive) {
+        self.properties.inPassiveListener = passive
+      },
+      get path () {
+        return self.properties.path
+      },
+      set path (path) {
+        self.properties.path = path
+      },
+      finishDispatch () {
+        self.setReadOnlyProperties({
+          currentTarget: null,
+          eventPhase: EventService.NONE,
+          path: [],
+          dispatching: false,
+          inPassiveListener: false,
+          propagationStopped: false,
+          immediatePropagationStopped: false
+        })
       }
     }
   }
@@ -154,16 +187,8 @@ class EventService {
    * @returns {Array.<PseudoEventTarget>}
    */
   composedPath () {
-    switch (this.eventPhase) {
-      case EventService.CAPTURING_PHASE:
-        return (0, getParentNodes_1.default)(this.target)
-      case EventService.BUBBLING_PHASE:
-        return (0, getParentNodes_1.default)(this.target).slice().reverse()
-      case EventService.AT_TARGET:
-        return [this.target]
-      default:
-        return []
-    }
+    // While the event is being dispatched this is every target it travels through, the target first and the root last
+    return this.properties.dispatching ? this.properties.path.slice() : []
   }
 
   /**
@@ -172,9 +197,12 @@ class EventService {
    * @returns {null}
    */
   preventDefault () {
-    this.setReadOnlyProperties({
-      defaultPrevented: true
-    })
+    // Only an event which can be cancelled can be prevented, and a passive listener cannot prevent the default
+    if (this.cancelable && !this.properties.inPassiveListener) {
+      this.setReadOnlyProperties({
+        defaultPrevented: true
+      })
+    }
     return null
   }
 
