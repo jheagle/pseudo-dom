@@ -29,6 +29,15 @@ are `PseudoUIEvent`, `PseudoMouseEvent`, `PseudoPointerEvent`, `PseudoKeyboardEv
 tree), and `simulate.click(element)` / `simulate.keyPress(element, key)` send what a user's action sends (pointerdown,
 mousedown, the focus moving, pointerup, mouseup, click; keydown, keyup), all trusted.
 
-Not implemented yet (these throw a "not implemented" error or are missing): `cloneNode`, `compareDocumentPosition`, `isEqualNode`, `querySelector` /
+Nodes can be copied and compared: `cloneNode(deep)` copies an element with its attributes (objects such as `style` are
+copied too, not shared) and, when deep, everything below it, without the parent or the event listeners; `isEqualNode`
+compares two nodes by what they hold (tag, attributes in any order, text and children in order);
+`compareDocumentPosition` says where another node is (`NodeService.DOCUMENT_POSITION_*`); `isConnected` is true when the
+tree has a document at the top and `ownerDocument` says which one made the node; `normalize` joins neighbouring text
+nodes. There are text and comment nodes (`PseudoText`, `PseudoComment`) and `textContent` works like the DOM's (the text
+of everything below, and setting it replaces the children with a text node); the document makes them with
+`createTextNode`, `createComment` and `createDocumentFragment`.
+
+Not implemented yet (these throw a "not implemented" error or are missing): `querySelector` /
 `querySelectorAll`, `innerHTML` / `outerHTML` parsing, and most of the rest of the Element and Document APIs. The API
 will change before 1.0.

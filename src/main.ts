@@ -21,6 +21,7 @@ import { FocusEventService as PseudoFocusEvent } from './services/FocusEventServ
 import { InputEventService as PseudoInputEvent } from './services/InputEventService'
 import { CustomEventService as PseudoCustomEvent } from './services/CustomEventService'
 import simulate from './simulate'
+import { TextService as PseudoText, CommentService as PseudoComment } from './services/NodeService'
 
 /**
  * All methods exported from this module are encapsulated within pseudoDom.
@@ -43,6 +44,8 @@ const pseudoDom = {
   PseudoCustomEvent,
   PseudoEventTarget,
   PseudoNode,
+  PseudoText,
+  PseudoComment,
   PseudoElement,
   PseudoHTMLElement,
   PseudoHTMLDocument
@@ -63,6 +66,8 @@ export {
   PseudoCustomEvent,
   PseudoEventTarget,
   PseudoNode,
+  PseudoText,
+  PseudoComment,
   PseudoElement,
   PseudoHTMLElement,
   PseudoHTMLDocument

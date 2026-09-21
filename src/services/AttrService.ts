@@ -33,6 +33,30 @@ export class AttrService extends NodeService implements PseudoAttr {
     this.nodeNameValue = name
   }
 
+  protected get acceptsChildren (): boolean {
+    return false
+  }
+
+  get nodeValue (): string | null {
+    return this.value
+  }
+
+  set nodeValue (value: string | null) {
+    this.value = value === null ? '' : String(value)
+  }
+
+  get textContent (): string | null {
+    return this.value
+  }
+
+  set textContent (text: string | null) {
+    this.value = text === null ? '' : String(text)
+  }
+
+  protected cloneShallow (): NodeService {
+    return new AttrService(this.localName, this.value, null, this.namespaceURI, this.prefix)
+  }
+
   get nodeType (): number {
     return NodeService.ATTRIBUTE_NODE
   }

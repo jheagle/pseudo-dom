@@ -7,7 +7,7 @@ describe('NodeService', () => {
     const node = new NodeService()
     expect(node.nodeType).toBe(NodeService.DEFAULT_NODE)
     expect(node.nodeName).toBe('')
-    expect(node.nodeValue).toBe('')
+    expect(node.nodeValue).toBeNull()
     expect(node.textContent).toBe('')
     expect(node.isConnected).toBe(false)
     expect(node.parentNode).toBeNull()
@@ -20,12 +20,14 @@ describe('NodeService', () => {
     expect(node.ownerDocument).toBeNull()
   })
 
-  test('nodeValue and textContent can be updated', () => {
+  test('nodeValue can be updated, and textContent is the text of the children', () => {
     const node = new NodeService()
     node.nodeValue = 'value'
-    node.textContent = 'text'
     expect(node.nodeValue).toBe('value')
+    node.textContent = 'text'
     expect(node.textContent).toBe('text')
+    expect(node.childNodes.length).toBe(1)
+    expect(node.firstChild.nodeType).toBe(NodeService.TEXT_NODE)
   })
 
   test('appendChild adds the child and returns it', () => {
@@ -79,14 +81,6 @@ describe('NodeService', () => {
     expect(node.isDefaultNamespace(null)).toBe(true)
     expect(node.lookupPrefix('http://example.com')).toBeNull()
     expect(node.lookupNamespaceURI('x')).toBeNull()
-  })
-
-  test('the parts of the Node API which are not implemented yet say so', () => {
-    const node = new NodeService()
-    const other = new NodeService()
-    expect(() => node.cloneNode(true)).toThrow('not implemented')
-    expect(() => node.compareDocumentPosition(other)).toThrow('not implemented')
-    expect(() => node.isEqualNode(other)).toThrow('not implemented')
   })
 
   describe('the tree links', () => {
