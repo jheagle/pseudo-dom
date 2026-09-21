@@ -1,6 +1,10 @@
-import PseudoNodeList from '../classes/PseudoNodeList';
+import { PseudoNodeList } from '../classes/PseudoNodeList';
+import { LinkedTreeList } from 'collect-your-stuff/dist/collections/linked-tree-list/LinkedTreeList';
 import { PseudoNode } from '../interfaces/PseudoNode';
 import EventTargetService from './EventTargetService';
+import { PseudoElement } from '../interfaces/PseudoElement';
+import { PseudoDocument } from '../interfaces/PseudoDocument';
+import { PseudoDocumentFragment } from '../interfaces/PseudoDocumentFragment';
 /**
  * Simulate the behaviour of the Node Class when there is no DOM available.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -25,10 +29,10 @@ export declare class NodeService extends EventTargetService implements PseudoNod
     static readonly DOCUMENT_FRAGMENT_NODE = 11;
     static readonly NOTATION_NODE = 12;
     children: PseudoNodeList | LinkedTreeList;
-    parent: NodeService | undefined;
-    protected nodeValue: string;
-    protected textContext: string;
-    protected name: string;
+    parent: PseudoNode | null;
+    protected nodeNameValue: string;
+    private nodeValueStore;
+    private textContentStore;
     private next;
     private prev;
     /**
@@ -38,39 +42,70 @@ export declare class NodeService extends EventTargetService implements PseudoNod
     constructor();
     get baseURI(): Location | string;
     get childNodes(): PseudoNodeList | LinkedTreeList;
-    get firstChild(): any;
+    get firstChild(): PseudoNode | null;
     get isConnected(): boolean;
-    get lastChild(): any;
-    get nextSibling(): NodeService | null;
+    get lastChild(): PseudoNode | null;
+    get nextSibling(): PseudoNode | null;
     get nodeName(): string;
     get nodeType(): number;
-    get ownerDocument(): any | undefined;
-    get parentNode(): NodeService | undefined;
-    get parentElement(): NodeService | null | undefined;
-    get previousSibling(): NodeService | null;
+    get nodeValue(): string | null;
+    set nodeValue(value: string | null);
+    get ownerDocument(): PseudoDocument | null;
+    get parentNode(): PseudoNode | null;
+    get parentElement(): PseudoElement | null;
+    get previousSibling(): PseudoNode | null;
+    get textContent(): string | null;
+    set textContent(text: string | null);
     /**
      *
-     * @param {NodeService} childNode
-     * @returns {NodeService}
+     * @param {PseudoNode} childNode
+     * @returns {PseudoNode}
      */
-    appendChild(childNode: NodeService): NodeService;
-    cloneNode(): void;
-    compareDocumentPosition(): void;
-    contains(): void;
-    getRootNode(): NodeService;
+    appendChild(childNode: PseudoNode): PseudoNode;
+    /**
+     * Not implemented yet.
+     * @throws {Error}
+     */
+    cloneNode(deep?: boolean): PseudoNode;
+    /**
+     * Not implemented yet.
+     * @throws {Error}
+     */
+    compareDocumentPosition(otherNode: PseudoNode): number;
+    /**
+     * Not implemented yet.
+     * @throws {Error}
+     */
+    contains(otherNode: PseudoNode): boolean;
+    getRootNode(options?: {
+        composed: boolean;
+    }): PseudoNode;
     hasChildNodes(): boolean;
-    insertBefore(): void;
-    isDefaultNamespace(): void;
-    isEqualNode(): void;
-    isSameNode(): void;
-    lookupPrefix(): void;
-    lookupNamespaceURI(): void;
+    /**
+     * Not implemented yet.
+     * @throws {Error}
+     */
+    insertBefore(newNode: PseudoNode, referenceNode: PseudoNode | null): PseudoNode | PseudoDocumentFragment;
+    isDefaultNamespace(namespaceURI: string | null): boolean;
+    /**
+     * Not implemented yet.
+     * @throws {Error}
+     */
+    isEqualNode(otherNode: PseudoNode): boolean;
+    isSameNode(otherNode: PseudoNode): boolean;
+    lookupPrefix(namespace: string): string | null;
+    lookupNamespaceURI(prefix: string): string | null;
     normalize(): void;
     /**
-     *
-     * @param {NodeService} childElement
-     * @returns {NodeService}
+     * Remove the given child from this node.
+     * @param {PseudoNode} childElement The child node, or its TreeLinker from the children list
+     * @returns {PseudoNode}
+     * @throws {Error} When the node is not a child of this node
      */
-    removeChild(childElement: TreeLinker): TreeLinker;
-    replaceChild(): void;
+    removeChild(childElement: PseudoNode): PseudoNode;
+    /**
+     * Not implemented yet.
+     * @throws {Error}
+     */
+    replaceChild(newChild: PseudoNode, oldChild: PseudoNode): PseudoNode;
 }

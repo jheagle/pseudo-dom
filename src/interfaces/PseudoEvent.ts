@@ -42,12 +42,6 @@ export interface PseudoEvent {
    * @param {boolean} [eventOptions.composed=true]
    * @constructor
    */
-  constructor (type: string, { bubbles, cancelable, composed }: {
-    bubbles?: boolean;
-    cancelable?: boolean;
-    composed?: boolean
-  })
-
   get bubbles (): boolean
 
   get cancelable (): boolean

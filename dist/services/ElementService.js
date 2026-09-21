@@ -1,16 +1,28 @@
 'use strict'
 
+require('core-js/modules/esnext.iterator.constructor.js')
+require('core-js/modules/esnext.iterator.find.js')
+require('core-js/modules/esnext.iterator.for-each.js')
+require('core-js/modules/esnext.iterator.map.js')
+require('core-js/modules/esnext.iterator.some.js')
+const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+  return mod && mod.__esModule
+    ? mod
+    : {
+        default: mod
+      }
+}
 Object.defineProperty(exports, '__esModule', {
   value: true
 })
 exports.ElementService = void 0
-require('core-js/modules/esnext.iterator.constructor.js')
-require('core-js/modules/esnext.iterator.find.js')
-require('core-js/modules/esnext.iterator.map.js')
-const _generateNodeList = _interopRequireDefault(require('../factories/generateNodeList'))
-const _TreeLinker = _interopRequireDefault(require('collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'))
-const _NodeService = require('./NodeService')
-function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: e } }
+const generateNodeList_1 = __importDefault(require('../factories/generateNodeList'))
+const TreeLinker_1 = require('collect-your-stuff/dist/collections/linked-tree-list/TreeLinker')
+const NodeService_1 = require('./NodeService')
+const AttrService_1 = require('./AttrService')
+const DOMTokenListService_1 = require('./DOMTokenListService')
+const NamedNodeMapService_1 = require('./NamedNodeMapService')
+const getParentNodesFromAttribute_1 = __importDefault(require('../functions/getParentNodesFromAttribute'))
 /**
  * Simulate the behaviour of the Element Class when there is no DOM available.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -26,14 +38,13 @@ function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: 
  * @property {function} getAttribute
  * @property {function} removeAttribute
  */
-class ElementService extends _NodeService.NodeService {
+class ElementService extends NodeService_1.NodeService {
   /**
-   * Simulate the Element object when the Dom is not available
-   * @param {Object} [elementOptions={}]
-   * @param {string} [elementOptions.tagName='']
-   * @param {array} [elementOptions.attributes=[]]
-   * @param {PseudoNode|Object} [elementOptions.parent={}]
-   * @param {Array} [elementOptions.children=[]]
+   * @param {Object} [settings={}]
+   * @param {string} [settings.tagName=''] The name of the tag this element represents
+   * @param {Array<{name: string, value: *}>} [settings.attributes=[]] The attributes (also assigned as properties) to start with
+   * @param {PseudoNode|null} [settings.parent=null] The parent node
+   * @param {Array} [settings.children=[]] The values or nodes to start as children
    * @constructor
    */
   constructor ({
@@ -43,10 +54,11 @@ class ElementService extends _NodeService.NodeService {
     children = []
   } = {}) {
     super()
+    this.tokenList = new DOMTokenListService_1.DOMTokenListService()
     this.parent = parent
-    this.children = (0, _generateNodeList.default)(_TreeLinker.default.fromArray(children).head)
-    this.tagName = tagName
-    this.attributes = attributes.concat([{
+    this.children = (0, generateNodeList_1.default)(TreeLinker_1.TreeLinker.fromArray(children).head)
+    this.tag = tagName
+    this.attributeList = attributes.concat([{
       name: 'className',
       value: ''
     }, {
@@ -56,30 +68,46 @@ class ElementService extends _NodeService.NodeService {
       name: 'innerHTML',
       value: ''
     }])
-    /**
-     * Map all incoming attributes to the attribute array and attach each as a property of this element
-     */
-    this.attributes.map(({
+    this.propertyAttributes = this.attributeList.map(({
+      name
+    }) => name)
+    this.attributeList.forEach(({
       name,
       value
     }) => {
-      // @ts-ignore
       this[name] = value
-      return {
-        name,
-        value
-      }
     })
-    // this.classList = new DOMSettableTokenList(this.className)
-    this.classList = this.className
+  }
+
+  get tagName () {
+    return this.tag
   }
 
   get nodeType () {
-    return PseudoNode.ELEMENT_NODE
+    return NodeService_1.NodeService.ELEMENT_NODE
+  }
+
+  get attributes () {
+    return new NamedNodeMapService_1.NamedNodeMapService(this.attributeList.map(({
+      name,
+      value
+    }) => new AttrService_1.AttrService(name, String(value), this)))
+  }
+
+  get classList () {
+    return this.tokenList
+  }
+
+  get className () {
+    return this.tokenList.value
+  }
+
+  set className (className) {
+    this.tokenList.value = className
   }
 
   /**
-   *
+   * Some elements have default behaviour, this registers it when the element is added.
    * @returns {Function}
    */
   applyDefaultEvent () {
@@ -92,8 +120,8 @@ class ElementService extends _NodeService.NodeService {
       case 'input':
         if (/^(submit|image)$/i.test(this.type || '')) {
           callback = event => {
-            const forms = require('./PseudoEvent').getParentNodesFromAttribute('tagName', 'form', this)
-            if (forms) {
+            const forms = (0, getParentNodesFromAttribute_1.default)('tagName', 'form', this)
+            if (forms.length) {
               forms[0].submit()
             }
           }
@@ -115,52 +143,63 @@ class ElementService extends _NodeService.NodeService {
   }
 
   /**
-   * Check if an attribute is assigned to this element.
-   * @param {string} attributeName - The attribute name to check
+   * Check whether the element has an attribute by that name.
+   * @param {string} attributeName
    * @returns {boolean}
    */
   hasAttribute (attributeName) {
-    return this.getAttribute(attributeName) !== 'undefined'
+    return this.attributeList.some(({
+      name
+    }) => name === attributeName)
   }
 
   /**
-   * Assign a new attribute or overwrite an assigned attribute with name and value.
-   * @param {string} attributeName - The name key of the attribute to append
-   * @param {string|Object} attributeValue - The value of the attribute to append
+   * Set the value of an attribute, adding the attribute if it did not exist.
+   * @param {string} attributeName
+   * @param {string} attributeValue
    * @returns {undefined}
    */
   setAttribute (attributeName, attributeValue) {
-    if (this.hasAttribute(attributeName) || this[attributeName] === 'undefined') {
-      // @ts-ignore
-      this[attributeName] = attributeValue
-      this.attributes.push({
+    const existing = this.attributeList.find(({
+      name
+    }) => name === attributeName)
+    if (existing) {
+      existing.value = attributeValue
+    } else {
+      this.attributeList.push({
         name: attributeName,
         value: attributeValue
       })
     }
-    return undefined
+    if (this.propertyAttributes.indexOf(attributeName) >= 0) {
+      this[attributeName] = attributeValue
+    }
   }
 
   /**
-   * Retrieve the value of the specified attribute from the Element
-   * @param {string} attributeName - A string representing the name of the attribute to be retrieved
-   * @returns {string|Object}
+   * Retrieve the value of an attribute.
+   * @param {string} attributeName
+   * @returns {string|null} The value, or null when there is no such attribute
    */
   getAttribute (attributeName) {
-    return this.attributes.find(attribute => attribute.name === attributeName)
+    const found = this.attributeList.find(({
+      name
+    }) => name === attributeName)
+    return found ? found.value : null
   }
 
   /**
-   * Remove an assigned attribute from the Element
-   * @param {string} attributeName - The string name of the attribute to be removed
-   * @returns {null}
+   * Remove an attribute from the element.
+   * @param {string} attributeName
+   * @returns {undefined}
    */
   removeAttribute (attributeName) {
-    if (this.hasAttribute(attributeName)) {
-      delete this[attributeName]
-      // TODO: how do we delete it as an attribute?
+    const index = this.attributeList.findIndex(({
+      name
+    }) => name === attributeName)
+    if (index >= 0) {
+      this.attributeList.splice(index, 1)
     }
-    return null
   }
 }
 exports.ElementService = ElementService

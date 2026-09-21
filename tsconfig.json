@@ -1,11 +1,20 @@
 {
-  "files": [
+  "include": [
     "src/**/*.ts"
   ],
+  "exclude": [
+    "src/**/*.test.*"
+  ],
   "compilerOptions": {
+    "strict": false,
     "noImplicitAny": true,
     "target": "es6",
-    "moduleResolution": "node",
-    "declaration": true
+    "module": "commonjs",
+    "moduleResolution": "node10",
+    "ignoreDeprecations": "6.0",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "declaration": true,
+    "types": []
   }
 }

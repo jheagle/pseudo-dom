@@ -6,6 +6,12 @@
 import { PseudoNode } from '../interfaces/PseudoNode';
 import { NodeService } from './NodeService';
 import { PseudoElement } from '../interfaces/PseudoElement';
+import { PseudoNamedNodeMap } from '../interfaces/PseudoNamedNodeMap';
+import { PseudoDOMTokenList } from '../interfaces/PseudoDOMTokenList';
+type attribute = {
+    name: string;
+    value: any;
+};
 /**
  * Simulate the behaviour of the Element Class when there is no DOM available.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -21,30 +27,36 @@ import { PseudoElement } from '../interfaces/PseudoElement';
  * @property {function} getAttribute
  * @property {function} removeAttribute
  */
-export declare class ElementService extends NodeService implements PseudoElement {
-    private readonly tagName;
-    private attributes;
-    private classList;
-    private className;
-    private type;
+export declare class ElementService extends NodeService implements Partial<PseudoElement> {
+    id: string;
+    innerHTML: string;
+    type: string;
+    private readonly tag;
+    private readonly attributeList;
+    private readonly propertyAttributes;
+    private readonly tokenList;
     /**
-     * Simulate the Element object when the Dom is not available
-     * @param {Object} [elementOptions={}]
-     * @param {string} [elementOptions.tagName='']
-     * @param {array} [elementOptions.attributes=[]]
-     * @param {PseudoNode|Object} [elementOptions.parent={}]
-     * @param {Array} [elementOptions.children=[]]
+     * @param {Object} [settings={}]
+     * @param {string} [settings.tagName=''] The name of the tag this element represents
+     * @param {Array<{name: string, value: *}>} [settings.attributes=[]] The attributes (also assigned as properties) to start with
+     * @param {PseudoNode|null} [settings.parent=null] The parent node
+     * @param {Array} [settings.children=[]] The values or nodes to start as children
      * @constructor
      */
     constructor({ tagName, attributes, parent, children }?: {
         tagName?: string;
-        attributes?: Array<any>;
+        attributes?: Array<attribute>;
         parent?: PseudoNode | null;
         children?: Array<any>;
     });
-    get nodeType(): any;
+    get tagName(): string;
+    get nodeType(): number;
+    get attributes(): PseudoNamedNodeMap;
+    get classList(): PseudoDOMTokenList;
+    get className(): string;
+    set className(className: string);
     /**
-     *
+     * Some elements have default behaviour, this registers it when the element is added.
      * @returns {Function}
      */
     applyDefaultEvent(): Function;
@@ -55,28 +67,29 @@ export declare class ElementService extends NodeService implements PseudoElement
      */
     appendChild(childElement: ElementService): PseudoNode;
     /**
-     * Check if an attribute is assigned to this element.
-     * @param {string} attributeName - The attribute name to check
+     * Check whether the element has an attribute by that name.
+     * @param {string} attributeName
      * @returns {boolean}
      */
     hasAttribute(attributeName: string): boolean;
     /**
-     * Assign a new attribute or overwrite an assigned attribute with name and value.
-     * @param {string} attributeName - The name key of the attribute to append
-     * @param {string|Object} attributeValue - The value of the attribute to append
+     * Set the value of an attribute, adding the attribute if it did not exist.
+     * @param {string} attributeName
+     * @param {string} attributeValue
      * @returns {undefined}
      */
-    setAttribute(attributeName: keyof ElementService, attributeValue: string | object): undefined;
+    setAttribute(attributeName: string, attributeValue: string): void;
     /**
-     * Retrieve the value of the specified attribute from the Element
-     * @param {string} attributeName - A string representing the name of the attribute to be retrieved
-     * @returns {string|Object}
+     * Retrieve the value of an attribute.
+     * @param {string} attributeName
+     * @returns {string|null} The value, or null when there is no such attribute
      */
-    getAttribute(attributeName: string): string | object;
+    getAttribute(attributeName: string): string | null;
     /**
-     * Remove an assigned attribute from the Element
-     * @param {string} attributeName - The string name of the attribute to be removed
-     * @returns {null}
+     * Remove an attribute from the element.
+     * @param {string} attributeName
+     * @returns {undefined}
      */
-    removeAttribute(attributeName: keyof ElementService): null;
+    removeAttribute(attributeName: string): void;
 }
+export {};

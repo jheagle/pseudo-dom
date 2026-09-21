@@ -7,9 +7,9 @@
  *
  * @type {PseudoHTMLElement}
  */
-import PseudoHTMLElement from '../interfaces/PseudoHTMLElement'
+import { HTMLElementService as PseudoHTMLElement } from '../services/HTMLElementService'
 import generateNodeList from '../factories/generateNodeList'
-import TreeLinker from 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'
+import { TreeLinker } from 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'
 
 /**
  * Simulate the behaviour of the HTMLDocument Class when there is no DOM available.

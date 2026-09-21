@@ -19,8 +19,6 @@ export interface PseudoEventTarget {
   /**
    * Creates a new EventTarget object instance.
    */
-  constructor ()
-
   /**
    * Registers an event handler of a specific event type on the EventTarget.
    * @param {string} type

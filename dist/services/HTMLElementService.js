@@ -4,7 +4,7 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 })
 exports.HTMLElementService = void 0
-const _ElementService = require('./ElementService')
+const ElementService_1 = require('./ElementService')
 /**
  * Simulate the behaviour of the HTMLElement Class when there is no DOM available.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -19,7 +19,7 @@ const _ElementService = require('./ElementService')
  * @property {Object} style - A container to define all applied inline-styles
  * @property {string} title - The title attribute which affects the text visible on hover
  */
-class HTMLElementService extends _ElementService.ElementService {
+class HTMLElementService extends ElementService_1.ElementService {
   /**
    * Simulate the HTMLElement object when the Dom is not available
    * @param {Object} [elementOptions={}]

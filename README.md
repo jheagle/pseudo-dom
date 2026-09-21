@@ -15,6 +15,9 @@ Mock the DOM for server side-side DOM state and in tests.
 <dt><a href="#NodeService">NodeService</a> ⇐ <code>PseudoEventTarget</code></dt>
 <dd><p>Simulate the behaviour of the Node Class when there is no DOM available.</p>
 </dd>
+<dt><a href="#NamedNodeMapService">NamedNodeMapService</a></dt>
+<dd><p>Simulate the behaviour of the NamedNodeMap Class when there is no DOM available.</p>
+</dd>
 <dt><a href="#HTMLElementService">HTMLElementService</a> ⇐ <code>PseudoElement</code></dt>
 <dd><p>Simulate the behaviour of the HTMLElement Class when there is no DOM available.</p>
 </dd>
@@ -27,8 +30,18 @@ Mock the DOM for server side-side DOM state and in tests.
 <dt><a href="#ElementService">ElementService</a> ⇐ <code>PseudoNode</code></dt>
 <dd><p>Simulate the behaviour of the Element Class when there is no DOM available.</p>
 </dd>
-<dt><a href="#PseudoNodeAttached">PseudoNodeAttached</a> ⇐ <code>PseudoEventTarget</code></dt>
-<dd><p>Simulate the behaviour of the Node Class when there is no DOM available.</p>
+<dt><a href="#DOMTokenListService">DOMTokenListService</a></dt>
+<dd><p>Simulate the behaviour of the DOMTokenList Class when there is no DOM available.</p>
+</dd>
+<dt><a href="#AttrService">AttrService</a> ⇐ <code><a href="#NodeService">NodeService</a></code></dt>
+<dd><p>Simulate the behaviour of the Attr Class when there is no DOM available.</p>
+</dd>
+<dt><a href="#LinkedNode">LinkedNode</a> ⇐ <code><a href="#NodeService">NodeService</a></code></dt>
+<dd><p>A node which is stored in a TreeLinker and answers questions about its position in the tree by asking that linker.</p>
+</dd>
+<dt><a href="#PseudoNodeList">PseudoNodeList</a> ⇐ <code>LinkedTreeList</code></dt>
+<dd><p>A NodeList, like the DOM one, iterates over the nodes themselves (the data stored in each TreeLinker), rather than
+the linkers that hold them.</p>
 </dd>
 <dt><a href="#PseudoHTMLDocument">PseudoHTMLDocument</a> ⇐ <code>PseudoHTMLElement</code></dt>
 <dd><p>Simulate the behaviour of the HTMLDocument Class when there is no DOM available.</p>
@@ -38,9 +51,23 @@ Mock the DOM for server side-side DOM state and in tests.
 </dd>
 </dl>
 
+## Constants
+
+<dl>
+<dt><a href="#HTMLElementService_1">HTMLElementService_1</a> : <code>PseudoHTMLElement</code></dt>
+<dd></dd>
+</dl>
+
 ## Functions
 
 <dl>
+<dt><a href="#generateNodeList">generateNodeList([innerList])</a> ⇒ <code><a href="#PseudoNodeList">PseudoNodeList</a></code></dt>
+<dd><p>Create a PseudoNodeList, optionally starting from an existing chain of linkers.</p>
+</dd>
+<dt><a href="#generateNode">generateNode()</a> ⇒ <code>function</code></dt>
+<dd><p>Create a TreeLinker class whose linkers each store a node (a LinkedNode) as their data, this can be used to build a
+tree (or list) of nodes from plain values.</p>
+</dd>
 <dt><a href="#generateDocument">generateDocument(root, context)</a> ⇒ <code>Window</code> | <code>PseudoEventTarget</code></dt>
 <dd><p>Construct the Pseudo Dom to provide access to Dom objects which are otherwise not available outside the browser
 context.</p>
@@ -71,26 +98,113 @@ Simulate the behaviour of the Node Class when there is no DOM available.
 
 
 * [NodeService](#NodeService) ⇐ <code>PseudoEventTarget</code>
-    * [.appendChild(childNode)](#NodeService+appendChild) ⇒ [<code>NodeService</code>](#NodeService)
-    * [.removeChild(childElement)](#NodeService+removeChild) ⇒ [<code>NodeService</code>](#NodeService)
+    * [.appendChild(childNode)](#NodeService+appendChild) ⇒ <code>PseudoNode</code>
+    * [.cloneNode()](#NodeService+cloneNode)
+    * [.compareDocumentPosition()](#NodeService+compareDocumentPosition)
+    * [.contains()](#NodeService+contains)
+    * [.insertBefore()](#NodeService+insertBefore)
+    * [.isEqualNode()](#NodeService+isEqualNode)
+    * [.removeChild(childElement)](#NodeService+removeChild) ⇒ <code>PseudoNode</code>
+    * [.replaceChild()](#NodeService+replaceChild)
 
 <a name="NodeService+appendChild"></a>
 
-### nodeService.appendChild(childNode) ⇒ [<code>NodeService</code>](#NodeService)
+### nodeService.appendChild(childNode) ⇒ <code>PseudoNode</code>
 **Kind**: instance method of [<code>NodeService</code>](#NodeService)  
 
 | Param | Type |
 | --- | --- |
-| childNode | [<code>NodeService</code>](#NodeService) | 
+| childNode | <code>PseudoNode</code> | 
+
+<a name="NodeService+cloneNode"></a>
+
+### nodeService.cloneNode()
+Not implemented yet.
+
+**Kind**: instance method of [<code>NodeService</code>](#NodeService)  
+**Throws**:
+
+- <code>Error</code> 
+
+<a name="NodeService+compareDocumentPosition"></a>
+
+### nodeService.compareDocumentPosition()
+Not implemented yet.
+
+**Kind**: instance method of [<code>NodeService</code>](#NodeService)  
+**Throws**:
+
+- <code>Error</code> 
+
+<a name="NodeService+contains"></a>
+
+### nodeService.contains()
+Not implemented yet.
+
+**Kind**: instance method of [<code>NodeService</code>](#NodeService)  
+**Throws**:
+
+- <code>Error</code> 
+
+<a name="NodeService+insertBefore"></a>
+
+### nodeService.insertBefore()
+Not implemented yet.
+
+**Kind**: instance method of [<code>NodeService</code>](#NodeService)  
+**Throws**:
+
+- <code>Error</code> 
+
+<a name="NodeService+isEqualNode"></a>
+
+### nodeService.isEqualNode()
+Not implemented yet.
+
+**Kind**: instance method of [<code>NodeService</code>](#NodeService)  
+**Throws**:
+
+- <code>Error</code> 
 
 <a name="NodeService+removeChild"></a>
 
-### nodeService.removeChild(childElement) ⇒ [<code>NodeService</code>](#NodeService)
-**Kind**: instance method of [<code>NodeService</code>](#NodeService)  
+### nodeService.removeChild(childElement) ⇒ <code>PseudoNode</code>
+Remove the given child from this node.
 
-| Param | Type |
-| --- | --- |
-| childElement | [<code>NodeService</code>](#NodeService) | 
+**Kind**: instance method of [<code>NodeService</code>](#NodeService)  
+**Throws**:
+
+- <code>Error</code> When the node is not a child of this node
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| childElement | <code>PseudoNode</code> | The child node, or its TreeLinker from the children list |
+
+<a name="NodeService+replaceChild"></a>
+
+### nodeService.replaceChild()
+Not implemented yet.
+
+**Kind**: instance method of [<code>NodeService</code>](#NodeService)  
+**Throws**:
+
+- <code>Error</code> 
+
+<a name="NamedNodeMapService"></a>
+
+## NamedNodeMapService
+Simulate the behaviour of the NamedNodeMap Class when there is no DOM available.
+
+**Kind**: global class  
+**Author**: Joshua Heagle <joshuaheagle@gmail.com>  
+<a name="new_NamedNodeMapService_new"></a>
+
+### new NamedNodeMapService([attributes])
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [attributes] | <code>Array.&lt;PseudoAttr&gt;</code> | <code>[]</code> | The attributes to start with |
 
 <a name="HTMLElementService"></a>
 
@@ -144,81 +258,32 @@ Simulate the behaviour of the EventTarget Class when there is no DOM available.
 
 
 * [EventTargetService](#EventTargetService)
-    * [.runEvents(event)](#EventTargetService+runEvents) ⇒ <code>boolean</code>
+    * [.runEvents(event)](#EventTargetService+runEvents) ⇒ <code>\*</code>
     * [.setDefaultEvent(type, callback)](#EventTargetService+setDefaultEvent)
-    * [.runDefaultEvent(event)](#EventTargetService+runDefaultEvent) ⇒ <code>boolean</code>
-    * [.startEvents(eventType)](#EventTargetService+startEvents) ⇒ <code>boolean</code>
-    * [.addEventListener(type, callback, [useCapture])](#EventTargetService+addEventListener)
-    * [.removeEventListener(type, callback)](#EventTargetService+removeEventListener)
-    * [.dispatchEvent(event, target)](#EventTargetService+dispatchEvent) ⇒ <code>boolean</code>
 
 <a name="EventTargetService+runEvents"></a>
 
-### eventTargetService.runEvents(event) ⇒ <code>boolean</code>
+### eventTargetService.runEvents(event) ⇒ <code>\*</code>
+Run each of the listeners registered on this target for the type of the event.
+
 **Kind**: instance method of [<code>EventTargetService</code>](#EventTargetService)  
+**Returns**: <code>\*</code> - true when there was nothing registered, otherwise the last value returned from a handler (null when none ran)  
 
 | Param | Type |
 | --- | --- |
-| event | <code>PseudoEvent</code> | 
+| event | [<code>EventService</code>](#EventService) | 
 
 <a name="EventTargetService+setDefaultEvent"></a>
 
 ### eventTargetService.setDefaultEvent(type, callback)
+Register the function to run when nothing else has prevented the default for this type of event.
+
 **Kind**: instance method of [<code>EventTargetService</code>](#EventTargetService)  
 
 | Param | Type |
 | --- | --- |
 | type | <code>string</code> | 
 | callback | <code>function</code> | 
-
-<a name="EventTargetService+runDefaultEvent"></a>
-
-### eventTargetService.runDefaultEvent(event) ⇒ <code>boolean</code>
-**Kind**: instance method of [<code>EventTargetService</code>](#EventTargetService)  
-
-| Param | Type |
-| --- | --- |
-| event | <code>PseudoEvent</code> | 
-
-<a name="EventTargetService+startEvents"></a>
-
-### eventTargetService.startEvents(eventType) ⇒ <code>boolean</code>
-**Kind**: instance method of [<code>EventTargetService</code>](#EventTargetService)  
-
-| Param | Type |
-| --- | --- |
-| eventType | <code>PseudoEvent</code> | 
-
-<a name="EventTargetService+addEventListener"></a>
-
-### eventTargetService.addEventListener(type, callback, [useCapture])
-**Kind**: instance method of [<code>EventTargetService</code>](#EventTargetService)  
-
-| Param | Type | Default |
-| --- | --- | --- |
-| type | <code>string</code> |  | 
-| callback | <code>function</code> \| <code>Object</code> |  | 
-| [useCapture] | <code>boolean</code> \| <code>Object</code> | <code>false</code> | 
-
-<a name="EventTargetService+removeEventListener"></a>
-
-### eventTargetService.removeEventListener(type, callback)
-**Kind**: instance method of [<code>EventTargetService</code>](#EventTargetService)  
-
-| Param | Type |
-| --- | --- |
-| type | <code>string</code> | 
-| callback | <code>function</code> | 
-
-<a name="EventTargetService+dispatchEvent"></a>
-
-### eventTargetService.dispatchEvent(event, target) ⇒ <code>boolean</code>
-**Kind**: instance method of [<code>EventTargetService</code>](#EventTargetService)  
-
-| Param | Type |
-| --- | --- |
-| event | <code>Event</code> \| <code>PseudoEvent</code> | 
-| target | <code>EventTarget</code> \| [<code>EventTargetService</code>](#EventTargetService) | 
 
 <a name="EventService"></a>
 
@@ -325,31 +390,31 @@ Simulate the behaviour of the Element Class when there is no DOM available.
 
 
 * [ElementService](#ElementService) ⇐ <code>PseudoNode</code>
-    * [new ElementService([elementOptions])](#new_ElementService_new)
+    * [new ElementService([settings])](#new_ElementService_new)
     * [.applyDefaultEvent()](#ElementService+applyDefaultEvent) ⇒ <code>function</code>
     * [.appendChild(childElement)](#ElementService+appendChild) ⇒ <code>PseudoNode</code>
     * [.hasAttribute(attributeName)](#ElementService+hasAttribute) ⇒ <code>boolean</code>
     * [.setAttribute(attributeName, attributeValue)](#ElementService+setAttribute) ⇒ <code>undefined</code>
-    * [.getAttribute(attributeName)](#ElementService+getAttribute) ⇒ <code>string</code> \| <code>Object</code>
-    * [.removeAttribute(attributeName)](#ElementService+removeAttribute) ⇒ <code>null</code>
+    * [.getAttribute(attributeName)](#ElementService+getAttribute) ⇒ <code>string</code> \| <code>null</code>
+    * [.removeAttribute(attributeName)](#ElementService+removeAttribute) ⇒ <code>undefined</code>
 
 <a name="new_ElementService_new"></a>
 
-### new ElementService([elementOptions])
-Simulate the Element object when the Dom is not available
+### new ElementService([settings])
 
-
-| Param | Type | Default |
-| --- | --- | --- |
-| [elementOptions] | <code>Object</code> | <code>{}</code> | 
-| [elementOptions.tagName] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | 
-| [elementOptions.attributes] | <code>array</code> | <code>[]</code> | 
-| [elementOptions.parent] | <code>PseudoNode</code> \| <code>Object</code> | <code>{}</code> | 
-| [elementOptions.children] | <code>Array</code> | <code>[]</code> | 
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [settings] | <code>Object</code> | <code>{}</code> |  |
+| [settings.tagName] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | The name of the tag this element represents |
+| [settings.attributes] | <code>Array.&lt;{name: string, value: \*}&gt;</code> | <code>[]</code> | The attributes (also assigned as properties) to start with |
+| [settings.parent] | <code>PseudoNode</code> \| <code>null</code> | <code></code> | The parent node |
+| [settings.children] | <code>Array</code> | <code>[]</code> | The values or nodes to start as children |
 
 <a name="ElementService+applyDefaultEvent"></a>
 
 ### elementService.applyDefaultEvent() ⇒ <code>function</code>
+Some elements have default behaviour, this registers it when the element is added.
+
 **Kind**: instance method of [<code>ElementService</code>](#ElementService)  
 <a name="ElementService+appendChild"></a>
 
@@ -363,87 +428,342 @@ Simulate the Element object when the Dom is not available
 <a name="ElementService+hasAttribute"></a>
 
 ### elementService.hasAttribute(attributeName) ⇒ <code>boolean</code>
-Check if an attribute is assigned to this element.
+Check whether the element has an attribute by that name.
 
 **Kind**: instance method of [<code>ElementService</code>](#ElementService)  
 
-| Param | Type | Description |
-| --- | --- | --- |
-| attributeName | <code>string</code> | The attribute name to check |
+| Param | Type |
+| --- | --- |
+| attributeName | <code>string</code> | 
 
 <a name="ElementService+setAttribute"></a>
 
 ### elementService.setAttribute(attributeName, attributeValue) ⇒ <code>undefined</code>
-Assign a new attribute or overwrite an assigned attribute with name and value.
+Set the value of an attribute, adding the attribute if it did not exist.
 
 **Kind**: instance method of [<code>ElementService</code>](#ElementService)  
 
-| Param | Type | Description |
-| --- | --- | --- |
-| attributeName | <code>string</code> | The name key of the attribute to append |
-| attributeValue | <code>string</code> \| <code>Object</code> | The value of the attribute to append |
+| Param | Type |
+| --- | --- |
+| attributeName | <code>string</code> | 
+| attributeValue | <code>string</code> | 
 
 <a name="ElementService+getAttribute"></a>
 
-### elementService.getAttribute(attributeName) ⇒ <code>string</code> \| <code>Object</code>
-Retrieve the value of the specified attribute from the Element
+### elementService.getAttribute(attributeName) ⇒ <code>string</code> \| <code>null</code>
+Retrieve the value of an attribute.
 
 **Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+**Returns**: <code>string</code> \| <code>null</code> - The value, or null when there is no such attribute  
 
-| Param | Type | Description |
-| --- | --- | --- |
-| attributeName | <code>string</code> | A string representing the name of the attribute to be retrieved |
+| Param | Type |
+| --- | --- |
+| attributeName | <code>string</code> | 
 
 <a name="ElementService+removeAttribute"></a>
 
-### elementService.removeAttribute(attributeName) ⇒ <code>null</code>
-Remove an assigned attribute from the Element
+### elementService.removeAttribute(attributeName) ⇒ <code>undefined</code>
+Remove an attribute from the element.
 
 **Kind**: instance method of [<code>ElementService</code>](#ElementService)  
 
-| Param | Type | Description |
-| --- | --- | --- |
-| attributeName | <code>string</code> | The string name of the attribute to be removed |
+| Param | Type |
+| --- | --- |
+| attributeName | <code>string</code> | 
 
-<a name="PseudoNodeAttached"></a>
+<a name="DOMTokenListService"></a>
 
-## PseudoNodeAttached ⇐ <code>PseudoEventTarget</code>
-Simulate the behaviour of the Node Class when there is no DOM available.
+## DOMTokenListService
+Simulate the behaviour of the DOMTokenList Class when there is no DOM available.
 
 **Kind**: global class  
-**Extends**: <code>PseudoEventTarget</code>  
 **Author**: Joshua Heagle <joshuaheagle@gmail.com>  
-**Properties**
+<a name="new_DOMTokenListService_new"></a>
 
-| Name | Type |
-| --- | --- |
-| name | <code>string</code> | 
-| appendChild | <code>function</code> | 
-| removeChild | <code>function</code> | 
+### new DOMTokenListService([value], [onChange])
 
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [value] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | The space separated tokens to start with |
+| [onChange] | <code>function</code> |  | Called with the new value whenever the tokens change |
 
-* [PseudoNodeAttached](#PseudoNodeAttached) ⇐ <code>PseudoEventTarget</code>
-    * [.appendChild(childNode)](#PseudoNodeAttached+appendChild) ⇒ <code>PseudoNode</code>
-    * [.removeChild(childElement)](#PseudoNodeAttached+removeChild) ⇒ <code>PseudoNode</code>
+<a name="AttrService"></a>
 
-<a name="PseudoNodeAttached+appendChild"></a>
+## AttrService ⇐ [<code>NodeService</code>](#NodeService)
+Simulate the behaviour of the Attr Class when there is no DOM available.
 
-### pseudoNodeAttached.appendChild(childNode) ⇒ <code>PseudoNode</code>
-**Kind**: instance method of [<code>PseudoNodeAttached</code>](#PseudoNodeAttached)  
+**Kind**: global class  
+**Extends**: [<code>NodeService</code>](#NodeService)  
+**Author**: Joshua Heagle <joshuaheagle@gmail.com>  
+
+* [AttrService](#AttrService) ⇐ [<code>NodeService</code>](#NodeService)
+    * [new AttrService(name, [value], [ownerElement], [namespaceURI], [prefix])](#new_AttrService_new)
+    * [.appendChild(childNode)](#NodeService+appendChild) ⇒ <code>PseudoNode</code>
+    * [.cloneNode()](#NodeService+cloneNode)
+    * [.compareDocumentPosition()](#NodeService+compareDocumentPosition)
+    * [.contains()](#NodeService+contains)
+    * [.insertBefore()](#NodeService+insertBefore)
+    * [.isEqualNode()](#NodeService+isEqualNode)
+    * [.removeChild(childElement)](#NodeService+removeChild) ⇒ <code>PseudoNode</code>
+    * [.replaceChild()](#NodeService+replaceChild)
+
+<a name="new_AttrService_new"></a>
+
+### new AttrService(name, [value], [ownerElement], [namespaceURI], [prefix])
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| name | <code>string</code> |  | The name of the attribute |
+| [value] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | The value of the attribute |
+| [ownerElement] | <code>PseudoElement</code> \| <code>null</code> | <code></code> | The element which has this attribute |
+| [namespaceURI] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | The namespace of the attribute |
+| [prefix] | <code>string</code> \| <code>null</code> | <code>null</code> | The namespace prefix of the attribute |
+
+<a name="NodeService+appendChild"></a>
+
+### attrService.appendChild(childNode) ⇒ <code>PseudoNode</code>
+**Kind**: instance method of [<code>AttrService</code>](#AttrService)  
+**Overrides**: [<code>appendChild</code>](#NodeService+appendChild)  
 
 | Param | Type |
 | --- | --- |
 | childNode | <code>PseudoNode</code> | 
 
-<a name="PseudoNodeAttached+removeChild"></a>
+<a name="NodeService+cloneNode"></a>
 
-### pseudoNodeAttached.removeChild(childElement) ⇒ <code>PseudoNode</code>
-**Kind**: instance method of [<code>PseudoNodeAttached</code>](#PseudoNodeAttached)  
+### attrService.cloneNode()
+Not implemented yet.
+
+**Kind**: instance method of [<code>AttrService</code>](#AttrService)  
+**Overrides**: [<code>cloneNode</code>](#NodeService+cloneNode)  
+**Throws**:
+
+- <code>Error</code> 
+
+<a name="NodeService+compareDocumentPosition"></a>
+
+### attrService.compareDocumentPosition()
+Not implemented yet.
+
+**Kind**: instance method of [<code>AttrService</code>](#AttrService)  
+**Overrides**: [<code>compareDocumentPosition</code>](#NodeService+compareDocumentPosition)  
+**Throws**:
+
+- <code>Error</code> 
+
+<a name="NodeService+contains"></a>
+
+### attrService.contains()
+Not implemented yet.
+
+**Kind**: instance method of [<code>AttrService</code>](#AttrService)  
+**Overrides**: [<code>contains</code>](#NodeService+contains)  
+**Throws**:
+
+- <code>Error</code> 
+
+<a name="NodeService+insertBefore"></a>
+
+### attrService.insertBefore()
+Not implemented yet.
+
+**Kind**: instance method of [<code>AttrService</code>](#AttrService)  
+**Overrides**: [<code>insertBefore</code>](#NodeService+insertBefore)  
+**Throws**:
+
+- <code>Error</code> 
+
+<a name="NodeService+isEqualNode"></a>
+
+### attrService.isEqualNode()
+Not implemented yet.
+
+**Kind**: instance method of [<code>AttrService</code>](#AttrService)  
+**Overrides**: [<code>isEqualNode</code>](#NodeService+isEqualNode)  
+**Throws**:
+
+- <code>Error</code> 
+
+<a name="NodeService+removeChild"></a>
+
+### attrService.removeChild(childElement) ⇒ <code>PseudoNode</code>
+Remove the given child from this node.
+
+**Kind**: instance method of [<code>AttrService</code>](#AttrService)  
+**Overrides**: [<code>removeChild</code>](#NodeService+removeChild)  
+**Throws**:
+
+- <code>Error</code> When the node is not a child of this node
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| childElement | <code>PseudoNode</code> | The child node, or its TreeLinker from the children list |
+
+<a name="NodeService+replaceChild"></a>
+
+### attrService.replaceChild()
+Not implemented yet.
+
+**Kind**: instance method of [<code>AttrService</code>](#AttrService)  
+**Overrides**: [<code>replaceChild</code>](#NodeService+replaceChild)  
+**Throws**:
+
+- <code>Error</code> 
+
+<a name="LinkedNode"></a>
+
+## LinkedNode ⇐ [<code>NodeService</code>](#NodeService)
+A node which is stored in a TreeLinker and answers questions about its position in the tree by asking that linker.
+
+**Kind**: global class  
+**Extends**: [<code>NodeService</code>](#NodeService)  
+**Author**: Joshua Heagle <joshuaheagle@gmail.com>  
+
+* [LinkedNode](#LinkedNode) ⇐ [<code>NodeService</code>](#NodeService)
+    * [new LinkedNode(linker, value)](#new_LinkedNode_new)
+    * [.appendChild(childNode)](#NodeService+appendChild) ⇒ <code>PseudoNode</code>
+    * [.cloneNode()](#NodeService+cloneNode)
+    * [.compareDocumentPosition()](#NodeService+compareDocumentPosition)
+    * [.contains()](#NodeService+contains)
+    * [.insertBefore()](#NodeService+insertBefore)
+    * [.isEqualNode()](#NodeService+isEqualNode)
+    * [.removeChild(childElement)](#NodeService+removeChild) ⇒ <code>PseudoNode</code>
+    * [.replaceChild()](#NodeService+replaceChild)
+
+<a name="new_LinkedNode_new"></a>
+
+### new LinkedNode(linker, value)
+
+| Param | Type | Description |
+| --- | --- | --- |
+| linker | <code>TreeLinker</code> | The linker holding this node |
+| value | <code>string</code> \| <code>null</code> | The value of the node |
+
+<a name="NodeService+appendChild"></a>
+
+### linkedNode.appendChild(childNode) ⇒ <code>PseudoNode</code>
+**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
+**Overrides**: [<code>appendChild</code>](#NodeService+appendChild)  
 
 | Param | Type |
 | --- | --- |
-| childElement | <code>PseudoNode</code> | 
+| childNode | <code>PseudoNode</code> | 
 
+<a name="NodeService+cloneNode"></a>
+
+### linkedNode.cloneNode()
+Not implemented yet.
+
+**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
+**Overrides**: [<code>cloneNode</code>](#NodeService+cloneNode)  
+**Throws**:
+
+- <code>Error</code> 
+
+<a name="NodeService+compareDocumentPosition"></a>
+
+### linkedNode.compareDocumentPosition()
+Not implemented yet.
+
+**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
+**Overrides**: [<code>compareDocumentPosition</code>](#NodeService+compareDocumentPosition)  
+**Throws**:
+
+- <code>Error</code> 
+
+<a name="NodeService+contains"></a>
+
+### linkedNode.contains()
+Not implemented yet.
+
+**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
+**Overrides**: [<code>contains</code>](#NodeService+contains)  
+**Throws**:
+
+- <code>Error</code> 
+
+<a name="NodeService+insertBefore"></a>
+
+### linkedNode.insertBefore()
+Not implemented yet.
+
+**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
+**Overrides**: [<code>insertBefore</code>](#NodeService+insertBefore)  
+**Throws**:
+
+- <code>Error</code> 
+
+<a name="NodeService+isEqualNode"></a>
+
+### linkedNode.isEqualNode()
+Not implemented yet.
+
+**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
+**Overrides**: [<code>isEqualNode</code>](#NodeService+isEqualNode)  
+**Throws**:
+
+- <code>Error</code> 
+
+<a name="NodeService+removeChild"></a>
+
+### linkedNode.removeChild(childElement) ⇒ <code>PseudoNode</code>
+Remove the given child from this node.
+
+**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
+**Overrides**: [<code>removeChild</code>](#NodeService+removeChild)  
+**Throws**:
+
+- <code>Error</code> When the node is not a child of this node
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| childElement | <code>PseudoNode</code> | The child node, or its TreeLinker from the children list |
+
+<a name="NodeService+replaceChild"></a>
+
+### linkedNode.replaceChild()
+Not implemented yet.
+
+**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
+**Overrides**: [<code>replaceChild</code>](#NodeService+replaceChild)  
+**Throws**:
+
+- <code>Error</code> 
+
+<a name="PseudoNodeList"></a>
+
+## PseudoNodeList ⇐ <code>LinkedTreeList</code>
+A NodeList, like the DOM one, iterates over the nodes themselves (the data stored in each TreeLinker), rather than
+the linkers that hold them.
+
+**Kind**: global class  
+**Extends**: <code>LinkedTreeList</code>  
+
+* [PseudoNodeList](#PseudoNodeList) ⇐ <code>LinkedTreeList</code>
+    * [.entries()](#PseudoNodeList+entries) ⇒ <code>Iterator</code>
+    * [.keys()](#PseudoNodeList+keys) ⇒ <code>Iterator</code>
+    * [.values()](#PseudoNodeList+values) ⇒ <code>Iterator</code>
+
+<a name="PseudoNodeList+entries"></a>
+
+### pseudoNodeList.entries() ⇒ <code>Iterator</code>
+Iterate over [index, node] pairs.
+
+**Kind**: instance method of [<code>PseudoNodeList</code>](#PseudoNodeList)  
+<a name="PseudoNodeList+keys"></a>
+
+### pseudoNodeList.keys() ⇒ <code>Iterator</code>
+Iterate over the indexes.
+
+**Kind**: instance method of [<code>PseudoNodeList</code>](#PseudoNodeList)  
+<a name="PseudoNodeList+values"></a>
+
+### pseudoNodeList.values() ⇒ <code>Iterator</code>
+Iterate over the nodes.
+
+**Kind**: instance method of [<code>PseudoNodeList</code>](#PseudoNodeList)  
 <a name="PseudoHTMLDocument"></a>
 
 ## PseudoHTMLDocument ⇐ <code>PseudoHTMLElement</code>
@@ -512,6 +832,7 @@ Handle events as they are stored and implemented.
 
 
 * [PseudoEventListener](#PseudoEventListener)
+    * [.callback](#PseudoEventListener+callback)
     * [.handleEvent(event)](#PseudoEventListener+handleEvent) ⇒ <code>\*</code>
     * [.doCapturePhase(event)](#PseudoEventListener+doCapturePhase) ⇒ <code>boolean</code>
     * [.doTargetPhase(event)](#PseudoEventListener+doTargetPhase) ⇒ <code>boolean</code>
@@ -522,6 +843,12 @@ Handle events as they are stored and implemented.
     * [.nonPassiveHalt(event)](#PseudoEventListener+nonPassiveHalt) ⇒ <code>boolean</code> \| <code>\*</code>
     * [.rejectEvent(event)](#PseudoEventListener+rejectEvent) ⇒ <code>\*</code> \| <code>boolean</code>
 
+<a name="PseudoEventListener+callback"></a>
+
+### pseudoEventListener.callback
+The function (or object with handleEvent) which was originally given when registering, used to find this listener again for removal.
+
+**Kind**: instance property of [<code>PseudoEventListener</code>](#PseudoEventListener)  
 <a name="PseudoEventListener+handleEvent"></a>
 
 ### pseudoEventListener.handleEvent(event) ⇒ <code>\*</code>
@@ -603,6 +930,29 @@ Handle events as they are stored and implemented.
 | --- | --- |
 | event | <code>PseudoEvent</code> | 
 
+<a name="HTMLElementService_1"></a>
+
+## HTMLElementService\_1 : <code>PseudoHTMLElement</code>
+**Kind**: global constant  
+<a name="generateNodeList"></a>
+
+## generateNodeList([innerList]) ⇒ [<code>PseudoNodeList</code>](#PseudoNodeList)
+Create a PseudoNodeList, optionally starting from an existing chain of linkers.
+
+**Kind**: global function  
+
+| Param | Type | Default |
+| --- | --- | --- |
+| [innerList] | <code>TreeLinker</code> \| <code>null</code> | <code></code> | 
+
+<a name="generateNode"></a>
+
+## generateNode() ⇒ <code>function</code>
+Create a TreeLinker class whose linkers each store a node (a LinkedNode) as their data, this can be used to build a
+tree (or list) of nodes from plain values.
+
+**Kind**: global function  
+**Returns**: <code>function</code> - The NodeFactory class (a TreeLinker) to use as the linker class  
 <a name="generateDocument"></a>
 
 ## generateDocument(root, context) ⇒ <code>Window</code> \| <code>PseudoEventTarget</code>

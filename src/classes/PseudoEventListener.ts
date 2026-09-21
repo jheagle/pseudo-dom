@@ -3,7 +3,7 @@
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @version 1.0.0
  */
-import PseudoEvent from '../interfaces/PseudoEvent'
+import { EventService } from '../services/EventService'
 import { listenerOptions } from '../interfaces/PseudoEventTarget'
 
 /**
@@ -22,12 +22,25 @@ class PseudoEventListener {
   }
   private eventType: string = ''
   private handler: Function
-  private isDefault: boolean = false
+  private readonly originalCallback: Function
+  private readonly defaultListener: boolean = false
 
-  constructor (eventType: string, { capture = false, once = false, passive = false } = {}, handleEvent: Function) {
+  constructor (eventType: string, { capture = false, once = false, passive = false } = {}, handleEvent: Function, originalCallback: Function = handleEvent) {
     this.eventOptions = { capture, once, passive }
     this.eventType = eventType
     this.handler = handleEvent
+    this.originalCallback = originalCallback
+  }
+
+  /**
+   * The function (or object with handleEvent) which was originally given when registering, used to find this listener again for removal.
+   */
+  get callback (): Function {
+    return this.originalCallback
+  }
+
+  get isDefault (): boolean {
+    return this.defaultListener
   }
 
   get once (): boolean {
@@ -40,7 +53,7 @@ class PseudoEventListener {
    * @param {PseudoEvent} event
    * @returns {*}
    */
-  handleEvent (event: PseudoEvent): any {
+  handleEvent (event: EventService): any {
     return this.handler(event)
   }
 
@@ -50,8 +63,8 @@ class PseudoEventListener {
    * @param {PseudoEvent} event
    * @returns {boolean}
    */
-  doCapturePhase (event: PseudoEvent): boolean {
-    return event.eventPhase === PseudoEvent.CAPTURING_PHASE && this.eventOptions.capture
+  doCapturePhase (event: EventService): boolean {
+    return event.eventPhase === EventService.CAPTURING_PHASE && this.eventOptions.capture
   }
 
   /**
@@ -60,8 +73,8 @@ class PseudoEventListener {
    * @param {PseudoEvent} event
    * @returns {boolean}
    */
-  doTargetPhase (event: PseudoEvent): boolean {
-    return event.eventPhase === PseudoEvent.AT_TARGET
+  doTargetPhase (event: EventService): boolean {
+    return event.eventPhase === EventService.AT_TARGET
   }
 
   /**
@@ -70,8 +83,8 @@ class PseudoEventListener {
    * @param {PseudoEvent} event
    * @returns {boolean|*}
    */
-  doBubblePhase (event: PseudoEvent): boolean | any {
-    return event.eventPhase === PseudoEvent.BUBBLING_PHASE && (event.bubbles || !this.eventOptions.capture)
+  doBubblePhase (event: EventService): boolean | any {
+    return event.eventPhase === EventService.BUBBLING_PHASE && (event.bubbles || !this.eventOptions.capture)
   }
 
   /**
@@ -80,7 +93,7 @@ class PseudoEventListener {
    * @param {PseudoEvent} event
    * @returns {boolean}
    */
-  skipPhase (event: PseudoEvent): boolean {
+  skipPhase (event: EventService): boolean {
     return !this.doCapturePhase(event) && !this.doTargetPhase(event) && !this.doBubblePhase(event)
   }
 
@@ -90,7 +103,7 @@ class PseudoEventListener {
    * @param {PseudoEvent} event
    * @returns {boolean|*}
    */
-  skipDefault (event: PseudoEvent): boolean | any {
+  skipDefault (event: EventService): boolean | any {
     return this.isDefault && event.defaultPrevented
   }
 
@@ -100,7 +113,7 @@ class PseudoEventListener {
    * @param {PseudoEvent} event
    * @returns {boolean}
    */
-  stopPropagation (event: PseudoEvent): boolean {
+  stopPropagation (event: EventService): boolean {
     return !this.doTargetPhase(event) && event.inner.propagationStopped
   }
 
@@ -110,7 +123,7 @@ class PseudoEventListener {
    * @param {PseudoEvent} event
    * @returns {boolean|*}
    */
-  nonPassiveHalt (event: PseudoEvent): boolean | any {
+  nonPassiveHalt (event: EventService): boolean | any {
     return !this.eventOptions.passive && (this.skipDefault(event) ||
       event.inner.immediatePropagationStopped ||
       this.stopPropagation(event)
@@ -123,7 +136,7 @@ class PseudoEventListener {
    * @param {PseudoEvent} event
    * @returns {*|boolean}
    */
-  rejectEvent (event: PseudoEvent): any | boolean {
+  rejectEvent (event: EventService): any | boolean {
     return this.nonPassiveHalt(event) || this.skipPhase(event)
   }
 }

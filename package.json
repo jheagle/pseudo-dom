@@ -12,6 +12,7 @@
     "htmldocs": "jsdoc -R MAIN.md -r src/ -d docs",
     "readme": "gulp readme",
     "test": "gulp testFull",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
     "test:quick": "gulp testQuick",
     "watch": "gulp watchFull",
     "watch:test": "gulp watchTest"

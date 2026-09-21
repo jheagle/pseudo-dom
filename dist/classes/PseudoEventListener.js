@@ -3,15 +3,12 @@
 Object.defineProperty(exports, '__esModule', {
   value: true
 })
-exports.default = void 0
-const _PseudoEvent = _interopRequireDefault(require('../interfaces/PseudoEvent'))
-function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: e } }
 /**
  * @file Substitute for the DOM EventEventListener Class.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @version 1.0.0
  */
-
+const EventService_1 = require('../services/EventService')
 /**
  * Handle events as they are stored and implemented.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -25,14 +22,14 @@ class PseudoEventListener {
     capture = false,
     once = false,
     passive = false
-  } = {}, handleEvent) {
+  } = {}, handleEvent, originalCallback = handleEvent) {
     this.eventOptions = {
       capture: false,
       once: false,
       passive: false
     }
     this.eventType = ''
-    this.isDefault = false
+    this.defaultListener = false
     this.eventOptions = {
       capture,
       once,
@@ -40,6 +37,18 @@ class PseudoEventListener {
     }
     this.eventType = eventType
     this.handler = handleEvent
+    this.originalCallback = originalCallback
+  }
+
+  /**
+   * The function (or object with handleEvent) which was originally given when registering, used to find this listener again for removal.
+   */
+  get callback () {
+    return this.originalCallback
+  }
+
+  get isDefault () {
+    return this.defaultListener
   }
 
   get once () {
@@ -63,7 +72,7 @@ class PseudoEventListener {
    * @returns {boolean}
    */
   doCapturePhase (event) {
-    return event.eventPhase === _PseudoEvent.default.CAPTURING_PHASE && this.eventOptions.capture
+    return event.eventPhase === EventService_1.EventService.CAPTURING_PHASE && this.eventOptions.capture
   }
 
   /**
@@ -73,7 +82,7 @@ class PseudoEventListener {
    * @returns {boolean}
    */
   doTargetPhase (event) {
-    return event.eventPhase === _PseudoEvent.default.AT_TARGET
+    return event.eventPhase === EventService_1.EventService.AT_TARGET
   }
 
   /**
@@ -83,7 +92,7 @@ class PseudoEventListener {
    * @returns {boolean|*}
    */
   doBubblePhase (event) {
-    return event.eventPhase === _PseudoEvent.default.BUBBLING_PHASE && (event.bubbles || !this.eventOptions.capture)
+    return event.eventPhase === EventService_1.EventService.BUBBLING_PHASE && (event.bubbles || !this.eventOptions.capture)
   }
 
   /**
@@ -136,4 +145,4 @@ class PseudoEventListener {
     return this.nonPassiveHalt(event) || this.skipPhase(event)
   }
 }
-const _default = exports.default = PseudoEventListener
+exports.default = PseudoEventListener

@@ -4,12 +4,12 @@
  * @version 1.0.0
  */
 
-import PseudoEvent from './interfaces/PseudoEvent'
-import PseudoEventTarget from './interfaces/PseudoEventTarget'
-import PseudoNode from './interfaces/PseudoNode'
-import PseudoElement from './interfaces/PseudoElement'
-import PseudoHTMLElement from './interfaces/PseudoHTMLElement'
-import PseudoHTMLDocument from '././classes/PseudoHTMLDocument'
+import { EventService as PseudoEvent } from './services/EventService'
+import PseudoEventTarget from './services/EventTargetService'
+import { NodeService as PseudoNode } from './services/NodeService'
+import { ElementService as PseudoElement } from './services/ElementService'
+import { HTMLElementService as PseudoHTMLElement } from './services/HTMLElementService'
+import PseudoHTMLDocument from './classes/PseudoHTMLDocument'
 
 export default {
   PseudoEvent,

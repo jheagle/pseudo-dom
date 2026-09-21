@@ -4,6 +4,6 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 })
 exports.DocumentFragmentService = void 0
-const _NodeService = require('./NodeService')
-class DocumentFragmentService extends _NodeService.NodeService {}
+const NodeService_1 = require('./NodeService')
+class DocumentFragmentService extends NodeService_1.NodeService {}
 exports.DocumentFragmentService = DocumentFragmentService

@@ -20,7 +20,7 @@ import { ElementService } from './ElementService';
  * @property {Object} style - A container to define all applied inline-styles
  * @property {string} title - The title attribute which affects the text visible on hover
  */
-export declare class HTMLElementService extends ElementService implements PseudoHTMLElement {
+export declare class HTMLElementService extends ElementService implements Partial<PseudoHTMLElement> {
     /**
      * Simulate the HTMLElement object when the Dom is not available
      * @param {Object} [elementOptions={}]

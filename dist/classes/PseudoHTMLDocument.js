@@ -1,13 +1,15 @@
 'use strict'
 
+const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+  return mod && mod.__esModule
+    ? mod
+    : {
+        default: mod
+      }
+}
 Object.defineProperty(exports, '__esModule', {
   value: true
 })
-exports.default = void 0
-const _PseudoHTMLElement = _interopRequireDefault(require('../interfaces/PseudoHTMLElement'))
-const _generateNodeList = _interopRequireDefault(require('../factories/generateNodeList'))
-const _TreeLinker = _interopRequireDefault(require('collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'))
-function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: e } }
 /**
  * @file Substitute for the DOM HTMLDocument Class.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -17,7 +19,9 @@ function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: 
  *
  * @type {PseudoHTMLElement}
  */
-
+const HTMLElementService_1 = require('../services/HTMLElementService')
+const generateNodeList_1 = __importDefault(require('../factories/generateNodeList'))
+const TreeLinker_1 = require('collect-your-stuff/dist/collections/linked-tree-list/TreeLinker')
 /**
  * Simulate the behaviour of the HTMLDocument Class when there is no DOM available.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -27,14 +31,14 @@ function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: 
  * @property {PseudoHTMLElement} body - A reference to the Body child element
  * @property {function} createElement - Generate a new PseudoHTMLElement with parent of document
  */
-class PseudoHTMLDocument extends _PseudoHTMLElement.default {
+class PseudoHTMLDocument extends HTMLElementService_1.HTMLElementService {
   /**
    * The root HTML element is acts as the parent to all HTML elements in the document.
    * @constructor
    */
   constructor () {
     super()
-    const html = new _PseudoHTMLElement.default({
+    const html = new HTMLElementService_1.HTMLElementService({
       tagName: 'html',
       parent: this
     })
@@ -42,7 +46,7 @@ class PseudoHTMLDocument extends _PseudoHTMLElement.default {
      * Create document head element
      * @type {PseudoHTMLElement}
      */
-    this.head = new _PseudoHTMLElement.default({
+    this.head = new HTMLElementService_1.HTMLElementService({
       tagName: 'head',
       parent: html
     })
@@ -50,11 +54,11 @@ class PseudoHTMLDocument extends _PseudoHTMLElement.default {
      * Create document body element
      * @type {PseudoHTMLElement}
      */
-    this.body = new _PseudoHTMLElement.default({
+    this.body = new HTMLElementService_1.HTMLElementService({
       tagName: 'body',
       parent: html
     })
-    html.children = (0, _generateNodeList.default)(_TreeLinker.default.fromArray([this.head, this.body]).head)
+    html.children = (0, generateNodeList_1.default)(TreeLinker_1.TreeLinker.fromArray([this.head, this.body]).head)
   }
 
   /**
@@ -63,11 +67,11 @@ class PseudoHTMLDocument extends _PseudoHTMLElement.default {
    * @returns {PseudoHTMLElement}
    */
   createElement (tagName = 'div') {
-    const returnElement = new _PseudoHTMLElement.default({
+    const returnElement = new HTMLElementService_1.HTMLElementService({
       tagName
     })
     returnElement.parent = this
     return returnElement
   }
 }
-const _default = exports.default = PseudoHTMLDocument
+exports.default = PseudoHTMLDocument

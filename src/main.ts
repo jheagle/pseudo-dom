@@ -4,11 +4,11 @@
  * @version 1.0.0
  */
 
-import PseudoEvent from './interfaces/PseudoEvent'
-import PseudoEventTarget from './interfaces/PseudoEventTarget'
-import PseudoNode from './interfaces/PseudoNode'
-import PseudoElement from './interfaces/PseudoElement'
-import PseudoHTMLElement from './interfaces/PseudoHTMLElement'
+import { EventService as PseudoEvent } from './services/EventService'
+import PseudoEventTarget from './services/EventTargetService'
+import { NodeService as PseudoNode } from './services/NodeService'
+import { ElementService as PseudoElement } from './services/ElementService'
+import { HTMLElementService as PseudoHTMLElement } from './services/HTMLElementService'
 import PseudoHTMLDocument from './classes/PseudoHTMLDocument'
 import generateDocument from './factories/generateDocument'
 
@@ -18,17 +18,15 @@ import generateDocument from './factories/generateDocument'
  * @typedef {Object} pseudoDom
  * @module pseudoDom/objects
  */
-const pseudoDom = Object.assign(
-  {
-    generateDocument
-  },
+const pseudoDom = {
+  generateDocument,
   PseudoEvent,
   PseudoEventTarget,
   PseudoNode,
   PseudoElement,
   PseudoHTMLElement,
   PseudoHTMLDocument
-)
+}
 
 export default pseudoDom
 

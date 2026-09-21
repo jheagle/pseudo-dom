@@ -139,7 +139,7 @@ export interface PseudoNode extends PseudoEventTarget {
      * Accepts a namespace URI as an argument and returns a boolean value with a value of true if the namespace is the default namespace on the given node or false if not.
      * @param namespaceURI
      */
-    isDefaultNamespace(namespaceURI: any): boolean;
+    isDefaultNamespace(namespaceURI: string | null): boolean;
     /**
      * Returns a boolean value which indicates whether two nodes are of the same type and all their defining data points match.
      * @param otherNode

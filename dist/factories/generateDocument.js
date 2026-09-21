@@ -1,15 +1,20 @@
 'use strict'
 
+const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+  return mod && mod.__esModule
+    ? mod
+    : {
+        default: mod
+      }
+}
 Object.defineProperty(exports, '__esModule', {
   value: true
 })
-exports.default = void 0
-const _PseudoEventTarget = _interopRequireDefault(require('../interfaces/PseudoEventTarget'))
-const _PseudoNode = _interopRequireDefault(require('../interfaces/PseudoNode'))
-const _PseudoElement = _interopRequireDefault(require('../interfaces/PseudoElement'))
-const _PseudoHTMLElement = _interopRequireDefault(require('../interfaces/PseudoHTMLElement'))
-const _PseudoHTMLDocument = _interopRequireDefault(require('../classes/PseudoHTMLDocument'))
-function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: e } }
+const EventTargetService_1 = __importDefault(require('../services/EventTargetService'))
+const NodeService_1 = require('../services/NodeService')
+const ElementService_1 = require('../services/ElementService')
+const HTMLElementService_1 = require('../services/HTMLElementService')
+const PseudoHTMLDocument_1 = __importDefault(require('../classes/PseudoHTMLDocument'))
 /**
  * Construct the Pseudo Dom to provide access to Dom objects which are otherwise not available outside the browser
  * context.
@@ -23,11 +28,11 @@ const generateDocument = (root, context = {}) => {
    *
    * @type {Window|PseudoEventTarget}
    */
-  const newWindow = typeof root.document === 'undefined' ? root : new _PseudoEventTarget.default()
+  const newWindow = typeof root.document === 'undefined' ? root : new EventTargetService_1.default()
   /**
    * @type {Node|PseudoNode}
    */
-  const Node = root.Node || new _PseudoNode.default()
+  const Node = root.Node || new NodeService_1.NodeService()
   if (typeof newWindow.Node === 'undefined') {
     newWindow.Node = Node
   }
@@ -35,7 +40,7 @@ const generateDocument = (root, context = {}) => {
    *
    * @type {Element|PseudoElement}
    */
-  const Element = root.Element || new _PseudoElement.default()
+  const Element = root.Element || new ElementService_1.ElementService()
   if (typeof newWindow.Element === 'undefined') {
     newWindow.Element = Element
   }
@@ -43,7 +48,7 @@ const generateDocument = (root, context = {}) => {
    * Create an instance of HTMLElement if not available
    * @type {HTMLElement|PseudoHTMLElement}
    */
-  const HTMLElement = root.HTMLElement || new _PseudoHTMLElement.default()
+  const HTMLElement = root.HTMLElement || new HTMLElementService_1.HTMLElementService()
   if (typeof newWindow.HTMLElement === 'undefined') {
     newWindow.HTMLElement = HTMLElement
   }
@@ -51,10 +56,10 @@ const generateDocument = (root, context = {}) => {
    * Define document when not available
    * @type {Document|PseudoHTMLDocument}
    */
-  const document = root.document || new _PseudoHTMLDocument.default()
+  const document = root.document || new PseudoHTMLDocument_1.default()
   if (typeof newWindow.document === 'undefined') {
     newWindow.document = document
   }
   return context ? Object.assign(context, newWindow) : Object.assign(root, newWindow)
 }
-const _default = exports.default = generateDocument
+exports.default = generateDocument

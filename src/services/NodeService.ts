@@ -4,11 +4,14 @@
  * @version 1.0.0
  */
 import generateNodeList from '../factories/generateNodeList'
-import PseudoNodeList from '../classes/PseudoNodeList'
-import LinkedTreeList from 'collect-your-stuff/dist/collections/linked-tree-list/LinkedTreeList'
-import TreeLinker from 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'
+import { PseudoNodeList } from '../classes/PseudoNodeList'
+import { LinkedTreeList } from 'collect-your-stuff/dist/collections/linked-tree-list/LinkedTreeList'
+import { TreeLinker } from 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'
 import { PseudoNode } from '../interfaces/PseudoNode'
 import EventTargetService from './EventTargetService'
+import { PseudoElement } from '../interfaces/PseudoElement'
+import { PseudoDocument } from '../interfaces/PseudoDocument'
+import { PseudoDocumentFragment } from '../interfaces/PseudoDocumentFragment'
 
 /**
  * Simulate the behaviour of the Node Class when there is no DOM available.
@@ -34,12 +37,12 @@ export class NodeService extends EventTargetService implements PseudoNode {
   public static readonly DOCUMENT_FRAGMENT_NODE = 11
   public static readonly NOTATION_NODE = 12
   public children: PseudoNodeList | LinkedTreeList
-  public parent: NodeService | undefined
-  protected nodeValue: string
-  protected textContext: string
-  protected name: string
-  private next: NodeService | null
-  private prev: NodeService | null
+  public parent: PseudoNode | null
+  protected nodeNameValue: string
+  private nodeValueStore: string | null
+  private textContentStore: string | null
+  private next: PseudoNode | null
+  private prev: PseudoNode | null
 
   /**
    *
@@ -47,10 +50,13 @@ export class NodeService extends EventTargetService implements PseudoNode {
    */
   constructor () {
     super()
-    this.nodeValue = ''
-    this.textContext = ''
+    this.nodeValueStore = ''
+    this.textContentStore = ''
+    this.nodeNameValue = ''
     this.children = generateNodeList()
-    this.parent = undefined
+    this.parent = null
+    this.next = null
+    this.prev = null
   }
 
   get baseURI (): Location | string {
@@ -61,96 +67,167 @@ export class NodeService extends EventTargetService implements PseudoNode {
     return this.children
   }
 
-  get firstChild () {
-    return this.children.first
+  get firstChild (): PseudoNode | null {
+    return this.children.first ? this.children.first.data : null
   }
 
-  get isConnected () {
+  get isConnected (): boolean {
     return !!this.parent
   }
 
-  get lastChild () {
-    return this.children.last
+  get lastChild (): PseudoNode | null {
+    return this.children.last ? this.children.last.data : null
   }
 
-  get nextSibling () {
+  get nextSibling (): PseudoNode | null {
     return this.isConnected
       ? this.next
       : null
   }
 
-  get nodeName () {
-    return this.name || ''
+  get nodeName (): string {
+    return this.nodeNameValue || ''
   }
 
-  get nodeType () {
+  get nodeType (): number {
     return NodeService.DEFAULT_NODE
   }
 
-  get ownerDocument (): any | undefined {
-    return undefined
+  get nodeValue (): string | null {
+    return this.nodeValueStore
   }
 
-  get parentNode () {
+  set nodeValue (value: string | null) {
+    this.nodeValueStore = value
+  }
+
+  get ownerDocument (): PseudoDocument | null {
+    return null
+  }
+
+  get parentNode (): PseudoNode | null {
     return this.parent
   }
 
-  get parentElement () {
-    return this.parent.nodeType === NodeService.ELEMENT_NODE ? this.parent : null
+  get parentElement (): PseudoElement | null {
+    return this.parent && this.parent.nodeType === NodeService.ELEMENT_NODE ? this.parent as PseudoElement : null
   }
 
-  get previousSibling () {
+  get previousSibling (): PseudoNode | null {
     return this.isConnected
       ? this.prev
       : null
   }
 
+  get textContent (): string | null {
+    return this.textContentStore
+  }
+
+  set textContent (text: string | null) {
+    this.textContentStore = text
+  }
+
   /**
    *
-   * @param {NodeService} childNode
-   * @returns {NodeService}
+   * @param {PseudoNode} childNode
+   * @returns {PseudoNode}
    */
-  appendChild (childNode: NodeService): NodeService {
+  appendChild (childNode: PseudoNode): PseudoNode {
     this.children.append(childNode)
     return childNode
   }
 
-  cloneNode () {}
-
-  compareDocumentPosition () {}
-
-  contains () {}
-
-  getRootNode (): NodeService {
-    return this.parent.getRootNode() || this.parent
+  /**
+   * Not implemented yet.
+   * @throws {Error}
+   */
+  cloneNode (deep: boolean = false): PseudoNode {
+    throw new Error(`NodeService.cloneNode(${deep}) is not implemented yet.`)
   }
 
-  hasChildNodes () {
+  /**
+   * Not implemented yet.
+   * @throws {Error}
+   */
+  compareDocumentPosition (otherNode: PseudoNode): number {
+    throw new Error('NodeService.compareDocumentPosition() is not implemented yet.')
+  }
+
+  /**
+   * Not implemented yet.
+   * @throws {Error}
+   */
+  contains (otherNode: PseudoNode): boolean {
+    throw new Error('NodeService.contains() is not implemented yet.')
+  }
+
+  getRootNode (options: { composed: boolean } = { composed: false }): PseudoNode {
+    return this.parent ? this.parent.getRootNode(options) : this
+  }
+
+  hasChildNodes (): boolean {
     return this.children.length > 0
   }
 
-  insertBefore () {}
-
-  isDefaultNamespace () {}
-
-  isEqualNode () {}
-
-  isSameNode () {}
-
-  lookupPrefix () {}
-
-  lookupNamespaceURI () {}
-
-  normalize () {}
-
   /**
-   *
-   * @param {NodeService} childElement
-   * @returns {NodeService}
+   * Not implemented yet.
+   * @throws {Error}
    */
-  removeChild (childElement: TreeLinker): TreeLinker {
-    return this.children.remove(childElement)
+  insertBefore (newNode: PseudoNode, referenceNode: PseudoNode | null): PseudoNode | PseudoDocumentFragment {
+    throw new Error('NodeService.insertBefore() is not implemented yet.')
   }
 
-  replaceChild () {}
+  isDefaultNamespace (namespaceURI: string | null): boolean {
+    return namespaceURI === null
+  }
+
+  /**
+   * Not implemented yet.
+   * @throws {Error}
+   */
+  isEqualNode (otherNode: PseudoNode): boolean {
+    throw new Error('NodeService.isEqualNode() is not implemented yet.')
+  }
+
+  isSameNode (otherNode: PseudoNode): boolean {
+    return this === otherNode
+  }
+
+  lookupPrefix (namespace: string): string | null {
+    return null
+  }
+
+  lookupNamespaceURI (prefix: string): string | null {
+    return null
+  }
+
+  normalize (): void {}
+
+  /**
+   * Remove the given child from this node.
+   * @param {PseudoNode} childElement The child node, or its TreeLinker from the children list
+   * @returns {PseudoNode}
+   * @throws {Error} When the node is not a child of this node
+   */
+  removeChild (childElement: PseudoNode): PseudoNode {
+    let found: any = null
+    this.children.forEach((linker: any) => {
+      if (found === null && (linker === childElement || linker.data === childElement)) {
+        found = linker
+      }
+    })
+    if (found === null) {
+      throw new Error('The node to be removed is not a child of this node.')
+    }
+    this.children.remove(found)
+    return found.data
+  }
+
+  /**
+   * Not implemented yet.
+   * @throws {Error}
+   */
+  replaceChild (newChild: PseudoNode, oldChild: PseudoNode): PseudoNode {
+    throw new Error('NodeService.replaceChild() is not implemented yet.')
+  }
 }

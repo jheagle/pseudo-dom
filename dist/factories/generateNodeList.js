@@ -3,8 +3,11 @@
 Object.defineProperty(exports, '__esModule', {
   value: true
 })
-exports.default = void 0
-const _PseudoNodeList = _interopRequireDefault(require('../classes/PseudoNodeList'))
-function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: e } }
-const generateNodeList = (innerList = null) => new _PseudoNodeList.default().initialize(innerList)
-const _default = exports.default = generateNodeList
+const PseudoNodeList_1 = require('../classes/PseudoNodeList')
+/**
+ * Create a PseudoNodeList, optionally starting from an existing chain of linkers.
+ * @param {TreeLinker|null} [innerList=null]
+ * @returns {PseudoNodeList}
+ */
+const generateNodeList = (innerList = null) => new PseudoNodeList_1.PseudoNodeList().initialize(innerList)
+exports.default = generateNodeList
