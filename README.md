@@ -8,14 +8,17 @@ Pseudo DOM recreates the browser DOM API (following the MDN documentation) so DO
 example in tests, without a real or headless browser. It is written in TypeScript and ships type definitions.
 
 Working today: `EventService` (Event), `EventTargetService` (EventTarget listeners for the target itself), `NodeService`
-(Node: children, siblings, `appendChild`, `removeChild`), `ElementService` / `HTMLElementService` (Element and
-HTMLElement, including attributes, `NamedNodeMap`, `classList`), `AttrService`, `DOMTokenListService`,
-`NamedNodeMapService`, `PseudoNodeList`, and `generateDocument` for creating a document.
+(Node: a real tree with `parentNode`, `previousSibling` / `nextSibling`, `firstChild` / `lastChild`, `appendChild`,
+`insertBefore`, `removeChild`, `replaceChild`, `contains` and `getRootNode`; nodes move when they are added somewhere
+else, document fragments insert their children, and a node cannot be put inside itself), `ElementService` /
+`HTMLElementService` (Element and HTMLElement, including attributes, `NamedNodeMap`, `classList`), `AttrService`,
+`DOMTokenListService`, `NamedNodeMapService`, `DocumentService` / `DocumentFragmentService`, `PseudoNodeList`, and
+`generateDocument` for creating a document.
 
 Not implemented yet (these throw a "not implemented" error or are missing): event dispatch through the tree (capture,
-target and bubble phases), `cloneNode`, `compareDocumentPosition`, `contains`, `insertBefore`, `isEqualNode`,
-`replaceChild`, `querySelector` / `querySelectorAll`, `innerHTML` / `outerHTML` parsing, and most of the rest of the
-Element and Document APIs. The API will change before 1.0.
+target and bubble phases), `cloneNode`, `compareDocumentPosition`, `isEqualNode`, `querySelector` /
+`querySelectorAll`, `innerHTML` / `outerHTML` parsing, and most of the rest of the Element and Document APIs. The API
+will change before 1.0.
 ## Modules
 
 <dl>
@@ -45,6 +48,13 @@ Element and Document APIs. The API will change before 1.0.
 <dt><a href="#ElementService">ElementService</a> ⇐ <code>PseudoNode</code></dt>
 <dd><p>Simulate the behaviour of the Element Class when there is no DOM available.</p>
 </dd>
+<dt><a href="#DocumentService">DocumentService</a> ⇐ <code><a href="#NodeService">NodeService</a></code></dt>
+<dd><p>Simulate the behaviour of the Document Class when there is no DOM available.</p>
+</dd>
+<dt><a href="#DocumentFragmentService">DocumentFragmentService</a> ⇐ <code><a href="#NodeService">NodeService</a></code></dt>
+<dd><p>Simulate the behaviour of the DocumentFragment Class when there is no DOM available: a container for nodes which is
+not part of a tree, when it is inserted its children are moved into the tree instead.</p>
+</dd>
 <dt><a href="#DOMTokenListService">DOMTokenListService</a></dt>
 <dd><p>Simulate the behaviour of the DOMTokenList Class when there is no DOM available.</p>
 </dd>
@@ -52,7 +62,8 @@ Element and Document APIs. The API will change before 1.0.
 <dd><p>Simulate the behaviour of the Attr Class when there is no DOM available.</p>
 </dd>
 <dt><a href="#LinkedNode">LinkedNode</a> ⇐ <code><a href="#NodeService">NodeService</a></code></dt>
-<dd><p>A node which is stored in a TreeLinker and answers questions about its position in the tree by asking that linker.</p>
+<dd><p>A node which is stored in a TreeLinker (for example by a list built from an array of values). It finds its siblings
+from that linker, and its parent from the linker&#39;s parent when it has not been given one by appendChild.</p>
 </dd>
 <dt><a href="#PseudoNodeList">PseudoNodeList</a> ⇐ <code>LinkedTreeList</code></dt>
 <dd><p>A NodeList, like the DOM one, iterates over the nodes themselves (the data stored in each TreeLinker), rather than
@@ -76,6 +87,15 @@ the linkers that hold them.</p>
 ## Functions
 
 <dl>
+<dt><a href="#getParentNodesFromAttribute">getParentNodesFromAttribute(attr, value, node)</a> ⇒ <code>Array.&lt;PseudoNode&gt;</code></dt>
+<dd><p>A selector function for retrieving existing parent PseudoNode from the given child item.
+This function will check all the parents starting from node, and scan the attributes
+property for matches. The return array contains all matching parent ancestors, starting with the root of the tree.</p>
+</dd>
+<dt><a href="#getParentNodes">getParentNodes(node)</a> ⇒ <code>Array.&lt;PseudoNode&gt;</code></dt>
+<dd><p>Get all of the ancestors of a node, starting with the root of the tree and ending with the node&#39;s own parent (the
+order in which an event travels down through them). A node which has no parent has no ancestors.</p>
+</dd>
 <dt><a href="#generateNodeList">generateNodeList([innerList])</a> ⇒ <code><a href="#PseudoNodeList">PseudoNodeList</a></code></dt>
 <dd><p>Create a PseudoNodeList, optionally starting from an existing chain of linkers.</p>
 </dd>
@@ -114,22 +134,38 @@ Simulate the behaviour of the Node Class when there is no DOM available.
 
 * [NodeService](#NodeService) ⇐ <code>PseudoEventTarget</code>
     * [.appendChild(childNode)](#NodeService+appendChild) ⇒ <code>PseudoNode</code>
+    * [.childInserted(child)](#NodeService+childInserted)
     * [.cloneNode()](#NodeService+cloneNode)
     * [.compareDocumentPosition()](#NodeService+compareDocumentPosition)
-    * [.contains()](#NodeService+contains)
-    * [.insertBefore()](#NodeService+insertBefore)
+    * [.contains(otherNode)](#NodeService+contains) ⇒ <code>boolean</code>
+    * [.insertBefore(newNode, [referenceNode])](#NodeService+insertBefore) ⇒ <code>PseudoNode</code>
     * [.isEqualNode()](#NodeService+isEqualNode)
     * [.removeChild(childElement)](#NodeService+removeChild) ⇒ <code>PseudoNode</code>
-    * [.replaceChild()](#NodeService+replaceChild)
+    * [.replaceChild(newChild, oldChild)](#NodeService+replaceChild) ⇒ <code>PseudoNode</code>
 
 <a name="NodeService+appendChild"></a>
 
 ### nodeService.appendChild(childNode) ⇒ <code>PseudoNode</code>
+Add a node as the last child of this node (a node which is already in a tree is moved).
+
+**Kind**: instance method of [<code>NodeService</code>](#NodeService)  
+**Returns**: <code>PseudoNode</code> - The added node  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| childNode | <code>PseudoNode</code> | The node to add |
+
+<a name="NodeService+childInserted"></a>
+
+### nodeService.childInserted(child)
+Called each time a node has been inserted as a child of this node, so that nodes which need to react to children
+(for example elements applying default events) can do so.
+
 **Kind**: instance method of [<code>NodeService</code>](#NodeService)  
 
-| Param | Type |
-| --- | --- |
-| childNode | <code>PseudoNode</code> | 
+| Param | Type | Description |
+| --- | --- | --- |
+| child | [<code>NodeService</code>](#NodeService) | The node which was inserted |
 
 <a name="NodeService+cloneNode"></a>
 
@@ -153,23 +189,32 @@ Not implemented yet.
 
 <a name="NodeService+contains"></a>
 
-### nodeService.contains()
-Not implemented yet.
+### nodeService.contains(otherNode) ⇒ <code>boolean</code>
+Check whether a node is this node or one of its descendants.
 
 **Kind**: instance method of [<code>NodeService</code>](#NodeService)  
-**Throws**:
 
-- <code>Error</code> 
+| Param | Type | Description |
+| --- | --- | --- |
+| otherNode | <code>PseudoNode</code> \| <code>null</code> | The node to look for |
 
 <a name="NodeService+insertBefore"></a>
 
-### nodeService.insertBefore()
-Not implemented yet.
+### nodeService.insertBefore(newNode, [referenceNode]) ⇒ <code>PseudoNode</code>
+Insert a node as a child of this node, before the given child (or at the end when there is none). A node which is
+already in a tree is moved, and the children of a document fragment are moved in order.
 
 **Kind**: instance method of [<code>NodeService</code>](#NodeService)  
+**Returns**: <code>PseudoNode</code> - The inserted node  
 **Throws**:
 
-- <code>Error</code> 
+- <code>Error</code> When the reference node is not a child of this node, or the new node is this node or contains it
+
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| newNode | <code>PseudoNode</code> |  | The node to insert |
+| [referenceNode] | <code>PseudoNode</code> \| <code>null</code> | <code></code> | The child of this node to insert before, or null to insert at the end |
 
 <a name="NodeService+isEqualNode"></a>
 
@@ -184,9 +229,10 @@ Not implemented yet.
 <a name="NodeService+removeChild"></a>
 
 ### nodeService.removeChild(childElement) ⇒ <code>PseudoNode</code>
-Remove the given child from this node.
+Remove a child from this node, it no longer has a parent or siblings afterwards.
 
 **Kind**: instance method of [<code>NodeService</code>](#NodeService)  
+**Returns**: <code>PseudoNode</code> - The removed node  
 **Throws**:
 
 - <code>Error</code> When the node is not a child of this node
@@ -194,17 +240,24 @@ Remove the given child from this node.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| childElement | <code>PseudoNode</code> | The child node, or its TreeLinker from the children list |
+| childElement | <code>PseudoNode</code> | The child node to remove |
 
 <a name="NodeService+replaceChild"></a>
 
-### nodeService.replaceChild()
-Not implemented yet.
+### nodeService.replaceChild(newChild, oldChild) ⇒ <code>PseudoNode</code>
+Replace a child of this node with another node (which is moved if it is already in a tree).
 
 **Kind**: instance method of [<code>NodeService</code>](#NodeService)  
+**Returns**: <code>PseudoNode</code> - The replaced node  
 **Throws**:
 
-- <code>Error</code> 
+- <code>Error</code> When the old node is not a child of this node
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| newChild | <code>PseudoNode</code> | The node which takes the place |
+| oldChild | <code>PseudoNode</code> | The child of this node to replace |
 
 <a name="NamedNodeMapService"></a>
 
@@ -421,7 +474,7 @@ Simulate the behaviour of the Element Class when there is no DOM available.
 * [ElementService](#ElementService) ⇐ <code>PseudoNode</code>
     * [new ElementService([settings])](#new_ElementService_new)
     * [.applyDefaultEvent()](#ElementService+applyDefaultEvent) ⇒ <code>function</code>
-    * [.appendChild(childElement)](#ElementService+appendChild) ⇒ <code>PseudoNode</code>
+    * [.childInserted(child)](#ElementService+childInserted)
     * [.hasAttribute(attributeName)](#ElementService+hasAttribute) ⇒ <code>boolean</code>
     * [.setAttribute(attributeName, attributeValue)](#ElementService+setAttribute) ⇒ <code>undefined</code>
     * [.getAttribute(attributeName)](#ElementService+getAttribute) ⇒ <code>string</code> \| <code>null</code>
@@ -436,8 +489,8 @@ Simulate the behaviour of the Element Class when there is no DOM available.
 | [settings] | <code>Object</code> | <code>{}</code> |  |
 | [settings.tagName] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | The name of the tag this element represents |
 | [settings.attributes] | <code>Array.&lt;{name: string, value: \*}&gt;</code> | <code>[]</code> | The attributes (also assigned as properties) to start with |
-| [settings.parent] | <code>PseudoNode</code> \| <code>null</code> | <code></code> | The parent node |
-| [settings.children] | <code>Array</code> | <code>[]</code> | The values or nodes to start as children |
+| [settings.parent] | <code>PseudoNode</code> \| <code>null</code> | <code></code> | The node to add this element to as its last child |
+| [settings.children] | <code>Array.&lt;PseudoNode&gt;</code> | <code>[]</code> | The nodes to start as children |
 
 <a name="ElementService+applyDefaultEvent"></a>
 
@@ -445,14 +498,16 @@ Simulate the behaviour of the Element Class when there is no DOM available.
 Some elements have default behaviour, this registers it when the element is added.
 
 **Kind**: instance method of [<code>ElementService</code>](#ElementService)  
-<a name="ElementService+appendChild"></a>
+<a name="ElementService+childInserted"></a>
 
-### elementService.appendChild(childElement) ⇒ <code>PseudoNode</code>
+### elementService.childInserted(child)
+An element which is added as a child gets its default events (for example a submit button submits its form).
+
 **Kind**: instance method of [<code>ElementService</code>](#ElementService)  
 
-| Param | Type |
-| --- | --- |
-| childElement | <code>PseudoNode</code> \| [<code>ElementService</code>](#ElementService) | 
+| Param | Type | Description |
+| --- | --- | --- |
+| child | [<code>NodeService</code>](#NodeService) | The node which was inserted |
 
 <a name="ElementService+hasAttribute"></a>
 
@@ -500,6 +555,279 @@ Remove an attribute from the element.
 | --- | --- |
 | attributeName | <code>string</code> | 
 
+<a name="DocumentService"></a>
+
+## DocumentService ⇐ [<code>NodeService</code>](#NodeService)
+Simulate the behaviour of the Document Class when there is no DOM available.
+
+**Kind**: global class  
+**Extends**: [<code>NodeService</code>](#NodeService)  
+**Author**: Joshua Heagle <joshuaheagle@gmail.com>  
+
+* [DocumentService](#DocumentService) ⇐ [<code>NodeService</code>](#NodeService)
+    * [.appendChild(childNode)](#NodeService+appendChild) ⇒ <code>PseudoNode</code>
+    * [.childInserted(child)](#NodeService+childInserted)
+    * [.cloneNode()](#NodeService+cloneNode)
+    * [.compareDocumentPosition()](#NodeService+compareDocumentPosition)
+    * [.contains(otherNode)](#NodeService+contains) ⇒ <code>boolean</code>
+    * [.insertBefore(newNode, [referenceNode])](#NodeService+insertBefore) ⇒ <code>PseudoNode</code>
+    * [.isEqualNode()](#NodeService+isEqualNode)
+    * [.removeChild(childElement)](#NodeService+removeChild) ⇒ <code>PseudoNode</code>
+    * [.replaceChild(newChild, oldChild)](#NodeService+replaceChild) ⇒ <code>PseudoNode</code>
+
+<a name="NodeService+appendChild"></a>
+
+### documentService.appendChild(childNode) ⇒ <code>PseudoNode</code>
+Add a node as the last child of this node (a node which is already in a tree is moved).
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
+**Returns**: <code>PseudoNode</code> - The added node  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| childNode | <code>PseudoNode</code> | The node to add |
+
+<a name="NodeService+childInserted"></a>
+
+### documentService.childInserted(child)
+Called each time a node has been inserted as a child of this node, so that nodes which need to react to children
+(for example elements applying default events) can do so.
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| child | [<code>NodeService</code>](#NodeService) | The node which was inserted |
+
+<a name="NodeService+cloneNode"></a>
+
+### documentService.cloneNode()
+Not implemented yet.
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
+**Throws**:
+
+- <code>Error</code> 
+
+<a name="NodeService+compareDocumentPosition"></a>
+
+### documentService.compareDocumentPosition()
+Not implemented yet.
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
+**Throws**:
+
+- <code>Error</code> 
+
+<a name="NodeService+contains"></a>
+
+### documentService.contains(otherNode) ⇒ <code>boolean</code>
+Check whether a node is this node or one of its descendants.
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| otherNode | <code>PseudoNode</code> \| <code>null</code> | The node to look for |
+
+<a name="NodeService+insertBefore"></a>
+
+### documentService.insertBefore(newNode, [referenceNode]) ⇒ <code>PseudoNode</code>
+Insert a node as a child of this node, before the given child (or at the end when there is none). A node which is
+already in a tree is moved, and the children of a document fragment are moved in order.
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
+**Returns**: <code>PseudoNode</code> - The inserted node  
+**Throws**:
+
+- <code>Error</code> When the reference node is not a child of this node, or the new node is this node or contains it
+
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| newNode | <code>PseudoNode</code> |  | The node to insert |
+| [referenceNode] | <code>PseudoNode</code> \| <code>null</code> | <code></code> | The child of this node to insert before, or null to insert at the end |
+
+<a name="NodeService+isEqualNode"></a>
+
+### documentService.isEqualNode()
+Not implemented yet.
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
+**Throws**:
+
+- <code>Error</code> 
+
+<a name="NodeService+removeChild"></a>
+
+### documentService.removeChild(childElement) ⇒ <code>PseudoNode</code>
+Remove a child from this node, it no longer has a parent or siblings afterwards.
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
+**Returns**: <code>PseudoNode</code> - The removed node  
+**Throws**:
+
+- <code>Error</code> When the node is not a child of this node
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| childElement | <code>PseudoNode</code> | The child node to remove |
+
+<a name="NodeService+replaceChild"></a>
+
+### documentService.replaceChild(newChild, oldChild) ⇒ <code>PseudoNode</code>
+Replace a child of this node with another node (which is moved if it is already in a tree).
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
+**Returns**: <code>PseudoNode</code> - The replaced node  
+**Throws**:
+
+- <code>Error</code> When the old node is not a child of this node
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| newChild | <code>PseudoNode</code> | The node which takes the place |
+| oldChild | <code>PseudoNode</code> | The child of this node to replace |
+
+<a name="DocumentFragmentService"></a>
+
+## DocumentFragmentService ⇐ [<code>NodeService</code>](#NodeService)
+Simulate the behaviour of the DocumentFragment Class when there is no DOM available: a container for nodes which is
+not part of a tree, when it is inserted its children are moved into the tree instead.
+
+**Kind**: global class  
+**Extends**: [<code>NodeService</code>](#NodeService)  
+**Author**: Joshua Heagle <joshuaheagle@gmail.com>  
+
+* [DocumentFragmentService](#DocumentFragmentService) ⇐ [<code>NodeService</code>](#NodeService)
+    * [.appendChild(childNode)](#NodeService+appendChild) ⇒ <code>PseudoNode</code>
+    * [.childInserted(child)](#NodeService+childInserted)
+    * [.cloneNode()](#NodeService+cloneNode)
+    * [.compareDocumentPosition()](#NodeService+compareDocumentPosition)
+    * [.contains(otherNode)](#NodeService+contains) ⇒ <code>boolean</code>
+    * [.insertBefore(newNode, [referenceNode])](#NodeService+insertBefore) ⇒ <code>PseudoNode</code>
+    * [.isEqualNode()](#NodeService+isEqualNode)
+    * [.removeChild(childElement)](#NodeService+removeChild) ⇒ <code>PseudoNode</code>
+    * [.replaceChild(newChild, oldChild)](#NodeService+replaceChild) ⇒ <code>PseudoNode</code>
+
+<a name="NodeService+appendChild"></a>
+
+### documentFragmentService.appendChild(childNode) ⇒ <code>PseudoNode</code>
+Add a node as the last child of this node (a node which is already in a tree is moved).
+
+**Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
+**Returns**: <code>PseudoNode</code> - The added node  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| childNode | <code>PseudoNode</code> | The node to add |
+
+<a name="NodeService+childInserted"></a>
+
+### documentFragmentService.childInserted(child)
+Called each time a node has been inserted as a child of this node, so that nodes which need to react to children
+(for example elements applying default events) can do so.
+
+**Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| child | [<code>NodeService</code>](#NodeService) | The node which was inserted |
+
+<a name="NodeService+cloneNode"></a>
+
+### documentFragmentService.cloneNode()
+Not implemented yet.
+
+**Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
+**Throws**:
+
+- <code>Error</code> 
+
+<a name="NodeService+compareDocumentPosition"></a>
+
+### documentFragmentService.compareDocumentPosition()
+Not implemented yet.
+
+**Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
+**Throws**:
+
+- <code>Error</code> 
+
+<a name="NodeService+contains"></a>
+
+### documentFragmentService.contains(otherNode) ⇒ <code>boolean</code>
+Check whether a node is this node or one of its descendants.
+
+**Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| otherNode | <code>PseudoNode</code> \| <code>null</code> | The node to look for |
+
+<a name="NodeService+insertBefore"></a>
+
+### documentFragmentService.insertBefore(newNode, [referenceNode]) ⇒ <code>PseudoNode</code>
+Insert a node as a child of this node, before the given child (or at the end when there is none). A node which is
+already in a tree is moved, and the children of a document fragment are moved in order.
+
+**Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
+**Returns**: <code>PseudoNode</code> - The inserted node  
+**Throws**:
+
+- <code>Error</code> When the reference node is not a child of this node, or the new node is this node or contains it
+
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| newNode | <code>PseudoNode</code> |  | The node to insert |
+| [referenceNode] | <code>PseudoNode</code> \| <code>null</code> | <code></code> | The child of this node to insert before, or null to insert at the end |
+
+<a name="NodeService+isEqualNode"></a>
+
+### documentFragmentService.isEqualNode()
+Not implemented yet.
+
+**Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
+**Throws**:
+
+- <code>Error</code> 
+
+<a name="NodeService+removeChild"></a>
+
+### documentFragmentService.removeChild(childElement) ⇒ <code>PseudoNode</code>
+Remove a child from this node, it no longer has a parent or siblings afterwards.
+
+**Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
+**Returns**: <code>PseudoNode</code> - The removed node  
+**Throws**:
+
+- <code>Error</code> When the node is not a child of this node
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| childElement | <code>PseudoNode</code> | The child node to remove |
+
+<a name="NodeService+replaceChild"></a>
+
+### documentFragmentService.replaceChild(newChild, oldChild) ⇒ <code>PseudoNode</code>
+Replace a child of this node with another node (which is moved if it is already in a tree).
+
+**Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
+**Returns**: <code>PseudoNode</code> - The replaced node  
+**Throws**:
+
+- <code>Error</code> When the old node is not a child of this node
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| newChild | <code>PseudoNode</code> | The node which takes the place |
+| oldChild | <code>PseudoNode</code> | The child of this node to replace |
+
 <a name="DOMTokenListService"></a>
 
 ## DOMTokenListService
@@ -528,13 +856,14 @@ Simulate the behaviour of the Attr Class when there is no DOM available.
 * [AttrService](#AttrService) ⇐ [<code>NodeService</code>](#NodeService)
     * [new AttrService(name, [value], [ownerElement], [namespaceURI], [prefix])](#new_AttrService_new)
     * [.appendChild(childNode)](#NodeService+appendChild) ⇒ <code>PseudoNode</code>
+    * [.childInserted(child)](#NodeService+childInserted)
     * [.cloneNode()](#NodeService+cloneNode)
     * [.compareDocumentPosition()](#NodeService+compareDocumentPosition)
-    * [.contains()](#NodeService+contains)
-    * [.insertBefore()](#NodeService+insertBefore)
+    * [.contains(otherNode)](#NodeService+contains) ⇒ <code>boolean</code>
+    * [.insertBefore(newNode, [referenceNode])](#NodeService+insertBefore) ⇒ <code>PseudoNode</code>
     * [.isEqualNode()](#NodeService+isEqualNode)
     * [.removeChild(childElement)](#NodeService+removeChild) ⇒ <code>PseudoNode</code>
-    * [.replaceChild()](#NodeService+replaceChild)
+    * [.replaceChild(newChild, oldChild)](#NodeService+replaceChild) ⇒ <code>PseudoNode</code>
 
 <a name="new_AttrService_new"></a>
 
@@ -551,12 +880,28 @@ Simulate the behaviour of the Attr Class when there is no DOM available.
 <a name="NodeService+appendChild"></a>
 
 ### attrService.appendChild(childNode) ⇒ <code>PseudoNode</code>
+Add a node as the last child of this node (a node which is already in a tree is moved).
+
 **Kind**: instance method of [<code>AttrService</code>](#AttrService)  
 **Overrides**: [<code>appendChild</code>](#NodeService+appendChild)  
+**Returns**: <code>PseudoNode</code> - The added node  
 
-| Param | Type |
-| --- | --- |
-| childNode | <code>PseudoNode</code> | 
+| Param | Type | Description |
+| --- | --- | --- |
+| childNode | <code>PseudoNode</code> | The node to add |
+
+<a name="NodeService+childInserted"></a>
+
+### attrService.childInserted(child)
+Called each time a node has been inserted as a child of this node, so that nodes which need to react to children
+(for example elements applying default events) can do so.
+
+**Kind**: instance method of [<code>AttrService</code>](#AttrService)  
+**Overrides**: [<code>childInserted</code>](#NodeService+childInserted)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| child | [<code>NodeService</code>](#NodeService) | The node which was inserted |
 
 <a name="NodeService+cloneNode"></a>
 
@@ -582,25 +927,34 @@ Not implemented yet.
 
 <a name="NodeService+contains"></a>
 
-### attrService.contains()
-Not implemented yet.
+### attrService.contains(otherNode) ⇒ <code>boolean</code>
+Check whether a node is this node or one of its descendants.
 
 **Kind**: instance method of [<code>AttrService</code>](#AttrService)  
 **Overrides**: [<code>contains</code>](#NodeService+contains)  
-**Throws**:
 
-- <code>Error</code> 
+| Param | Type | Description |
+| --- | --- | --- |
+| otherNode | <code>PseudoNode</code> \| <code>null</code> | The node to look for |
 
 <a name="NodeService+insertBefore"></a>
 
-### attrService.insertBefore()
-Not implemented yet.
+### attrService.insertBefore(newNode, [referenceNode]) ⇒ <code>PseudoNode</code>
+Insert a node as a child of this node, before the given child (or at the end when there is none). A node which is
+already in a tree is moved, and the children of a document fragment are moved in order.
 
 **Kind**: instance method of [<code>AttrService</code>](#AttrService)  
 **Overrides**: [<code>insertBefore</code>](#NodeService+insertBefore)  
+**Returns**: <code>PseudoNode</code> - The inserted node  
 **Throws**:
 
-- <code>Error</code> 
+- <code>Error</code> When the reference node is not a child of this node, or the new node is this node or contains it
+
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| newNode | <code>PseudoNode</code> |  | The node to insert |
+| [referenceNode] | <code>PseudoNode</code> \| <code>null</code> | <code></code> | The child of this node to insert before, or null to insert at the end |
 
 <a name="NodeService+isEqualNode"></a>
 
@@ -616,10 +970,11 @@ Not implemented yet.
 <a name="NodeService+removeChild"></a>
 
 ### attrService.removeChild(childElement) ⇒ <code>PseudoNode</code>
-Remove the given child from this node.
+Remove a child from this node, it no longer has a parent or siblings afterwards.
 
 **Kind**: instance method of [<code>AttrService</code>](#AttrService)  
 **Overrides**: [<code>removeChild</code>](#NodeService+removeChild)  
+**Returns**: <code>PseudoNode</code> - The removed node  
 **Throws**:
 
 - <code>Error</code> When the node is not a child of this node
@@ -627,23 +982,31 @@ Remove the given child from this node.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| childElement | <code>PseudoNode</code> | The child node, or its TreeLinker from the children list |
+| childElement | <code>PseudoNode</code> | The child node to remove |
 
 <a name="NodeService+replaceChild"></a>
 
-### attrService.replaceChild()
-Not implemented yet.
+### attrService.replaceChild(newChild, oldChild) ⇒ <code>PseudoNode</code>
+Replace a child of this node with another node (which is moved if it is already in a tree).
 
 **Kind**: instance method of [<code>AttrService</code>](#AttrService)  
 **Overrides**: [<code>replaceChild</code>](#NodeService+replaceChild)  
+**Returns**: <code>PseudoNode</code> - The replaced node  
 **Throws**:
 
-- <code>Error</code> 
+- <code>Error</code> When the old node is not a child of this node
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| newChild | <code>PseudoNode</code> | The node which takes the place |
+| oldChild | <code>PseudoNode</code> | The child of this node to replace |
 
 <a name="LinkedNode"></a>
 
 ## LinkedNode ⇐ [<code>NodeService</code>](#NodeService)
-A node which is stored in a TreeLinker and answers questions about its position in the tree by asking that linker.
+A node which is stored in a TreeLinker (for example by a list built from an array of values). It finds its siblings
+from that linker, and its parent from the linker's parent when it has not been given one by appendChild.
 
 **Kind**: global class  
 **Extends**: [<code>NodeService</code>](#NodeService)  
@@ -652,13 +1015,14 @@ A node which is stored in a TreeLinker and answers questions about its position 
 * [LinkedNode](#LinkedNode) ⇐ [<code>NodeService</code>](#NodeService)
     * [new LinkedNode(linker, value)](#new_LinkedNode_new)
     * [.appendChild(childNode)](#NodeService+appendChild) ⇒ <code>PseudoNode</code>
+    * [.childInserted(child)](#NodeService+childInserted)
     * [.cloneNode()](#NodeService+cloneNode)
     * [.compareDocumentPosition()](#NodeService+compareDocumentPosition)
-    * [.contains()](#NodeService+contains)
-    * [.insertBefore()](#NodeService+insertBefore)
+    * [.contains(otherNode)](#NodeService+contains) ⇒ <code>boolean</code>
+    * [.insertBefore(newNode, [referenceNode])](#NodeService+insertBefore) ⇒ <code>PseudoNode</code>
     * [.isEqualNode()](#NodeService+isEqualNode)
     * [.removeChild(childElement)](#NodeService+removeChild) ⇒ <code>PseudoNode</code>
-    * [.replaceChild()](#NodeService+replaceChild)
+    * [.replaceChild(newChild, oldChild)](#NodeService+replaceChild) ⇒ <code>PseudoNode</code>
 
 <a name="new_LinkedNode_new"></a>
 
@@ -672,12 +1036,28 @@ A node which is stored in a TreeLinker and answers questions about its position 
 <a name="NodeService+appendChild"></a>
 
 ### linkedNode.appendChild(childNode) ⇒ <code>PseudoNode</code>
+Add a node as the last child of this node (a node which is already in a tree is moved).
+
 **Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
 **Overrides**: [<code>appendChild</code>](#NodeService+appendChild)  
+**Returns**: <code>PseudoNode</code> - The added node  
 
-| Param | Type |
-| --- | --- |
-| childNode | <code>PseudoNode</code> | 
+| Param | Type | Description |
+| --- | --- | --- |
+| childNode | <code>PseudoNode</code> | The node to add |
+
+<a name="NodeService+childInserted"></a>
+
+### linkedNode.childInserted(child)
+Called each time a node has been inserted as a child of this node, so that nodes which need to react to children
+(for example elements applying default events) can do so.
+
+**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
+**Overrides**: [<code>childInserted</code>](#NodeService+childInserted)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| child | [<code>NodeService</code>](#NodeService) | The node which was inserted |
 
 <a name="NodeService+cloneNode"></a>
 
@@ -703,25 +1083,34 @@ Not implemented yet.
 
 <a name="NodeService+contains"></a>
 
-### linkedNode.contains()
-Not implemented yet.
+### linkedNode.contains(otherNode) ⇒ <code>boolean</code>
+Check whether a node is this node or one of its descendants.
 
 **Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
 **Overrides**: [<code>contains</code>](#NodeService+contains)  
-**Throws**:
 
-- <code>Error</code> 
+| Param | Type | Description |
+| --- | --- | --- |
+| otherNode | <code>PseudoNode</code> \| <code>null</code> | The node to look for |
 
 <a name="NodeService+insertBefore"></a>
 
-### linkedNode.insertBefore()
-Not implemented yet.
+### linkedNode.insertBefore(newNode, [referenceNode]) ⇒ <code>PseudoNode</code>
+Insert a node as a child of this node, before the given child (or at the end when there is none). A node which is
+already in a tree is moved, and the children of a document fragment are moved in order.
 
 **Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
 **Overrides**: [<code>insertBefore</code>](#NodeService+insertBefore)  
+**Returns**: <code>PseudoNode</code> - The inserted node  
 **Throws**:
 
-- <code>Error</code> 
+- <code>Error</code> When the reference node is not a child of this node, or the new node is this node or contains it
+
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| newNode | <code>PseudoNode</code> |  | The node to insert |
+| [referenceNode] | <code>PseudoNode</code> \| <code>null</code> | <code></code> | The child of this node to insert before, or null to insert at the end |
 
 <a name="NodeService+isEqualNode"></a>
 
@@ -737,10 +1126,11 @@ Not implemented yet.
 <a name="NodeService+removeChild"></a>
 
 ### linkedNode.removeChild(childElement) ⇒ <code>PseudoNode</code>
-Remove the given child from this node.
+Remove a child from this node, it no longer has a parent or siblings afterwards.
 
 **Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
 **Overrides**: [<code>removeChild</code>](#NodeService+removeChild)  
+**Returns**: <code>PseudoNode</code> - The removed node  
 **Throws**:
 
 - <code>Error</code> When the node is not a child of this node
@@ -748,18 +1138,25 @@ Remove the given child from this node.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| childElement | <code>PseudoNode</code> | The child node, or its TreeLinker from the children list |
+| childElement | <code>PseudoNode</code> | The child node to remove |
 
 <a name="NodeService+replaceChild"></a>
 
-### linkedNode.replaceChild()
-Not implemented yet.
+### linkedNode.replaceChild(newChild, oldChild) ⇒ <code>PseudoNode</code>
+Replace a child of this node with another node (which is moved if it is already in a tree).
 
 **Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
 **Overrides**: [<code>replaceChild</code>](#NodeService+replaceChild)  
+**Returns**: <code>PseudoNode</code> - The replaced node  
 **Throws**:
 
-- <code>Error</code> 
+- <code>Error</code> When the old node is not a child of this node
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| newChild | <code>PseudoNode</code> | The node which takes the place |
+| oldChild | <code>PseudoNode</code> | The child of this node to replace |
 
 <a name="PseudoNodeList"></a>
 
@@ -807,7 +1204,7 @@ Simulate the behaviour of the HTMLDocument Class when there is no DOM available.
 | --- | --- | --- |
 | head | <code>PseudoHTMLElement</code> | A reference to the Head child element |
 | body | <code>PseudoHTMLElement</code> | A reference to the Body child element |
-| createElement | <code>function</code> | Generate a new PseudoHTMLElement with parent of document |
+| createElement | <code>function</code> | Generate a new PseudoHTMLElement (which is not in the document until it is appended) |
 
 
 * [PseudoHTMLDocument](#PseudoHTMLDocument) ⇐ <code>PseudoHTMLElement</code>
@@ -836,7 +1233,7 @@ Create document body element
 <a name="PseudoHTMLDocument+createElement"></a>
 
 ### pseudoHTMLDocument.createElement(tagName) ⇒ <code>PseudoHTMLElement</code>
-Create and return a PseudoHTMLElement
+Create and return a PseudoHTMLElement, which is not added to the document until it is appended somewhere
 
 **Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
 
@@ -963,6 +1360,33 @@ The function (or object with handleEvent) which was originally given when regist
 
 ## HTMLElementService\_1 : <code>PseudoHTMLElement</code>
 **Kind**: global constant  
+<a name="getParentNodesFromAttribute"></a>
+
+## getParentNodesFromAttribute(attr, value, node) ⇒ <code>Array.&lt;PseudoNode&gt;</code>
+A selector function for retrieving existing parent PseudoNode from the given child item.
+This function will check all the parents starting from node, and scan the attributes
+property for matches. The return array contains all matching parent ancestors, starting with the root of the tree.
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| attr | <code>string</code> | The property to compare on each ancestor (a missing property counts as false) |
+| value | <code>boolean</code> \| <code>number</code> \| <code>string</code> | The value the property must have |
+| node | <code>PseudoEventTarget</code> \| <code>PseudoNode</code> \| <code>\*</code> | The node to find the matching ancestors of |
+
+<a name="getParentNodes"></a>
+
+## getParentNodes(node) ⇒ <code>Array.&lt;PseudoNode&gt;</code>
+Get all of the ancestors of a node, starting with the root of the tree and ending with the node's own parent (the
+order in which an event travels down through them). A node which has no parent has no ancestors.
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| node | <code>PseudoEventTarget</code> \| <code>PseudoNode</code> \| <code>\*</code> | The node to find the ancestors of |
+
 <a name="generateNodeList"></a>
 
 ## generateNodeList([innerList]) ⇒ [<code>PseudoNodeList</code>](#PseudoNodeList)

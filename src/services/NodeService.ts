@@ -41,8 +41,8 @@ export class NodeService extends EventTargetService implements PseudoNode {
   protected nodeNameValue: string
   private nodeValueStore: string | null
   private textContentStore: string | null
-  private next: PseudoNode | null
-  private prev: PseudoNode | null
+  /** The linker which holds this node in the children list of its parent, from which its siblings are found (null while it has no parent). */
+  protected listLinker: TreeLinker | null
 
   /**
    *
@@ -55,8 +55,7 @@ export class NodeService extends EventTargetService implements PseudoNode {
     this.nodeNameValue = ''
     this.children = generateNodeList()
     this.parent = null
-    this.next = null
-    this.prev = null
+    this.listLinker = null
   }
 
   get baseURI (): Location | string {
@@ -80,9 +79,7 @@ export class NodeService extends EventTargetService implements PseudoNode {
   }
 
   get nextSibling (): PseudoNode | null {
-    return this.isConnected
-      ? this.next
-      : null
+    return this.listLinker && this.listLinker.next ? this.listLinker.next.data : null
   }
 
   get nodeName (): string {
@@ -114,9 +111,7 @@ export class NodeService extends EventTargetService implements PseudoNode {
   }
 
   get previousSibling (): PseudoNode | null {
-    return this.isConnected
-      ? this.prev
-      : null
+    return this.listLinker && this.listLinker.prev ? this.listLinker.prev.data : null
   }
 
   get textContent (): string | null {
@@ -128,14 +123,20 @@ export class NodeService extends EventTargetService implements PseudoNode {
   }
 
   /**
-   *
-   * @param {PseudoNode} childNode
-   * @returns {PseudoNode}
+   * Add a node as the last child of this node (a node which is already in a tree is moved).
+   * @param {PseudoNode} childNode The node to add
+   * @returns {PseudoNode} The added node
    */
   appendChild (childNode: PseudoNode): PseudoNode {
-    this.children.append(childNode)
-    return childNode
+    return this.insertBefore(childNode, null)
   }
+
+  /**
+   * Called each time a node has been inserted as a child of this node, so that nodes which need to react to children
+   * (for example elements applying default events) can do so.
+   * @param {NodeService} child The node which was inserted
+   */
+  protected childInserted (child: NodeService): void {}
 
   /**
    * Not implemented yet.
@@ -154,11 +155,19 @@ export class NodeService extends EventTargetService implements PseudoNode {
   }
 
   /**
-   * Not implemented yet.
-   * @throws {Error}
+   * Check whether a node is this node or one of its descendants.
+   * @param {PseudoNode|null} otherNode The node to look for
+   * @returns {boolean}
    */
-  contains (otherNode: PseudoNode): boolean {
-    throw new Error('NodeService.contains() is not implemented yet.')
+  contains (otherNode: PseudoNode | null): boolean {
+    let current: PseudoNode | null = otherNode
+    while (current) {
+      if (current === this) {
+        return true
+      }
+      current = current.parentNode
+    }
+    return false
   }
 
   getRootNode (options: { composed: boolean } = { composed: false }): PseudoNode {
@@ -170,11 +179,42 @@ export class NodeService extends EventTargetService implements PseudoNode {
   }
 
   /**
-   * Not implemented yet.
-   * @throws {Error}
+   * Insert a node as a child of this node, before the given child (or at the end when there is none). A node which is
+   * already in a tree is moved, and the children of a document fragment are moved in order.
+   * @param {PseudoNode} newNode The node to insert
+   * @param {PseudoNode|null} [referenceNode=null] The child of this node to insert before, or null to insert at the end
+   * @returns {PseudoNode} The inserted node
+   * @throws {Error} When the reference node is not a child of this node, or the new node is this node or contains it
    */
-  insertBefore (newNode: PseudoNode, referenceNode: PseudoNode | null): PseudoNode | PseudoDocumentFragment {
-    throw new Error('NodeService.insertBefore() is not implemented yet.')
+  insertBefore (newNode: PseudoNode, referenceNode: PseudoNode | null = null): PseudoNode | PseudoDocumentFragment {
+    if (referenceNode !== null && referenceNode.parentNode !== this) {
+      throw new Error('The node before which the new node is to be inserted is not a child of this node.')
+    }
+    if (newNode === referenceNode) {
+      // Inserting a node before itself leaves it where it is
+      return newNode
+    }
+    if (typeof newNode.contains === 'function' && newNode.contains(this)) {
+      throw new Error('The new node cannot be inserted into itself or one of its own descendants.')
+    }
+    if (newNode.nodeType === NodeService.DOCUMENT_FRAGMENT_NODE) {
+      // The children of a fragment are inserted (moved) in order, and the fragment is left empty
+      while (newNode.firstChild) {
+        this.insertBefore(newNode.firstChild, referenceNode)
+      }
+      return newNode
+    }
+    if (newNode.parentNode) {
+      // A node can only be in one place, so it is moved from where it was
+      newNode.parentNode.removeChild(newNode)
+    }
+    const linker: TreeLinker = new TreeLinker({ data: newNode })
+    this.children.insertBefore(referenceNode ? (referenceNode as NodeService).listLinker : null, linker)
+    const inserted: NodeService = newNode as NodeService
+    inserted.parent = this
+    inserted.listLinker = linker
+    this.childInserted(inserted)
+    return newNode
   }
 
   isDefaultNamespace (namespaceURI: string | null): boolean {
@@ -204,30 +244,43 @@ export class NodeService extends EventTargetService implements PseudoNode {
   normalize (): void {}
 
   /**
-   * Remove the given child from this node.
-   * @param {PseudoNode} childElement The child node, or its TreeLinker from the children list
-   * @returns {PseudoNode}
+   * Remove a child from this node, it no longer has a parent or siblings afterwards.
+   * @param {PseudoNode} childElement The child node to remove
+   * @returns {PseudoNode} The removed node
    * @throws {Error} When the node is not a child of this node
    */
   removeChild (childElement: PseudoNode): PseudoNode {
-    let found: any = null
-    this.children.forEach((linker: any) => {
-      if (found === null && (linker === childElement || linker.data === childElement)) {
-        found = linker
-      }
-    })
-    if (found === null) {
+    if (!childElement || childElement.parentNode !== this) {
       throw new Error('The node to be removed is not a child of this node.')
     }
-    this.children.remove(found)
-    return found.data
+    const removed: NodeService = childElement as NodeService
+    this.children.remove(removed.listLinker as TreeLinker)
+    removed.parent = null
+    removed.listLinker = null
+    return childElement
   }
 
   /**
-   * Not implemented yet.
-   * @throws {Error}
+   * Replace a child of this node with another node (which is moved if it is already in a tree).
+   * @param {PseudoNode} newChild The node which takes the place
+   * @param {PseudoNode} oldChild The child of this node to replace
+   * @returns {PseudoNode} The replaced node
+   * @throws {Error} When the old node is not a child of this node
    */
   replaceChild (newChild: PseudoNode, oldChild: PseudoNode): PseudoNode {
-    throw new Error('NodeService.replaceChild() is not implemented yet.')
+    if (!oldChild || oldChild.parentNode !== this) {
+      throw new Error('The node to be replaced is not a child of this node.')
+    }
+    if (newChild === oldChild) {
+      return oldChild
+    }
+    // The new node goes where the old one was, which is before the old node's next sibling (unless that is the new node)
+    let reference: PseudoNode | null = oldChild.nextSibling
+    if (reference === newChild) {
+      reference = newChild.nextSibling
+    }
+    this.removeChild(oldChild)
+    this.insertBefore(newChild, reference)
+    return oldChild
   }
 }

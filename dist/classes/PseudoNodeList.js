@@ -24,16 +24,22 @@ class PseudoNodeList extends LinkedTreeList_1.LinkedTreeList {
    * @returns {Iterator}
    */
   [Symbol.iterator] () {
-    const linkers = super[Symbol.iterator]()
+    // Walk the nodes of this list only (the linkers of a child list have no children of their own)
+    let current = this.first
     return {
       next: () => {
-        const result = linkers.next()
-        return result.done
-          ? result
-          : {
-              done: false,
-              value: result.value.data
-            }
+        if (current === null) {
+          return {
+            done: true,
+            value: undefined
+          }
+        }
+        const result = {
+          done: false,
+          value: current.data
+        }
+        current = current.next
+        return result
       }
     }
   }

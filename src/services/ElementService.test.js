@@ -59,4 +59,27 @@ describe('ElementService', () => {
     expect(parent.hasChildNodes()).toBe(true)
     expect(parent.firstChild).toBe(child)
   })
+
+  test('elements can be created with children and a parent, which are appended for real', () => {
+    const child = new ElementService({ tagName: 'span' })
+    const parent = new ElementService({ tagName: 'div', children: [child] })
+    expect(child.parentNode).toBe(parent)
+    const outer = new ElementService({ tagName: 'section', parent })
+    expect(Array.from(parent.childNodes)).toEqual([child, outer])
+    expect(outer.previousSibling).toBe(child)
+  })
+
+  test('children which are not nodes are refused', () => {
+    expect(() => new ElementService({ tagName: 'div', children: ['text'] })).toThrow('must be nodes')
+  })
+
+  test('elements get their default events however they are inserted', () => {
+    const form = new ElementService({ tagName: 'form' })
+    const before = jest.spyOn(form, 'applyDefaultEvent')
+    const parent = new ElementService({ tagName: 'div' })
+    const reference = new ElementService({ tagName: 'p' })
+    parent.appendChild(reference)
+    parent.insertBefore(form, reference)
+    expect(before).toHaveBeenCalledTimes(1)
+  })
 })

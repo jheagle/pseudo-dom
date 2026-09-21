@@ -39,8 +39,8 @@ export declare class ElementService extends NodeService implements Partial<Pseud
      * @param {Object} [settings={}]
      * @param {string} [settings.tagName=''] The name of the tag this element represents
      * @param {Array<{name: string, value: *}>} [settings.attributes=[]] The attributes (also assigned as properties) to start with
-     * @param {PseudoNode|null} [settings.parent=null] The parent node
-     * @param {Array} [settings.children=[]] The values or nodes to start as children
+     * @param {PseudoNode|null} [settings.parent=null] The node to add this element to as its last child
+     * @param {Array<PseudoNode>} [settings.children=[]] The nodes to start as children
      * @constructor
      */
     constructor({ tagName, attributes, parent, children }?: {
@@ -61,11 +61,10 @@ export declare class ElementService extends NodeService implements Partial<Pseud
      */
     applyDefaultEvent(): Function;
     /**
-     *
-     * @param {PseudoNode|ElementService} childElement
-     * @returns {PseudoNode}
+     * An element which is added as a child gets its default events (for example a submit button submits its form).
+     * @param {NodeService} child The node which was inserted
      */
-    appendChild(childElement: ElementService): PseudoNode;
+    protected childInserted(child: NodeService): void;
     /**
      * Check whether the element has an attribute by that name.
      * @param {string} attributeName

@@ -15,7 +15,7 @@ import { HTMLElementService as PseudoHTMLElement } from '../services/HTMLElement
  * @augments PseudoHTMLElement
  * @property {PseudoHTMLElement} head - A reference to the Head child element
  * @property {PseudoHTMLElement} body - A reference to the Body child element
- * @property {function} createElement - Generate a new PseudoHTMLElement with parent of document
+ * @property {function} createElement - Generate a new PseudoHTMLElement (which is not in the document until it is appended)
  */
 declare class PseudoHTMLDocument extends PseudoHTMLElement {
     private head;
@@ -26,7 +26,7 @@ declare class PseudoHTMLDocument extends PseudoHTMLElement {
      */
     constructor();
     /**
-     * Create and return a PseudoHTMLElement
+     * Create and return a PseudoHTMLElement, which is not added to the document until it is appended somewhere
      * @param {string} tagName - Tag Name is a string representing the type of Dom element this represents
      * @returns {PseudoHTMLElement}
      */

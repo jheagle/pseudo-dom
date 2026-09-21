@@ -1,9 +1,11 @@
-/**
- * A helper selector function for retrieving all parent PseudoNode for the given child node.
- * @param {PseudoNode} node
- * @returns {Array.<PseudoNode>}
- */
 import { PseudoNode } from '../interfaces/PseudoNode';
 import { PseudoEventTarget } from '../interfaces/PseudoEventTarget';
-declare const getParentNodes: (node: PseudoEventTarget) => Array<PseudoNode>;
+/**
+ * Get all of the ancestors of a node, starting with the root of the tree and ending with the node's own parent (the
+ * order in which an event travels down through them). A node which has no parent has no ancestors.
+ * @function getParentNodes
+ * @param {PseudoEventTarget|PseudoNode|*} node The node to find the ancestors of
+ * @returns {Array<PseudoNode>}
+ */
+declare const getParentNodes: (node: PseudoEventTarget | PseudoNode | any) => Array<PseudoNode>;
 export default getParentNodes;
