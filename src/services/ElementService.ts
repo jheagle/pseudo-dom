@@ -4,8 +4,6 @@
  * @version 1.0.0
  */
 import { PseudoNode } from '../interfaces/PseudoNode'
-import generateNodeList from '../factories/generateNodeList'
-import { TreeLinker } from 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker'
 import { EventService } from './EventService'
 import { NodeService } from './NodeService'
 import { PseudoElement } from '../interfaces/PseudoElement'
@@ -46,8 +44,8 @@ export class ElementService extends NodeService implements Partial<PseudoElement
    * @param {Object} [settings={}]
    * @param {string} [settings.tagName=''] The name of the tag this element represents
    * @param {Array<{name: string, value: *}>} [settings.attributes=[]] The attributes (also assigned as properties) to start with
-   * @param {PseudoNode|null} [settings.parent=null] The parent node
-   * @param {Array} [settings.children=[]] The values or nodes to start as children
+   * @param {PseudoNode|null} [settings.parent=null] The node to add this element to as its last child
+   * @param {Array<PseudoNode>} [settings.children=[]] The nodes to start as children
    * @constructor
    */
   constructor ({ tagName = '', attributes = [], parent = null, children = [] }: {
@@ -58,8 +56,6 @@ export class ElementService extends NodeService implements Partial<PseudoElement
   } = {}) {
     super()
     this.tokenList = new DOMTokenListService()
-    this.parent = parent
-    this.children = generateNodeList(TreeLinker.fromArray(children).head)
     this.tag = tagName
     this.attributeList = attributes.concat([
       { name: 'className', value: '' },
@@ -70,6 +66,15 @@ export class ElementService extends NodeService implements Partial<PseudoElement
     this.attributeList.forEach(({ name, value }) => {
       (this as any)[name] = value
     })
+    children.forEach(child => {
+      if (!child || typeof child.nodeType !== 'number') {
+        throw new TypeError('The children of an element must be nodes.')
+      }
+      this.appendChild(child)
+    })
+    if (parent) {
+      parent.appendChild(this)
+    }
   }
 
   get tagName (): string {
@@ -122,14 +127,13 @@ export class ElementService extends NodeService implements Partial<PseudoElement
   }
 
   /**
-   *
-   * @param {PseudoNode|ElementService} childElement
-   * @returns {PseudoNode}
+   * An element which is added as a child gets its default events (for example a submit button submits its form).
+   * @param {NodeService} child The node which was inserted
    */
-  appendChild (childElement: ElementService): PseudoNode {
-    super.appendChild(childElement)
-    childElement.applyDefaultEvent()
-    return childElement
+  protected childInserted (child: NodeService): void {
+    if (typeof (child as any).applyDefaultEvent === 'function') {
+      (child as ElementService).applyDefaultEvent()
+    }
   }
 
   /**

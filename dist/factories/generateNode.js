@@ -9,7 +9,8 @@ exports.NodeFactory = exports.LinkedNode = void 0
 const TreeLinker_1 = require('collect-your-stuff/dist/collections/linked-tree-list/TreeLinker')
 const NodeService_1 = require('../services/NodeService')
 /**
- * A node which is stored in a TreeLinker and answers questions about its position in the tree by asking that linker.
+ * A node which is stored in a TreeLinker (for example by a list built from an array of values). It finds its siblings
+ * from that linker, and its parent from the linker's parent when it has not been given one by appendChild.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @class
  * @augments NodeService
@@ -22,59 +23,25 @@ class LinkedNode extends NodeService_1.NodeService {
    */
   constructor (linker, value = '') {
     super()
-    this.linker = linker
+    this.listLinker = linker
     this.nodeValue = value
   }
 
-  get childNodes () {
-    return this.linker.children
-  }
-
-  get firstChild () {
-    const children = this.linker.children
-    return children && children.first ? children.first.data : null
-  }
-
   get isConnected () {
-    return !!this.linker.parent
-  }
-
-  get lastChild () {
-    const children = this.linker.children
-    return children && children.last ? children.last.data : null
-  }
-
-  get nextSibling () {
-    return this.linker.next ? this.linker.next.data : null
-  }
-
-  get ownerDocument () {
-    const root = this.linker.parent ? this.linker.rootParent : null
-    return root ? root.data : null
+    return !!this.parentNode
   }
 
   get parentNode () {
-    return this.linker.parent ? this.linker.parent.data : null
+    if (this.parent) {
+      return this.parent
+    }
+    const parentLinker = this.listLinker ? this.listLinker.parent : null
+    return parentLinker ? parentLinker.data : null
   }
 
   get parentElement () {
     const parent = this.parentNode
     return parent && parent.nodeType === NodeService_1.NodeService.ELEMENT_NODE ? parent : null
-  }
-
-  get previousSibling () {
-    return this.linker.prev ? this.linker.prev.data : null
-  }
-
-  appendChild (childNode) {
-    this.linker.next = childNode
-    childNode.prev = this.linker
-    return childNode
-  }
-
-  getRootNode () {
-    const root = this.linker.rootParent
-    return root ? root.data : this
   }
 }
 exports.LinkedNode = LinkedNode

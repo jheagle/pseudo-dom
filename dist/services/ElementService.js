@@ -16,8 +16,6 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 })
 exports.ElementService = void 0
-const generateNodeList_1 = __importDefault(require('../factories/generateNodeList'))
-const TreeLinker_1 = require('collect-your-stuff/dist/collections/linked-tree-list/TreeLinker')
 const NodeService_1 = require('./NodeService')
 const AttrService_1 = require('./AttrService')
 const DOMTokenListService_1 = require('./DOMTokenListService')
@@ -43,8 +41,8 @@ class ElementService extends NodeService_1.NodeService {
    * @param {Object} [settings={}]
    * @param {string} [settings.tagName=''] The name of the tag this element represents
    * @param {Array<{name: string, value: *}>} [settings.attributes=[]] The attributes (also assigned as properties) to start with
-   * @param {PseudoNode|null} [settings.parent=null] The parent node
-   * @param {Array} [settings.children=[]] The values or nodes to start as children
+   * @param {PseudoNode|null} [settings.parent=null] The node to add this element to as its last child
+   * @param {Array<PseudoNode>} [settings.children=[]] The nodes to start as children
    * @constructor
    */
   constructor ({
@@ -55,8 +53,6 @@ class ElementService extends NodeService_1.NodeService {
   } = {}) {
     super()
     this.tokenList = new DOMTokenListService_1.DOMTokenListService()
-    this.parent = parent
-    this.children = (0, generateNodeList_1.default)(TreeLinker_1.TreeLinker.fromArray(children).head)
     this.tag = tagName
     this.attributeList = attributes.concat([{
       name: 'className',
@@ -77,6 +73,15 @@ class ElementService extends NodeService_1.NodeService {
     }) => {
       this[name] = value
     })
+    children.forEach(child => {
+      if (!child || typeof child.nodeType !== 'number') {
+        throw new TypeError('The children of an element must be nodes.')
+      }
+      this.appendChild(child)
+    })
+    if (parent) {
+      parent.appendChild(this)
+    }
   }
 
   get tagName () {
@@ -132,14 +137,13 @@ class ElementService extends NodeService_1.NodeService {
   }
 
   /**
-   *
-   * @param {PseudoNode|ElementService} childElement
-   * @returns {PseudoNode}
+   * An element which is added as a child gets its default events (for example a submit button submits its form).
+   * @param {NodeService} child The node which was inserted
    */
-  appendChild (childElement) {
-    super.appendChild(childElement)
-    childElement.applyDefaultEvent()
-    return childElement
+  childInserted (child) {
+    if (typeof child.applyDefaultEvent === 'function') {
+      child.applyDefaultEvent()
+    }
   }
 
   /**

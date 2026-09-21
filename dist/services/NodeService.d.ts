@@ -1,5 +1,6 @@
 import { PseudoNodeList } from '../classes/PseudoNodeList';
 import { LinkedTreeList } from 'collect-your-stuff/dist/collections/linked-tree-list/LinkedTreeList';
+import { TreeLinker } from 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker';
 import { PseudoNode } from '../interfaces/PseudoNode';
 import EventTargetService from './EventTargetService';
 import { PseudoElement } from '../interfaces/PseudoElement';
@@ -33,8 +34,8 @@ export declare class NodeService extends EventTargetService implements PseudoNod
     protected nodeNameValue: string;
     private nodeValueStore;
     private textContentStore;
-    private next;
-    private prev;
+    /** The linker which holds this node in the children list of its parent, from which its siblings are found (null while it has no parent). */
+    protected listLinker: TreeLinker | null;
     /**
      *
      * @constructor
@@ -57,11 +58,17 @@ export declare class NodeService extends EventTargetService implements PseudoNod
     get textContent(): string | null;
     set textContent(text: string | null);
     /**
-     *
-     * @param {PseudoNode} childNode
-     * @returns {PseudoNode}
+     * Add a node as the last child of this node (a node which is already in a tree is moved).
+     * @param {PseudoNode} childNode The node to add
+     * @returns {PseudoNode} The added node
      */
     appendChild(childNode: PseudoNode): PseudoNode;
+    /**
+     * Called each time a node has been inserted as a child of this node, so that nodes which need to react to children
+     * (for example elements applying default events) can do so.
+     * @param {NodeService} child The node which was inserted
+     */
+    protected childInserted(child: NodeService): void;
     /**
      * Not implemented yet.
      * @throws {Error}
@@ -73,19 +80,24 @@ export declare class NodeService extends EventTargetService implements PseudoNod
      */
     compareDocumentPosition(otherNode: PseudoNode): number;
     /**
-     * Not implemented yet.
-     * @throws {Error}
+     * Check whether a node is this node or one of its descendants.
+     * @param {PseudoNode|null} otherNode The node to look for
+     * @returns {boolean}
      */
-    contains(otherNode: PseudoNode): boolean;
+    contains(otherNode: PseudoNode | null): boolean;
     getRootNode(options?: {
         composed: boolean;
     }): PseudoNode;
     hasChildNodes(): boolean;
     /**
-     * Not implemented yet.
-     * @throws {Error}
+     * Insert a node as a child of this node, before the given child (or at the end when there is none). A node which is
+     * already in a tree is moved, and the children of a document fragment are moved in order.
+     * @param {PseudoNode} newNode The node to insert
+     * @param {PseudoNode|null} [referenceNode=null] The child of this node to insert before, or null to insert at the end
+     * @returns {PseudoNode} The inserted node
+     * @throws {Error} When the reference node is not a child of this node, or the new node is this node or contains it
      */
-    insertBefore(newNode: PseudoNode, referenceNode: PseudoNode | null): PseudoNode | PseudoDocumentFragment;
+    insertBefore(newNode: PseudoNode, referenceNode?: PseudoNode | null): PseudoNode | PseudoDocumentFragment;
     isDefaultNamespace(namespaceURI: string | null): boolean;
     /**
      * Not implemented yet.
@@ -97,15 +109,18 @@ export declare class NodeService extends EventTargetService implements PseudoNod
     lookupNamespaceURI(prefix: string): string | null;
     normalize(): void;
     /**
-     * Remove the given child from this node.
-     * @param {PseudoNode} childElement The child node, or its TreeLinker from the children list
-     * @returns {PseudoNode}
+     * Remove a child from this node, it no longer has a parent or siblings afterwards.
+     * @param {PseudoNode} childElement The child node to remove
+     * @returns {PseudoNode} The removed node
      * @throws {Error} When the node is not a child of this node
      */
     removeChild(childElement: PseudoNode): PseudoNode;
     /**
-     * Not implemented yet.
-     * @throws {Error}
+     * Replace a child of this node with another node (which is moved if it is already in a tree).
+     * @param {PseudoNode} newChild The node which takes the place
+     * @param {PseudoNode} oldChild The child of this node to replace
+     * @returns {PseudoNode} The replaced node
+     * @throws {Error} When the old node is not a child of this node
      */
     replaceChild(newChild: PseudoNode, oldChild: PseudoNode): PseudoNode;
 }
