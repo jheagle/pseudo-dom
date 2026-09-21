@@ -63,9 +63,9 @@ export declare class EventService implements PseudoEvent {
      *
      * @param {string} typeArg
      * @param {Object} [eventOptions={}]
-     * @param {boolean} [eventOptions.bubbles=true]
-     * @param {boolean} [eventOptions.cancelable=true]
-     * @param {boolean} [eventOptions.composed=true]
+     * @param {boolean} [eventOptions.bubbles=false]
+     * @param {boolean} [eventOptions.cancelable=false]
+     * @param {boolean} [eventOptions.composed=false]
      * @constructor
      */
     constructor(typeArg?: string, { bubbles, cancelable, composed }?: {

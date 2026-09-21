@@ -3,7 +3,7 @@ import { EventService } from './EventService'
 
 // Listeners only run for an event which is at (or moving through) a phase, so place the event at the target.
 const eventAtTarget = type => {
-  const event = new EventService(type)
+  const event = new EventService(type, { bubbles: true, cancelable: true })
   event.inner.eventPhase = EventService.AT_TARGET
   return event
 }

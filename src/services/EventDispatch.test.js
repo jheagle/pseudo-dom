@@ -3,6 +3,9 @@ import { NodeService } from './NodeService'
 import EventTargetService from './EventTargetService'
 import { ElementService } from './ElementService'
 
+// Events which bubble and can be cancelled, since the events of the DOM do neither unless they are asked to
+const bubbling = (type = 'click', options = {}) => new EventService(type, Object.assign({ bubbles: true, cancelable: true }, options))
+
 // root > parent > target, each recording what happened to the events they hear
 const makeTree = () => {
   const root = new NodeService()
@@ -25,7 +28,7 @@ describe('dispatching an event through the tree', () => {
       listen(node, true, ':capture')
       listen(node, false, ':bubble')
     })
-    target.dispatchEvent(new EventService('click'))
+    target.dispatchEvent(bubbling())
     expect(log).toEqual([
       'root:capture 1 root',
       'parent:capture 1 parent',
@@ -39,11 +42,11 @@ describe('dispatching an event through the tree', () => {
   test('the event does not bubble when it is not a bubbling event', () => {
     const { root, parent, target, log, listen } = makeTree()
     ;[root, parent, target].forEach(node => listen(node, false))
-    target.dispatchEvent(new EventService('click', { bubbles: false }))
+    target.dispatchEvent(bubbling('click', { bubbles: false }))
     expect(log).toEqual(['target 2 target'])
     ;[root, parent, target].forEach(node => listen(node, true, ':capture'))
     log.length = 0
-    target.dispatchEvent(new EventService('click', { bubbles: false }))
+    target.dispatchEvent(bubbling('click', { bubbles: false }))
     expect(log).toEqual(['root:capture 1 root', 'parent:capture 1 parent', 'target:capture 2 target', 'target 2 target'])
   })
 
@@ -51,7 +54,7 @@ describe('dispatching an event through the tree', () => {
     const { root, parent, target } = makeTree()
     const seen = []
     parent.addEventListener('click', event => seen.push([event.target, event.currentTarget, event.eventPhase, event.composedPath()]))
-    const event = new EventService('click')
+    const event = bubbling()
     target.dispatchEvent(event)
     expect(seen).toEqual([[target, parent, EventService.BUBBLING_PHASE, [target, parent, root]]])
   })
@@ -60,7 +63,7 @@ describe('dispatching an event through the tree', () => {
     const { target, parent } = makeTree()
     let count = 0
     parent.addEventListener('click', () => count++)
-    const event = new EventService('click')
+    const event = bubbling()
     target.dispatchEvent(event)
     expect(event.eventPhase).toBe(EventService.NONE)
     expect(event.currentTarget).toBeNull()
@@ -72,7 +75,7 @@ describe('dispatching an event through the tree', () => {
 
   test('an event cannot be dispatched again while it is being dispatched', () => {
     const { target } = makeTree()
-    const event = new EventService('click')
+    const event = bubbling()
     let error
     target.addEventListener('click', () => {
       try {
@@ -91,7 +94,7 @@ describe('dispatching an event through the tree', () => {
     parent.addEventListener('click', event => event.stopPropagation())
     listen(parent, false, ':second')
     listen(target, false)
-    target.dispatchEvent(new EventService('click'))
+    target.dispatchEvent(bubbling())
     expect(log).toEqual(['target 2 target', 'parent:second 3 parent'])
   })
 
@@ -100,7 +103,7 @@ describe('dispatching an event through the tree', () => {
     root.addEventListener('click', event => event.stopPropagation(), true)
     listen(parent, true)
     listen(target, false)
-    target.dispatchEvent(new EventService('click'))
+    target.dispatchEvent(bubbling())
     expect(log).toEqual([])
   })
 
@@ -110,14 +113,14 @@ describe('dispatching an event through the tree', () => {
     parent.addEventListener('click', event => event.stopImmediatePropagation())
     listen(parent, false, ':never')
     listen(root, false)
-    target.dispatchEvent(new EventService('click'))
+    target.dispatchEvent(bubbling())
     expect(log).toEqual(['target:first 2 target'])
   })
 
   test('the stop flags are cleared afterwards', () => {
     const { target } = makeTree()
     target.addEventListener('click', event => event.stopImmediatePropagation())
-    const event = new EventService('click')
+    const event = bubbling()
     target.dispatchEvent(event)
     expect(event.inner.immediatePropagationStopped).toBe(false)
     expect(event.inner.propagationStopped).toBe(false)
@@ -136,8 +139,8 @@ describe('dispatching an event through the tree', () => {
     })
     target.addEventListener('click', removed)
     parent.addEventListener('click', () => calls.push('parent'))
-    target.dispatchEvent(new EventService('click'))
-    target.dispatchEvent(new EventService('click'))
+    target.dispatchEvent(bubbling())
+    target.dispatchEvent(bubbling())
     expect(calls).toEqual(['once', 'first', 'parent', 'first', 'late', 'parent'])
   })
 
@@ -148,7 +151,7 @@ describe('dispatching an event through the tree', () => {
     const listenerObject = { handleEvent () { objectThis = this } }
     parent.addEventListener('click', function () { thisValue = this })
     parent.addEventListener('click', listenerObject)
-    target.dispatchEvent(new EventService('click'))
+    target.dispatchEvent(bubbling())
     expect(thisValue).toBe(parent)
     expect(objectThis).toBe(listenerObject)
   })
@@ -160,14 +163,14 @@ describe('dispatching an event through the tree', () => {
     target.addEventListener('click', handler)
     target.addEventListener('click', handler)
     target.addEventListener('click', handler, true)
-    target.dispatchEvent(new EventService('click'))
+    target.dispatchEvent(bubbling())
     expect(calls).toEqual(['run', 'run'])
     target.removeEventListener('click', handler, true)
     calls.length = 0
-    target.dispatchEvent(new EventService('click'))
+    target.dispatchEvent(bubbling())
     expect(calls).toEqual(['run'])
     target.removeEventListener('click', handler)
-    target.dispatchEvent(new EventService('click'))
+    target.dispatchEvent(bubbling())
     expect(calls).toEqual(['run'])
   })
 
@@ -175,9 +178,9 @@ describe('dispatching an event through the tree', () => {
     const alone = new NodeService()
     let called = false
     alone.addEventListener('click', () => { called = true })
-    expect(alone.dispatchEvent(new EventService('click'))).toBe(true)
+    expect(alone.dispatchEvent(bubbling())).toBe(true)
     expect(called).toBe(true)
-    expect(new EventTargetService().dispatchEvent(new EventService('click'))).toBe(true)
+    expect(new EventTargetService().dispatchEvent(bubbling())).toBe(true)
   })
 })
 
@@ -185,16 +188,16 @@ describe('cancelling and the default action', () => {
   test('dispatchEvent is false when a listener prevents the default of a cancelable event', () => {
     const { parent, target } = makeTree()
     parent.addEventListener('click', event => event.preventDefault())
-    expect(target.dispatchEvent(new EventService('click'))).toBe(false)
+    expect(target.dispatchEvent(bubbling())).toBe(false)
   })
 
   test('preventDefault does nothing for an event which is not cancelable, or in a passive listener', () => {
     const { parent, target } = makeTree()
     parent.addEventListener('click', event => event.preventDefault())
-    expect(target.dispatchEvent(new EventService('click', { cancelable: false }))).toBe(true)
+    expect(target.dispatchEvent(bubbling('click', { cancelable: false }))).toBe(true)
     const passive = makeTree()
     passive.parent.addEventListener('click', event => event.preventDefault(), { passive: true })
-    expect(passive.target.dispatchEvent(new EventService('click'))).toBe(true)
+    expect(passive.target.dispatchEvent(bubbling())).toBe(true)
   })
 
   test('the default action of the target runs afterwards unless the default was prevented', () => {
@@ -209,11 +212,11 @@ describe('cancelling and the default action', () => {
     const target = new Target()
     parent.appendChild(target)
     target.addEventListener('click', () => target.actions.push('listener'))
-    target.dispatchEvent(new EventService('click'))
+    target.dispatchEvent(bubbling())
     expect(target.actions).toEqual(['listener', `default ${EventService.NONE}`])
     parent.addEventListener('click', event => event.preventDefault())
     target.actions.length = 0
-    expect(target.dispatchEvent(new EventService('click'))).toBe(false)
+    expect(target.dispatchEvent(bubbling())).toBe(false)
     expect(target.actions).toEqual(['listener'])
   })
 })
@@ -225,7 +228,7 @@ describe('listeners which throw', () => {
     target.addEventListener('click', () => { throw new Error('first') })
     target.addEventListener('click', () => calls.push('second'))
     parent.addEventListener('click', () => calls.push('parent'))
-    expect(() => target.dispatchEvent(new EventService('click'))).toThrow('first')
+    expect(() => target.dispatchEvent(bubbling())).toThrow('first')
     expect(calls).toEqual(['second', 'parent'])
   })
 
@@ -235,7 +238,7 @@ describe('listeners which throw', () => {
     parent.addEventListener('click', () => { throw new Error('two') })
     let error
     try {
-      target.dispatchEvent(new EventService('click'))
+      target.dispatchEvent(bubbling())
     } catch (caught) {
       error = caught
     }
@@ -260,7 +263,7 @@ describe('clicking a submit button', () => {
     const seen = []
     form.addEventListener('submit', event => seen.push(['form', event.target === form]))
     outer.addEventListener('submit', event => seen.push(['outer', event.target === form]))
-    button.dispatchEvent(new EventService('click'))
+    button.dispatchEvent(bubbling())
     expect(seen).toEqual([['form', true], ['outer', true]])
   })
 
@@ -269,7 +272,7 @@ describe('clicking a submit button', () => {
     let submitted = false
     form.addEventListener('submit', () => { submitted = true })
     wrapper.addEventListener('click', event => event.preventDefault())
-    button.dispatchEvent(new EventService('click'))
+    button.dispatchEvent(bubbling())
     expect(submitted).toBe(false)
   })
 
@@ -280,7 +283,7 @@ describe('clicking a submit button', () => {
     wrapper.removeChild(button)
     wrapper.appendChild(button)
     wrapper.appendChild(button)
-    button.dispatchEvent(new EventService('click'))
+    button.dispatchEvent(bubbling())
     expect(count).toBe(1)
   })
 
@@ -288,6 +291,18 @@ describe('clicking a submit button', () => {
     const button = new ElementService({ tagName: 'button', attributes: [{ name: 'type', value: 'submit' }] })
     const parent = new ElementService({ tagName: 'div' })
     parent.appendChild(button)
-    expect(button.dispatchEvent(new EventService('click'))).toBe(true)
+    expect(button.dispatchEvent(bubbling())).toBe(true)
+  })
+})
+
+describe('an event which is not asked to bubble or be cancelled', () => {
+  test('does not bubble to the ancestors, and cannot be prevented', () => {
+    const { root, parent, target, log, listen } = makeTree()
+    ;[root, parent, target].forEach(node => listen(node, false))
+    target.addEventListener('click', event => event.preventDefault())
+    const event = new EventService('click')
+    expect(target.dispatchEvent(event)).toBe(true)
+    expect(log).toEqual(['target 2 target'])
+    expect(event.defaultPrevented).toBe(false)
   })
 })

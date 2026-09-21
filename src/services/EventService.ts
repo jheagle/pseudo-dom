@@ -80,9 +80,9 @@ export class EventService implements PseudoEvent {
   public static readonly AT_TARGET = 2
   public static readonly BUBBLING_PHASE = 3
   private properties: innerProperties = {
-    bubbles: true,
-    cancelable: true,
-    composed: true,
+    bubbles: false,
+    cancelable: false,
+    composed: false,
     currentTarget: null,
     defaultPrevented: false,
     immediatePropagationStopped: false,
@@ -101,12 +101,12 @@ export class EventService implements PseudoEvent {
    *
    * @param {string} typeArg
    * @param {Object} [eventOptions={}]
-   * @param {boolean} [eventOptions.bubbles=true]
-   * @param {boolean} [eventOptions.cancelable=true]
-   * @param {boolean} [eventOptions.composed=true]
+   * @param {boolean} [eventOptions.bubbles=false]
+   * @param {boolean} [eventOptions.cancelable=false]
+   * @param {boolean} [eventOptions.composed=false]
    * @constructor
    */
-  constructor (typeArg: string = '', { bubbles = true, cancelable = true, composed = true }: {
+  constructor (typeArg: string = '', { bubbles = false, cancelable = false, composed = false }: {
     bubbles?: boolean;
     cancelable?: boolean;
     composed?: boolean

@@ -43,20 +43,20 @@ class EventService {
    *
    * @param {string} typeArg
    * @param {Object} [eventOptions={}]
-   * @param {boolean} [eventOptions.bubbles=true]
-   * @param {boolean} [eventOptions.cancelable=true]
-   * @param {boolean} [eventOptions.composed=true]
+   * @param {boolean} [eventOptions.bubbles=false]
+   * @param {boolean} [eventOptions.cancelable=false]
+   * @param {boolean} [eventOptions.composed=false]
    * @constructor
    */
   constructor (typeArg = '', {
-    bubbles = true,
-    cancelable = true,
-    composed = true
+    bubbles = false,
+    cancelable = false,
+    composed = false
   } = {}) {
     this.properties = {
-      bubbles: true,
-      cancelable: true,
-      composed: true,
+      bubbles: false,
+      cancelable: false,
+      composed: false,
       currentTarget: null,
       defaultPrevented: false,
       immediatePropagationStopped: false,

@@ -485,9 +485,9 @@ Simulate the behaviour of the Event Class when there is no DOM available.
 | --- | --- | --- |
 | typeArg | <code>string</code> |  | 
 | [eventOptions] | <code>Object</code> | <code>{}</code> | 
-| [eventOptions.bubbles] | <code>boolean</code> | <code>true</code> | 
-| [eventOptions.cancelable] | <code>boolean</code> | <code>true</code> | 
-| [eventOptions.composed] | <code>boolean</code> | <code>true</code> | 
+| [eventOptions.bubbles] | <code>boolean</code> | <code>false</code> | 
+| [eventOptions.cancelable] | <code>boolean</code> | <code>false</code> | 
+| [eventOptions.composed] | <code>boolean</code> | <code>false</code> | 
 
 <a name="EventService+inner"></a>
 
