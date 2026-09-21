@@ -5,6 +5,7 @@
  */
 import { PseudoNode } from '../interfaces/PseudoNode'
 import { EventService } from './EventService'
+import createEvent from '../factories/createEvent'
 import { NodeService } from './NodeService'
 import { PseudoElement } from '../interfaces/PseudoElement'
 import { PseudoNamedNodeMap } from '../interfaces/PseudoNamedNodeMap'
@@ -114,17 +115,17 @@ export class ElementService extends NodeService implements Partial<PseudoElement
     switch (this.tagName) {
       case 'button':
       case 'input':
-        if (/^(submit|image)$/i.test(this.type || '')) {
-          // Clicking a submit button submits the form it is in: the form gets a submit event, which can be cancelled
-          callback = (event: EventService): void => {
-            const forms: Array<any> = getParentNodesFromAttribute('tagName', 'form', this)
-            if (forms.length) {
-              forms[forms.length - 1].dispatchEvent(new EventService('submit', { bubbles: true, cancelable: true }))
-            }
+        // Clicking a submit button submits the form it is in: the form gets a submit event, which can be cancelled
+        callback = (event: EventService): void => {
+          const type: string = String(this.getAttribute('type') || this.type || '').toLowerCase()
+          const submits: boolean = this.tagName === 'button' ? type !== 'button' && type !== 'reset' : /^(submit|image)$/.test(type)
+          const forms: Array<any> = getParentNodesFromAttribute('tagName', 'form', this)
+          if (submits && forms.length && !this.hasAttribute('disabled')) {
+            forms[forms.length - 1].dispatchEvent(createEvent('submit', {}, { browser: true, trusted: event.isTrusted }))
           }
-          super.setDefaultEvent('click', callback)
-          this.defaultEventApplied = true
         }
+        super.setDefaultEvent('click', callback)
+        this.defaultEventApplied = true
     }
     return callback
   }

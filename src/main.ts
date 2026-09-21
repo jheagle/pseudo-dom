@@ -11,6 +11,16 @@ import { ElementService as PseudoElement } from './services/ElementService'
 import { HTMLElementService as PseudoHTMLElement } from './services/HTMLElementService'
 import PseudoHTMLDocument from './classes/PseudoHTMLDocument'
 import generateDocument from './factories/generateDocument'
+import createEvent from './factories/createEvent'
+import eventDefaults from './factories/eventDefaults'
+import { UIEventService as PseudoUIEvent } from './services/UIEventService'
+import { MouseEventService as PseudoMouseEvent } from './services/MouseEventService'
+import { PointerEventService as PseudoPointerEvent } from './services/PointerEventService'
+import { KeyboardEventService as PseudoKeyboardEvent } from './services/KeyboardEventService'
+import { FocusEventService as PseudoFocusEvent } from './services/FocusEventService'
+import { InputEventService as PseudoInputEvent } from './services/InputEventService'
+import { CustomEventService as PseudoCustomEvent } from './services/CustomEventService'
+import simulate from './simulate'
 
 /**
  * All methods exported from this module are encapsulated within pseudoDom.
@@ -20,7 +30,17 @@ import generateDocument from './factories/generateDocument'
  */
 const pseudoDom = {
   generateDocument,
+  createEvent,
+  eventDefaults,
+  simulate,
   PseudoEvent,
+  PseudoUIEvent,
+  PseudoMouseEvent,
+  PseudoPointerEvent,
+  PseudoKeyboardEvent,
+  PseudoFocusEvent,
+  PseudoInputEvent,
+  PseudoCustomEvent,
   PseudoEventTarget,
   PseudoNode,
   PseudoElement,
@@ -30,7 +50,17 @@ const pseudoDom = {
 
 export {
   generateDocument,
+  createEvent,
+  eventDefaults,
+  simulate,
   PseudoEvent,
+  PseudoUIEvent,
+  PseudoMouseEvent,
+  PseudoPointerEvent,
+  PseudoKeyboardEvent,
+  PseudoFocusEvent,
+  PseudoInputEvent,
+  PseudoCustomEvent,
   PseudoEventTarget,
   PseudoNode,
   PseudoElement,

@@ -18,12 +18,26 @@ else, document fragments insert their children, and a node cannot be put inside 
 `DOMTokenListService`, `NamedNodeMapService`, `DocumentService` / `DocumentFragmentService`, `PseudoNodeList`, and
 `generateDocument` for creating a document.
 
+Standard events: `createEvent(type, init, { browser, trusted })` makes the kind of event which suits the type (a click is a
+`MouseEvent`, a keydown a `KeyboardEvent`, ...). Like the constructor in a browser it gives nothing (no bubbling, no
+cancelling, not trusted) unless asked, but with `browser: true` it uses `eventDefaults`, the table of how the browser
+creates each standard type (click bubbles and can be cancelled, focus does not bubble but focusin does, input bubbles
+but cannot be cancelled, ...), and `trusted: true` makes `isTrusted` true, as for a real user action. The kinds of event
+are `PseudoUIEvent`, `PseudoMouseEvent`, `PseudoPointerEvent`, `PseudoKeyboardEvent`, `PseudoFocusEvent`,
+`PseudoInputEvent` and `PseudoCustomEvent`. Elements have `click()` (an untrusted click, like a script's),
+`focus()` and `blur()` (with blur / focusout / focus / focusin and the related targets, and a focused element for each
+tree), and `simulate.click(element)` / `simulate.keyPress(element, key)` send what a user's action sends (pointerdown,
+mousedown, the focus moving, pointerup, mouseup, click; keydown, keyup), all trusted.
+
 Not implemented yet (these throw a "not implemented" error or are missing): `cloneNode`, `compareDocumentPosition`, `isEqualNode`, `querySelector` /
 `querySelectorAll`, `innerHTML` / `outerHTML` parsing, and most of the rest of the Element and Document APIs. The API
 will change before 1.0.
 ## Modules
 
 <dl>
+<dt><a href="#module_pseudoDom/simulate">pseudoDom/simulate</a></dt>
+<dd><p>Simulate what a user does, with the events the browser sends for it.</p>
+</dd>
 <dt><a href="#module_pseudoDom/objects">pseudoDom/objects</a> : <code>Object</code></dt>
 <dd><p>All methods exported from this module are encapsulated within pseudoDom.</p>
 </dd>
@@ -32,14 +46,33 @@ will change before 1.0.
 ## Classes
 
 <dl>
+<dt><a href="#UIEventService">UIEventService</a> ⇐ <code><a href="#EventService">EventService</a></code></dt>
+<dd><p>Simulate the behaviour of the UIEvent Class when there is no DOM available: the events which come from a user
+interface (the mouse, the keyboard, focus and input).</p>
+</dd>
+<dt><a href="#PointerEventService">PointerEventService</a> ⇐ <code><a href="#MouseEventService">MouseEventService</a></code></dt>
+<dd><p>Simulate the behaviour of the PointerEvent Class when there is no DOM available.</p>
+</dd>
 <dt><a href="#NodeService">NodeService</a> ⇐ <code>PseudoEventTarget</code></dt>
 <dd><p>Simulate the behaviour of the Node Class when there is no DOM available.</p>
 </dd>
 <dt><a href="#NamedNodeMapService">NamedNodeMapService</a></dt>
 <dd><p>Simulate the behaviour of the NamedNodeMap Class when there is no DOM available.</p>
 </dd>
+<dt><a href="#MouseEventService">MouseEventService</a> ⇐ <code><a href="#UIEventService">UIEventService</a></code></dt>
+<dd><p>Simulate the behaviour of the MouseEvent Class when there is no DOM available.</p>
+</dd>
+<dt><a href="#KeyboardEventService">KeyboardEventService</a> ⇐ <code><a href="#UIEventService">UIEventService</a></code></dt>
+<dd><p>Simulate the behaviour of the KeyboardEvent Class when there is no DOM available.</p>
+</dd>
+<dt><a href="#InputEventService">InputEventService</a> ⇐ <code><a href="#UIEventService">UIEventService</a></code></dt>
+<dd><p>Simulate the behaviour of the InputEvent Class when there is no DOM available.</p>
+</dd>
 <dt><a href="#HTMLElementService">HTMLElementService</a> ⇐ <code>PseudoElement</code></dt>
 <dd><p>Simulate the behaviour of the HTMLElement Class when there is no DOM available.</p>
+</dd>
+<dt><a href="#FocusEventService">FocusEventService</a> ⇐ <code><a href="#UIEventService">UIEventService</a></code></dt>
+<dd><p>Simulate the behaviour of the FocusEvent Class when there is no DOM available.</p>
 </dd>
 <dt><a href="#EventTargetService">EventTargetService</a></dt>
 <dd><p>Simulate the behaviour of the EventTarget Class when there is no DOM available.
@@ -63,6 +96,9 @@ not part of a tree, when it is inserted its children are moved into the tree ins
 <dt><a href="#DOMTokenListService">DOMTokenListService</a></dt>
 <dd><p>Simulate the behaviour of the DOMTokenList Class when there is no DOM available.</p>
 </dd>
+<dt><a href="#CustomEventService">CustomEventService</a> ⇐ <code><a href="#EventService">EventService</a></code></dt>
+<dd><p>Simulate the behaviour of the CustomEvent Class when there is no DOM available: an event which carries data.</p>
+</dd>
 <dt><a href="#AttrService">AttrService</a> ⇐ <code><a href="#NodeService">NodeService</a></code></dt>
 <dd><p>Simulate the behaviour of the Attr Class when there is no DOM available.</p>
 </dd>
@@ -82,9 +118,23 @@ the linkers that hold them.</p>
 </dd>
 </dl>
 
+## Members
+
+<dl>
+<dt><a href="#eventDefaults">eventDefaults</a> : <code>Object.&lt;string, EventDefinition&gt;</code></dt>
+<dd><p>The events which the browser itself creates (for a user action, or for something like element.click()) have these
+options. A script which creates an event with the constructor gets none of them (everything is false) unless it asks
+for them, which is why createEvent only uses this table when it is told the browser is creating the event.
+The values follow the UI Events, HTML, Pointer Events, Clipboard, Drag and Drop, Touch and CSS specifications.</p>
+</dd>
+</dl>
+
 ## Constants
 
 <dl>
+<dt><a href="#focused">focused</a></dt>
+<dd><p>The element which has the focus, kept for each tree (the root node of the tree it is in), like document.activeElement.</p>
+</dd>
 <dt><a href="#HTMLElementService_1">HTMLElementService_1</a> : <code>PseudoHTMLElement</code></dt>
 <dd></dd>
 </dl>
@@ -92,6 +142,12 @@ the linkers that hold them.</p>
 ## Functions
 
 <dl>
+<dt><a href="#modifierKeys">modifierKeys([init])</a> ⇒ <code>ModifierKeys</code></dt>
+<dd><p>Pick the modifier keys out of the init object of an event.</p>
+</dd>
+<dt><a href="#modifierState">modifierState(keys, key)</a> ⇒ <code>boolean</code></dt>
+<dd><p>Answer getModifierState for a set of held modifier keys.</p>
+</dd>
 <dt><a href="#getParentNodesFromAttribute">getParentNodesFromAttribute(attr, value, node)</a> ⇒ <code>Array.&lt;PseudoNode&gt;</code></dt>
 <dd><p>A selector function for retrieving existing parent PseudoNode from the given child item.
 This function will check all the parents starting from node, and scan the attributes
@@ -100,6 +156,12 @@ property for matches. The return array contains all matching parent ancestors, s
 <dt><a href="#getParentNodes">getParentNodes(node)</a> ⇒ <code>Array.&lt;PseudoNode&gt;</code></dt>
 <dd><p>Get all of the ancestors of a node, starting with the root of the tree and ending with the node&#39;s own parent (the
 order in which an event travels down through them). A node which has no parent has no ancestors.</p>
+</dd>
+<dt><a href="#getActiveElement">getActiveElement(root)</a> ⇒ <code>Object</code> | <code>null</code></dt>
+<dd><p>Find the element which has the focus in a tree.</p>
+</dd>
+<dt><a href="#setActiveElement">setActiveElement(root, element)</a></dt>
+<dd><p>Remember the element which has the focus in a tree.</p>
 </dd>
 <dt><a href="#generateNodeList">generateNodeList([innerList])</a> ⇒ <code><a href="#PseudoNodeList">PseudoNodeList</a></code></dt>
 <dd><p>Create a PseudoNodeList, optionally starting from an existing chain of linkers.</p>
@@ -112,7 +174,67 @@ tree (or list) of nodes from plain values.</p>
 <dd><p>Construct the Pseudo Dom to provide access to Dom objects which are otherwise not available outside the browser
 context.</p>
 </dd>
+<dt><a href="#createEvent">createEvent(type, [init], [options])</a> ⇒ <code><a href="#EventService">EventService</a></code></dt>
+<dd><p>Create an event of the kind which suits its type (a click is a MouseEvent, a keydown a KeyboardEvent, ...).
+By default this is like using the constructor of the event in a script: nothing bubbles or can be cancelled unless
+the init says so, and the event is not trusted. With browser: true the event is created the way the browser creates
+it, using the standard options for its type (see eventDefaults), and trusted: true makes it look like it came from a
+real user action (isTrusted).</p>
+</dd>
 </dl>
+
+<a name="module_pseudoDom/simulate"></a>
+
+## pseudoDom/simulate
+Simulate what a user does, with the events the browser sends for it.
+
+**Version**: 1.0.0  
+**Author**: Joshua Heagle <joshuaheagle@gmail.com>  
+
+* [pseudoDom/simulate](#module_pseudoDom/simulate)
+    * [~focusableFrom(element)](#module_pseudoDom/simulate..focusableFrom) ⇒ <code>\*</code> \| <code>null</code>
+    * [~click(element, [init])](#module_pseudoDom/simulate..click) ⇒ <code>boolean</code>
+    * [~keyPress(element, key, [init])](#module_pseudoDom/simulate..keyPress) ⇒ <code>boolean</code>
+
+<a name="module_pseudoDom/simulate..focusableFrom"></a>
+
+### pseudoDom/simulate~focusableFrom(element) ⇒ <code>\*</code> \| <code>null</code>
+The nearest element (starting with the element itself) which can have the focus.
+
+**Kind**: inner method of [<code>pseudoDom/simulate</code>](#module_pseudoDom/simulate)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| element | <code>\*</code> | Where to start |
+
+<a name="module_pseudoDom/simulate..click"></a>
+
+### pseudoDom/simulate~click(element, [init]) ⇒ <code>boolean</code>
+Click an element the way a user does: pointerdown and mousedown, then the focus moves to the nearest element which
+can have it (or is taken away from the one which had it) unless mousedown was cancelled, then pointerup, mouseup
+and finally click. Every event is trusted and has the options the browser gives it. A disabled element gets nothing.
+
+**Kind**: inner method of [<code>pseudoDom/simulate</code>](#module_pseudoDom/simulate)  
+**Returns**: <code>boolean</code> - False when the click was cancelled (or the element is disabled), so its default action did not happen  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| element | <code>\*</code> |  | The element to click |
+| [init] | <code>Object</code> | <code>{}</code> | Options for the events (for example clientX, clientY, shiftKey) |
+
+<a name="module_pseudoDom/simulate..keyPress"></a>
+
+### pseudoDom/simulate~keyPress(element, key, [init]) ⇒ <code>boolean</code>
+Press and release a key on an element (the element which has the focus, or one given): keydown and then keyup.
+
+**Kind**: inner method of [<code>pseudoDom/simulate</code>](#module_pseudoDom/simulate)  
+**Returns**: <code>boolean</code> - False when keydown was cancelled, so its default action did not happen  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| element | <code>\*</code> |  | The element which gets the key |
+| key | <code>string</code> |  | The value of the key, such as a or Enter |
+| [init] | <code>Object</code> | <code>{}</code> | Options for the events (for example code, shiftKey) |
 
 <a name="module_pseudoDom/objects"></a>
 
@@ -120,6 +242,164 @@ context.</p>
 All methods exported from this module are encapsulated within pseudoDom.
 
 **Author**: Joshua Heagle <joshuaheagle@gmail.com>  
+<a name="UIEventService"></a>
+
+## UIEventService ⇐ [<code>EventService</code>](#EventService)
+Simulate the behaviour of the UIEvent Class when there is no DOM available: the events which come from a user
+interface (the mouse, the keyboard, focus and input).
+
+**Kind**: global class  
+**Extends**: [<code>EventService</code>](#EventService)  
+**Author**: Joshua Heagle <joshuaheagle@gmail.com>  
+**Properties**
+
+| Name | Type |
+| --- | --- |
+| detail | <code>number</code> | 
+| view | <code>\*</code> | 
+
+
+* [UIEventService](#UIEventService) ⇐ [<code>EventService</code>](#EventService)
+    * [new UIEventService([typeArg], [init])](#new_UIEventService_new)
+    * [.inner](#EventService+inner) ⇒ <code>EventInner</code>
+    * [.composedPath()](#EventService+composedPath) ⇒ <code>Array.&lt;PseudoEventTarget&gt;</code>
+    * [.preventDefault()](#EventService+preventDefault) ⇒ <code>null</code>
+    * [.stopImmediatePropagation()](#EventService+stopImmediatePropagation) ⇒ <code>null</code>
+    * [.stopPropagation()](#EventService+stopPropagation) ⇒ <code>null</code>
+
+<a name="new_UIEventService_new"></a>
+
+### new UIEventService([typeArg], [init])
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [typeArg] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | The type of the event |
+| [init] | <code>UIEventInit</code> | <code>{}</code> | The options for the event |
+
+<a name="EventService+inner"></a>
+
+### uiEventService.inner ⇒ <code>EventInner</code>
+Scope several accessors inside the inner object. These are only intended for usage by other DOM classes.
+
+**Kind**: instance property of [<code>UIEventService</code>](#UIEventService)  
+**Overrides**: [<code>inner</code>](#EventService+inner)  
+<a name="EventService+composedPath"></a>
+
+### uiEventService.composedPath() ⇒ <code>Array.&lt;PseudoEventTarget&gt;</code>
+Return an array of targets that will have the event executed open them. The order is based on the eventPhase
+
+**Kind**: instance method of [<code>UIEventService</code>](#UIEventService)  
+**Overrides**: [<code>composedPath</code>](#EventService+composedPath)  
+<a name="EventService+preventDefault"></a>
+
+### uiEventService.preventDefault() ⇒ <code>null</code>
+Cancels the event (if it is cancelable).
+
+**Kind**: instance method of [<code>UIEventService</code>](#UIEventService)  
+**Overrides**: [<code>preventDefault</code>](#EventService+preventDefault)  
+<a name="EventService+stopImmediatePropagation"></a>
+
+### uiEventService.stopImmediatePropagation() ⇒ <code>null</code>
+For this particular event, no other listener will be called.
+Neither those attached on the same element, nor those attached on elements which will be traversed later (in
+capture phase, for instance)
+
+**Kind**: instance method of [<code>UIEventService</code>](#UIEventService)  
+**Overrides**: [<code>stopImmediatePropagation</code>](#EventService+stopImmediatePropagation)  
+<a name="EventService+stopPropagation"></a>
+
+### uiEventService.stopPropagation() ⇒ <code>null</code>
+Stops the propagation of events further along in the Dom.
+
+**Kind**: instance method of [<code>UIEventService</code>](#UIEventService)  
+**Overrides**: [<code>stopPropagation</code>](#EventService+stopPropagation)  
+<a name="PointerEventService"></a>
+
+## PointerEventService ⇐ [<code>MouseEventService</code>](#MouseEventService)
+Simulate the behaviour of the PointerEvent Class when there is no DOM available.
+
+**Kind**: global class  
+**Extends**: [<code>MouseEventService</code>](#MouseEventService)  
+**Author**: Joshua Heagle <joshuaheagle@gmail.com>  
+**Properties**
+
+| Name | Type |
+| --- | --- |
+| pointerId | <code>number</code> | 
+| width | <code>number</code> | 
+| height | <code>number</code> | 
+| pressure | <code>number</code> | 
+| pointerType | <code>string</code> | 
+| isPrimary | <code>boolean</code> | 
+
+
+* [PointerEventService](#PointerEventService) ⇐ [<code>MouseEventService</code>](#MouseEventService)
+    * [new PointerEventService([typeArg], [init])](#new_PointerEventService_new)
+    * [.inner](#EventService+inner) ⇒ <code>EventInner</code>
+    * [.getModifierState(key)](#MouseEventService+getModifierState) ⇒ <code>boolean</code>
+    * [.composedPath()](#EventService+composedPath) ⇒ <code>Array.&lt;PseudoEventTarget&gt;</code>
+    * [.preventDefault()](#EventService+preventDefault) ⇒ <code>null</code>
+    * [.stopImmediatePropagation()](#EventService+stopImmediatePropagation) ⇒ <code>null</code>
+    * [.stopPropagation()](#EventService+stopPropagation) ⇒ <code>null</code>
+
+<a name="new_PointerEventService_new"></a>
+
+### new PointerEventService([typeArg], [init])
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [typeArg] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | The type of the event |
+| [init] | <code>PointerEventInit</code> | <code>{}</code> | The options for the event |
+
+<a name="EventService+inner"></a>
+
+### pointerEventService.inner ⇒ <code>EventInner</code>
+Scope several accessors inside the inner object. These are only intended for usage by other DOM classes.
+
+**Kind**: instance property of [<code>PointerEventService</code>](#PointerEventService)  
+**Overrides**: [<code>inner</code>](#EventService+inner)  
+<a name="MouseEventService+getModifierState"></a>
+
+### pointerEventService.getModifierState(key) ⇒ <code>boolean</code>
+Whether a modifier key was held down when the event happened.
+
+**Kind**: instance method of [<code>PointerEventService</code>](#PointerEventService)  
+**Overrides**: [<code>getModifierState</code>](#MouseEventService+getModifierState)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| key | <code>string</code> | Control, Shift, Alt or Meta |
+
+<a name="EventService+composedPath"></a>
+
+### pointerEventService.composedPath() ⇒ <code>Array.&lt;PseudoEventTarget&gt;</code>
+Return an array of targets that will have the event executed open them. The order is based on the eventPhase
+
+**Kind**: instance method of [<code>PointerEventService</code>](#PointerEventService)  
+**Overrides**: [<code>composedPath</code>](#EventService+composedPath)  
+<a name="EventService+preventDefault"></a>
+
+### pointerEventService.preventDefault() ⇒ <code>null</code>
+Cancels the event (if it is cancelable).
+
+**Kind**: instance method of [<code>PointerEventService</code>](#PointerEventService)  
+**Overrides**: [<code>preventDefault</code>](#EventService+preventDefault)  
+<a name="EventService+stopImmediatePropagation"></a>
+
+### pointerEventService.stopImmediatePropagation() ⇒ <code>null</code>
+For this particular event, no other listener will be called.
+Neither those attached on the same element, nor those attached on elements which will be traversed later (in
+capture phase, for instance)
+
+**Kind**: instance method of [<code>PointerEventService</code>](#PointerEventService)  
+**Overrides**: [<code>stopImmediatePropagation</code>](#EventService+stopImmediatePropagation)  
+<a name="EventService+stopPropagation"></a>
+
+### pointerEventService.stopPropagation() ⇒ <code>null</code>
+Stops the propagation of events further along in the Dom.
+
+**Kind**: instance method of [<code>PointerEventService</code>](#PointerEventService)  
+**Overrides**: [<code>stopPropagation</code>](#EventService+stopPropagation)  
 <a name="NodeService"></a>
 
 ## NodeService ⇐ <code>PseudoEventTarget</code>
@@ -279,6 +559,249 @@ Simulate the behaviour of the NamedNodeMap Class when there is no DOM available.
 | --- | --- | --- | --- |
 | [attributes] | <code>Array.&lt;PseudoAttr&gt;</code> | <code>[]</code> | The attributes to start with |
 
+<a name="MouseEventService"></a>
+
+## MouseEventService ⇐ [<code>UIEventService</code>](#UIEventService)
+Simulate the behaviour of the MouseEvent Class when there is no DOM available.
+
+**Kind**: global class  
+**Extends**: [<code>UIEventService</code>](#UIEventService)  
+**Author**: Joshua Heagle <joshuaheagle@gmail.com>  
+**Properties**
+
+| Name | Type |
+| --- | --- |
+| screenX | <code>number</code> | 
+| screenY | <code>number</code> | 
+| clientX | <code>number</code> | 
+| clientY | <code>number</code> | 
+| button | <code>number</code> | 
+| buttons | <code>number</code> | 
+| relatedTarget | <code>PseudoEventTarget</code> \| <code>null</code> | 
+
+
+* [MouseEventService](#MouseEventService) ⇐ [<code>UIEventService</code>](#UIEventService)
+    * [new MouseEventService([typeArg], [init])](#new_MouseEventService_new)
+    * [.inner](#EventService+inner) ⇒ <code>EventInner</code>
+    * [.getModifierState(key)](#MouseEventService+getModifierState) ⇒ <code>boolean</code>
+    * [.composedPath()](#EventService+composedPath) ⇒ <code>Array.&lt;PseudoEventTarget&gt;</code>
+    * [.preventDefault()](#EventService+preventDefault) ⇒ <code>null</code>
+    * [.stopImmediatePropagation()](#EventService+stopImmediatePropagation) ⇒ <code>null</code>
+    * [.stopPropagation()](#EventService+stopPropagation) ⇒ <code>null</code>
+
+<a name="new_MouseEventService_new"></a>
+
+### new MouseEventService([typeArg], [init])
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [typeArg] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | The type of the event |
+| [init] | <code>MouseEventInit</code> | <code>{}</code> | The options for the event |
+
+<a name="EventService+inner"></a>
+
+### mouseEventService.inner ⇒ <code>EventInner</code>
+Scope several accessors inside the inner object. These are only intended for usage by other DOM classes.
+
+**Kind**: instance property of [<code>MouseEventService</code>](#MouseEventService)  
+**Overrides**: [<code>inner</code>](#EventService+inner)  
+<a name="MouseEventService+getModifierState"></a>
+
+### mouseEventService.getModifierState(key) ⇒ <code>boolean</code>
+Whether a modifier key was held down when the event happened.
+
+**Kind**: instance method of [<code>MouseEventService</code>](#MouseEventService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| key | <code>string</code> | Control, Shift, Alt or Meta |
+
+<a name="EventService+composedPath"></a>
+
+### mouseEventService.composedPath() ⇒ <code>Array.&lt;PseudoEventTarget&gt;</code>
+Return an array of targets that will have the event executed open them. The order is based on the eventPhase
+
+**Kind**: instance method of [<code>MouseEventService</code>](#MouseEventService)  
+**Overrides**: [<code>composedPath</code>](#EventService+composedPath)  
+<a name="EventService+preventDefault"></a>
+
+### mouseEventService.preventDefault() ⇒ <code>null</code>
+Cancels the event (if it is cancelable).
+
+**Kind**: instance method of [<code>MouseEventService</code>](#MouseEventService)  
+**Overrides**: [<code>preventDefault</code>](#EventService+preventDefault)  
+<a name="EventService+stopImmediatePropagation"></a>
+
+### mouseEventService.stopImmediatePropagation() ⇒ <code>null</code>
+For this particular event, no other listener will be called.
+Neither those attached on the same element, nor those attached on elements which will be traversed later (in
+capture phase, for instance)
+
+**Kind**: instance method of [<code>MouseEventService</code>](#MouseEventService)  
+**Overrides**: [<code>stopImmediatePropagation</code>](#EventService+stopImmediatePropagation)  
+<a name="EventService+stopPropagation"></a>
+
+### mouseEventService.stopPropagation() ⇒ <code>null</code>
+Stops the propagation of events further along in the Dom.
+
+**Kind**: instance method of [<code>MouseEventService</code>](#MouseEventService)  
+**Overrides**: [<code>stopPropagation</code>](#EventService+stopPropagation)  
+<a name="KeyboardEventService"></a>
+
+## KeyboardEventService ⇐ [<code>UIEventService</code>](#UIEventService)
+Simulate the behaviour of the KeyboardEvent Class when there is no DOM available.
+
+**Kind**: global class  
+**Extends**: [<code>UIEventService</code>](#UIEventService)  
+**Author**: Joshua Heagle <joshuaheagle@gmail.com>  
+**Properties**
+
+| Name | Type |
+| --- | --- |
+| key | <code>string</code> | 
+| code | <code>string</code> | 
+| location | <code>number</code> | 
+| repeat | <code>boolean</code> | 
+| isComposing | <code>boolean</code> | 
+
+
+* [KeyboardEventService](#KeyboardEventService) ⇐ [<code>UIEventService</code>](#UIEventService)
+    * [new KeyboardEventService([typeArg], [init])](#new_KeyboardEventService_new)
+    * [.inner](#EventService+inner) ⇒ <code>EventInner</code>
+    * [.getModifierState(key)](#KeyboardEventService+getModifierState) ⇒ <code>boolean</code>
+    * [.composedPath()](#EventService+composedPath) ⇒ <code>Array.&lt;PseudoEventTarget&gt;</code>
+    * [.preventDefault()](#EventService+preventDefault) ⇒ <code>null</code>
+    * [.stopImmediatePropagation()](#EventService+stopImmediatePropagation) ⇒ <code>null</code>
+    * [.stopPropagation()](#EventService+stopPropagation) ⇒ <code>null</code>
+
+<a name="new_KeyboardEventService_new"></a>
+
+### new KeyboardEventService([typeArg], [init])
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [typeArg] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | The type of the event |
+| [init] | <code>KeyboardEventInit</code> | <code>{}</code> | The options for the event |
+
+<a name="EventService+inner"></a>
+
+### keyboardEventService.inner ⇒ <code>EventInner</code>
+Scope several accessors inside the inner object. These are only intended for usage by other DOM classes.
+
+**Kind**: instance property of [<code>KeyboardEventService</code>](#KeyboardEventService)  
+**Overrides**: [<code>inner</code>](#EventService+inner)  
+<a name="KeyboardEventService+getModifierState"></a>
+
+### keyboardEventService.getModifierState(key) ⇒ <code>boolean</code>
+Whether a modifier key was held down when the event happened.
+
+**Kind**: instance method of [<code>KeyboardEventService</code>](#KeyboardEventService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| key | <code>string</code> | Control, Shift, Alt or Meta |
+
+<a name="EventService+composedPath"></a>
+
+### keyboardEventService.composedPath() ⇒ <code>Array.&lt;PseudoEventTarget&gt;</code>
+Return an array of targets that will have the event executed open them. The order is based on the eventPhase
+
+**Kind**: instance method of [<code>KeyboardEventService</code>](#KeyboardEventService)  
+**Overrides**: [<code>composedPath</code>](#EventService+composedPath)  
+<a name="EventService+preventDefault"></a>
+
+### keyboardEventService.preventDefault() ⇒ <code>null</code>
+Cancels the event (if it is cancelable).
+
+**Kind**: instance method of [<code>KeyboardEventService</code>](#KeyboardEventService)  
+**Overrides**: [<code>preventDefault</code>](#EventService+preventDefault)  
+<a name="EventService+stopImmediatePropagation"></a>
+
+### keyboardEventService.stopImmediatePropagation() ⇒ <code>null</code>
+For this particular event, no other listener will be called.
+Neither those attached on the same element, nor those attached on elements which will be traversed later (in
+capture phase, for instance)
+
+**Kind**: instance method of [<code>KeyboardEventService</code>](#KeyboardEventService)  
+**Overrides**: [<code>stopImmediatePropagation</code>](#EventService+stopImmediatePropagation)  
+<a name="EventService+stopPropagation"></a>
+
+### keyboardEventService.stopPropagation() ⇒ <code>null</code>
+Stops the propagation of events further along in the Dom.
+
+**Kind**: instance method of [<code>KeyboardEventService</code>](#KeyboardEventService)  
+**Overrides**: [<code>stopPropagation</code>](#EventService+stopPropagation)  
+<a name="InputEventService"></a>
+
+## InputEventService ⇐ [<code>UIEventService</code>](#UIEventService)
+Simulate the behaviour of the InputEvent Class when there is no DOM available.
+
+**Kind**: global class  
+**Extends**: [<code>UIEventService</code>](#UIEventService)  
+**Author**: Joshua Heagle <joshuaheagle@gmail.com>  
+**Properties**
+
+| Name | Type |
+| --- | --- |
+| data | <code>string</code> \| <code>null</code> | 
+| inputType | <code>string</code> | 
+| isComposing | <code>boolean</code> | 
+
+
+* [InputEventService](#InputEventService) ⇐ [<code>UIEventService</code>](#UIEventService)
+    * [new InputEventService([typeArg], [init])](#new_InputEventService_new)
+    * [.inner](#EventService+inner) ⇒ <code>EventInner</code>
+    * [.composedPath()](#EventService+composedPath) ⇒ <code>Array.&lt;PseudoEventTarget&gt;</code>
+    * [.preventDefault()](#EventService+preventDefault) ⇒ <code>null</code>
+    * [.stopImmediatePropagation()](#EventService+stopImmediatePropagation) ⇒ <code>null</code>
+    * [.stopPropagation()](#EventService+stopPropagation) ⇒ <code>null</code>
+
+<a name="new_InputEventService_new"></a>
+
+### new InputEventService([typeArg], [init])
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [typeArg] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | The type of the event |
+| [init] | <code>InputEventInit</code> | <code>{}</code> | The options for the event |
+
+<a name="EventService+inner"></a>
+
+### inputEventService.inner ⇒ <code>EventInner</code>
+Scope several accessors inside the inner object. These are only intended for usage by other DOM classes.
+
+**Kind**: instance property of [<code>InputEventService</code>](#InputEventService)  
+**Overrides**: [<code>inner</code>](#EventService+inner)  
+<a name="EventService+composedPath"></a>
+
+### inputEventService.composedPath() ⇒ <code>Array.&lt;PseudoEventTarget&gt;</code>
+Return an array of targets that will have the event executed open them. The order is based on the eventPhase
+
+**Kind**: instance method of [<code>InputEventService</code>](#InputEventService)  
+**Overrides**: [<code>composedPath</code>](#EventService+composedPath)  
+<a name="EventService+preventDefault"></a>
+
+### inputEventService.preventDefault() ⇒ <code>null</code>
+Cancels the event (if it is cancelable).
+
+**Kind**: instance method of [<code>InputEventService</code>](#InputEventService)  
+**Overrides**: [<code>preventDefault</code>](#EventService+preventDefault)  
+<a name="EventService+stopImmediatePropagation"></a>
+
+### inputEventService.stopImmediatePropagation() ⇒ <code>null</code>
+For this particular event, no other listener will be called.
+Neither those attached on the same element, nor those attached on elements which will be traversed later (in
+capture phase, for instance)
+
+**Kind**: instance method of [<code>InputEventService</code>](#InputEventService)  
+**Overrides**: [<code>stopImmediatePropagation</code>](#EventService+stopImmediatePropagation)  
+<a name="EventService+stopPropagation"></a>
+
+### inputEventService.stopPropagation() ⇒ <code>null</code>
+Stops the propagation of events further along in the Dom.
+
+**Kind**: instance method of [<code>InputEventService</code>](#InputEventService)  
+**Overrides**: [<code>stopPropagation</code>](#EventService+stopPropagation)  
 <a name="HTMLElementService"></a>
 
 ## HTMLElementService ⇐ <code>PseudoElement</code>
@@ -300,6 +823,14 @@ Simulate the behaviour of the HTMLElement Class when there is no DOM available.
 | style | <code>Object</code> | A container to define all applied inline-styles |
 | title | <code>string</code> | The title attribute which affects the text visible on hover |
 
+
+* [HTMLElementService](#HTMLElementService) ⇐ <code>PseudoElement</code>
+    * [new HTMLElementService([elementOptions])](#new_HTMLElementService_new)
+    * [.canFocus](#HTMLElementService+canFocus) ⇒ <code>boolean</code>
+    * [.click()](#HTMLElementService+click)
+    * [.focus()](#HTMLElementService+focus)
+    * [.blur()](#HTMLElementService+blur)
+
 <a name="new_HTMLElementService_new"></a>
 
 ### new HTMLElementService([elementOptions])
@@ -313,6 +844,102 @@ Simulate the HTMLElement object when the Dom is not available
 | [elementOptions.parent] | <code>PseudoNode</code> \| <code>Object</code> | <code>{}</code> | 
 | [elementOptions.children] | <code>Array</code> | <code>[]</code> | 
 
+<a name="HTMLElementService+canFocus"></a>
+
+### htmlElementService.canFocus ⇒ <code>boolean</code>
+Whether this element can have the focus: form controls and links which are not disabled, and anything with a tabindex.
+
+**Kind**: instance property of [<code>HTMLElementService</code>](#HTMLElementService)  
+<a name="HTMLElementService+click"></a>
+
+### htmlElementService.click()
+Click the element: a click event is sent to it, which bubbles and can be cancelled, like one from a user but a
+script made it (so it is not trusted). A disabled element does nothing.
+
+**Kind**: instance method of [<code>HTMLElementService</code>](#HTMLElementService)  
+<a name="HTMLElementService+focus"></a>
+
+### htmlElementService.focus()
+Give the element the focus. The element which had it gets blur then focusout, and this one gets focus then
+focusin (blur and focus do not bubble, focusin and focusout do). Nothing happens when the element cannot have the
+focus or already has it.
+
+**Kind**: instance method of [<code>HTMLElementService</code>](#HTMLElementService)  
+<a name="HTMLElementService+blur"></a>
+
+### htmlElementService.blur()
+Take the focus away from the element, when it has it: it gets blur then focusout.
+
+**Kind**: instance method of [<code>HTMLElementService</code>](#HTMLElementService)  
+<a name="FocusEventService"></a>
+
+## FocusEventService ⇐ [<code>UIEventService</code>](#UIEventService)
+Simulate the behaviour of the FocusEvent Class when there is no DOM available.
+
+**Kind**: global class  
+**Extends**: [<code>UIEventService</code>](#UIEventService)  
+**Author**: Joshua Heagle <joshuaheagle@gmail.com>  
+**Properties**
+
+| Name | Type |
+| --- | --- |
+| relatedTarget | <code>PseudoEventTarget</code> \| <code>null</code> | 
+
+
+* [FocusEventService](#FocusEventService) ⇐ [<code>UIEventService</code>](#UIEventService)
+    * [new FocusEventService([typeArg], [init])](#new_FocusEventService_new)
+    * [.inner](#EventService+inner) ⇒ <code>EventInner</code>
+    * [.composedPath()](#EventService+composedPath) ⇒ <code>Array.&lt;PseudoEventTarget&gt;</code>
+    * [.preventDefault()](#EventService+preventDefault) ⇒ <code>null</code>
+    * [.stopImmediatePropagation()](#EventService+stopImmediatePropagation) ⇒ <code>null</code>
+    * [.stopPropagation()](#EventService+stopPropagation) ⇒ <code>null</code>
+
+<a name="new_FocusEventService_new"></a>
+
+### new FocusEventService([typeArg], [init])
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [typeArg] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | The type of the event |
+| [init] | <code>FocusEventInit</code> | <code>{}</code> | The options for the event |
+
+<a name="EventService+inner"></a>
+
+### focusEventService.inner ⇒ <code>EventInner</code>
+Scope several accessors inside the inner object. These are only intended for usage by other DOM classes.
+
+**Kind**: instance property of [<code>FocusEventService</code>](#FocusEventService)  
+**Overrides**: [<code>inner</code>](#EventService+inner)  
+<a name="EventService+composedPath"></a>
+
+### focusEventService.composedPath() ⇒ <code>Array.&lt;PseudoEventTarget&gt;</code>
+Return an array of targets that will have the event executed open them. The order is based on the eventPhase
+
+**Kind**: instance method of [<code>FocusEventService</code>](#FocusEventService)  
+**Overrides**: [<code>composedPath</code>](#EventService+composedPath)  
+<a name="EventService+preventDefault"></a>
+
+### focusEventService.preventDefault() ⇒ <code>null</code>
+Cancels the event (if it is cancelable).
+
+**Kind**: instance method of [<code>FocusEventService</code>](#FocusEventService)  
+**Overrides**: [<code>preventDefault</code>](#EventService+preventDefault)  
+<a name="EventService+stopImmediatePropagation"></a>
+
+### focusEventService.stopImmediatePropagation() ⇒ <code>null</code>
+For this particular event, no other listener will be called.
+Neither those attached on the same element, nor those attached on elements which will be traversed later (in
+capture phase, for instance)
+
+**Kind**: instance method of [<code>FocusEventService</code>](#FocusEventService)  
+**Overrides**: [<code>stopImmediatePropagation</code>](#EventService+stopImmediatePropagation)  
+<a name="EventService+stopPropagation"></a>
+
+### focusEventService.stopPropagation() ⇒ <code>null</code>
+Stops the propagation of events further along in the Dom.
+
+**Kind**: instance method of [<code>FocusEventService</code>](#FocusEventService)  
+**Overrides**: [<code>stopPropagation</code>](#EventService+stopPropagation)  
 <a name="EventTargetService"></a>
 
 ## EventTargetService
@@ -917,6 +1544,75 @@ Simulate the behaviour of the DOMTokenList Class when there is no DOM available.
 | [value] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | The space separated tokens to start with |
 | [onChange] | <code>function</code> |  | Called with the new value whenever the tokens change |
 
+<a name="CustomEventService"></a>
+
+## CustomEventService ⇐ [<code>EventService</code>](#EventService)
+Simulate the behaviour of the CustomEvent Class when there is no DOM available: an event which carries data.
+
+**Kind**: global class  
+**Extends**: [<code>EventService</code>](#EventService)  
+**Author**: Joshua Heagle <joshuaheagle@gmail.com>  
+**Properties**
+
+| Name | Type |
+| --- | --- |
+| detail | <code>\*</code> | 
+
+
+* [CustomEventService](#CustomEventService) ⇐ [<code>EventService</code>](#EventService)
+    * [new CustomEventService([typeArg], [init])](#new_CustomEventService_new)
+    * [.inner](#EventService+inner) ⇒ <code>EventInner</code>
+    * [.composedPath()](#EventService+composedPath) ⇒ <code>Array.&lt;PseudoEventTarget&gt;</code>
+    * [.preventDefault()](#EventService+preventDefault) ⇒ <code>null</code>
+    * [.stopImmediatePropagation()](#EventService+stopImmediatePropagation) ⇒ <code>null</code>
+    * [.stopPropagation()](#EventService+stopPropagation) ⇒ <code>null</code>
+
+<a name="new_CustomEventService_new"></a>
+
+### new CustomEventService([typeArg], [init])
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [typeArg] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | The type of the event |
+| [init] | <code>CustomEventInit</code> | <code>{}</code> | The options for the event |
+
+<a name="EventService+inner"></a>
+
+### customEventService.inner ⇒ <code>EventInner</code>
+Scope several accessors inside the inner object. These are only intended for usage by other DOM classes.
+
+**Kind**: instance property of [<code>CustomEventService</code>](#CustomEventService)  
+**Overrides**: [<code>inner</code>](#EventService+inner)  
+<a name="EventService+composedPath"></a>
+
+### customEventService.composedPath() ⇒ <code>Array.&lt;PseudoEventTarget&gt;</code>
+Return an array of targets that will have the event executed open them. The order is based on the eventPhase
+
+**Kind**: instance method of [<code>CustomEventService</code>](#CustomEventService)  
+**Overrides**: [<code>composedPath</code>](#EventService+composedPath)  
+<a name="EventService+preventDefault"></a>
+
+### customEventService.preventDefault() ⇒ <code>null</code>
+Cancels the event (if it is cancelable).
+
+**Kind**: instance method of [<code>CustomEventService</code>](#CustomEventService)  
+**Overrides**: [<code>preventDefault</code>](#EventService+preventDefault)  
+<a name="EventService+stopImmediatePropagation"></a>
+
+### customEventService.stopImmediatePropagation() ⇒ <code>null</code>
+For this particular event, no other listener will be called.
+Neither those attached on the same element, nor those attached on elements which will be traversed later (in
+capture phase, for instance)
+
+**Kind**: instance method of [<code>CustomEventService</code>](#CustomEventService)  
+**Overrides**: [<code>stopImmediatePropagation</code>](#EventService+stopImmediatePropagation)  
+<a name="EventService+stopPropagation"></a>
+
+### customEventService.stopPropagation() ⇒ <code>null</code>
+Stops the propagation of events further along in the Dom.
+
+**Kind**: instance method of [<code>CustomEventService</code>](#CustomEventService)  
+**Overrides**: [<code>stopPropagation</code>](#EventService+stopPropagation)  
 <a name="AttrService"></a>
 
 ## AttrService ⇐ [<code>NodeService</code>](#NodeService)
@@ -1442,10 +2138,48 @@ current one.
 | --- | --- |
 | event | <code>PseudoEvent</code> | 
 
+<a name="eventDefaults"></a>
+
+## eventDefaults : <code>Object.&lt;string, EventDefinition&gt;</code>
+The events which the browser itself creates (for a user action, or for something like element.click()) have these
+options. A script which creates an event with the constructor gets none of them (everything is false) unless it asks
+for them, which is why createEvent only uses this table when it is told the browser is creating the event.
+The values follow the UI Events, HTML, Pointer Events, Clipboard, Drag and Drop, Touch and CSS specifications.
+
+**Kind**: global variable  
+<a name="focused"></a>
+
+## focused
+The element which has the focus, kept for each tree (the root node of the tree it is in), like document.activeElement.
+
+**Kind**: global constant  
 <a name="HTMLElementService_1"></a>
 
 ## HTMLElementService\_1 : <code>PseudoHTMLElement</code>
 **Kind**: global constant  
+<a name="modifierKeys"></a>
+
+## modifierKeys([init]) ⇒ <code>ModifierKeys</code>
+Pick the modifier keys out of the init object of an event.
+
+**Kind**: global function  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [init] | <code>Object</code> | <code>{}</code> | The init of an event |
+
+<a name="modifierState"></a>
+
+## modifierState(keys, key) ⇒ <code>boolean</code>
+Answer getModifierState for a set of held modifier keys.
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| keys | <code>ModifierKeys</code> | The modifier keys which were held down |
+| key | <code>string</code> | The name of the modifier (Control, Shift, Alt or Meta) |
+
 <a name="getParentNodesFromAttribute"></a>
 
 ## getParentNodesFromAttribute(attr, value, node) ⇒ <code>Array.&lt;PseudoNode&gt;</code>
@@ -1472,6 +2206,29 @@ order in which an event travels down through them). A node which has no parent h
 | Param | Type | Description |
 | --- | --- | --- |
 | node | <code>PseudoEventTarget</code> \| <code>PseudoNode</code> \| <code>\*</code> | The node to find the ancestors of |
+
+<a name="getActiveElement"></a>
+
+## getActiveElement(root) ⇒ <code>Object</code> \| <code>null</code>
+Find the element which has the focus in a tree.
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| root | <code>Object</code> | The root node of the tree |
+
+<a name="setActiveElement"></a>
+
+## setActiveElement(root, element)
+Remember the element which has the focus in a tree.
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| root | <code>Object</code> | The root node of the tree |
+| element | <code>Object</code> \| <code>null</code> | The element which now has the focus, or null when nothing has it |
 
 <a name="generateNodeList"></a>
 
@@ -1537,3 +2294,20 @@ Create an instance of HTMLElement if not available
 Define document when not available
 
 **Kind**: inner constant of [<code>generateDocument</code>](#generateDocument)  
+<a name="createEvent"></a>
+
+## createEvent(type, [init], [options]) ⇒ [<code>EventService</code>](#EventService)
+Create an event of the kind which suits its type (a click is a MouseEvent, a keydown a KeyboardEvent, ...).
+By default this is like using the constructor of the event in a script: nothing bubbles or can be cancelled unless
+the init says so, and the event is not trusted. With browser: true the event is created the way the browser creates
+it, using the standard options for its type (see eventDefaults), and trusted: true makes it look like it came from a
+real user action (isTrusted).
+
+**Kind**: global function  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| type | <code>string</code> |  | The type of the event, such as click |
+| [init] | <code>Object</code> | <code>{}</code> | The options for the event (bubbles, cancelable, composed and those of its kind of event) |
+| [options] | <code>CreateEventOptions</code> | <code>{}</code> | Whether the browser is creating the event, and whether it is trusted |
+

@@ -151,7 +151,7 @@
       }
     }
     exports.default = PseudoEventListener
-  }, { '../services/EventService': 12 }],
+  }, { '../services/EventService': 17 }],
   2: [function (require, module, exports) {
     'use strict'
 
@@ -219,7 +219,7 @@
       }
     }
     exports.default = PseudoHTMLDocument
-  }, { '../services/HTMLElementService': 14 }],
+  }, { '../services/HTMLElementService': 20 }],
   3: [function (require, module, exports) {
     'use strict'
 
@@ -292,8 +292,173 @@
       }
     }
     exports.PseudoNodeList = PseudoNodeList
-  }, { 'collect-your-stuff/dist/collections/linked-tree-list/LinkedTreeList': 23, 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.map.js': 134 }],
+  }, { 'collect-your-stuff/dist/collections/linked-tree-list/LinkedTreeList': 35, 'core-js/modules/esnext.iterator.constructor.js': 144, 'core-js/modules/esnext.iterator.map.js': 148 }],
   4: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.createEvent = void 0
+    const EventService_1 = require('../services/EventService')
+    const UIEventService_1 = require('../services/UIEventService')
+    const MouseEventService_1 = require('../services/MouseEventService')
+    const PointerEventService_1 = require('../services/PointerEventService')
+    const KeyboardEventService_1 = require('../services/KeyboardEventService')
+    const FocusEventService_1 = require('../services/FocusEventService')
+    const InputEventService_1 = require('../services/InputEventService')
+    const CustomEventService_1 = require('../services/CustomEventService')
+    const eventDefaults_1 = require('./eventDefaults')
+    const eventClasses = {
+      Event: EventService_1.EventService,
+      UIEvent: UIEventService_1.UIEventService,
+      MouseEvent: MouseEventService_1.MouseEventService,
+      PointerEvent: PointerEventService_1.PointerEventService,
+      KeyboardEvent: KeyboardEventService_1.KeyboardEventService,
+      FocusEvent: FocusEventService_1.FocusEventService,
+      InputEvent: InputEventService_1.InputEventService,
+      CustomEvent: CustomEventService_1.CustomEventService
+    }
+    /**
+ * Create an event of the kind which suits its type (a click is a MouseEvent, a keydown a KeyboardEvent, ...).
+ * By default this is like using the constructor of the event in a script: nothing bubbles or can be cancelled unless
+ * the init says so, and the event is not trusted. With browser: true the event is created the way the browser creates
+ * it, using the standard options for its type (see eventDefaults), and trusted: true makes it look like it came from a
+ * real user action (isTrusted).
+ * @function createEvent
+ * @param {string} type The type of the event, such as click
+ * @param {Object} [init={}] The options for the event (bubbles, cancelable, composed and those of its kind of event)
+ * @param {CreateEventOptions} [options={}] Whether the browser is creating the event, and whether it is trusted
+ * @returns {EventService}
+ */
+    const createEvent = (type, init = {}, {
+      browser = false,
+      trusted = false
+    } = {}) => {
+      const definition = eventDefaults_1.eventDefaults[type]
+      const options = browser && definition
+        ? Object.assign({
+          bubbles: definition.bubbles,
+          cancelable: definition.cancelable,
+          composed: definition.composed
+        }, init)
+        : init
+      const EventClass = eventClasses[definition ? definition.interface : 'Event']
+      const event = new EventClass(type, options)
+      event.inner.trusted = trusted
+      return event
+    }
+    exports.createEvent = createEvent
+    exports.default = exports.createEvent
+  }, { '../services/CustomEventService': 14, '../services/EventService': 17, '../services/FocusEventService': 19, '../services/InputEventService': 21, '../services/KeyboardEventService': 22, '../services/MouseEventService': 23, '../services/PointerEventService': 26, '../services/UIEventService': 27, './eventDefaults': 5 }],
+  5: [function (require, module, exports) {
+    'use strict'
+
+    /**
+ * @file The standard event types of the browser, and how the browser creates them.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @version 1.0.0
+ */
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.eventDefaults = void 0
+    const define = (bubbles, cancelable, composed, eventInterface = 'Event') => ({
+      bubbles,
+      cancelable,
+      composed,
+      interface: eventInterface
+    })
+    /**
+ * The events which the browser itself creates (for a user action, or for something like element.click()) have these
+ * options. A script which creates an event with the constructor gets none of them (everything is false) unless it asks
+ * for them, which is why createEvent only uses this table when it is told the browser is creating the event.
+ * The values follow the UI Events, HTML, Pointer Events, Clipboard, Drag and Drop, Touch and CSS specifications.
+ * @type {Object.<string, EventDefinition>}
+ */
+    exports.eventDefaults = {
+      // Mouse (UI Events)
+      click: define(true, true, true, 'MouseEvent'),
+      auxclick: define(true, true, true, 'MouseEvent'),
+      dblclick: define(true, true, true, 'MouseEvent'),
+      contextmenu: define(true, true, true, 'MouseEvent'),
+      mousedown: define(true, true, true, 'MouseEvent'),
+      mouseup: define(true, true, true, 'MouseEvent'),
+      mousemove: define(true, true, true, 'MouseEvent'),
+      mouseover: define(true, true, true, 'MouseEvent'),
+      mouseout: define(true, true, true, 'MouseEvent'),
+      mouseenter: define(false, false, true, 'MouseEvent'),
+      mouseleave: define(false, false, true, 'MouseEvent'),
+      wheel: define(true, true, true, 'MouseEvent'),
+      // Pointer (Pointer Events)
+      pointerdown: define(true, true, true, 'PointerEvent'),
+      pointerup: define(true, true, true, 'PointerEvent'),
+      pointermove: define(true, true, true, 'PointerEvent'),
+      pointerover: define(true, true, true, 'PointerEvent'),
+      pointerout: define(true, true, true, 'PointerEvent'),
+      pointerenter: define(false, false, true, 'PointerEvent'),
+      pointerleave: define(false, false, true, 'PointerEvent'),
+      pointercancel: define(true, false, true, 'PointerEvent'),
+      gotpointercapture: define(true, false, true, 'PointerEvent'),
+      lostpointercapture: define(true, false, true, 'PointerEvent'),
+      // Keyboard (UI Events)
+      keydown: define(true, true, true, 'KeyboardEvent'),
+      keypress: define(true, true, true, 'KeyboardEvent'),
+      keyup: define(true, true, true, 'KeyboardEvent'),
+      // Focus (UI Events): focus and blur do not bubble, focusin and focusout do
+      focus: define(false, false, true, 'FocusEvent'),
+      blur: define(false, false, true, 'FocusEvent'),
+      focusin: define(true, false, true, 'FocusEvent'),
+      focusout: define(true, false, true, 'FocusEvent'),
+      // Forms (HTML, Input Events)
+      beforeinput: define(true, true, true, 'InputEvent'),
+      input: define(true, false, true, 'InputEvent'),
+      change: define(true, false, false),
+      select: define(true, false, false),
+      submit: define(true, true, false),
+      reset: define(true, true, false),
+      invalid: define(false, true, false),
+      toggle: define(false, false, false),
+      // Loading and the page (HTML)
+      load: define(false, false, false),
+      error: define(false, false, false),
+      abort: define(false, false, false),
+      scroll: define(false, false, false),
+      scrollend: define(false, false, false),
+      resize: define(false, false, false),
+      DOMContentLoaded: define(true, false, false),
+      readystatechange: define(false, false, false),
+      visibilitychange: define(true, false, false),
+      // Clipboard
+      copy: define(true, true, true),
+      cut: define(true, true, true),
+      paste: define(true, true, true),
+      // Drag and drop
+      drag: define(true, true, true, 'MouseEvent'),
+      dragstart: define(true, true, true, 'MouseEvent'),
+      dragend: define(true, false, true, 'MouseEvent'),
+      dragenter: define(true, true, true, 'MouseEvent'),
+      dragover: define(true, true, true, 'MouseEvent'),
+      dragleave: define(true, false, true, 'MouseEvent'),
+      drop: define(true, true, true, 'MouseEvent'),
+      // Touch
+      touchstart: define(true, true, true, 'UIEvent'),
+      touchmove: define(true, true, true, 'UIEvent'),
+      touchend: define(true, true, true, 'UIEvent'),
+      touchcancel: define(true, false, true, 'UIEvent'),
+      // Animations and transitions (CSS)
+      animationstart: define(true, false, false),
+      animationiteration: define(true, false, false),
+      animationend: define(true, false, false),
+      animationcancel: define(true, false, false),
+      transitionrun: define(true, false, false),
+      transitionstart: define(true, false, false),
+      transitionend: define(true, false, false),
+      transitioncancel: define(true, false, false)
+    }
+    exports.default = exports.eventDefaults
+  }, {}],
+  6: [function (require, module, exports) {
     'use strict'
 
     const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
@@ -359,8 +524,8 @@
       return context ? Object.assign(context, newWindow) : Object.assign(root, newWindow)
     }
     exports.default = generateDocument
-  }, { '../classes/PseudoHTMLDocument': 2, '../services/ElementService': 11, '../services/EventTargetService': 13, '../services/HTMLElementService': 14, '../services/NodeService': 16 }],
-  5: [function (require, module, exports) {
+  }, { '../classes/PseudoHTMLDocument': 2, '../services/ElementService': 16, '../services/EventTargetService': 18, '../services/HTMLElementService': 20, '../services/NodeService': 25 }],
+  7: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -375,7 +540,42 @@
     const generateNodeList = (innerList = null) => new PseudoNodeList_1.PseudoNodeList().initialize(innerList)
     exports.default = generateNodeList
   }, { '../classes/PseudoNodeList': 3 }],
-  6: [function (require, module, exports) {
+  8: [function (require, module, exports) {
+    'use strict'
+
+    require('core-js/modules/esnext.weak-map.delete-all.js')
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.setActiveElement = exports.getActiveElement = void 0
+    /**
+ * The element which has the focus, kept for each tree (the root node of the tree it is in), like document.activeElement.
+ */
+    const focused = new WeakMap()
+    /**
+ * Find the element which has the focus in a tree.
+ * @function getActiveElement
+ * @param {Object} root The root node of the tree
+ * @returns {Object|null}
+ */
+    const getActiveElement = root => focused.get(root) || null
+    exports.getActiveElement = getActiveElement
+    /**
+ * Remember the element which has the focus in a tree.
+ * @function setActiveElement
+ * @param {Object} root The root node of the tree
+ * @param {Object|null} element The element which now has the focus, or null when nothing has it
+ */
+    const setActiveElement = (root, element) => {
+      if (element === null) {
+        focused.delete(root)
+      } else {
+        focused.set(root, element)
+      }
+    }
+    exports.setActiveElement = setActiveElement
+  }, { 'core-js/modules/esnext.weak-map.delete-all.js': 151 }],
+  9: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -399,7 +599,7 @@
     }
     exports.default = getParentNodes
   }, {}],
-  7: [function (require, module, exports) {
+  10: [function (require, module, exports) {
     'use strict'
 
     require('core-js/modules/esnext.iterator.constructor.js')
@@ -429,8 +629,51 @@
       return (0, getParentNodes_1.default)(node).filter(parent => (parent[attr] || false) === value)
     }
     exports.default = getParentNodesFromAttribute
-  }, { './getParentNodes': 6, 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.filter.js': 131 }],
-  8: [function (require, module, exports) {
+  }, { './getParentNodes': 9, 'core-js/modules/esnext.iterator.constructor.js': 144, 'core-js/modules/esnext.iterator.filter.js': 145 }],
+  11: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.modifierState = exports.modifierKeys = void 0
+    /**
+ * Pick the modifier keys out of the init object of an event.
+ * @function modifierKeys
+ * @param {Object} [init={}] The init of an event
+ * @returns {ModifierKeys}
+ */
+    const modifierKeys = (init = {}) => ({
+      ctrlKey: !!init.ctrlKey,
+      shiftKey: !!init.shiftKey,
+      altKey: !!init.altKey,
+      metaKey: !!init.metaKey
+    })
+    exports.modifierKeys = modifierKeys
+    /**
+ * Answer getModifierState for a set of held modifier keys.
+ * @function modifierState
+ * @param {ModifierKeys} keys The modifier keys which were held down
+ * @param {string} key The name of the modifier (Control, Shift, Alt or Meta)
+ * @returns {boolean}
+ */
+    const modifierState = (keys, key) => {
+      switch (key) {
+        case 'Control':
+          return keys.ctrlKey
+        case 'Shift':
+          return keys.shiftKey
+        case 'Alt':
+          return keys.altKey
+        case 'Meta':
+          return keys.metaKey
+        default:
+          return false
+      }
+    }
+    exports.modifierState = modifierState
+  }, {}],
+  12: [function (require, module, exports) {
     'use strict'
 
     /**
@@ -448,7 +691,7 @@
     Object.defineProperty(exports, '__esModule', {
       value: true
     })
-    exports.PseudoHTMLDocument = exports.PseudoHTMLElement = exports.PseudoElement = exports.PseudoNode = exports.PseudoEventTarget = exports.PseudoEvent = exports.generateDocument = void 0
+    exports.PseudoHTMLDocument = exports.PseudoHTMLElement = exports.PseudoElement = exports.PseudoNode = exports.PseudoEventTarget = exports.PseudoCustomEvent = exports.PseudoInputEvent = exports.PseudoFocusEvent = exports.PseudoKeyboardEvent = exports.PseudoPointerEvent = exports.PseudoMouseEvent = exports.PseudoUIEvent = exports.PseudoEvent = exports.simulate = exports.eventDefaults = exports.createEvent = exports.generateDocument = void 0
     const EventService_1 = require('./services/EventService')
     Object.defineProperty(exports, 'PseudoEvent', {
       enumerable: true,
@@ -483,6 +726,61 @@
     exports.PseudoHTMLDocument = PseudoHTMLDocument_1.default
     const generateDocument_1 = __importDefault(require('./factories/generateDocument'))
     exports.generateDocument = generateDocument_1.default
+    const createEvent_1 = __importDefault(require('./factories/createEvent'))
+    exports.createEvent = createEvent_1.default
+    const eventDefaults_1 = __importDefault(require('./factories/eventDefaults'))
+    exports.eventDefaults = eventDefaults_1.default
+    const UIEventService_1 = require('./services/UIEventService')
+    Object.defineProperty(exports, 'PseudoUIEvent', {
+      enumerable: true,
+      get: function () {
+        return UIEventService_1.UIEventService
+      }
+    })
+    const MouseEventService_1 = require('./services/MouseEventService')
+    Object.defineProperty(exports, 'PseudoMouseEvent', {
+      enumerable: true,
+      get: function () {
+        return MouseEventService_1.MouseEventService
+      }
+    })
+    const PointerEventService_1 = require('./services/PointerEventService')
+    Object.defineProperty(exports, 'PseudoPointerEvent', {
+      enumerable: true,
+      get: function () {
+        return PointerEventService_1.PointerEventService
+      }
+    })
+    const KeyboardEventService_1 = require('./services/KeyboardEventService')
+    Object.defineProperty(exports, 'PseudoKeyboardEvent', {
+      enumerable: true,
+      get: function () {
+        return KeyboardEventService_1.KeyboardEventService
+      }
+    })
+    const FocusEventService_1 = require('./services/FocusEventService')
+    Object.defineProperty(exports, 'PseudoFocusEvent', {
+      enumerable: true,
+      get: function () {
+        return FocusEventService_1.FocusEventService
+      }
+    })
+    const InputEventService_1 = require('./services/InputEventService')
+    Object.defineProperty(exports, 'PseudoInputEvent', {
+      enumerable: true,
+      get: function () {
+        return InputEventService_1.InputEventService
+      }
+    })
+    const CustomEventService_1 = require('./services/CustomEventService')
+    Object.defineProperty(exports, 'PseudoCustomEvent', {
+      enumerable: true,
+      get: function () {
+        return CustomEventService_1.CustomEventService
+      }
+    })
+    const simulate_1 = __importDefault(require('./simulate'))
+    exports.simulate = simulate_1.default
     /**
  * All methods exported from this module are encapsulated within pseudoDom.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -491,7 +789,17 @@
  */
     const pseudoDom = {
       generateDocument: generateDocument_1.default,
+      createEvent: createEvent_1.default,
+      eventDefaults: eventDefaults_1.default,
+      simulate: simulate_1.default,
       PseudoEvent: EventService_1.EventService,
+      PseudoUIEvent: UIEventService_1.UIEventService,
+      PseudoMouseEvent: MouseEventService_1.MouseEventService,
+      PseudoPointerEvent: PointerEventService_1.PointerEventService,
+      PseudoKeyboardEvent: KeyboardEventService_1.KeyboardEventService,
+      PseudoFocusEvent: FocusEventService_1.FocusEventService,
+      PseudoInputEvent: InputEventService_1.InputEventService,
+      PseudoCustomEvent: CustomEventService_1.CustomEventService,
       PseudoEventTarget: EventTargetService_1.default,
       PseudoNode: NodeService_1.NodeService,
       PseudoElement: ElementService_1.ElementService,
@@ -506,8 +814,8 @@
       // @ts-ignore
       window.pseudoDom = pseudoDom
     }
-  }, { './classes/PseudoHTMLDocument': 2, './factories/generateDocument': 4, './services/ElementService': 11, './services/EventService': 12, './services/EventTargetService': 13, './services/HTMLElementService': 14, './services/NodeService': 16 }],
-  9: [function (require, module, exports) {
+  }, { './classes/PseudoHTMLDocument': 2, './factories/createEvent': 4, './factories/eventDefaults': 5, './factories/generateDocument': 6, './services/CustomEventService': 14, './services/ElementService': 16, './services/EventService': 17, './services/EventTargetService': 18, './services/FocusEventService': 19, './services/HTMLElementService': 20, './services/InputEventService': 21, './services/KeyboardEventService': 22, './services/MouseEventService': 23, './services/NodeService': 25, './services/PointerEventService': 26, './services/UIEventService': 27, './simulate': 28 }],
+  13: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -565,8 +873,45 @@
       }
     }
     exports.AttrService = AttrService
-  }, { './NodeService': 16 }],
-  10: [function (require, module, exports) {
+  }, { './NodeService': 25 }],
+  14: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.CustomEventService = void 0
+    /**
+ * @file Substitute for the DOM CustomEvent Class.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @version 1.0.0
+ */
+    const EventService_1 = require('./EventService')
+    /**
+ * Simulate the behaviour of the CustomEvent Class when there is no DOM available: an event which carries data.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @class
+ * @augments EventService
+ * @property {*} detail
+ */
+    class CustomEventService extends EventService_1.EventService {
+      /**
+   * @param {string} [typeArg=''] The type of the event
+   * @param {CustomEventInit} [init={}] The options for the event
+   * @constructor
+   */
+      constructor (typeArg = '', init = {}) {
+        super(typeArg, init)
+        this.eventDetail = typeof init.detail === 'undefined' ? null : init.detail
+      }
+
+      get detail () {
+        return this.eventDetail
+      }
+    }
+    exports.CustomEventService = CustomEventService
+  }, { './EventService': 17 }],
+  15: [function (require, module, exports) {
     'use strict'
 
     require('core-js/modules/esnext.iterator.constructor.js')
@@ -684,8 +1029,8 @@
       }
     }
     exports.DOMTokenListService = DOMTokenListService
-  }, { 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.filter.js': 131, 'core-js/modules/esnext.iterator.for-each.js': 133, 'core-js/modules/esnext.iterator.map.js': 134 }],
-  11: [function (require, module, exports) {
+  }, { 'core-js/modules/esnext.iterator.constructor.js': 144, 'core-js/modules/esnext.iterator.filter.js': 145, 'core-js/modules/esnext.iterator.for-each.js': 147, 'core-js/modules/esnext.iterator.map.js': 148 }],
+  16: [function (require, module, exports) {
     'use strict'
 
     require('core-js/modules/esnext.iterator.constructor.js')
@@ -704,7 +1049,7 @@
       value: true
     })
     exports.ElementService = void 0
-    const EventService_1 = require('./EventService')
+    const createEvent_1 = __importDefault(require('../factories/createEvent'))
     const NodeService_1 = require('./NodeService')
     const AttrService_1 = require('./AttrService')
     const DOMTokenListService_1 = require('./DOMTokenListService')
@@ -813,20 +1158,20 @@
         switch (this.tagName) {
           case 'button':
           case 'input':
-            if (/^(submit|image)$/i.test(this.type || '')) {
-              // Clicking a submit button submits the form it is in: the form gets a submit event, which can be cancelled
-              callback = event => {
-                const forms = (0, getParentNodesFromAttribute_1.default)('tagName', 'form', this)
-                if (forms.length) {
-                  forms[forms.length - 1].dispatchEvent(new EventService_1.EventService('submit', {
-                    bubbles: true,
-                    cancelable: true
-                  }))
-                }
+            // Clicking a submit button submits the form it is in: the form gets a submit event, which can be cancelled
+            callback = event => {
+              const type = String(this.getAttribute('type') || this.type || '').toLowerCase()
+              const submits = this.tagName === 'button' ? type !== 'button' && type !== 'reset' : /^(submit|image)$/.test(type)
+              const forms = (0, getParentNodesFromAttribute_1.default)('tagName', 'form', this)
+              if (submits && forms.length && !this.hasAttribute('disabled')) {
+                forms[forms.length - 1].dispatchEvent((0, createEvent_1.default)('submit', {}, {
+                  browser: true,
+                  trusted: event.isTrusted
+                }))
               }
-              super.setDefaultEvent('click', callback)
-              this.defaultEventApplied = true
             }
+            super.setDefaultEvent('click', callback)
+            this.defaultEventApplied = true
         }
         return callback
       }
@@ -902,8 +1247,8 @@
       }
     }
     exports.ElementService = ElementService
-  }, { '../functions/getParentNodesFromAttribute': 7, './AttrService': 9, './DOMTokenListService': 10, './EventService': 12, './NamedNodeMapService': 15, './NodeService': 16, 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.find.js': 132, 'core-js/modules/esnext.iterator.for-each.js': 133, 'core-js/modules/esnext.iterator.map.js': 134, 'core-js/modules/esnext.iterator.some.js': 136 }],
-  12: [function (require, module, exports) {
+  }, { '../factories/createEvent': 4, '../functions/getParentNodesFromAttribute': 10, './AttrService': 13, './DOMTokenListService': 15, './NamedNodeMapService': 24, './NodeService': 25, 'core-js/modules/esnext.iterator.constructor.js': 144, 'core-js/modules/esnext.iterator.find.js': 146, 'core-js/modules/esnext.iterator.for-each.js': 147, 'core-js/modules/esnext.iterator.map.js': 148, 'core-js/modules/esnext.iterator.some.js': 150 }],
+  17: [function (require, module, exports) {
     'use strict'
 
     /**
@@ -971,7 +1316,7 @@
           target: null,
           timeStamp: Math.floor(Date.now() / 1000),
           type: '',
-          isTrusted: true,
+          isTrusted: false,
           dispatching: false,
           inPassiveListener: false,
           path: []
@@ -1054,6 +1399,12 @@
           },
           get propagationStopped () {
             return self.properties.propagationStopped
+          },
+          get trusted () {
+            return self.properties.isTrusted
+          },
+          set trusted (trusted) {
+            self.properties.isTrusted = trusted
           },
           get dispatching () {
             return self.properties.dispatching
@@ -1149,7 +1500,7 @@
     EventService.AT_TARGET = 2
     EventService.BUBBLING_PHASE = 3
   }, {}],
-  13: [function (require, module, exports) {
+  18: [function (require, module, exports) {
     'use strict'
 
     require('core-js/modules/esnext.iterator.constructor.js')
@@ -1382,15 +1733,61 @@
       }
     }
     exports.default = EventTargetService
-  }, { '../classes/PseudoEventListener': 1, '../functions/getParentNodes': 6, './EventService': 12, 'collect-your-stuff/dist/collections/linked-list/LinkedList': 21, 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.filter.js': 131, 'core-js/modules/esnext.iterator.find.js': 132, 'core-js/modules/esnext.iterator.for-each.js': 133, 'core-js/modules/esnext.iterator.map.js': 134, 'core-js/modules/esnext.iterator.some.js': 136 }],
-  14: [function (require, module, exports) {
+  }, { '../classes/PseudoEventListener': 1, '../functions/getParentNodes': 9, './EventService': 17, 'collect-your-stuff/dist/collections/linked-list/LinkedList': 33, 'core-js/modules/esnext.iterator.constructor.js': 144, 'core-js/modules/esnext.iterator.filter.js': 145, 'core-js/modules/esnext.iterator.find.js': 146, 'core-js/modules/esnext.iterator.for-each.js': 147, 'core-js/modules/esnext.iterator.map.js': 148, 'core-js/modules/esnext.iterator.some.js': 150 }],
+  19: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
       value: true
     })
+    exports.FocusEventService = void 0
+    /**
+ * @file Substitute for the DOM FocusEvent Class.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @version 1.0.0
+ */
+    const UIEventService_1 = require('./UIEventService')
+    /**
+ * Simulate the behaviour of the FocusEvent Class when there is no DOM available.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @class
+ * @augments UIEventService
+ * @property {PseudoEventTarget|null} relatedTarget
+ */
+    class FocusEventService extends UIEventService_1.UIEventService {
+      /**
+   * @param {string} [typeArg=''] The type of the event
+   * @param {FocusEventInit} [init={}] The options for the event
+   * @constructor
+   */
+      constructor (typeArg = '', init = {}) {
+        super(typeArg, init)
+        this.related = init.relatedTarget || null
+      }
+
+      get relatedTarget () {
+        return this.related
+      }
+    }
+    exports.FocusEventService = FocusEventService
+  }, { './UIEventService': 27 }],
+  20: [function (require, module, exports) {
+    'use strict'
+
+    const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+      return mod && mod.__esModule
+        ? mod
+        : {
+            default: mod
+          }
+    }
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
     exports.HTMLElementService = void 0
     const ElementService_1 = require('./ElementService')
+    const createEvent_1 = __importDefault(require('../factories/createEvent'))
+    const activeElement_1 = require('../functions/activeElement')
     /**
  * Simulate the behaviour of the HTMLElement Class when there is no DOM available.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -1450,10 +1847,343 @@
           children
         })
       }
+
+      /**
+   * Whether this element can have the focus: form controls and links which are not disabled, and anything with a tabindex.
+   * @returns {boolean}
+   */
+      get canFocus () {
+        if (this.hasAttribute('disabled')) {
+          return false
+        }
+        switch (this.tagName) {
+          case 'button':
+          case 'select':
+          case 'textarea':
+            return true
+          case 'input':
+            return String(this.getAttribute('type') || '').toLowerCase() !== 'hidden'
+          case 'a':
+            return this.hasAttribute('href') || this.hasAttribute('tabindex')
+          default:
+            return this.hasAttribute('tabindex')
+        }
+      }
+
+      /**
+   * Click the element: a click event is sent to it, which bubbles and can be cancelled, like one from a user but a
+   * script made it (so it is not trusted). A disabled element does nothing.
+   */
+      click () {
+        if (this.hasAttribute('disabled')) {
+          return
+        }
+        this.dispatchEvent((0, createEvent_1.default)('click', {}, {
+          browser: true
+        }))
+      }
+
+      /**
+   * Give the element the focus. The element which had it gets blur then focusout, and this one gets focus then
+   * focusin (blur and focus do not bubble, focusin and focusout do). Nothing happens when the element cannot have the
+   * focus or already has it.
+   */
+      focus () {
+        const root = this.getRootNode()
+        const previous = (0, activeElement_1.getActiveElement)(root)
+        if (!this.canFocus || previous === this) {
+          return
+        }
+        const send = (target, type, relatedTarget) => {
+          target.dispatchEvent((0, createEvent_1.default)(type, {
+            relatedTarget
+          }, {
+            browser: true,
+            trusted: true
+          }))
+        }
+        if (previous) {
+          send(previous, 'blur', this)
+          send(previous, 'focusout', this)
+        }
+        (0, activeElement_1.setActiveElement)(root, this)
+        send(this, 'focus', previous)
+        send(this, 'focusin', previous)
+      }
+
+      /**
+   * Take the focus away from the element, when it has it: it gets blur then focusout.
+   */
+      blur () {
+        const root = this.getRootNode()
+        if ((0, activeElement_1.getActiveElement)(root) !== this) {
+          return
+        }
+        (0, activeElement_1.setActiveElement)(root, null)
+        this.dispatchEvent((0, createEvent_1.default)('blur', {
+          relatedTarget: null
+        }, {
+          browser: true,
+          trusted: true
+        }))
+        this.dispatchEvent((0, createEvent_1.default)('focusout', {
+          relatedTarget: null
+        }, {
+          browser: true,
+          trusted: true
+        }))
+      }
     }
     exports.HTMLElementService = HTMLElementService
-  }, { './ElementService': 11 }],
-  15: [function (require, module, exports) {
+  }, { '../factories/createEvent': 4, '../functions/activeElement': 8, './ElementService': 16 }],
+  21: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.InputEventService = void 0
+    /**
+ * @file Substitute for the DOM InputEvent Class.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @version 1.0.0
+ */
+    const UIEventService_1 = require('./UIEventService')
+    /**
+ * Simulate the behaviour of the InputEvent Class when there is no DOM available.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @class
+ * @augments UIEventService
+ * @property {string|null} data
+ * @property {string} inputType
+ * @property {boolean} isComposing
+ */
+    class InputEventService extends UIEventService_1.UIEventService {
+      /**
+   * @param {string} [typeArg=''] The type of the event
+   * @param {InputEventInit} [init={}] The options for the event
+   * @constructor
+   */
+      constructor (typeArg = '', init = {}) {
+        super(typeArg, init)
+        this.inputData = typeof init.data === 'string' ? init.data : null
+        this.kind = init.inputType || ''
+        this.composing = !!init.isComposing
+      }
+
+      get data () {
+        return this.inputData
+      }
+
+      get inputType () {
+        return this.kind
+      }
+
+      get isComposing () {
+        return this.composing
+      }
+    }
+    exports.InputEventService = InputEventService
+  }, { './UIEventService': 27 }],
+  22: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.KeyboardEventService = void 0
+    /**
+ * @file Substitute for the DOM KeyboardEvent Class.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @version 1.0.0
+ */
+    const UIEventService_1 = require('./UIEventService')
+    const modifierState_1 = require('../functions/modifierState')
+    /**
+ * Simulate the behaviour of the KeyboardEvent Class when there is no DOM available.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @class
+ * @augments UIEventService
+ * @property {string} key
+ * @property {string} code
+ * @property {number} location
+ * @property {boolean} repeat
+ * @property {boolean} isComposing
+ */
+    class KeyboardEventService extends UIEventService_1.UIEventService {
+      /**
+   * @param {string} [typeArg=''] The type of the event
+   * @param {KeyboardEventInit} [init={}] The options for the event
+   * @constructor
+   */
+      constructor (typeArg = '', init = {}) {
+        super(typeArg, init)
+        this.keyValue = init.key || ''
+        this.keyCode = init.code || ''
+        this.keyLocation = init.location || 0
+        this.held = !!init.repeat
+        this.composing = !!init.isComposing
+        this.modifiers = (0, modifierState_1.modifierKeys)(init)
+      }
+
+      get key () {
+        return this.keyValue
+      }
+
+      get code () {
+        return this.keyCode
+      }
+
+      get location () {
+        return this.keyLocation
+      }
+
+      get repeat () {
+        return this.held
+      }
+
+      get isComposing () {
+        return this.composing
+      }
+
+      get ctrlKey () {
+        return this.modifiers.ctrlKey
+      }
+
+      get shiftKey () {
+        return this.modifiers.shiftKey
+      }
+
+      get altKey () {
+        return this.modifiers.altKey
+      }
+
+      get metaKey () {
+        return this.modifiers.metaKey
+      }
+
+      /**
+   * Whether a modifier key was held down when the event happened.
+   * @param {string} key Control, Shift, Alt or Meta
+   * @returns {boolean}
+   */
+      getModifierState (key) {
+        return (0, modifierState_1.modifierState)(this.modifiers, key)
+      }
+    }
+    exports.KeyboardEventService = KeyboardEventService
+  }, { '../functions/modifierState': 11, './UIEventService': 27 }],
+  23: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.MouseEventService = void 0
+    /**
+ * @file Substitute for the DOM MouseEvent Class.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @version 1.0.0
+ */
+    const UIEventService_1 = require('./UIEventService')
+    const modifierState_1 = require('../functions/modifierState')
+    /**
+ * Simulate the behaviour of the MouseEvent Class when there is no DOM available.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @class
+ * @augments UIEventService
+ * @property {number} screenX
+ * @property {number} screenY
+ * @property {number} clientX
+ * @property {number} clientY
+ * @property {number} button
+ * @property {number} buttons
+ * @property {PseudoEventTarget|null} relatedTarget
+ */
+    class MouseEventService extends UIEventService_1.UIEventService {
+      /**
+   * @param {string} [typeArg=''] The type of the event
+   * @param {MouseEventInit} [init={}] The options for the event
+   * @constructor
+   */
+      constructor (typeArg = '', init = {}) {
+        super(typeArg, init)
+        this.position = {
+          screenX: init.screenX || 0,
+          screenY: init.screenY || 0,
+          clientX: init.clientX || 0,
+          clientY: init.clientY || 0
+        }
+        this.modifiers = (0, modifierState_1.modifierKeys)(init)
+        this.buttonPressed = init.button || 0
+        this.buttonsDown = init.buttons || 0
+        this.related = init.relatedTarget || null
+      }
+
+      get screenX () {
+        return this.position.screenX
+      }
+
+      get screenY () {
+        return this.position.screenY
+      }
+
+      get clientX () {
+        return this.position.clientX
+      }
+
+      get clientY () {
+        return this.position.clientY
+      }
+
+      get x () {
+        return this.position.clientX
+      }
+
+      get y () {
+        return this.position.clientY
+      }
+
+      get ctrlKey () {
+        return this.modifiers.ctrlKey
+      }
+
+      get shiftKey () {
+        return this.modifiers.shiftKey
+      }
+
+      get altKey () {
+        return this.modifiers.altKey
+      }
+
+      get metaKey () {
+        return this.modifiers.metaKey
+      }
+
+      get button () {
+        return this.buttonPressed
+      }
+
+      get buttons () {
+        return this.buttonsDown
+      }
+
+      get relatedTarget () {
+        return this.related
+      }
+
+      /**
+   * Whether a modifier key was held down when the event happened.
+   * @param {string} key Control, Shift, Alt or Meta
+   * @returns {boolean}
+   */
+      getModifierState (key) {
+        return (0, modifierState_1.modifierState)(this.modifiers, key)
+      }
+    }
+    exports.MouseEventService = MouseEventService
+  }, { '../functions/modifierState': 11, './UIEventService': 27 }],
+  24: [function (require, module, exports) {
     'use strict'
 
     require('core-js/modules/esnext.iterator.constructor.js')
@@ -1531,8 +2261,8 @@
       }
     }
     exports.NamedNodeMapService = NamedNodeMapService
-  }, { 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.find.js': 132 }],
-  16: [function (require, module, exports) {
+  }, { 'core-js/modules/esnext.iterator.constructor.js': 144, 'core-js/modules/esnext.iterator.find.js': 146 }],
+  25: [function (require, module, exports) {
     'use strict'
 
     const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
@@ -1820,8 +2550,238 @@
     NodeService.DOCUMENT_TYPE_NODE = 10
     NodeService.DOCUMENT_FRAGMENT_NODE = 11
     NodeService.NOTATION_NODE = 12
-  }, { '../factories/generateNodeList': 5, './EventTargetService': 13, 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker': 24 }],
-  17: [function (require, module, exports) {
+  }, { '../factories/generateNodeList': 7, './EventTargetService': 18, 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker': 36 }],
+  26: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.PointerEventService = void 0
+    /**
+ * @file Substitute for the DOM PointerEvent Class.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @version 1.0.0
+ */
+    const MouseEventService_1 = require('./MouseEventService')
+    /**
+ * Simulate the behaviour of the PointerEvent Class when there is no DOM available.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @class
+ * @augments MouseEventService
+ * @property {number} pointerId
+ * @property {number} width
+ * @property {number} height
+ * @property {number} pressure
+ * @property {string} pointerType
+ * @property {boolean} isPrimary
+ */
+    class PointerEventService extends MouseEventService_1.MouseEventService {
+      /**
+   * @param {string} [typeArg=''] The type of the event
+   * @param {PointerEventInit} [init={}] The options for the event
+   * @constructor
+   */
+      constructor (typeArg = '', init = {}) {
+        super(typeArg, init)
+        this.pointer = {
+          pointerId: init.pointerId || 0,
+          width: typeof init.width === 'number' ? init.width : 1,
+          height: typeof init.height === 'number' ? init.height : 1,
+          pressure: init.pressure || 0,
+          pointerType: init.pointerType || '',
+          isPrimary: !!init.isPrimary
+        }
+      }
+
+      get pointerId () {
+        return this.pointer.pointerId
+      }
+
+      get width () {
+        return this.pointer.width
+      }
+
+      get height () {
+        return this.pointer.height
+      }
+
+      get pressure () {
+        return this.pointer.pressure
+      }
+
+      get pointerType () {
+        return this.pointer.pointerType
+      }
+
+      get isPrimary () {
+        return this.pointer.isPrimary
+      }
+    }
+    exports.PointerEventService = PointerEventService
+  }, { './MouseEventService': 23 }],
+  27: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.UIEventService = void 0
+    /**
+ * @file Substitute for the DOM UIEvent Class.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @version 1.0.0
+ */
+    const EventService_1 = require('./EventService')
+    /**
+ * Simulate the behaviour of the UIEvent Class when there is no DOM available: the events which come from a user
+ * interface (the mouse, the keyboard, focus and input).
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @class
+ * @augments EventService
+ * @property {number} detail
+ * @property {*} view
+ */
+    class UIEventService extends EventService_1.EventService {
+      /**
+   * @param {string} [typeArg=''] The type of the event
+   * @param {UIEventInit} [init={}] The options for the event
+   * @constructor
+   */
+      constructor (typeArg = '', init = {}) {
+        super(typeArg, init)
+        this.uiDetail = init.detail || 0
+        this.uiView = init.view || null
+      }
+
+      get detail () {
+        return this.uiDetail
+      }
+
+      get view () {
+        return this.uiView
+      }
+    }
+    exports.UIEventService = UIEventService
+  }, { './EventService': 17 }],
+  28: [function (require, module, exports) {
+    'use strict'
+
+    const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+      return mod && mod.__esModule
+        ? mod
+        : {
+            default: mod
+          }
+    }
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.keyPress = exports.click = void 0
+    /**
+ * @file Simulate what a user does, with the events the browser sends for it.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @version 1.0.0
+ * @module pseudoDom/simulate
+ */
+    const createEvent_1 = __importDefault(require('./factories/createEvent'))
+    const activeElement_1 = require('./functions/activeElement')
+    const send = (target, type, init) => target.dispatchEvent((0, createEvent_1.default)(type, init, {
+      browser: true,
+      trusted: true
+    }))
+    /**
+ * The nearest element (starting with the element itself) which can have the focus.
+ * @param {*} element Where to start
+ * @returns {*|null}
+ */
+    const focusableFrom = element => {
+      let current = element
+      while (current) {
+        if (current.canFocus) {
+          return current
+        }
+        current = current.parentNode
+      }
+      return null
+    }
+    /**
+ * Click an element the way a user does: pointerdown and mousedown, then the focus moves to the nearest element which
+ * can have it (or is taken away from the one which had it) unless mousedown was cancelled, then pointerup, mouseup
+ * and finally click. Every event is trusted and has the options the browser gives it. A disabled element gets nothing.
+ * @function click
+ * @param {*} element The element to click
+ * @param {Object} [init={}] Options for the events (for example clientX, clientY, shiftKey)
+ * @returns {boolean} False when the click was cancelled (or the element is disabled), so its default action did not happen
+ */
+    const click = (element, init = {}) => {
+      if (element.hasAttribute && element.hasAttribute('disabled')) {
+        return false
+      }
+      const pointer = Object.assign({
+        pointerId: 1,
+        pointerType: 'mouse',
+        isPrimary: true,
+        button: 0
+      }, init)
+      send(element, 'pointerdown', Object.assign({
+        buttons: 1
+      }, pointer))
+      if (send(element, 'mousedown', Object.assign({
+        buttons: 1,
+        detail: 1
+      }, init, {
+        button: 0
+      }))) {
+        const focusable = focusableFrom(element)
+        if (focusable) {
+          focusable.focus()
+        } else {
+          const active = (0, activeElement_1.getActiveElement)(element.getRootNode())
+          if (active) {
+            active.blur()
+          }
+        }
+      }
+      send(element, 'pointerup', Object.assign({
+        buttons: 0
+      }, pointer))
+      send(element, 'mouseup', Object.assign({
+        buttons: 0,
+        detail: 1
+      }, init, {
+        button: 0
+      }))
+      return send(element, 'click', Object.assign({
+        detail: 1
+      }, init, {
+        button: 0
+      }))
+    }
+    exports.click = click
+    /**
+ * Press and release a key on an element (the element which has the focus, or one given): keydown and then keyup.
+ * @function keyPress
+ * @param {*} element The element which gets the key
+ * @param {string} key The value of the key, such as a or Enter
+ * @param {Object} [init={}] Options for the events (for example code, shiftKey)
+ * @returns {boolean} False when keydown was cancelled, so its default action did not happen
+ */
+    const keyPress = (element, key, init = {}) => {
+      const options = Object.assign({
+        key
+      }, init)
+      const proceeded = send(element, 'keydown', options)
+      send(element, 'keyup', options)
+      return proceeded
+    }
+    exports.keyPress = keyPress
+    exports.default = {
+      click: exports.click,
+      keyPress: exports.keyPress
+    }
+  }, { './factories/createEvent': 4, './functions/activeElement': 8 }],
+  29: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -1888,8 +2848,8 @@
       head: [],
       tail: null
     })
-  }, { 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.reduce.js': 135 }],
-  18: [function (require, module, exports) {
+  }, { 'core-js/modules/esnext.iterator.constructor.js': 144, 'core-js/modules/esnext.iterator.reduce.js': 149 }],
+  30: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -2113,8 +3073,8 @@
       const list = new classType(elementClass)
       return list.initialize(elementClass.fromArray(values).head)
     }
-  }, { '../../recipes/ArrayIterator': 25, './ArrayElement': 17 }],
-  19: [function (require, module, exports) {
+  }, { '../../recipes/ArrayIterator': 37, './ArrayElement': 29 }],
+  31: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -2188,8 +3148,8 @@
       head: null,
       tail: null
     })
-  }, { '../linked-list/Linker': 22, 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.reduce.js': 135 }],
-  20: [function (require, module, exports) {
+  }, { '../linked-list/Linker': 34, 'core-js/modules/esnext.iterator.constructor.js': 144, 'core-js/modules/esnext.iterator.reduce.js': 149 }],
+  32: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -2517,8 +3477,8 @@
     DoublyLinkedList.fromArray = (values = [], linkerClass = _DoubleLinker.DoubleLinker, classType = DoublyLinkedList) => {
       return _LinkedList.LinkedList.fromArray(values, linkerClass, classType)
     }
-  }, { '../../recipes/DoubleLinkerIterator': 26, '../linked-list/LinkedList': 21, './DoubleLinker': 19, 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.for-each.js': 133 }],
-  21: [function (require, module, exports) {
+  }, { '../../recipes/DoubleLinkerIterator': 38, '../linked-list/LinkedList': 33, './DoubleLinker': 31, 'core-js/modules/esnext.iterator.constructor.js': 144, 'core-js/modules/esnext.iterator.for-each.js': 147 }],
+  33: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -2815,8 +3775,8 @@
       const list = new classType(linkerClass)
       return list.initialize(linkerClass.fromArray(values).head)
     }
-  }, { '../../recipes/LinkerIterator': 27, '../arrayable/Arrayable': 18, './Linker': 22 }],
-  22: [function (require, module, exports) {
+  }, { '../../recipes/LinkerIterator': 39, '../arrayable/Arrayable': 30, './Linker': 34 }],
+  34: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -2901,8 +3861,8 @@
       head: null,
       tail: null
     })
-  }, { '../arrayable/ArrayElement': 17, 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.reduce.js': 135 }],
-  23: [function (require, module, exports) {
+  }, { '../arrayable/ArrayElement': 29, 'core-js/modules/esnext.iterator.constructor.js': 144, 'core-js/modules/esnext.iterator.reduce.js': 149 }],
+  35: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -3197,8 +4157,8 @@
       const list = new classType(linkerClass)
       return list.initialize(linkerClass.fromArray(values).head)
     }
-  }, { '../../recipes/TreeLinkerIterator': 28, '../doubly-linked-list/DoublyLinkedList': 20, './TreeLinker': 24, 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.for-each.js': 133 }],
-  24: [function (require, module, exports) {
+  }, { '../../recipes/TreeLinkerIterator': 40, '../doubly-linked-list/DoublyLinkedList': 32, './TreeLinker': 36, 'core-js/modules/esnext.iterator.constructor.js': 144, 'core-js/modules/esnext.iterator.for-each.js': 147 }],
+  36: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -3293,8 +4253,8 @@
  * @returns {{head: TreeLinker, tail: TreeLinker}}
  */
     TreeLinker.fromArray = (values = [], classType = TreeLinker) => _DoubleLinker.DoubleLinker.fromArray(values, classType)
-  }, { '../doubly-linked-list/DoubleLinker': 19, './LinkedTreeList': 23, 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.map.js': 134 }],
-  25: [function (require, module, exports) {
+  }, { '../doubly-linked-list/DoubleLinker': 31, './LinkedTreeList': 35, 'core-js/modules/esnext.iterator.constructor.js': 144, 'core-js/modules/esnext.iterator.map.js': 148 }],
+  37: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -3335,7 +4295,7 @@
     }
     exports.ArrayIterator = ArrayIterator
   }, {}],
-  26: [function (require, module, exports) {
+  38: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -3370,7 +4330,7 @@
     }
     exports.DoubleLinkerIterator = DoubleLinkerIterator
   }, {}],
-  27: [function (require, module, exports) {
+  39: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -3405,7 +4365,7 @@
     }
     exports.LinkerIterator = LinkerIterator
   }, {}],
-  28: [function (require, module, exports) {
+  40: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -3442,8 +4402,8 @@
       }
     }
     exports.TreeLinkerIterator = TreeLinkerIterator
-  }, { '../services/parseTreeNext': 29 }],
-  29: [function (require, module, exports) {
+  }, { '../services/parseTreeNext': 41 }],
+  41: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -3487,7 +4447,7 @@
     }
     exports.parseTreeNext = parseTreeNext
   }, {}],
-  30: [function (require, module, exports) {
+  42: [function (require, module, exports) {
     'use strict'
     const isCallable = require('../internals/is-callable')
     const tryToString = require('../internals/try-to-string')
@@ -3499,8 +4459,18 @@
       if (isCallable(argument)) return argument
       throw new $TypeError(tryToString(argument) + ' is not a function')
     }
-  }, { '../internals/is-callable': 74, '../internals/try-to-string': 117 }],
-  31: [function (require, module, exports) {
+  }, { '../internals/is-callable': 87, '../internals/try-to-string': 130 }],
+  43: [function (require, module, exports) {
+    'use strict'
+    const has = require('../internals/weak-map-helpers').has
+
+    // Perform ? RequireInternalSlot(M, [[WeakMapData]])
+    module.exports = function (it) {
+      has(it)
+      return it
+    }
+  }, { '../internals/weak-map-helpers': 135 }],
+  44: [function (require, module, exports) {
     'use strict'
     const isPrototypeOf = require('../internals/object-is-prototype-of')
 
@@ -3510,8 +4480,8 @@
       if (isPrototypeOf(Prototype, it)) return it
       throw new $TypeError('Incorrect invocation')
     }
-  }, { '../internals/object-is-prototype-of': 99 }],
-  32: [function (require, module, exports) {
+  }, { '../internals/object-is-prototype-of': 112 }],
+  45: [function (require, module, exports) {
     'use strict'
     const isObject = require('../internals/is-object')
 
@@ -3523,8 +4493,8 @@
       if (isObject(argument)) return argument
       throw new $TypeError($String(argument) + ' is not an object')
     }
-  }, { '../internals/is-object': 77 }],
-  33: [function (require, module, exports) {
+  }, { '../internals/is-object': 90 }],
+  46: [function (require, module, exports) {
     'use strict'
     const toIndexedObject = require('../internals/to-indexed-object')
     const toAbsoluteIndex = require('../internals/to-absolute-index')
@@ -3563,8 +4533,8 @@
       // https://tc39.es/ecma262/#sec-array.prototype.indexof
       indexOf: createMethod(false)
     }
-  }, { '../internals/length-of-array-like': 89, '../internals/to-absolute-index': 110, '../internals/to-indexed-object': 111 }],
-  34: [function (require, module, exports) {
+  }, { '../internals/length-of-array-like': 102, '../internals/to-absolute-index': 123, '../internals/to-indexed-object': 124 }],
+  47: [function (require, module, exports) {
     'use strict'
     const anObject = require('../internals/an-object')
     const iteratorClose = require('../internals/iterator-close')
@@ -3577,8 +4547,8 @@
         iteratorClose(iterator, 'throw', error)
       }
     }
-  }, { '../internals/an-object': 32, '../internals/iterator-close': 83 }],
-  35: [function (require, module, exports) {
+  }, { '../internals/an-object': 45, '../internals/iterator-close': 96 }],
+  48: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
 
@@ -3588,8 +4558,8 @@
     module.exports = function (it) {
       return stringSlice(toString(it), 8, -1)
     }
-  }, { '../internals/function-uncurry-this': 59 }],
-  36: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 72 }],
+  49: [function (require, module, exports) {
     'use strict'
     const hasOwn = require('../internals/has-own-property')
     const ownKeys = require('../internals/own-keys')
@@ -3607,8 +4577,8 @@
         }
       }
     }
-  }, { '../internals/has-own-property': 66, '../internals/object-define-property': 94, '../internals/object-get-own-property-descriptor': 95, '../internals/own-keys': 104 }],
-  37: [function (require, module, exports) {
+  }, { '../internals/has-own-property': 79, '../internals/object-define-property': 107, '../internals/object-get-own-property-descriptor': 108, '../internals/own-keys': 117 }],
+  50: [function (require, module, exports) {
     'use strict'
     const fails = require('../internals/fails')
 
@@ -3618,8 +4588,8 @@
       // eslint-disable-next-line es/no-object-getprototypeof -- required for testing
       return Object.getPrototypeOf(new F()) !== F.prototype
     })
-  }, { '../internals/fails': 52 }],
-  38: [function (require, module, exports) {
+  }, { '../internals/fails': 65 }],
+  51: [function (require, module, exports) {
     'use strict'
     // `CreateIterResultObject` abstract operation
     // https://tc39.es/ecma262/#sec-createiterresultobject
@@ -3627,7 +4597,7 @@
       return { value, done }
     }
   }, {}],
-  39: [function (require, module, exports) {
+  52: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const definePropertyModule = require('../internals/object-define-property')
@@ -3641,8 +4611,8 @@
         object[key] = value
         return object
       }
-  }, { '../internals/create-property-descriptor': 40, '../internals/descriptors': 46, '../internals/object-define-property': 94 }],
-  40: [function (require, module, exports) {
+  }, { '../internals/create-property-descriptor': 53, '../internals/descriptors': 59, '../internals/object-define-property': 107 }],
+  53: [function (require, module, exports) {
     'use strict'
     module.exports = function (bitmap, value) {
       return {
@@ -3653,7 +4623,7 @@
       }
     }
   }, {}],
-  41: [function (require, module, exports) {
+  54: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const definePropertyModule = require('../internals/object-define-property')
@@ -3663,8 +4633,8 @@
       if (DESCRIPTORS) definePropertyModule.f(object, key, createPropertyDescriptor(0, value))
       else object[key] = value
     }
-  }, { '../internals/create-property-descriptor': 40, '../internals/descriptors': 46, '../internals/object-define-property': 94 }],
-  42: [function (require, module, exports) {
+  }, { '../internals/create-property-descriptor': 53, '../internals/descriptors': 59, '../internals/object-define-property': 107 }],
+  55: [function (require, module, exports) {
     'use strict'
     const makeBuiltIn = require('../internals/make-built-in')
     const defineProperty = require('../internals/object-define-property')
@@ -3674,8 +4644,8 @@
       if (descriptor.set) makeBuiltIn(descriptor.set, name, { setter: true })
       return defineProperty.f(target, name, descriptor)
     }
-  }, { '../internals/make-built-in': 90, '../internals/object-define-property': 94 }],
-  43: [function (require, module, exports) {
+  }, { '../internals/make-built-in': 103, '../internals/object-define-property': 107 }],
+  56: [function (require, module, exports) {
     'use strict'
     const isCallable = require('../internals/is-callable')
     const definePropertyModule = require('../internals/object-define-property')
@@ -3706,8 +4676,8 @@
         }
       } return O
     }
-  }, { '../internals/define-global-property': 45, '../internals/is-callable': 74, '../internals/make-built-in': 90, '../internals/object-define-property': 94 }],
-  44: [function (require, module, exports) {
+  }, { '../internals/define-global-property': 58, '../internals/is-callable': 87, '../internals/make-built-in': 103, '../internals/object-define-property': 107 }],
+  57: [function (require, module, exports) {
     'use strict'
     const defineBuiltIn = require('../internals/define-built-in')
 
@@ -3715,8 +4685,8 @@
       for (const key in src) defineBuiltIn(target, key, src[key], options)
       return target
     }
-  }, { '../internals/define-built-in': 43 }],
-  45: [function (require, module, exports) {
+  }, { '../internals/define-built-in': 56 }],
+  58: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
 
@@ -3730,8 +4700,8 @@
         globalThis[key] = value
       } return value
     }
-  }, { '../internals/global-this': 65 }],
-  46: [function (require, module, exports) {
+  }, { '../internals/global-this': 78 }],
+  59: [function (require, module, exports) {
     'use strict'
     const fails = require('../internals/fails')
 
@@ -3740,8 +4710,8 @@
       // eslint-disable-next-line es/no-object-defineproperty -- required for testing
       return Object.defineProperty({}, 1, { get: function () { return 7 } })[1] !== 7
     })
-  }, { '../internals/fails': 52 }],
-  47: [function (require, module, exports) {
+  }, { '../internals/fails': 65 }],
+  60: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
     const isObject = require('../internals/is-object')
@@ -3753,8 +4723,8 @@
     module.exports = function (it) {
       return EXISTS ? document.createElement(it) : {}
     }
-  }, { '../internals/global-this': 65, '../internals/is-object': 77 }],
-  48: [function (require, module, exports) {
+  }, { '../internals/global-this': 78, '../internals/is-object': 90 }],
+  61: [function (require, module, exports) {
     'use strict'
     // IE8- don't enum bug keys
     module.exports = [
@@ -3767,7 +4737,7 @@
       'valueOf'
     ]
   }, {}],
-  49: [function (require, module, exports) {
+  62: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
 
@@ -3775,8 +4745,8 @@
     const userAgent = navigator && navigator.userAgent
 
     module.exports = userAgent ? String(userAgent) : ''
-  }, { '../internals/global-this': 65 }],
-  50: [function (require, module, exports) {
+  }, { '../internals/global-this': 78 }],
+  63: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
     const userAgent = require('../internals/environment-user-agent')
@@ -3805,8 +4775,8 @@
     }
 
     module.exports = version
-  }, { '../internals/environment-user-agent': 49, '../internals/global-this': 65 }],
-  51: [function (require, module, exports) {
+  }, { '../internals/environment-user-agent': 62, '../internals/global-this': 78 }],
+  64: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
     const getOwnPropertyDescriptor = require('../internals/object-get-own-property-descriptor').f
@@ -3864,8 +4834,8 @@
         }
       }
     }
-  }, { '../internals/copy-constructor-properties': 36, '../internals/create-non-enumerable-property': 39, '../internals/define-built-in': 43, '../internals/define-global-property': 45, '../internals/global-this': 65, '../internals/is-forced': 75, '../internals/object-get-own-property-descriptor': 95 }],
-  52: [function (require, module, exports) {
+  }, { '../internals/copy-constructor-properties': 49, '../internals/create-non-enumerable-property': 52, '../internals/define-built-in': 56, '../internals/define-global-property': 58, '../internals/global-this': 78, '../internals/is-forced': 88, '../internals/object-get-own-property-descriptor': 108 }],
+  65: [function (require, module, exports) {
     'use strict'
     module.exports = function (exec) {
       try {
@@ -3875,7 +4845,7 @@
       }
     }
   }, {}],
-  53: [function (require, module, exports) {
+  66: [function (require, module, exports) {
     'use strict'
     const NATIVE_BIND = require('../internals/function-bind-native')
 
@@ -3889,8 +4859,8 @@
       : function () {
         return call.apply(apply, arguments)
       })
-  }, { '../internals/function-bind-native': 55 }],
-  54: [function (require, module, exports) {
+  }, { '../internals/function-bind-native': 68 }],
+  67: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this-clause')
     const aCallable = require('../internals/a-callable')
@@ -3905,8 +4875,8 @@
         return fn.apply(that, arguments)
       }
     }
-  }, { '../internals/a-callable': 30, '../internals/function-bind-native': 55, '../internals/function-uncurry-this-clause': 58 }],
-  55: [function (require, module, exports) {
+  }, { '../internals/a-callable': 42, '../internals/function-bind-native': 68, '../internals/function-uncurry-this-clause': 71 }],
+  68: [function (require, module, exports) {
     'use strict'
     const fails = require('../internals/fails')
 
@@ -3916,8 +4886,8 @@
       // eslint-disable-next-line no-prototype-builtins -- safe
       return typeof test !== 'function' || test.hasOwnProperty('prototype')
     })
-  }, { '../internals/fails': 52 }],
-  56: [function (require, module, exports) {
+  }, { '../internals/fails': 65 }],
+  69: [function (require, module, exports) {
     'use strict'
     const NATIVE_BIND = require('../internals/function-bind-native')
 
@@ -3928,8 +4898,8 @@
       : function () {
         return call.apply(call, arguments)
       }
-  }, { '../internals/function-bind-native': 55 }],
-  57: [function (require, module, exports) {
+  }, { '../internals/function-bind-native': 68 }],
+  70: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const hasOwn = require('../internals/has-own-property')
@@ -3948,8 +4918,8 @@
       PROPER,
       CONFIGURABLE
     }
-  }, { '../internals/descriptors': 46, '../internals/has-own-property': 66 }],
-  58: [function (require, module, exports) {
+  }, { '../internals/descriptors': 59, '../internals/has-own-property': 79 }],
+  71: [function (require, module, exports) {
     'use strict'
     const classofRaw = require('../internals/classof-raw')
     const uncurryThis = require('../internals/function-uncurry-this')
@@ -3960,8 +4930,8 @@
       //   https://github.com/zloirock/core-js/issues/1130
       if (classofRaw(fn) === 'Function') return uncurryThis(fn)
     }
-  }, { '../internals/classof-raw': 35, '../internals/function-uncurry-this': 59 }],
-  59: [function (require, module, exports) {
+  }, { '../internals/classof-raw': 48, '../internals/function-uncurry-this': 72 }],
+  72: [function (require, module, exports) {
     'use strict'
     const NATIVE_BIND = require('../internals/function-bind-native')
 
@@ -3977,8 +4947,8 @@
           return call.apply(fn, arguments)
         }
       }
-  }, { '../internals/function-bind-native': 55 }],
-  60: [function (require, module, exports) {
+  }, { '../internals/function-bind-native': 68 }],
+  73: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
     const isCallable = require('../internals/is-callable')
@@ -3990,8 +4960,8 @@
     module.exports = function (namespace, method) {
       return arguments.length < 2 ? aFunction(globalThis[namespace]) : globalThis[namespace] && globalThis[namespace][method]
     }
-  }, { '../internals/global-this': 65, '../internals/is-callable': 74 }],
-  61: [function (require, module, exports) {
+  }, { '../internals/global-this': 78, '../internals/is-callable': 87 }],
+  74: [function (require, module, exports) {
     'use strict'
     // `GetIteratorDirect(obj)` abstract operation
     // https://tc39.es/ecma262/#sec-getiteratordirect
@@ -4003,7 +4973,7 @@
       }
     }
   }, {}],
-  62: [function (require, module, exports) {
+  75: [function (require, module, exports) {
     'use strict'
     const call = require('../internals/function-call')
     const isCallable = require('../internals/is-callable')
@@ -4018,8 +4988,8 @@
       if (isCallable(iteratorMethod)) return anObject(call(iteratorMethod, argument))
       throw new $TypeError(tryToString(argument) + ' is not iterable')
     }
-  }, { '../internals/an-object': 32, '../internals/function-call': 56, '../internals/get-iterator-method-internal': 63, '../internals/is-callable': 74, '../internals/try-to-string': 117 }],
-  63: [function (require, module, exports) {
+  }, { '../internals/an-object': 45, '../internals/function-call': 69, '../internals/get-iterator-method-internal': 76, '../internals/is-callable': 87, '../internals/try-to-string': 130 }],
+  76: [function (require, module, exports) {
     'use strict'
     const classof = require('../internals/classof-raw')
     const isNullOrUndefined = require('../internals/is-null-or-undefined')
@@ -4036,8 +5006,8 @@
     (classof(it) === 'Arguments' ? ArrayPrototype[ITERATOR] : undefined)
       }
     }
-  }, { '../internals/classof-raw': 35, '../internals/get-method': 64, '../internals/is-null-or-undefined': 76, '../internals/well-known-symbol': 122 }],
-  64: [function (require, module, exports) {
+  }, { '../internals/classof-raw': 48, '../internals/get-method': 77, '../internals/is-null-or-undefined': 89, '../internals/well-known-symbol': 136 }],
+  77: [function (require, module, exports) {
     'use strict'
     const aCallable = require('../internals/a-callable')
     const isNullOrUndefined = require('../internals/is-null-or-undefined')
@@ -4048,8 +5018,8 @@
       const func = V[P]
       return isNullOrUndefined(func) ? undefined : aCallable(func)
     }
-  }, { '../internals/a-callable': 30, '../internals/is-null-or-undefined': 76 }],
-  65: [function (require, module, exports) {
+  }, { '../internals/a-callable': 42, '../internals/is-null-or-undefined': 89 }],
+  78: [function (require, module, exports) {
     (function (global) {
       (function () {
         'use strict'
@@ -4071,7 +5041,7 @@
       }).call(this)
     }).call(this, typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : typeof window !== 'undefined' ? window : {})
   }, {}],
-  66: [function (require, module, exports) {
+  79: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
     const toObject = require('../internals/to-object')
@@ -4084,18 +5054,18 @@
     module.exports = Object.hasOwn || function hasOwn (it, key) {
       return hasOwnProperty(toObject(it), key)
     }
-  }, { '../internals/function-uncurry-this': 59, '../internals/to-object': 114 }],
-  67: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 72, '../internals/to-object': 127 }],
+  80: [function (require, module, exports) {
     'use strict'
     module.exports = {}
   }, {}],
-  68: [function (require, module, exports) {
+  81: [function (require, module, exports) {
     'use strict'
     const getBuiltIn = require('../internals/get-built-in')
 
     module.exports = getBuiltIn('document', 'documentElement')
-  }, { '../internals/get-built-in': 60 }],
-  69: [function (require, module, exports) {
+  }, { '../internals/get-built-in': 73 }],
+  82: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const fails = require('../internals/fails')
@@ -4108,8 +5078,8 @@
         get: function () { return 7 }
       }).a !== 7
     })
-  }, { '../internals/descriptors': 46, '../internals/document-create-element': 47, '../internals/fails': 52 }],
-  70: [function (require, module, exports) {
+  }, { '../internals/descriptors': 59, '../internals/document-create-element': 60, '../internals/fails': 65 }],
+  83: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
     const fails = require('../internals/fails')
@@ -4126,8 +5096,8 @@
     }) ? function (it) {
         return classof(it) === 'String' ? split(it, '') : $Object(it)
       } : $Object
-  }, { '../internals/classof-raw': 35, '../internals/fails': 52, '../internals/function-uncurry-this': 59 }],
-  71: [function (require, module, exports) {
+  }, { '../internals/classof-raw': 48, '../internals/fails': 65, '../internals/function-uncurry-this': 72 }],
+  84: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
     const isCallable = require('../internals/is-callable')
@@ -4143,8 +5113,8 @@
     }
 
     module.exports = store.inspectSource
-  }, { '../internals/function-uncurry-this': 59, '../internals/is-callable': 74, '../internals/shared-store': 107 }],
-  72: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 72, '../internals/is-callable': 87, '../internals/shared-store': 120 }],
+  85: [function (require, module, exports) {
     'use strict'
     const NATIVE_WEAK_MAP = require('../internals/weak-map-basic-detection')
     const globalThis = require('../internals/global-this')
@@ -4216,8 +5186,8 @@
       enforce,
       getterFor
     }
-  }, { '../internals/create-non-enumerable-property': 39, '../internals/global-this': 65, '../internals/has-own-property': 66, '../internals/hidden-keys': 67, '../internals/is-object': 77, '../internals/shared-key': 106, '../internals/shared-store': 107, '../internals/weak-map-basic-detection': 121 }],
-  73: [function (require, module, exports) {
+  }, { '../internals/create-non-enumerable-property': 52, '../internals/global-this': 78, '../internals/has-own-property': 79, '../internals/hidden-keys': 80, '../internals/is-object': 90, '../internals/shared-key': 119, '../internals/shared-store': 120, '../internals/weak-map-basic-detection': 134 }],
+  86: [function (require, module, exports) {
     'use strict'
     const wellKnownSymbol = require('../internals/well-known-symbol')
     const Iterators = require('../internals/iterators')
@@ -4229,8 +5199,8 @@
     module.exports = function (it) {
       return it !== undefined && (Iterators.Array === it || ArrayPrototype[ITERATOR] === it)
     }
-  }, { '../internals/iterators': 88, '../internals/well-known-symbol': 122 }],
-  74: [function (require, module, exports) {
+  }, { '../internals/iterators': 101, '../internals/well-known-symbol': 136 }],
+  87: [function (require, module, exports) {
     'use strict'
     // https://tc39.es/ecma262/#sec-IsHTMLDDA-internal-slot
     const documentAll = typeof document === 'object' && document.all
@@ -4246,7 +5216,7 @@
         return typeof argument === 'function'
       }
   }, {}],
-  75: [function (require, module, exports) {
+  88: [function (require, module, exports) {
     'use strict'
     const fails = require('../internals/fails')
     const isCallable = require('../internals/is-callable')
@@ -4273,8 +5243,8 @@
     var POLYFILL = isForced.POLYFILL = 'P'
 
     module.exports = isForced
-  }, { '../internals/fails': 52, '../internals/is-callable': 74 }],
-  76: [function (require, module, exports) {
+  }, { '../internals/fails': 65, '../internals/is-callable': 87 }],
+  89: [function (require, module, exports) {
     'use strict'
     // we can't use just `it == null` since of `document.all` special case
     // https://tc39.es/ecma262/#sec-IsHTMLDDA-internal-slot-aec
@@ -4282,19 +5252,19 @@
       return it === null || it === undefined
     }
   }, {}],
-  77: [function (require, module, exports) {
+  90: [function (require, module, exports) {
     'use strict'
     const isCallable = require('../internals/is-callable')
 
     module.exports = function (it) {
       return typeof it === 'object' ? it !== null : isCallable(it)
     }
-  }, { '../internals/is-callable': 74 }],
-  78: [function (require, module, exports) {
+  }, { '../internals/is-callable': 87 }],
+  91: [function (require, module, exports) {
     'use strict'
     module.exports = false
   }, {}],
-  79: [function (require, module, exports) {
+  92: [function (require, module, exports) {
     'use strict'
     const getBuiltIn = require('../internals/get-built-in')
     const isCallable = require('../internals/is-callable')
@@ -4311,8 +5281,8 @@
         const $Symbol = getBuiltIn('Symbol')
         return isCallable($Symbol) && isPrototypeOf($Symbol.prototype, $Object(it))
       }
-  }, { '../internals/get-built-in': 60, '../internals/is-callable': 74, '../internals/object-is-prototype-of': 99, '../internals/use-symbol-as-uid': 119 }],
-  80: [function (require, module, exports) {
+  }, { '../internals/get-built-in': 73, '../internals/is-callable': 87, '../internals/object-is-prototype-of': 112, '../internals/use-symbol-as-uid': 132 }],
+  93: [function (require, module, exports) {
     'use strict'
     const bind = require('../internals/function-bind-context')
     const call = require('../internals/function-call')
@@ -4387,8 +5357,8 @@
         if (typeof result === 'object' && result && isPrototypeOf(ResultPrototype, result)) return result
       } return new Result(false)
     }
-  }, { '../internals/an-object': 32, '../internals/function-bind-context': 54, '../internals/function-call': 56, '../internals/get-iterator-internal': 62, '../internals/get-iterator-method-internal': 63, '../internals/is-array-iterator-method': 73, '../internals/iterator-close': 83, '../internals/length-of-array-like': 89, '../internals/object-is-prototype-of': 99, '../internals/try-to-string': 117 }],
-  81: [function (require, module, exports) {
+  }, { '../internals/an-object': 45, '../internals/function-bind-context': 67, '../internals/function-call': 69, '../internals/get-iterator-internal': 75, '../internals/get-iterator-method-internal': 76, '../internals/is-array-iterator-method': 86, '../internals/iterator-close': 96, '../internals/length-of-array-like': 102, '../internals/object-is-prototype-of': 112, '../internals/try-to-string': 130 }],
+  94: [function (require, module, exports) {
     'use strict'
     // release references held by exhausted / closed iterator helpers to allow GC of the source chain
     module.exports = function (state) {
@@ -4396,7 +5366,7 @@
     state.iterables = state.iters = state.openIters = state.padding = state.finishResults = state.buffer = null
     }
   }, {}],
-  82: [function (require, module, exports) {
+  95: [function (require, module, exports) {
     'use strict'
     const iteratorClose = require('../internals/iterator-close')
 
@@ -4413,8 +5383,8 @@
       if (kind === 'throw') throw value
       return value
     }
-  }, { '../internals/iterator-close': 83 }],
-  83: [function (require, module, exports) {
+  }, { '../internals/iterator-close': 96 }],
+  96: [function (require, module, exports) {
     'use strict'
     const call = require('../internals/function-call')
     const anObject = require('../internals/an-object')
@@ -4439,8 +5409,8 @@
       anObject(innerResult)
       return value
     }
-  }, { '../internals/an-object': 32, '../internals/function-call': 56, '../internals/get-method': 64 }],
-  84: [function (require, module, exports) {
+  }, { '../internals/an-object': 45, '../internals/function-call': 69, '../internals/get-method': 77 }],
+  97: [function (require, module, exports) {
     'use strict'
     const call = require('../internals/function-call')
     const create = require('../internals/object-create')
@@ -4540,8 +5510,8 @@
 
       return IteratorProxy
     }
-  }, { '../internals/create-iter-result-object': 38, '../internals/create-non-enumerable-property': 39, '../internals/define-built-ins': 44, '../internals/function-call': 56, '../internals/get-method': 64, '../internals/internal-state': 72, '../internals/iterator-cleanup-state': 81, '../internals/iterator-close': 83, '../internals/iterator-close-all': 82, '../internals/iterators-core': 87, '../internals/object-create': 92, '../internals/well-known-symbol': 122 }],
-  85: [function (require, module, exports) {
+  }, { '../internals/create-iter-result-object': 51, '../internals/create-non-enumerable-property': 52, '../internals/define-built-ins': 57, '../internals/function-call': 69, '../internals/get-method': 77, '../internals/internal-state': 85, '../internals/iterator-cleanup-state': 94, '../internals/iterator-close': 96, '../internals/iterator-close-all': 95, '../internals/iterators-core': 100, '../internals/object-create': 105, '../internals/well-known-symbol': 136 }],
+  98: [function (require, module, exports) {
     'use strict'
     // Should throw an error on invalid iterator
     // https://issues.chromium.org/issues/336839115
@@ -4557,7 +5527,7 @@
       }
     }
   }, {}],
-  86: [function (require, module, exports) {
+  99: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
 
@@ -4583,8 +5553,8 @@
 
       if (!CLOSED) return method
     }
-  }, { '../internals/global-this': 65 }],
-  87: [function (require, module, exports) {
+  }, { '../internals/global-this': 78 }],
+  100: [function (require, module, exports) {
     'use strict'
     const fails = require('../internals/fails')
     const isCallable = require('../internals/is-callable')
@@ -4634,12 +5604,12 @@
       IteratorPrototype,
       BUGGY_SAFARI_ITERATORS
     }
-  }, { '../internals/define-built-in': 43, '../internals/fails': 52, '../internals/is-callable': 74, '../internals/is-object': 77, '../internals/is-pure': 78, '../internals/object-create': 92, '../internals/object-get-prototype-of': 98, '../internals/well-known-symbol': 122 }],
-  88: [function (require, module, exports) {
+  }, { '../internals/define-built-in': 56, '../internals/fails': 65, '../internals/is-callable': 87, '../internals/is-object': 90, '../internals/is-pure': 91, '../internals/object-create': 105, '../internals/object-get-prototype-of': 111, '../internals/well-known-symbol': 136 }],
+  101: [function (require, module, exports) {
     'use strict'
     module.exports = Object.create ? Object.create(null) : {}
   }, {}],
-  89: [function (require, module, exports) {
+  102: [function (require, module, exports) {
     'use strict'
     const toLength = require('../internals/to-length')
 
@@ -4648,8 +5618,8 @@
     module.exports = function (obj) {
       return toLength(obj.length)
     }
-  }, { '../internals/to-length': 113 }],
-  90: [function (require, module, exports) {
+  }, { '../internals/to-length': 126 }],
+  103: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
     const fails = require('../internals/fails')
@@ -4705,8 +5675,8 @@
     Function.prototype.toString = makeBuiltIn(function toString () {
       return isCallable(this) && getInternalState(this).source || inspectSource(this)
     }, 'toString')
-  }, { '../internals/descriptors': 46, '../internals/fails': 52, '../internals/function-name': 57, '../internals/function-uncurry-this': 59, '../internals/has-own-property': 66, '../internals/inspect-source': 71, '../internals/internal-state': 72, '../internals/is-callable': 74 }],
-  91: [function (require, module, exports) {
+  }, { '../internals/descriptors': 59, '../internals/fails': 65, '../internals/function-name': 70, '../internals/function-uncurry-this': 72, '../internals/has-own-property': 79, '../internals/inspect-source': 84, '../internals/internal-state': 85, '../internals/is-callable': 87 }],
+  104: [function (require, module, exports) {
     'use strict'
     const ceil = Math.ceil
     const floor = Math.floor
@@ -4719,7 +5689,7 @@
       return (n > 0 ? floor : ceil)(n)
     }
   }, {}],
-  92: [function (require, module, exports) {
+  105: [function (require, module, exports) {
     'use strict'
     /* global ActiveXObject -- old IE, WSH */
     const anObject = require('../internals/an-object')
@@ -4805,8 +5775,8 @@
       } else result = NullProtoObject()
       return Properties === undefined ? result : definePropertiesModule.f(result, Properties)
     }
-  }, { '../internals/an-object': 32, '../internals/document-create-element': 47, '../internals/enum-bug-keys': 48, '../internals/hidden-keys': 67, '../internals/html': 68, '../internals/object-define-properties': 93, '../internals/shared-key': 106 }],
-  93: [function (require, module, exports) {
+  }, { '../internals/an-object': 45, '../internals/document-create-element': 60, '../internals/enum-bug-keys': 61, '../internals/hidden-keys': 80, '../internals/html': 81, '../internals/object-define-properties': 106, '../internals/shared-key': 119 }],
+  106: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const V8_PROTOTYPE_DEFINE_BUG = require('../internals/v8-prototype-define-bug')
@@ -4830,8 +5800,8 @@
         while (length > index) definePropertyModule.f(O, key = keys[index++], props[key])
         return O
       }
-  }, { '../internals/an-object': 32, '../internals/descriptors': 46, '../internals/object-define-property': 94, '../internals/object-keys': 101, '../internals/to-indexed-object': 111, '../internals/v8-prototype-define-bug': 120 }],
-  94: [function (require, module, exports) {
+  }, { '../internals/an-object': 45, '../internals/descriptors': 59, '../internals/object-define-property': 107, '../internals/object-keys': 114, '../internals/to-indexed-object': 124, '../internals/v8-prototype-define-bug': 133 }],
+  107: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const IE8_DOM_DEFINE = require('../internals/ie8-dom-define')
@@ -4880,8 +5850,8 @@
       if ('value' in Attributes) O[P] = Attributes.value
       return O
     }
-  }, { '../internals/an-object': 32, '../internals/descriptors': 46, '../internals/ie8-dom-define': 69, '../internals/to-property-key': 116, '../internals/v8-prototype-define-bug': 120 }],
-  95: [function (require, module, exports) {
+  }, { '../internals/an-object': 45, '../internals/descriptors': 59, '../internals/ie8-dom-define': 82, '../internals/to-property-key': 129, '../internals/v8-prototype-define-bug': 133 }],
+  108: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const call = require('../internals/function-call')
@@ -4907,8 +5877,8 @@
       }
       if (hasOwn(O, P)) return createPropertyDescriptor(!call(propertyIsEnumerableModule.f, O, P), O[P])
     }
-  }, { '../internals/create-property-descriptor': 40, '../internals/descriptors': 46, '../internals/function-call': 56, '../internals/has-own-property': 66, '../internals/ie8-dom-define': 69, '../internals/object-property-is-enumerable': 102, '../internals/to-indexed-object': 111, '../internals/to-property-key': 116 }],
-  96: [function (require, module, exports) {
+  }, { '../internals/create-property-descriptor': 53, '../internals/descriptors': 59, '../internals/function-call': 69, '../internals/has-own-property': 79, '../internals/ie8-dom-define': 82, '../internals/object-property-is-enumerable': 115, '../internals/to-indexed-object': 124, '../internals/to-property-key': 129 }],
+  109: [function (require, module, exports) {
     'use strict'
     const internalObjectKeys = require('../internals/object-keys-internal')
     const enumBugKeys = require('../internals/enum-bug-keys')
@@ -4921,13 +5891,13 @@
     exports.f = Object.getOwnPropertyNames || function getOwnPropertyNames (O) {
       return internalObjectKeys(O, hiddenKeys)
     }
-  }, { '../internals/enum-bug-keys': 48, '../internals/object-keys-internal': 100 }],
-  97: [function (require, module, exports) {
+  }, { '../internals/enum-bug-keys': 61, '../internals/object-keys-internal': 113 }],
+  110: [function (require, module, exports) {
     'use strict'
     // eslint-disable-next-line es/no-object-getownpropertysymbols -- safe
     exports.f = Object.getOwnPropertySymbols
   }, {}],
-  98: [function (require, module, exports) {
+  111: [function (require, module, exports) {
     'use strict'
     const hasOwn = require('../internals/has-own-property')
     const isCallable = require('../internals/is-callable')
@@ -4952,14 +5922,14 @@
           return constructor.prototype
         } return object instanceof $Object ? ObjectPrototype : null
       }
-  }, { '../internals/correct-prototype-getter': 37, '../internals/has-own-property': 66, '../internals/is-callable': 74, '../internals/shared-key': 106, '../internals/to-object': 114 }],
-  99: [function (require, module, exports) {
+  }, { '../internals/correct-prototype-getter': 50, '../internals/has-own-property': 79, '../internals/is-callable': 87, '../internals/shared-key': 119, '../internals/to-object': 127 }],
+  112: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
 
     module.exports = uncurryThis({}.isPrototypeOf)
-  }, { '../internals/function-uncurry-this': 59 }],
-  100: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 72 }],
+  113: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
     const hasOwn = require('../internals/has-own-property')
@@ -4983,8 +5953,8 @@
       }
       return result
     }
-  }, { '../internals/array-includes': 33, '../internals/function-uncurry-this': 59, '../internals/has-own-property': 66, '../internals/hidden-keys': 67, '../internals/to-indexed-object': 111 }],
-  101: [function (require, module, exports) {
+  }, { '../internals/array-includes': 46, '../internals/function-uncurry-this': 72, '../internals/has-own-property': 79, '../internals/hidden-keys': 80, '../internals/to-indexed-object': 124 }],
+  114: [function (require, module, exports) {
     'use strict'
     const internalObjectKeys = require('../internals/object-keys-internal')
     const enumBugKeys = require('../internals/enum-bug-keys')
@@ -4995,8 +5965,8 @@
     module.exports = Object.keys || function keys (O) {
       return internalObjectKeys(O, enumBugKeys)
     }
-  }, { '../internals/enum-bug-keys': 48, '../internals/object-keys-internal': 100 }],
-  102: [function (require, module, exports) {
+  }, { '../internals/enum-bug-keys': 61, '../internals/object-keys-internal': 113 }],
+  115: [function (require, module, exports) {
     'use strict'
     const $propertyIsEnumerable = {}.propertyIsEnumerable
     // eslint-disable-next-line es/no-object-getownpropertydescriptor -- safe
@@ -5014,7 +5984,7 @@
       }
       : $propertyIsEnumerable
   }, {}],
-  103: [function (require, module, exports) {
+  116: [function (require, module, exports) {
     'use strict'
     const call = require('../internals/function-call')
     const isCallable = require('../internals/is-callable')
@@ -5031,8 +6001,8 @@
       if (pref !== 'string' && isCallable(fn = input.toString) && !isObject(val = call(fn, input))) return val
       throw new $TypeError("Can't convert object to primitive value")
     }
-  }, { '../internals/function-call': 56, '../internals/is-callable': 74, '../internals/is-object': 77 }],
-  104: [function (require, module, exports) {
+  }, { '../internals/function-call': 69, '../internals/is-callable': 87, '../internals/is-object': 90 }],
+  117: [function (require, module, exports) {
     'use strict'
     const getBuiltIn = require('../internals/get-built-in')
     const uncurryThis = require('../internals/function-uncurry-this')
@@ -5048,8 +6018,8 @@
       const getOwnPropertySymbols = getOwnPropertySymbolsModule.f
       return getOwnPropertySymbols ? concat(keys, getOwnPropertySymbols(it)) : keys
     }
-  }, { '../internals/an-object': 32, '../internals/function-uncurry-this': 59, '../internals/get-built-in': 60, '../internals/object-get-own-property-names': 96, '../internals/object-get-own-property-symbols': 97 }],
-  105: [function (require, module, exports) {
+  }, { '../internals/an-object': 45, '../internals/function-uncurry-this': 72, '../internals/get-built-in': 73, '../internals/object-get-own-property-names': 109, '../internals/object-get-own-property-symbols': 110 }],
+  118: [function (require, module, exports) {
     'use strict'
     const isNullOrUndefined = require('../internals/is-null-or-undefined')
 
@@ -5061,8 +6031,8 @@
       if (isNullOrUndefined(it)) throw new $TypeError("Can't call method on " + it)
       return it
     }
-  }, { '../internals/is-null-or-undefined': 76 }],
-  106: [function (require, module, exports) {
+  }, { '../internals/is-null-or-undefined': 89 }],
+  119: [function (require, module, exports) {
     'use strict'
     const shared = require('../internals/shared')
     const uid = require('../internals/uid')
@@ -5072,8 +6042,8 @@
     module.exports = function (key) {
       return keys[key] || (keys[key] = uid(key))
     }
-  }, { '../internals/shared': 108, '../internals/uid': 118 }],
-  107: [function (require, module, exports) {
+  }, { '../internals/shared': 121, '../internals/uid': 131 }],
+  120: [function (require, module, exports) {
     'use strict'
     const IS_PURE = require('../internals/is-pure')
     const globalThis = require('../internals/global-this')
@@ -5089,8 +6059,8 @@
       license: 'https://github.com/zloirock/core-js/blob/v3.50.0/LICENSE',
       source: 'https://github.com/zloirock/core-js'
     })
-  }, { '../internals/define-global-property': 45, '../internals/global-this': 65, '../internals/is-pure': 78 }],
-  108: [function (require, module, exports) {
+  }, { '../internals/define-global-property': 58, '../internals/global-this': 78, '../internals/is-pure': 91 }],
+  121: [function (require, module, exports) {
     'use strict'
     const store = require('../internals/shared-store')
     // eslint-disable-next-line es/no-object-create -- safe
@@ -5099,8 +6069,8 @@
     module.exports = function (key, value) {
       return store[key] || (store[key] = value || create(null))
     }
-  }, { '../internals/shared-store': 107 }],
-  109: [function (require, module, exports) {
+  }, { '../internals/shared-store': 120 }],
+  122: [function (require, module, exports) {
     'use strict'
     /* eslint-disable es/no-symbol -- required for testing */
     const V8_VERSION = require('../internals/environment-v8-version')
@@ -5120,8 +6090,8 @@
     // Chrome 38-40 symbols are not inherited from DOM collections prototypes to instances
     !Symbol.sham && V8_VERSION && V8_VERSION < 41
     })
-  }, { '../internals/environment-v8-version': 50, '../internals/fails': 52, '../internals/global-this': 65 }],
-  110: [function (require, module, exports) {
+  }, { '../internals/environment-v8-version': 63, '../internals/fails': 65, '../internals/global-this': 78 }],
+  123: [function (require, module, exports) {
     'use strict'
     const toIntegerOrInfinity = require('../internals/to-integer-or-infinity')
 
@@ -5135,8 +6105,8 @@
       const integer = toIntegerOrInfinity(index)
       return integer < 0 ? max(integer + length, 0) : min(integer, length)
     }
-  }, { '../internals/to-integer-or-infinity': 112 }],
-  111: [function (require, module, exports) {
+  }, { '../internals/to-integer-or-infinity': 125 }],
+  124: [function (require, module, exports) {
     'use strict'
     // toObject with fallback for non-array-like ES3 strings
     const IndexedObject = require('../internals/indexed-object')
@@ -5145,8 +6115,8 @@
     module.exports = function (it) {
       return IndexedObject(requireObjectCoercible(it))
     }
-  }, { '../internals/indexed-object': 70, '../internals/require-object-coercible': 105 }],
-  112: [function (require, module, exports) {
+  }, { '../internals/indexed-object': 83, '../internals/require-object-coercible': 118 }],
+  125: [function (require, module, exports) {
     'use strict'
     const trunc = require('../internals/math-trunc')
 
@@ -5157,8 +6127,8 @@
       // eslint-disable-next-line no-self-compare -- NaN check
       return number !== number || number === 0 ? 0 : trunc(number)
     }
-  }, { '../internals/math-trunc': 91 }],
-  113: [function (require, module, exports) {
+  }, { '../internals/math-trunc': 104 }],
+  126: [function (require, module, exports) {
     'use strict'
     const toIntegerOrInfinity = require('../internals/to-integer-or-infinity')
 
@@ -5170,8 +6140,8 @@
       const len = toIntegerOrInfinity(argument)
       return len > 0 ? min(len, 0x1FFFFFFFFFFFFF) : 0 // 2 ** 53 - 1 == 9007199254740991
     }
-  }, { '../internals/to-integer-or-infinity': 112 }],
-  114: [function (require, module, exports) {
+  }, { '../internals/to-integer-or-infinity': 125 }],
+  127: [function (require, module, exports) {
     'use strict'
     const requireObjectCoercible = require('../internals/require-object-coercible')
 
@@ -5182,8 +6152,8 @@
     module.exports = function (argument) {
       return $Object(requireObjectCoercible(argument))
     }
-  }, { '../internals/require-object-coercible': 105 }],
-  115: [function (require, module, exports) {
+  }, { '../internals/require-object-coercible': 118 }],
+  128: [function (require, module, exports) {
     'use strict'
     const call = require('../internals/function-call')
     const isObject = require('../internals/is-object')
@@ -5210,8 +6180,8 @@
       if (pref === undefined) pref = 'number'
       return ordinaryToPrimitive(input, pref)
     }
-  }, { '../internals/function-call': 56, '../internals/get-method': 64, '../internals/is-object': 77, '../internals/is-symbol': 79, '../internals/ordinary-to-primitive': 103, '../internals/well-known-symbol': 122 }],
-  116: [function (require, module, exports) {
+  }, { '../internals/function-call': 69, '../internals/get-method': 77, '../internals/is-object': 90, '../internals/is-symbol': 92, '../internals/ordinary-to-primitive': 116, '../internals/well-known-symbol': 136 }],
+  129: [function (require, module, exports) {
     'use strict'
     const toPrimitive = require('../internals/to-primitive')
     const isSymbol = require('../internals/is-symbol')
@@ -5222,8 +6192,8 @@
       const key = toPrimitive(argument, 'string')
       return isSymbol(key) ? key : key + ''
     }
-  }, { '../internals/is-symbol': 79, '../internals/to-primitive': 115 }],
-  117: [function (require, module, exports) {
+  }, { '../internals/is-symbol': 92, '../internals/to-primitive': 128 }],
+  130: [function (require, module, exports) {
     'use strict'
     const $String = String
 
@@ -5235,7 +6205,7 @@
       }
     }
   }, {}],
-  118: [function (require, module, exports) {
+  131: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
 
@@ -5246,8 +6216,8 @@
     module.exports = function (key) {
       return 'Symbol(' + (key === undefined ? '' : key) + ')_' + toString(++id + postfix, 36)
     }
-  }, { '../internals/function-uncurry-this': 59 }],
-  119: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 72 }],
+  132: [function (require, module, exports) {
     'use strict'
     /* eslint-disable es/no-symbol -- required for testing */
     const NATIVE_SYMBOL = require('../internals/symbol-constructor-detection')
@@ -5255,8 +6225,8 @@
     module.exports = NATIVE_SYMBOL &&
   !Symbol.sham &&
   typeof Symbol.iterator === 'symbol'
-  }, { '../internals/symbol-constructor-detection': 109 }],
-  120: [function (require, module, exports) {
+  }, { '../internals/symbol-constructor-detection': 122 }],
+  133: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const fails = require('../internals/fails')
@@ -5270,8 +6240,8 @@
         writable: false
       }).prototype !== 42
     })
-  }, { '../internals/descriptors': 46, '../internals/fails': 52 }],
-  121: [function (require, module, exports) {
+  }, { '../internals/descriptors': 59, '../internals/fails': 65 }],
+  134: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
     const isCallable = require('../internals/is-callable')
@@ -5279,8 +6249,24 @@
     const WeakMap = globalThis.WeakMap
 
     module.exports = isCallable(WeakMap) && /native code/.test(String(WeakMap))
-  }, { '../internals/global-this': 65, '../internals/is-callable': 74 }],
-  122: [function (require, module, exports) {
+  }, { '../internals/global-this': 78, '../internals/is-callable': 87 }],
+  135: [function (require, module, exports) {
+    'use strict'
+    const uncurryThis = require('../internals/function-uncurry-this')
+
+    // eslint-disable-next-line es/no-weak-map -- safe
+    const WeakMapPrototype = WeakMap.prototype
+
+    module.exports = {
+      // eslint-disable-next-line es/no-weak-map -- safe
+      WeakMap,
+      set: uncurryThis(WeakMapPrototype.set),
+      get: uncurryThis(WeakMapPrototype.get),
+      has: uncurryThis(WeakMapPrototype.has),
+      remove: uncurryThis(WeakMapPrototype.delete)
+    }
+  }, { '../internals/function-uncurry-this': 72 }],
+  136: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
     const shared = require('../internals/shared')
@@ -5300,8 +6286,8 @@
           : createWellKnownSymbol('Symbol.' + name)
       } return WellKnownSymbolsStore[name]
     }
-  }, { '../internals/global-this': 65, '../internals/has-own-property': 66, '../internals/shared': 108, '../internals/symbol-constructor-detection': 109, '../internals/uid': 118, '../internals/use-symbol-as-uid': 119 }],
-  123: [function (require, module, exports) {
+  }, { '../internals/global-this': 78, '../internals/has-own-property': 79, '../internals/shared': 121, '../internals/symbol-constructor-detection': 122, '../internals/uid': 131, '../internals/use-symbol-as-uid': 132 }],
+  137: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const globalThis = require('../internals/global-this')
@@ -5367,8 +6353,8 @@
     $({ global: true, constructor: true, forced: FORCED }, {
       Iterator: IteratorConstructor
     })
-  }, { '../internals/an-instance': 31, '../internals/an-object': 32, '../internals/create-property': 41, '../internals/define-built-in-accessor': 42, '../internals/descriptors': 46, '../internals/export': 51, '../internals/fails': 52, '../internals/global-this': 65, '../internals/has-own-property': 66, '../internals/is-callable': 74, '../internals/is-pure': 78, '../internals/iterators-core': 87, '../internals/object-get-prototype-of': 98, '../internals/well-known-symbol': 122 }],
-  124: [function (require, module, exports) {
+  }, { '../internals/an-instance': 44, '../internals/an-object': 45, '../internals/create-property': 54, '../internals/define-built-in-accessor': 55, '../internals/descriptors': 59, '../internals/export': 64, '../internals/fails': 65, '../internals/global-this': 78, '../internals/has-own-property': 79, '../internals/is-callable': 87, '../internals/is-pure': 91, '../internals/iterators-core': 100, '../internals/object-get-prototype-of': 111, '../internals/well-known-symbol': 136 }],
+  138: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -5420,8 +6406,8 @@
         })
       }
     })
-  }, { '../internals/a-callable': 30, '../internals/an-object': 32, '../internals/call-with-safe-iteration-closing': 34, '../internals/export': 51, '../internals/function-call': 56, '../internals/get-iterator-direct': 61, '../internals/is-pure': 78, '../internals/iterator-close': 83, '../internals/iterator-create-proxy': 84, '../internals/iterator-helper-throws-on-invalid-iterator': 85, '../internals/iterator-helper-without-closing-on-early-error': 86 }],
-  125: [function (require, module, exports) {
+  }, { '../internals/a-callable': 42, '../internals/an-object': 45, '../internals/call-with-safe-iteration-closing': 47, '../internals/export': 64, '../internals/function-call': 69, '../internals/get-iterator-direct': 74, '../internals/is-pure': 91, '../internals/iterator-close': 96, '../internals/iterator-create-proxy': 97, '../internals/iterator-helper-throws-on-invalid-iterator': 98, '../internals/iterator-helper-without-closing-on-early-error': 99 }],
+  139: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -5454,8 +6440,8 @@
         }, { IS_RECORD: true, INTERRUPTED: true }).result
       }
     })
-  }, { '../internals/a-callable': 30, '../internals/an-object': 32, '../internals/export': 51, '../internals/function-call': 56, '../internals/get-iterator-direct': 61, '../internals/iterate': 80, '../internals/iterator-close': 83, '../internals/iterator-helper-without-closing-on-early-error': 86 }],
-  126: [function (require, module, exports) {
+  }, { '../internals/a-callable': 42, '../internals/an-object': 45, '../internals/export': 64, '../internals/function-call': 69, '../internals/get-iterator-direct': 74, '../internals/iterate': 93, '../internals/iterator-close': 96, '../internals/iterator-helper-without-closing-on-early-error': 99 }],
+  140: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -5488,8 +6474,8 @@
         }, { IS_RECORD: true })
       }
     })
-  }, { '../internals/a-callable': 30, '../internals/an-object': 32, '../internals/export': 51, '../internals/function-call': 56, '../internals/get-iterator-direct': 61, '../internals/iterate': 80, '../internals/iterator-close': 83, '../internals/iterator-helper-without-closing-on-early-error': 86 }],
-  127: [function (require, module, exports) {
+  }, { '../internals/a-callable': 42, '../internals/an-object': 45, '../internals/export': 64, '../internals/function-call': 69, '../internals/get-iterator-direct': 74, '../internals/iterate': 93, '../internals/iterator-close': 96, '../internals/iterator-helper-without-closing-on-early-error': 99 }],
+  141: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -5534,8 +6520,8 @@
         })
       }
     })
-  }, { '../internals/a-callable': 30, '../internals/an-object': 32, '../internals/call-with-safe-iteration-closing': 34, '../internals/export': 51, '../internals/function-call': 56, '../internals/get-iterator-direct': 61, '../internals/is-pure': 78, '../internals/iterator-close': 83, '../internals/iterator-create-proxy': 84, '../internals/iterator-helper-throws-on-invalid-iterator': 85, '../internals/iterator-helper-without-closing-on-early-error': 86 }],
-  128: [function (require, module, exports) {
+  }, { '../internals/a-callable': 42, '../internals/an-object': 45, '../internals/call-with-safe-iteration-closing': 47, '../internals/export': 64, '../internals/function-call': 69, '../internals/get-iterator-direct': 74, '../internals/is-pure': 91, '../internals/iterator-close': 96, '../internals/iterator-create-proxy': 97, '../internals/iterator-helper-throws-on-invalid-iterator': 98, '../internals/iterator-helper-without-closing-on-early-error': 99 }],
+  142: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const iterate = require('../internals/iterate')
@@ -5588,8 +6574,8 @@
         return accumulator
       }
     })
-  }, { '../internals/a-callable': 30, '../internals/an-object': 32, '../internals/export': 51, '../internals/fails': 52, '../internals/function-apply': 53, '../internals/get-iterator-direct': 61, '../internals/iterate': 80, '../internals/iterator-close': 83, '../internals/iterator-helper-without-closing-on-early-error': 86 }],
-  129: [function (require, module, exports) {
+  }, { '../internals/a-callable': 42, '../internals/an-object': 45, '../internals/export': 64, '../internals/fails': 65, '../internals/function-apply': 66, '../internals/get-iterator-direct': 74, '../internals/iterate': 93, '../internals/iterator-close': 96, '../internals/iterator-helper-without-closing-on-early-error': 99 }],
+  143: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -5622,40 +6608,60 @@
         }, { IS_RECORD: true, INTERRUPTED: true }).stopped
       }
     })
-  }, { '../internals/a-callable': 30, '../internals/an-object': 32, '../internals/export': 51, '../internals/function-call': 56, '../internals/get-iterator-direct': 61, '../internals/iterate': 80, '../internals/iterator-close': 83, '../internals/iterator-helper-without-closing-on-early-error': 86 }],
-  130: [function (require, module, exports) {
+  }, { '../internals/a-callable': 42, '../internals/an-object': 45, '../internals/export': 64, '../internals/function-call': 69, '../internals/get-iterator-direct': 74, '../internals/iterate': 93, '../internals/iterator-close': 96, '../internals/iterator-helper-without-closing-on-early-error': 99 }],
+  144: [function (require, module, exports) {
     'use strict'
     // TODO: Remove from `core-js@4`
     require('../modules/es.iterator.constructor')
-  }, { '../modules/es.iterator.constructor': 123 }],
-  131: [function (require, module, exports) {
+  }, { '../modules/es.iterator.constructor': 137 }],
+  145: [function (require, module, exports) {
     'use strict'
     // TODO: Remove from `core-js@4`
     require('../modules/es.iterator.filter')
-  }, { '../modules/es.iterator.filter': 124 }],
-  132: [function (require, module, exports) {
+  }, { '../modules/es.iterator.filter': 138 }],
+  146: [function (require, module, exports) {
     'use strict'
     // TODO: Remove from `core-js@4`
     require('../modules/es.iterator.find')
-  }, { '../modules/es.iterator.find': 125 }],
-  133: [function (require, module, exports) {
+  }, { '../modules/es.iterator.find': 139 }],
+  147: [function (require, module, exports) {
     'use strict'
     // TODO: Remove from `core-js@4`
     require('../modules/es.iterator.for-each')
-  }, { '../modules/es.iterator.for-each': 126 }],
-  134: [function (require, module, exports) {
+  }, { '../modules/es.iterator.for-each': 140 }],
+  148: [function (require, module, exports) {
     'use strict'
     // TODO: Remove from `core-js@4`
     require('../modules/es.iterator.map')
-  }, { '../modules/es.iterator.map': 127 }],
-  135: [function (require, module, exports) {
+  }, { '../modules/es.iterator.map': 141 }],
+  149: [function (require, module, exports) {
     'use strict'
     // TODO: Remove from `core-js@4`
     require('../modules/es.iterator.reduce')
-  }, { '../modules/es.iterator.reduce': 128 }],
-  136: [function (require, module, exports) {
+  }, { '../modules/es.iterator.reduce': 142 }],
+  150: [function (require, module, exports) {
     'use strict'
     // TODO: Remove from `core-js@4`
     require('../modules/es.iterator.some')
-  }, { '../modules/es.iterator.some': 129 }]
-}, {}, [8])
+  }, { '../modules/es.iterator.some': 143 }],
+  151: [function (require, module, exports) {
+    'use strict'
+    const $ = require('../internals/export')
+    const aWeakMap = require('../internals/a-weak-map')
+    const remove = require('../internals/weak-map-helpers').remove
+
+    // `WeakMap.prototype.deleteAll` method
+    // https://github.com/tc39/proposal-collection-methods
+    $({ target: 'WeakMap', proto: true, real: true, forced: true }, {
+      deleteAll: function deleteAll (/* ...elements */) {
+        const collection = aWeakMap(this)
+        let allDeleted = true
+        let wasDeleted
+        for (let k = 0, len = arguments.length; k < len; k++) {
+          wasDeleted = remove(collection, arguments[k])
+          allDeleted = allDeleted && wasDeleted
+        } return !!allDeleted
+      }
+    })
+  }, { '../internals/a-weak-map': 43, '../internals/export': 64, '../internals/weak-map-helpers': 135 }]
+}, {}, [12])
