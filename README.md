@@ -258,13 +258,27 @@ Simulate the behaviour of the EventTarget Class when there is no DOM available.
 
 
 * [EventTargetService](#EventTargetService)
+    * [.listenersFor(type)](#EventTargetService+listenersFor) ⇒ <code>LinkedList</code>
     * [.runEvents(event)](#EventTargetService+runEvents) ⇒ <code>\*</code>
     * [.setDefaultEvent(type, callback)](#EventTargetService+setDefaultEvent)
+
+<a name="EventTargetService+listenersFor"></a>
+
+### eventTargetService.listenersFor(type) ⇒ <code>LinkedList</code>
+The listeners registered for a type of event, creating the (empty) list of them when there are none yet.
+
+**Kind**: instance method of [<code>EventTargetService</code>](#EventTargetService)  
+
+| Param | Type |
+| --- | --- |
+| type | <code>string</code> | 
 
 <a name="EventTargetService+runEvents"></a>
 
 ### eventTargetService.runEvents(event) ⇒ <code>\*</code>
 Run each of the listeners registered on this target for the type of the event.
+Listeners which do not apply to the event's phase are skipped, running stops once immediate propagation is stopped,
+and listeners added or removed while running do not change which ones run for this event.
 
 **Kind**: instance method of [<code>EventTargetService</code>](#EventTargetService)  
 **Returns**: <code>\*</code> - true when there was nothing registered, otherwise the last value returned from a handler (null when none ran)  

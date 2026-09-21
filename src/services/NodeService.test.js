@@ -51,6 +51,16 @@ describe('NodeService', () => {
     expect(() => parent.removeChild(new NodeService())).toThrow('not a child')
   })
 
+  test('the only child can be removed, leaving the node without children', () => {
+    const parent = new NodeService()
+    const child = new NodeService()
+    parent.appendChild(child)
+    expect(parent.removeChild(child)).toBe(child)
+    expect(parent.hasChildNodes()).toBe(false)
+    expect(parent.firstChild).toBeNull()
+    expect(parent.lastChild).toBeNull()
+  })
+
   test('isSameNode compares identity', () => {
     const node = new NodeService()
     expect(node.isSameNode(node)).toBe(true)
