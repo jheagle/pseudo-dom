@@ -9,6 +9,7 @@ import { NodeService as PseudoNode } from './services/NodeService';
 import { ElementService as PseudoElement } from './services/ElementService';
 import { HTMLElementService as PseudoHTMLElement } from './services/HTMLElementService';
 import PseudoHTMLDocument from './classes/PseudoHTMLDocument';
+import generateDocument from './factories/generateDocument';
 /**
  * All methods exported from this module are encapsulated within pseudoDom.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -24,4 +25,5 @@ declare const pseudoDom: {
     PseudoHTMLElement: typeof PseudoHTMLElement;
     PseudoHTMLDocument: typeof PseudoHTMLDocument;
 };
+export { generateDocument, PseudoEvent, PseudoEventTarget, PseudoNode, PseudoElement, PseudoHTMLElement, PseudoHTMLDocument };
 export default pseudoDom;

@@ -28,6 +28,16 @@ const pseudoDom = {
   PseudoHTMLDocument
 }
 
+export {
+  generateDocument,
+  PseudoEvent,
+  PseudoEventTarget,
+  PseudoNode,
+  PseudoElement,
+  PseudoHTMLElement,
+  PseudoHTMLDocument
+}
+
 export default pseudoDom
 
 if (this) {
