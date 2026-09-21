@@ -9,32 +9,39 @@ describe('PseudoEvent', () => {
     expect(testEvent.type).toBe('click')
   })
 
-  test('event has bubbles', () => {
-    expect(testEvent.bubbles).toBe(true)
-    const nonBubblesEvent = new GenericEvent('click', { bubbles: false })
-    expect(nonBubblesEvent.bubbles).toBe(false)
+  test('event has bubbles, which is false unless it is asked for (like the DOM)', () => {
+    expect(testEvent.bubbles).toBe(false)
+    const bubblesEvent = new GenericEvent('click', { bubbles: true })
+    expect(bubblesEvent.bubbles).toBe(true)
   })
 
-  test('event has cancelable', () => {
-    expect(testEvent.cancelable).toBe(true)
-    const nonCancelableEvent = new GenericEvent('click', { cancelable: false })
-    expect(nonCancelableEvent.cancelable).toBe(false)
+  test('event has cancelable, which is false unless it is asked for (like the DOM)', () => {
+    expect(testEvent.cancelable).toBe(false)
+    const cancelableEvent = new GenericEvent('click', { cancelable: true })
+    expect(cancelableEvent.cancelable).toBe(true)
   })
 
-  test('event has composed', () => {
-    expect(testEvent.composed).toBe(true)
-    const nonComposedEvent = new GenericEvent('click', { composed: false })
-    expect(nonComposedEvent.composed).toBe(false)
+  test('event has composed, which is false unless it is asked for (like the DOM)', () => {
+    expect(testEvent.composed).toBe(false)
+    const composedEvent = new GenericEvent('click', { composed: true })
+    expect(composedEvent.composed).toBe(true)
   })
 
   test('event has currentTarget', () => {
     expect(testEvent).toHaveProperty('currentTarget')
   })
 
-  test('event has defaultPrevented, which can be updated with preventDefault()', () => {
-    expect(testEvent.defaultPrevented).toBe(false)
-    testEvent.preventDefault()
-    expect(testEvent.defaultPrevented).toBe(true)
+  test('event has defaultPrevented, which can be updated with preventDefault() when the event is cancelable', () => {
+    const cancelableEvent = new GenericEvent('click', { cancelable: true })
+    expect(cancelableEvent.defaultPrevented).toBe(false)
+    cancelableEvent.preventDefault()
+    expect(cancelableEvent.defaultPrevented).toBe(true)
+  })
+
+  test('preventDefault does nothing for an event which is not cancelable', () => {
+    const plainEvent = new GenericEvent('click')
+    plainEvent.preventDefault()
+    expect(plainEvent.defaultPrevented).toBe(false)
   })
 
   test('event has immediatePropagationStopped, which can be updated with stopImmediatePropagation()', () => {

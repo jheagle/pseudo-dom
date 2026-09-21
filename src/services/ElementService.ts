@@ -39,6 +39,7 @@ export class ElementService extends NodeService implements Partial<PseudoElement
   private readonly attributeList: Array<attribute>
   private readonly propertyAttributes: Array<string>
   private readonly tokenList: DOMTokenListService
+  private defaultEventApplied: boolean = false
 
   /**
    * @param {Object} [settings={}]
@@ -107,20 +108,22 @@ export class ElementService extends NodeService implements Partial<PseudoElement
    */
   applyDefaultEvent (): Function {
     let callback: (event: EventService) => void = (event: EventService): undefined => undefined
+    if (this.defaultEventApplied) {
+      return callback
+    }
     switch (this.tagName) {
-      case 'form':
-        this.addEventListener('submit', callback)
-        break
       case 'button':
       case 'input':
         if (/^(submit|image)$/i.test(this.type || '')) {
+          // Clicking a submit button submits the form it is in: the form gets a submit event, which can be cancelled
           callback = (event: EventService): void => {
             const forms: Array<any> = getParentNodesFromAttribute('tagName', 'form', this)
             if (forms.length) {
-              forms[0].submit()
+              forms[forms.length - 1].dispatchEvent(new EventService('submit', { bubbles: true, cancelable: true }))
             }
           }
           super.setDefaultEvent('click', callback)
+          this.defaultEventApplied = true
         }
     }
     return callback

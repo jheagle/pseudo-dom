@@ -35,6 +35,7 @@ export declare class ElementService extends NodeService implements Partial<Pseud
     private readonly attributeList;
     private readonly propertyAttributes;
     private readonly tokenList;
+    private defaultEventApplied;
     /**
      * @param {Object} [settings={}]
      * @param {string} [settings.tagName=''] The name of the tag this element represents

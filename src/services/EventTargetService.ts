@@ -6,6 +6,7 @@
 import { EventService } from './EventService'
 import PseudoEventListener from '../classes/PseudoEventListener'
 import { listenerOptions, PseudoEventTarget } from '../interfaces/PseudoEventTarget'
+import getParentNodes from '../functions/getParentNodes'
 import { LinkedList } from 'collect-your-stuff/dist/collections/linked-list/LinkedList'
 import { Linker } from 'collect-your-stuff/dist/collections/linked-list/Linker'
 
@@ -16,6 +17,9 @@ type defaultEvents = { [key: string]: Function }
 
 /**
  * Simulate the behaviour of the EventTarget Class when there is no DOM available.
+ * Dispatching an event sends it through the tree the way the DOM does: down from the root to the target (capture
+ * listeners), to the target itself, then back up to the root (the listeners which are not capture listeners, when the
+ * event bubbles).
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @class
  * @property {Object.<string, Array.<PseudoEventListener>>} listeners
@@ -48,33 +52,55 @@ class EventTargetService implements PseudoEventTarget {
   }
 
   /**
-   * Run each of the listeners registered on this target for the type of the event.
-   * Listeners which do not apply to the event's phase are skipped, running stops once immediate propagation is stopped,
-   * and listeners added or removed while running do not change which ones run for this event.
-   * @param {EventService} event
-   * @returns {*} true when there was nothing registered, otherwise the last value returned from a handler (null when none ran)
+   * Run the listeners registered on this target for the type of the event which apply to the phase the event is in
+   * (at the target, the capture listeners run before the others). Listeners which are added while this runs do not run
+   * for this event, and listeners which are removed while it runs no longer do. Running stops as soon as immediate
+   * propagation is stopped. A listener which throws does not stop the others.
+   * @param {EventService} event The event, which is at a phase and has a current target
+   * @returns {Array<*>} The errors which the listeners threw
    */
-  private runEvents (event: EventService): any {
+  private runEvents (event: EventService): Array<any> {
+    const errors: Array<any> = []
     if (!(event.type in this.listeners)) {
-      return true
+      return errors
     }
-    const listeners = this.listeners[event.type]
-    let eventReturn: any = null
-    // Work from a copy of the linkers so that removing a listener (for example a once listener) does not disturb the walk
-    for (const linker of Array.from(listeners)) {
-      const listener: PseudoEventListener = linker.data
+    const listeners: Array<PseudoEventListener> = Array.from(this.listeners[event.type]).map((linker: Linker) => linker.data)
+    // At the target the capture listeners come first, otherwise the order is the order they were added
+    const ordered: Array<PseudoEventListener> = event.eventPhase === EventService.AT_TARGET
+      ? listeners.filter(listener => listener.capture).concat(listeners.filter(listener => !listener.capture))
+      : listeners
+    for (const listener of ordered) {
       if (event.inner.immediatePropagationStopped) {
         break
       }
       if (listener.rejectEvent(event)) {
         continue
       }
-      eventReturn = listener.handleEvent(event)
       if (listener.once) {
-        listeners.remove(linker)
+        this.removeListener(event.type, listener)
       }
+      event.inner.inPassiveListener = listener.passive
+      try {
+        listener.handleEvent(event)
+      } catch (error) {
+        errors.push(error)
+      }
+      event.inner.inPassiveListener = false
     }
-    return eventReturn
+    return errors
+  }
+
+  /**
+   * Take a listener out of the registered listeners, so that it does not run again.
+   * @param {string} type
+   * @param {PseudoEventListener} listener
+   */
+  private removeListener (type: string, listener: PseudoEventListener): void {
+    listener.removed = true
+    const registered: LinkedList = this.listeners[type]
+    Array.from(registered)
+      .filter((linker: Linker) => linker.data === listener)
+      .forEach((linker: Linker) => registered.remove(linker))
   }
 
   /**
@@ -87,50 +113,33 @@ class EventTargetService implements PseudoEventTarget {
     this.defaultEvent[type] = callback
   }
 
-  private runDefaultEvent (event: EventService): boolean {
-    if (event.defaultPrevented) {
-      return false
-    }
-    this.defaultEvent[event.type](event)
-    return true
-  }
-
-  private startEvents (eventType: string): boolean {
-    const event: EventService = new EventService(eventType)
-    event.inner.target = this
-    ;[
-      EventService.CAPTURING_PHASE,
-      EventService.AT_TARGET,
-      EventService.BUBBLING_PHASE
-    ].forEach(phase => {
-      let continueEvents: any = null
-      if (phase === EventService.AT_TARGET || !event.inner.propagationStopped) {
-        event.inner.eventPhase = phase
-        event.composedPath().forEach(target => {
-          event.inner.currentTarget = target
-          continueEvents = (event.currentTarget as EventTargetService).runEvents(event)
-        })
-      }
-      if (event.eventPhase === EventService.AT_TARGET && typeof continueEvents !== 'boolean' && this.defaultEvent[eventType]) {
-        this.runDefaultEvent(event)
-      }
-    })
-    return true
-  }
-
+  /**
+   * Registers an event handler of a specific event type. Adding the same handler again for the same type and phase does
+   * nothing, like the DOM.
+   * @param {string} type The type of event to listen for
+   * @param {Function|Object} callback The function to call (or an object with a handleEvent function)
+   * @param {Object|boolean} [useCapture=false] Listen while the event travels down to the target (true), or an object with capture, once and passive
+   */
   public addEventListener (type: string, callback: Function | {
     handleEvent: Function
   } | any, useCapture: listenerOptions | boolean = false): void {
     let options: listenerOptions = { capture: false, once: false, passive: false }
-    if (typeof useCapture === 'object') {
+    if (typeof useCapture === 'object' && useCapture !== null) {
       // Originally useCapture was a single boolean flag, later optional other flags can be used
       // Here we take all the given flags from the object and assign them as the options
       options = Object.assign(options, useCapture)
     } else {
-      options.capture = useCapture
+      options.capture = !!useCapture
     }
-    const listener: PseudoEventListener = new PseudoEventListener(type, options, (callback.handleEvent || callback).bind(this), callback)
-    const listeners = this.listenersFor(type)
+    const listeners: LinkedList = this.listenersFor(type)
+    const alreadyAdded: boolean = Array.from(listeners)
+      .some((linker: Linker) => linker.data.callback === callback && linker.data.capture === options.capture)
+    if (alreadyAdded) {
+      return
+    }
+    // A function runs with this target as this, an object runs its handleEvent as itself
+    const handler: Function = typeof callback === 'function' ? callback.bind(this) : callback.handleEvent.bind(callback)
+    const listener: PseudoEventListener = new PseudoEventListener(type, options, handler, callback)
     // Listeners run in the order they were added, except that listeners which are not defaults always come before the defaults
     const firstDefault = Array.from(listeners).find((linker: Linker) => linker.data.isDefault)
     if (firstDefault && !listener.isDefault) {
@@ -140,22 +149,81 @@ class EventTargetService implements PseudoEventTarget {
     }
   }
 
-  public removeEventListener (type: string, callback: Function): void {
+  /**
+   * Removes an event listener, the one which was added with the same type, handler and phase.
+   * @param {string} type The type of event
+   * @param {Function|Object} callback The handler which was added
+   * @param {Object|boolean} [options=false] Whether the listener was a capture listener (true), or an object with capture
+   */
+  public removeEventListener (type: string, callback: Function, options: listenerOptions | boolean = false): void {
     if (!(type in this.listeners)) {
       return
     }
-    const listeners = this.listeners[type]
-    Array.from(listeners)
-      .filter((linker: Linker) => !linker.data.isDefault && linker.data.callback === callback)
-      .forEach((linker: Linker) => listeners.remove(linker))
+    const capture: boolean = typeof options === 'object' && options !== null ? !!options.capture : !!options
+    Array.from(this.listeners[type])
+      .map((linker: Linker) => linker.data as PseudoEventListener)
+      .filter(listener => !listener.isDefault && listener.callback === callback && listener.capture === capture)
+      .forEach(listener => this.removeListener(type, listener))
   }
 
-  public dispatchEvent (event: EventService, target: EventTargetService = this): boolean {
-    event.inner.target = target
-    if (!(event.type in this.listeners)) {
-      return true
+  /**
+   * Dispatches an event to this target and through the tree: capture listeners of the ancestors from the root down,
+   * then the listeners of this target, then (when the event bubbles) the other listeners of the ancestors from the
+   * parent up to the root. stopPropagation() stops it reaching further targets, stopImmediatePropagation() also stops
+   * the remaining listeners of the current target. Afterwards, unless the default was prevented, the default action
+   * of this target (see setDefaultEvent) runs. The event can be dispatched again afterwards.
+   * @param {EventService} event The event to dispatch
+   * @returns {boolean} False when the event was cancelable and a listener prevented the default, otherwise true
+   * @throws {Error} When the event is already being dispatched, or (after the whole dispatch has finished) the error
+   * which a listener threw (an error with all of them in its errors property when several did)
+   */
+  public dispatchEvent (event: EventService): boolean {
+    if (event.inner.dispatching) {
+      throw new Error('The event is already being dispatched.')
     }
-    this.runEvents(event)
+    event.inner.dispatching = true
+    event.inner.target = this
+    // The ancestors, the root first, which can have listeners
+    const ancestors: Array<EventTargetService> = getParentNodes(this)
+      .filter((node: any) => node instanceof EventTargetService) as unknown as Array<EventTargetService>
+    event.inner.path = ([this] as Array<EventTargetService>).concat(ancestors.slice().reverse())
+    const errors: Array<any> = []
+    const visit = (target: EventTargetService, phase: number): void => {
+      event.inner.eventPhase = phase
+      event.inner.currentTarget = target
+      errors.push(...target.runEvents(event))
+    }
+    for (const ancestor of ancestors) {
+      if (event.inner.propagationStopped) {
+        break
+      }
+      visit(ancestor, EventService.CAPTURING_PHASE)
+    }
+    if (!event.inner.propagationStopped) {
+      visit(this, EventService.AT_TARGET)
+    }
+    if (event.bubbles) {
+      for (const ancestor of ancestors.slice().reverse()) {
+        if (event.inner.propagationStopped) {
+          break
+        }
+        visit(ancestor, EventService.BUBBLING_PHASE)
+      }
+    }
+    event.inner.finishDispatch()
+    if (!event.defaultPrevented && typeof this.defaultEvent[event.type] === 'function') {
+      try {
+        this.defaultEvent[event.type](event)
+      } catch (error) {
+        errors.push(error)
+      }
+    }
+    if (errors.length === 1) {
+      throw errors[0]
+    }
+    if (errors.length > 1) {
+      throw Object.assign(new Error(`${errors.length} listeners threw an error while dispatching the ${event.type} event.`), { errors })
+    }
     return !event.defaultPrevented
   }
 }

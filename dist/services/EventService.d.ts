@@ -5,12 +5,24 @@
  */
 import { PseudoEventTarget } from '../interfaces/PseudoEventTarget';
 import { PseudoEvent } from '../interfaces/PseudoEvent';
+/**
+ * The parts of an event which the dispatching of it (EventTargetService) needs to change or read. Not part of the DOM's
+ * Event, which is why they are kept apart from the event's own properties.
+ */
 export type EventInner = {
-    currentTarget: PseudoEventTarget;
+    currentTarget: PseudoEventTarget | null;
     eventPhase: number;
     target: PseudoEventTarget;
     immediatePropagationStopped: boolean;
     propagationStopped: boolean;
+    /** True while the event is being dispatched. */
+    dispatching: boolean;
+    /** True while a passive listener is running, in which preventDefault does nothing. */
+    inPassiveListener: boolean;
+    /** The targets the event travels through, the target first and the root last, set while dispatching. */
+    path: Array<PseudoEventTarget>;
+    /** Finish the dispatch: no phase, no current target, no path and the stop flags are cleared so the event can be dispatched again. */
+    finishDispatch: () => void;
 };
 /**
  * Simulate the behaviour of the Event Class when there is no DOM available.
@@ -51,9 +63,9 @@ export declare class EventService implements PseudoEvent {
      *
      * @param {string} typeArg
      * @param {Object} [eventOptions={}]
-     * @param {boolean} [eventOptions.bubbles=true]
-     * @param {boolean} [eventOptions.cancelable=true]
-     * @param {boolean} [eventOptions.composed=true]
+     * @param {boolean} [eventOptions.bubbles=false]
+     * @param {boolean} [eventOptions.cancelable=false]
+     * @param {boolean} [eventOptions.composed=false]
      * @constructor
      */
     constructor(typeArg?: string, { bubbles, cancelable, composed }?: {

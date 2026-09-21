@@ -7,7 +7,10 @@ Mock the DOM for server side-side DOM state and in tests.
 Pseudo DOM recreates the browser DOM API (following the MDN documentation) so DOM-dependent code can run in Node, for
 example in tests, without a real or headless browser. It is written in TypeScript and ships type definitions.
 
-Working today: `EventService` (Event), `EventTargetService` (EventTarget listeners for the target itself), `NodeService`
+Working today: `EventService` (Event) and `EventTargetService` (EventTarget), which dispatch an event through the tree the
+way the DOM does (capture down from the root, the target, then bubbling back up, with `stopPropagation`,
+`stopImmediatePropagation`, `once`, `passive`, `preventDefault` and the default action of the target; clicking a submit
+button sends a `submit` event to its form), `NodeService`
 (Node: a real tree with `parentNode`, `previousSibling` / `nextSibling`, `firstChild` / `lastChild`, `appendChild`,
 `insertBefore`, `removeChild`, `replaceChild`, `contains` and `getRootNode`; nodes move when they are added somewhere
 else, document fragments insert their children, and a node cannot be put inside itself), `ElementService` /
@@ -15,8 +18,7 @@ else, document fragments insert their children, and a node cannot be put inside 
 `DOMTokenListService`, `NamedNodeMapService`, `DocumentService` / `DocumentFragmentService`, `PseudoNodeList`, and
 `generateDocument` for creating a document.
 
-Not implemented yet (these throw a "not implemented" error or are missing): event dispatch through the tree (capture,
-target and bubble phases), `cloneNode`, `compareDocumentPosition`, `isEqualNode`, `querySelector` /
+Not implemented yet (these throw a "not implemented" error or are missing): `cloneNode`, `compareDocumentPosition`, `isEqualNode`, `querySelector` /
 `querySelectorAll`, `innerHTML` / `outerHTML` parsing, and most of the rest of the Element and Document APIs. The API
 will change before 1.0.
 ## Modules
@@ -40,7 +42,10 @@ will change before 1.0.
 <dd><p>Simulate the behaviour of the HTMLElement Class when there is no DOM available.</p>
 </dd>
 <dt><a href="#EventTargetService">EventTargetService</a></dt>
-<dd><p>Simulate the behaviour of the EventTarget Class when there is no DOM available.</p>
+<dd><p>Simulate the behaviour of the EventTarget Class when there is no DOM available.
+Dispatching an event sends it through the tree the way the DOM does: down from the root to the target (capture
+listeners), to the target itself, then back up to the root (the listeners which are not capture listeners, when the
+event bubbles).</p>
 </dd>
 <dt><a href="#EventService">EventService</a></dt>
 <dd><p>Simulate the behaviour of the Event Class when there is no DOM available.</p>
@@ -312,6 +317,9 @@ Simulate the HTMLElement object when the Dom is not available
 
 ## EventTargetService
 Simulate the behaviour of the EventTarget Class when there is no DOM available.
+Dispatching an event sends it through the tree the way the DOM does: down from the root to the target (capture
+listeners), to the target itself, then back up to the root (the listeners which are not capture listeners, when the
+event bubbles).
 
 **Kind**: global class  
 **Author**: Joshua Heagle <joshuaheagle@gmail.com>  
@@ -327,8 +335,12 @@ Simulate the behaviour of the EventTarget Class when there is no DOM available.
 
 * [EventTargetService](#EventTargetService)
     * [.listenersFor(type)](#EventTargetService+listenersFor) ⇒ <code>LinkedList</code>
-    * [.runEvents(event)](#EventTargetService+runEvents) ⇒ <code>\*</code>
+    * [.runEvents(event)](#EventTargetService+runEvents) ⇒ <code>Array.&lt;\*&gt;</code>
+    * [.removeListener(type, listener)](#EventTargetService+removeListener)
     * [.setDefaultEvent(type, callback)](#EventTargetService+setDefaultEvent)
+    * [.addEventListener(type, callback, [useCapture])](#EventTargetService+addEventListener)
+    * [.removeEventListener(type, callback, [options])](#EventTargetService+removeEventListener)
+    * [.dispatchEvent(event)](#EventTargetService+dispatchEvent) ⇒ <code>boolean</code>
 
 <a name="EventTargetService+listenersFor"></a>
 
@@ -343,17 +355,30 @@ The listeners registered for a type of event, creating the (empty) list of them 
 
 <a name="EventTargetService+runEvents"></a>
 
-### eventTargetService.runEvents(event) ⇒ <code>\*</code>
-Run each of the listeners registered on this target for the type of the event.
-Listeners which do not apply to the event's phase are skipped, running stops once immediate propagation is stopped,
-and listeners added or removed while running do not change which ones run for this event.
+### eventTargetService.runEvents(event) ⇒ <code>Array.&lt;\*&gt;</code>
+Run the listeners registered on this target for the type of the event which apply to the phase the event is in
+(at the target, the capture listeners run before the others). Listeners which are added while this runs do not run
+for this event, and listeners which are removed while it runs no longer do. Running stops as soon as immediate
+propagation is stopped. A listener which throws does not stop the others.
 
 **Kind**: instance method of [<code>EventTargetService</code>](#EventTargetService)  
-**Returns**: <code>\*</code> - true when there was nothing registered, otherwise the last value returned from a handler (null when none ran)  
+**Returns**: <code>Array.&lt;\*&gt;</code> - The errors which the listeners threw  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | [<code>EventService</code>](#EventService) | The event, which is at a phase and has a current target |
+
+<a name="EventTargetService+removeListener"></a>
+
+### eventTargetService.removeListener(type, listener)
+Take a listener out of the registered listeners, so that it does not run again.
+
+**Kind**: instance method of [<code>EventTargetService</code>](#EventTargetService)  
 
 | Param | Type |
 | --- | --- |
-| event | [<code>EventService</code>](#EventService) | 
+| type | <code>string</code> | 
+| listener | [<code>PseudoEventListener</code>](#PseudoEventListener) | 
 
 <a name="EventTargetService+setDefaultEvent"></a>
 
@@ -366,6 +391,54 @@ Register the function to run when nothing else has prevented the default for thi
 | --- | --- |
 | type | <code>string</code> | 
 | callback | <code>function</code> | 
+
+<a name="EventTargetService+addEventListener"></a>
+
+### eventTargetService.addEventListener(type, callback, [useCapture])
+Registers an event handler of a specific event type. Adding the same handler again for the same type and phase does
+nothing, like the DOM.
+
+**Kind**: instance method of [<code>EventTargetService</code>](#EventTargetService)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| type | <code>string</code> |  | The type of event to listen for |
+| callback | <code>function</code> \| <code>Object</code> |  | The function to call (or an object with a handleEvent function) |
+| [useCapture] | <code>Object</code> \| <code>boolean</code> | <code>false</code> | Listen while the event travels down to the target (true), or an object with capture, once and passive |
+
+<a name="EventTargetService+removeEventListener"></a>
+
+### eventTargetService.removeEventListener(type, callback, [options])
+Removes an event listener, the one which was added with the same type, handler and phase.
+
+**Kind**: instance method of [<code>EventTargetService</code>](#EventTargetService)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| type | <code>string</code> |  | The type of event |
+| callback | <code>function</code> \| <code>Object</code> |  | The handler which was added |
+| [options] | <code>Object</code> \| <code>boolean</code> | <code>false</code> | Whether the listener was a capture listener (true), or an object with capture |
+
+<a name="EventTargetService+dispatchEvent"></a>
+
+### eventTargetService.dispatchEvent(event) ⇒ <code>boolean</code>
+Dispatches an event to this target and through the tree: capture listeners of the ancestors from the root down,
+then the listeners of this target, then (when the event bubbles) the other listeners of the ancestors from the
+parent up to the root. stopPropagation() stops it reaching further targets, stopImmediatePropagation() also stops
+the remaining listeners of the current target. Afterwards, unless the default was prevented, the default action
+of this target (see setDefaultEvent) runs. The event can be dispatched again afterwards.
+
+**Kind**: instance method of [<code>EventTargetService</code>](#EventTargetService)  
+**Returns**: <code>boolean</code> - False when the event was cancelable and a listener prevented the default, otherwise true  
+**Throws**:
+
+- <code>Error</code> When the event is already being dispatched, or (after the whole dispatch has finished) the error
+which a listener threw (an error with all of them in its errors property when several did)
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | [<code>EventService</code>](#EventService) | The event to dispatch |
 
 <a name="EventService"></a>
 
@@ -412,9 +485,9 @@ Simulate the behaviour of the Event Class when there is no DOM available.
 | --- | --- | --- |
 | typeArg | <code>string</code> |  | 
 | [eventOptions] | <code>Object</code> | <code>{}</code> | 
-| [eventOptions.bubbles] | <code>boolean</code> | <code>true</code> | 
-| [eventOptions.cancelable] | <code>boolean</code> | <code>true</code> | 
-| [eventOptions.composed] | <code>boolean</code> | <code>true</code> | 
+| [eventOptions.bubbles] | <code>boolean</code> | <code>false</code> | 
+| [eventOptions.cancelable] | <code>boolean</code> | <code>false</code> | 
+| [eventOptions.composed] | <code>boolean</code> | <code>false</code> | 
 
 <a name="EventService+inner"></a>
 
@@ -1258,21 +1331,51 @@ Handle events as they are stored and implemented.
 
 
 * [PseudoEventListener](#PseudoEventListener)
+    * [new PseudoEventListener(eventType, [options], handleEvent, [originalCallback])](#new_PseudoEventListener_new)
     * [.callback](#PseudoEventListener+callback)
+    * [.capture](#PseudoEventListener+capture)
+    * [.passive](#PseudoEventListener+passive)
+    * [.removed](#PseudoEventListener+removed)
     * [.handleEvent(event)](#PseudoEventListener+handleEvent) ⇒ <code>\*</code>
     * [.doCapturePhase(event)](#PseudoEventListener+doCapturePhase) ⇒ <code>boolean</code>
     * [.doTargetPhase(event)](#PseudoEventListener+doTargetPhase) ⇒ <code>boolean</code>
-    * [.doBubblePhase(event)](#PseudoEventListener+doBubblePhase) ⇒ <code>boolean</code> \| <code>\*</code>
+    * [.doBubblePhase(event)](#PseudoEventListener+doBubblePhase) ⇒ <code>boolean</code>
     * [.skipPhase(event)](#PseudoEventListener+skipPhase) ⇒ <code>boolean</code>
-    * [.skipDefault(event)](#PseudoEventListener+skipDefault) ⇒ <code>boolean</code> \| <code>\*</code>
-    * [.stopPropagation(event)](#PseudoEventListener+stopPropagation) ⇒ <code>boolean</code>
-    * [.nonPassiveHalt(event)](#PseudoEventListener+nonPassiveHalt) ⇒ <code>boolean</code> \| <code>\*</code>
-    * [.rejectEvent(event)](#PseudoEventListener+rejectEvent) ⇒ <code>\*</code> \| <code>boolean</code>
+    * [.rejectEvent(event)](#PseudoEventListener+rejectEvent) ⇒ <code>boolean</code>
+
+<a name="new_PseudoEventListener_new"></a>
+
+### new PseudoEventListener(eventType, [options], handleEvent, [originalCallback])
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| eventType | <code>string</code> |  | The type of event this listens for |
+| [options] | <code>Object</code> |  | The capture, once and passive options |
+| handleEvent | <code>function</code> |  | The function which is called with the event, already bound to what it should run as |
+| [originalCallback] | <code>function</code> | <code>handleEvent</code> | The function (or object) which was given when registering, used to find this listener again |
 
 <a name="PseudoEventListener+callback"></a>
 
 ### pseudoEventListener.callback
 The function (or object with handleEvent) which was originally given when registering, used to find this listener again for removal.
+
+**Kind**: instance property of [<code>PseudoEventListener</code>](#PseudoEventListener)  
+<a name="PseudoEventListener+capture"></a>
+
+### pseudoEventListener.capture
+Whether this listener listens in the capture phase (and at the target) rather than in the bubble phase.
+
+**Kind**: instance property of [<code>PseudoEventListener</code>](#PseudoEventListener)  
+<a name="PseudoEventListener+passive"></a>
+
+### pseudoEventListener.passive
+Whether the listener promises not to prevent the default (preventDefault does nothing while it runs).
+
+**Kind**: instance property of [<code>PseudoEventListener</code>](#PseudoEventListener)  
+<a name="PseudoEventListener+removed"></a>
+
+### pseudoEventListener.removed
+Whether this listener has been removed, a removed listener does not run even if the event already started.
 
 **Kind**: instance property of [<code>PseudoEventListener</code>](#PseudoEventListener)  
 <a name="PseudoEventListener+handleEvent"></a>
@@ -1287,6 +1390,8 @@ The function (or object with handleEvent) which was originally given when regist
 <a name="PseudoEventListener+doCapturePhase"></a>
 
 ### pseudoEventListener.doCapturePhase(event) ⇒ <code>boolean</code>
+A capture listener runs while the event travels down to the target.
+
 **Kind**: instance method of [<code>PseudoEventListener</code>](#PseudoEventListener)  
 
 | Param | Type |
@@ -1296,6 +1401,8 @@ The function (or object with handleEvent) which was originally given when regist
 <a name="PseudoEventListener+doTargetPhase"></a>
 
 ### pseudoEventListener.doTargetPhase(event) ⇒ <code>boolean</code>
+Every listener of the target itself runs, capture listeners first.
+
 **Kind**: instance method of [<code>PseudoEventListener</code>](#PseudoEventListener)  
 
 | Param | Type |
@@ -1304,7 +1411,9 @@ The function (or object with handleEvent) which was originally given when regist
 
 <a name="PseudoEventListener+doBubblePhase"></a>
 
-### pseudoEventListener.doBubblePhase(event) ⇒ <code>boolean</code> \| <code>\*</code>
+### pseudoEventListener.doBubblePhase(event) ⇒ <code>boolean</code>
+A listener which is not a capture listener runs while the event travels back up (when it bubbles).
+
 **Kind**: instance method of [<code>PseudoEventListener</code>](#PseudoEventListener)  
 
 | Param | Type |
@@ -1320,36 +1429,13 @@ The function (or object with handleEvent) which was originally given when regist
 | --- | --- |
 | event | <code>PseudoEvent</code> | 
 
-<a name="PseudoEventListener+skipDefault"></a>
-
-### pseudoEventListener.skipDefault(event) ⇒ <code>boolean</code> \| <code>\*</code>
-**Kind**: instance method of [<code>PseudoEventListener</code>](#PseudoEventListener)  
-
-| Param | Type |
-| --- | --- |
-| event | <code>PseudoEvent</code> | 
-
-<a name="PseudoEventListener+stopPropagation"></a>
-
-### pseudoEventListener.stopPropagation(event) ⇒ <code>boolean</code>
-**Kind**: instance method of [<code>PseudoEventListener</code>](#PseudoEventListener)  
-
-| Param | Type |
-| --- | --- |
-| event | <code>PseudoEvent</code> | 
-
-<a name="PseudoEventListener+nonPassiveHalt"></a>
-
-### pseudoEventListener.nonPassiveHalt(event) ⇒ <code>boolean</code> \| <code>\*</code>
-**Kind**: instance method of [<code>PseudoEventListener</code>](#PseudoEventListener)  
-
-| Param | Type |
-| --- | --- |
-| event | <code>PseudoEvent</code> | 
-
 <a name="PseudoEventListener+rejectEvent"></a>
 
-### pseudoEventListener.rejectEvent(event) ⇒ <code>\*</code> \| <code>boolean</code>
+### pseudoEventListener.rejectEvent(event) ⇒ <code>boolean</code>
+Whether this listener should not run for the event as it is now (it was removed, or it is for another phase).
+Stopping propagation is handled by the dispatching, since it stops other targets and not the listeners of the
+current one.
+
 **Kind**: instance method of [<code>PseudoEventListener</code>](#PseudoEventListener)  
 
 | Param | Type |

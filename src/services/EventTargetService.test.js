@@ -3,7 +3,7 @@ import { EventService } from './EventService'
 
 // Listeners only run for an event which is at (or moving through) a phase, so place the event at the target.
 const eventAtTarget = type => {
-  const event = new EventService(type)
+  const event = new EventService(type, { bubbles: true, cancelable: true })
   event.inner.eventPhase = EventService.AT_TARGET
   return event
 }
@@ -85,17 +85,6 @@ describe('EventTargetService', () => {
     target.addEventListener('click', function () { thisValue = this })
     target.dispatchEvent(eventAtTarget('click'))
     expect(thisValue).toBe(target)
-  })
-
-  test('a listener which does not apply to the phase is skipped without stopping the ones after it', () => {
-    const target = new EventTargetService()
-    const calls = []
-    target.addEventListener('click', () => calls.push('bubble only'))
-    target.addEventListener('click', () => calls.push('capture'), true)
-    const event = new EventService('click')
-    event.inner.eventPhase = EventService.CAPTURING_PHASE
-    target.dispatchEvent(event)
-    expect(calls).toEqual(['capture'])
   })
 
   test('listeners added while the event is running do not run for that event', () => {

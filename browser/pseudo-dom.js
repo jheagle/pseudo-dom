@@ -20,6 +20,13 @@
  * @property {boolean} isDefault
  */
     class PseudoEventListener {
+      /**
+   * @param {string} eventType The type of event this listens for
+   * @param {Object} [options] The capture, once and passive options
+   * @param {Function} handleEvent The function which is called with the event, already bound to what it should run as
+   * @param {Function} [originalCallback=handleEvent] The function (or object) which was given when registering, used to find this listener again
+   * @constructor
+   */
       constructor (eventType, {
         capture = false,
         once = false,
@@ -32,6 +39,7 @@
         }
         this.eventType = ''
         this.defaultListener = false
+        this.isRemoved = false
         this.eventOptions = {
           capture,
           once,
@@ -49,12 +57,31 @@
         return this.originalCallback
       }
 
+      /** Whether this listener listens in the capture phase (and at the target) rather than in the bubble phase. */
+      get capture () {
+        return this.eventOptions.capture
+      }
+
       get isDefault () {
         return this.defaultListener
       }
 
       get once () {
         return this.eventOptions.once
+      }
+
+      /** Whether the listener promises not to prevent the default (preventDefault does nothing while it runs). */
+      get passive () {
+        return this.eventOptions.passive
+      }
+
+      /** Whether this listener has been removed, a removed listener does not run even if the event already started. */
+      get removed () {
+        return this.isRemoved
+      }
+
+      set removed (removed) {
+        this.isRemoved = removed
       }
 
       /**
@@ -68,6 +95,7 @@
       }
 
       /**
+   * A capture listener runs while the event travels down to the target.
    * @method
    * @name PseudoEventListener#doCapturePhase
    * @param {PseudoEvent} event
@@ -78,6 +106,7 @@
       }
 
       /**
+   * Every listener of the target itself runs, capture listeners first.
    * @method
    * @name PseudoEventListener#doTargetPhase
    * @param {PseudoEvent} event
@@ -88,13 +117,14 @@
       }
 
       /**
+   * A listener which is not a capture listener runs while the event travels back up (when it bubbles).
    * @method
    * @name PseudoEventListener#doBubblePhase
    * @param {PseudoEvent} event
-   * @returns {boolean|*}
+   * @returns {boolean}
    */
       doBubblePhase (event) {
-        return event.eventPhase === EventService_1.EventService.BUBBLING_PHASE && (event.bubbles || !this.eventOptions.capture)
+        return event.eventPhase === EventService_1.EventService.BUBBLING_PHASE && !this.eventOptions.capture
       }
 
       /**
@@ -108,43 +138,16 @@
       }
 
       /**
-   * @method
-   * @name PseudoEventListener#skipDefault
-   * @param {PseudoEvent} event
-   * @returns {boolean|*}
-   */
-      skipDefault (event) {
-        return this.isDefault && event.defaultPrevented
-      }
-
-      /**
-   * @method
-   * @name PseudoEventListener#stopPropagation
-   * @param {PseudoEvent} event
-   * @returns {boolean}
-   */
-      stopPropagation (event) {
-        return !this.doTargetPhase(event) && event.inner.propagationStopped
-      }
-
-      /**
-   * @method
-   * @name PseudoEventListener#nonPassiveHalt
-   * @param {PseudoEvent} event
-   * @returns {boolean|*}
-   */
-      nonPassiveHalt (event) {
-        return !this.eventOptions.passive && (this.skipDefault(event) || event.inner.immediatePropagationStopped || this.stopPropagation(event))
-      }
-
-      /**
+   * Whether this listener should not run for the event as it is now (it was removed, or it is for another phase).
+   * Stopping propagation is handled by the dispatching, since it stops other targets and not the listeners of the
+   * current one.
    * @method
    * @name PseudoEventListener#rejectEvent
    * @param {PseudoEvent} event
-   * @returns {*|boolean}
+   * @returns {boolean}
    */
       rejectEvent (event) {
-        return this.nonPassiveHalt(event) || this.skipPhase(event)
+        return this.isRemoved || this.skipPhase(event)
       }
     }
     exports.default = PseudoEventListener
@@ -701,6 +704,7 @@
       value: true
     })
     exports.ElementService = void 0
+    const EventService_1 = require('./EventService')
     const NodeService_1 = require('./NodeService')
     const AttrService_1 = require('./AttrService')
     const DOMTokenListService_1 = require('./DOMTokenListService')
@@ -737,6 +741,7 @@
         children = []
       } = {}) {
         super()
+        this.defaultEventApplied = false
         this.tokenList = new DOMTokenListService_1.DOMTokenListService()
         this.tag = tagName
         this.attributeList = attributes.concat([{
@@ -802,20 +807,25 @@
    */
       applyDefaultEvent () {
         let callback = event => undefined
+        if (this.defaultEventApplied) {
+          return callback
+        }
         switch (this.tagName) {
-          case 'form':
-            this.addEventListener('submit', callback)
-            break
           case 'button':
           case 'input':
             if (/^(submit|image)$/i.test(this.type || '')) {
+              // Clicking a submit button submits the form it is in: the form gets a submit event, which can be cancelled
               callback = event => {
                 const forms = (0, getParentNodesFromAttribute_1.default)('tagName', 'form', this)
                 if (forms.length) {
-                  forms[0].submit()
+                  forms[forms.length - 1].dispatchEvent(new EventService_1.EventService('submit', {
+                    bubbles: true,
+                    cancelable: true
+                  }))
                 }
               }
               super.setDefaultEvent('click', callback)
+              this.defaultEventApplied = true
             }
         }
         return callback
@@ -892,7 +902,7 @@
       }
     }
     exports.ElementService = ElementService
-  }, { '../functions/getParentNodesFromAttribute': 7, './AttrService': 9, './DOMTokenListService': 10, './NamedNodeMapService': 15, './NodeService': 16, 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.find.js': 132, 'core-js/modules/esnext.iterator.for-each.js': 133, 'core-js/modules/esnext.iterator.map.js': 134, 'core-js/modules/esnext.iterator.some.js': 136 }],
+  }, { '../functions/getParentNodesFromAttribute': 7, './AttrService': 9, './DOMTokenListService': 10, './EventService': 12, './NamedNodeMapService': 15, './NodeService': 16, 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.find.js': 132, 'core-js/modules/esnext.iterator.for-each.js': 133, 'core-js/modules/esnext.iterator.map.js': 134, 'core-js/modules/esnext.iterator.some.js': 136 }],
   12: [function (require, module, exports) {
     'use strict'
 
@@ -901,18 +911,10 @@
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @version 1.0.0
  */
-    const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
-      return mod && mod.__esModule
-        ? mod
-        : {
-            default: mod
-          }
-    }
     Object.defineProperty(exports, '__esModule', {
       value: true
     })
     exports.EventService = void 0
-    const getParentNodes_1 = __importDefault(require('../functions/getParentNodes'))
     /**
  * Simulate the behaviour of the Event Class when there is no DOM available.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -947,20 +949,20 @@
    *
    * @param {string} typeArg
    * @param {Object} [eventOptions={}]
-   * @param {boolean} [eventOptions.bubbles=true]
-   * @param {boolean} [eventOptions.cancelable=true]
-   * @param {boolean} [eventOptions.composed=true]
+   * @param {boolean} [eventOptions.bubbles=false]
+   * @param {boolean} [eventOptions.cancelable=false]
+   * @param {boolean} [eventOptions.composed=false]
    * @constructor
    */
       constructor (typeArg = '', {
-        bubbles = true,
-        cancelable = true,
-        composed = true
+        bubbles = false,
+        cancelable = false,
+        composed = false
       } = {}) {
         this.properties = {
-          bubbles: true,
-          cancelable: true,
-          composed: true,
+          bubbles: false,
+          cancelable: false,
+          composed: false,
           currentTarget: null,
           defaultPrevented: false,
           immediatePropagationStopped: false,
@@ -969,7 +971,10 @@
           target: null,
           timeStamp: Math.floor(Date.now() / 1000),
           type: '',
-          isTrusted: true
+          isTrusted: true,
+          dispatching: false,
+          inPassiveListener: false,
+          path: []
         }
         this.setReadOnlyProperties({
           type: typeArg,
@@ -1026,11 +1031,20 @@
       get inner () {
         const self = this
         return {
+          get currentTarget () {
+            return self.properties.currentTarget
+          },
           set currentTarget (target) {
             self.properties.currentTarget = target
           },
+          get eventPhase () {
+            return self.properties.eventPhase
+          },
           set eventPhase (phase) {
             self.properties.eventPhase = phase
+          },
+          get target () {
+            return self.properties.target
           },
           set target (target) {
             self.properties.target = target
@@ -1040,6 +1054,35 @@
           },
           get propagationStopped () {
             return self.properties.propagationStopped
+          },
+          get dispatching () {
+            return self.properties.dispatching
+          },
+          set dispatching (dispatching) {
+            self.properties.dispatching = dispatching
+          },
+          get inPassiveListener () {
+            return self.properties.inPassiveListener
+          },
+          set inPassiveListener (passive) {
+            self.properties.inPassiveListener = passive
+          },
+          get path () {
+            return self.properties.path
+          },
+          set path (path) {
+            self.properties.path = path
+          },
+          finishDispatch () {
+            self.setReadOnlyProperties({
+              currentTarget: null,
+              eventPhase: EventService.NONE,
+              path: [],
+              dispatching: false,
+              inPassiveListener: false,
+              propagationStopped: false,
+              immediatePropagationStopped: false
+            })
           }
         }
       }
@@ -1050,16 +1093,8 @@
    * @returns {Array.<PseudoEventTarget>}
    */
       composedPath () {
-        switch (this.eventPhase) {
-          case EventService.CAPTURING_PHASE:
-            return (0, getParentNodes_1.default)(this.target)
-          case EventService.BUBBLING_PHASE:
-            return (0, getParentNodes_1.default)(this.target).slice().reverse()
-          case EventService.AT_TARGET:
-            return [this.target]
-          default:
-            return []
-        }
+        // While the event is being dispatched this is every target it travels through, the target first and the root last
+        return this.properties.dispatching ? this.properties.path.slice() : []
       }
 
       /**
@@ -1068,9 +1103,12 @@
    * @returns {null}
    */
       preventDefault () {
-        this.setReadOnlyProperties({
-          defaultPrevented: true
-        })
+        // Only an event which can be cancelled can be prevented, and a passive listener cannot prevent the default
+        if (this.cancelable && !this.properties.inPassiveListener) {
+          this.setReadOnlyProperties({
+            defaultPrevented: true
+          })
+        }
         return null
       }
 
@@ -1110,7 +1148,7 @@
     EventService.CAPTURING_PHASE = 1
     EventService.AT_TARGET = 2
     EventService.BUBBLING_PHASE = 3
-  }, { '../functions/getParentNodes': 6 }],
+  }, {}],
   13: [function (require, module, exports) {
     'use strict'
 
@@ -1118,6 +1156,8 @@
     require('core-js/modules/esnext.iterator.filter.js')
     require('core-js/modules/esnext.iterator.find.js')
     require('core-js/modules/esnext.iterator.for-each.js')
+    require('core-js/modules/esnext.iterator.map.js')
+    require('core-js/modules/esnext.iterator.some.js')
     const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
       return mod && mod.__esModule
         ? mod
@@ -1135,9 +1175,13 @@
  */
     const EventService_1 = require('./EventService')
     const PseudoEventListener_1 = __importDefault(require('../classes/PseudoEventListener'))
+    const getParentNodes_1 = __importDefault(require('../functions/getParentNodes'))
     const LinkedList_1 = require('collect-your-stuff/dist/collections/linked-list/LinkedList')
     /**
  * Simulate the behaviour of the EventTarget Class when there is no DOM available.
+ * Dispatching an event sends it through the tree the way the DOM does: down from the root to the target (capture
+ * listeners), to the target itself, then back up to the root (the listeners which are not capture listeners, when the
+ * event bubbles).
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @class
  * @property {Object.<string, Array.<PseudoEventListener>>} listeners
@@ -1167,33 +1211,51 @@
       }
 
       /**
-   * Run each of the listeners registered on this target for the type of the event.
-   * Listeners which do not apply to the event's phase are skipped, running stops once immediate propagation is stopped,
-   * and listeners added or removed while running do not change which ones run for this event.
-   * @param {EventService} event
-   * @returns {*} true when there was nothing registered, otherwise the last value returned from a handler (null when none ran)
+   * Run the listeners registered on this target for the type of the event which apply to the phase the event is in
+   * (at the target, the capture listeners run before the others). Listeners which are added while this runs do not run
+   * for this event, and listeners which are removed while it runs no longer do. Running stops as soon as immediate
+   * propagation is stopped. A listener which throws does not stop the others.
+   * @param {EventService} event The event, which is at a phase and has a current target
+   * @returns {Array<*>} The errors which the listeners threw
    */
       runEvents (event) {
+        const errors = []
         if (!(event.type in this.listeners)) {
-          return true
+          return errors
         }
-        const listeners = this.listeners[event.type]
-        let eventReturn = null
-        // Work from a copy of the linkers so that removing a listener (for example a once listener) does not disturb the walk
-        for (const linker of Array.from(listeners)) {
-          const listener = linker.data
+        const listeners = Array.from(this.listeners[event.type]).map(linker => linker.data)
+        // At the target the capture listeners come first, otherwise the order is the order they were added
+        const ordered = event.eventPhase === EventService_1.EventService.AT_TARGET ? listeners.filter(listener => listener.capture).concat(listeners.filter(listener => !listener.capture)) : listeners
+        for (const listener of ordered) {
           if (event.inner.immediatePropagationStopped) {
             break
           }
           if (listener.rejectEvent(event)) {
             continue
           }
-          eventReturn = listener.handleEvent(event)
           if (listener.once) {
-            listeners.remove(linker)
+            this.removeListener(event.type, listener)
           }
+          event.inner.inPassiveListener = listener.passive
+          try {
+            listener.handleEvent(event)
+          } catch (error) {
+            errors.push(error)
+          }
+          event.inner.inPassiveListener = false
         }
-        return eventReturn
+        return errors
+      }
+
+      /**
+   * Take a listener out of the registered listeners, so that it does not run again.
+   * @param {string} type
+   * @param {PseudoEventListener} listener
+   */
+      removeListener (type, listener) {
+        listener.removed = true
+        const registered = this.listeners[type]
+        Array.from(registered).filter(linker => linker.data === listener).forEach(linker => registered.remove(linker))
       }
 
       /**
@@ -1206,48 +1268,34 @@
         this.defaultEvent[type] = callback
       }
 
-      runDefaultEvent (event) {
-        if (event.defaultPrevented) {
-          return false
-        }
-        this.defaultEvent[event.type](event)
-        return true
-      }
-
-      startEvents (eventType) {
-        const event = new EventService_1.EventService(eventType)
-        event.inner.target = this;
-        [EventService_1.EventService.CAPTURING_PHASE, EventService_1.EventService.AT_TARGET, EventService_1.EventService.BUBBLING_PHASE].forEach(phase => {
-          let continueEvents = null
-          if (phase === EventService_1.EventService.AT_TARGET || !event.inner.propagationStopped) {
-            event.inner.eventPhase = phase
-            event.composedPath().forEach(target => {
-              event.inner.currentTarget = target
-              continueEvents = event.currentTarget.runEvents(event)
-            })
-          }
-          if (event.eventPhase === EventService_1.EventService.AT_TARGET && typeof continueEvents !== 'boolean' && this.defaultEvent[eventType]) {
-            this.runDefaultEvent(event)
-          }
-        })
-        return true
-      }
-
+      /**
+   * Registers an event handler of a specific event type. Adding the same handler again for the same type and phase does
+   * nothing, like the DOM.
+   * @param {string} type The type of event to listen for
+   * @param {Function|Object} callback The function to call (or an object with a handleEvent function)
+   * @param {Object|boolean} [useCapture=false] Listen while the event travels down to the target (true), or an object with capture, once and passive
+   */
       addEventListener (type, callback, useCapture = false) {
         let options = {
           capture: false,
           once: false,
           passive: false
         }
-        if (typeof useCapture === 'object') {
+        if (typeof useCapture === 'object' && useCapture !== null) {
           // Originally useCapture was a single boolean flag, later optional other flags can be used
           // Here we take all the given flags from the object and assign them as the options
           options = Object.assign(options, useCapture)
         } else {
-          options.capture = useCapture
+          options.capture = !!useCapture
         }
-        const listener = new PseudoEventListener_1.default(type, options, (callback.handleEvent || callback).bind(this), callback)
         const listeners = this.listenersFor(type)
+        const alreadyAdded = Array.from(listeners).some(linker => linker.data.callback === callback && linker.data.capture === options.capture)
+        if (alreadyAdded) {
+          return
+        }
+        // A function runs with this target as this, an object runs its handleEvent as itself
+        const handler = typeof callback === 'function' ? callback.bind(this) : callback.handleEvent.bind(callback)
+        const listener = new PseudoEventListener_1.default(type, options, handler, callback)
         // Listeners run in the order they were added, except that listeners which are not defaults always come before the defaults
         const firstDefault = Array.from(listeners).find(linker => linker.data.isDefault)
         if (firstDefault && !listener.isDefault) {
@@ -1257,25 +1305,84 @@
         }
       }
 
-      removeEventListener (type, callback) {
+      /**
+   * Removes an event listener, the one which was added with the same type, handler and phase.
+   * @param {string} type The type of event
+   * @param {Function|Object} callback The handler which was added
+   * @param {Object|boolean} [options=false] Whether the listener was a capture listener (true), or an object with capture
+   */
+      removeEventListener (type, callback, options = false) {
         if (!(type in this.listeners)) {
           return
         }
-        const listeners = this.listeners[type]
-        Array.from(listeners).filter(linker => !linker.data.isDefault && linker.data.callback === callback).forEach(linker => listeners.remove(linker))
+        const capture = typeof options === 'object' && options !== null ? !!options.capture : !!options
+        Array.from(this.listeners[type]).map(linker => linker.data).filter(listener => !listener.isDefault && listener.callback === callback && listener.capture === capture).forEach(listener => this.removeListener(type, listener))
       }
 
-      dispatchEvent (event, target = this) {
-        event.inner.target = target
-        if (!(event.type in this.listeners)) {
-          return true
+      /**
+   * Dispatches an event to this target and through the tree: capture listeners of the ancestors from the root down,
+   * then the listeners of this target, then (when the event bubbles) the other listeners of the ancestors from the
+   * parent up to the root. stopPropagation() stops it reaching further targets, stopImmediatePropagation() also stops
+   * the remaining listeners of the current target. Afterwards, unless the default was prevented, the default action
+   * of this target (see setDefaultEvent) runs. The event can be dispatched again afterwards.
+   * @param {EventService} event The event to dispatch
+   * @returns {boolean} False when the event was cancelable and a listener prevented the default, otherwise true
+   * @throws {Error} When the event is already being dispatched, or (after the whole dispatch has finished) the error
+   * which a listener threw (an error with all of them in its errors property when several did)
+   */
+      dispatchEvent (event) {
+        if (event.inner.dispatching) {
+          throw new Error('The event is already being dispatched.')
         }
-        this.runEvents(event)
+        event.inner.dispatching = true
+        event.inner.target = this
+        // The ancestors, the root first, which can have listeners
+        const ancestors = (0, getParentNodes_1.default)(this).filter(node => node instanceof EventTargetService)
+        event.inner.path = [this].concat(ancestors.slice().reverse())
+        const errors = []
+        const visit = (target, phase) => {
+          event.inner.eventPhase = phase
+          event.inner.currentTarget = target
+          errors.push(...target.runEvents(event))
+        }
+        for (const ancestor of ancestors) {
+          if (event.inner.propagationStopped) {
+            break
+          }
+          visit(ancestor, EventService_1.EventService.CAPTURING_PHASE)
+        }
+        if (!event.inner.propagationStopped) {
+          visit(this, EventService_1.EventService.AT_TARGET)
+        }
+        if (event.bubbles) {
+          for (const ancestor of ancestors.slice().reverse()) {
+            if (event.inner.propagationStopped) {
+              break
+            }
+            visit(ancestor, EventService_1.EventService.BUBBLING_PHASE)
+          }
+        }
+        event.inner.finishDispatch()
+        if (!event.defaultPrevented && typeof this.defaultEvent[event.type] === 'function') {
+          try {
+            this.defaultEvent[event.type](event)
+          } catch (error) {
+            errors.push(error)
+          }
+        }
+        if (errors.length === 1) {
+          throw errors[0]
+        }
+        if (errors.length > 1) {
+          throw Object.assign(new Error(`${errors.length} listeners threw an error while dispatching the ${event.type} event.`), {
+            errors
+          })
+        }
         return !event.defaultPrevented
       }
     }
     exports.default = EventTargetService
-  }, { '../classes/PseudoEventListener': 1, './EventService': 12, 'collect-your-stuff/dist/collections/linked-list/LinkedList': 21, 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.filter.js': 131, 'core-js/modules/esnext.iterator.find.js': 132, 'core-js/modules/esnext.iterator.for-each.js': 133 }],
+  }, { '../classes/PseudoEventListener': 1, '../functions/getParentNodes': 6, './EventService': 12, 'collect-your-stuff/dist/collections/linked-list/LinkedList': 21, 'core-js/modules/esnext.iterator.constructor.js': 130, 'core-js/modules/esnext.iterator.filter.js': 131, 'core-js/modules/esnext.iterator.find.js': 132, 'core-js/modules/esnext.iterator.for-each.js': 133, 'core-js/modules/esnext.iterator.map.js': 134, 'core-js/modules/esnext.iterator.some.js': 136 }],
   14: [function (require, module, exports) {
     'use strict'
 
