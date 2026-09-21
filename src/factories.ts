@@ -5,8 +5,12 @@
  */
 import generateNode from './factories/generateNode'
 import generateNodeList from './factories/generateNodeList'
+import createEvent from './factories/createEvent'
+import eventDefaults from './factories/eventDefaults'
 
 export default {
   generateNode,
-  nodeListFactory: generateNodeList
+  nodeListFactory: generateNodeList,
+  createEvent,
+  eventDefaults
 }

@@ -16,7 +16,7 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 })
 exports.ElementService = void 0
-const EventService_1 = require('./EventService')
+const createEvent_1 = __importDefault(require('../factories/createEvent'))
 const NodeService_1 = require('./NodeService')
 const AttrService_1 = require('./AttrService')
 const DOMTokenListService_1 = require('./DOMTokenListService')
@@ -125,20 +125,20 @@ class ElementService extends NodeService_1.NodeService {
     switch (this.tagName) {
       case 'button':
       case 'input':
-        if (/^(submit|image)$/i.test(this.type || '')) {
-          // Clicking a submit button submits the form it is in: the form gets a submit event, which can be cancelled
-          callback = event => {
-            const forms = (0, getParentNodesFromAttribute_1.default)('tagName', 'form', this)
-            if (forms.length) {
-              forms[forms.length - 1].dispatchEvent(new EventService_1.EventService('submit', {
-                bubbles: true,
-                cancelable: true
-              }))
-            }
+        // Clicking a submit button submits the form it is in: the form gets a submit event, which can be cancelled
+        callback = event => {
+          const type = String(this.getAttribute('type') || this.type || '').toLowerCase()
+          const submits = this.tagName === 'button' ? type !== 'button' && type !== 'reset' : /^(submit|image)$/.test(type)
+          const forms = (0, getParentNodesFromAttribute_1.default)('tagName', 'form', this)
+          if (submits && forms.length && !this.hasAttribute('disabled')) {
+            forms[forms.length - 1].dispatchEvent((0, createEvent_1.default)('submit', {}, {
+              browser: true,
+              trusted: event.isTrusted
+            }))
           }
-          super.setDefaultEvent('click', callback)
-          this.defaultEventApplied = true
         }
+        super.setDefaultEvent('click', callback)
+        this.defaultEventApplied = true
     }
     return callback
   }

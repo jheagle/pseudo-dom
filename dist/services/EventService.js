@@ -65,7 +65,7 @@ class EventService {
       target: null,
       timeStamp: Math.floor(Date.now() / 1000),
       type: '',
-      isTrusted: true,
+      isTrusted: false,
       dispatching: false,
       inPassiveListener: false,
       path: []
@@ -148,6 +148,12 @@ class EventService {
       },
       get propagationStopped () {
         return self.properties.propagationStopped
+      },
+      get trusted () {
+        return self.properties.isTrusted
+      },
+      set trusted (trusted) {
+        self.properties.isTrusted = trusted
       },
       get dispatching () {
         return self.properties.dispatching

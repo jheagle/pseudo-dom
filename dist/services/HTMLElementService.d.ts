@@ -34,4 +34,24 @@ export declare class HTMLElementService extends ElementService implements Partia
         parent?: PseudoNode | null;
         children?: Array<any>;
     });
+    /**
+     * Whether this element can have the focus: form controls and links which are not disabled, and anything with a tabindex.
+     * @returns {boolean}
+     */
+    get canFocus(): boolean;
+    /**
+     * Click the element: a click event is sent to it, which bubbles and can be cancelled, like one from a user but a
+     * script made it (so it is not trusted). A disabled element does nothing.
+     */
+    click(): void;
+    /**
+     * Give the element the focus. The element which had it gets blur then focusout, and this one gets focus then
+     * focusin (blur and focus do not bubble, focusin and focusout do). Nothing happens when the element cannot have the
+     * focus or already has it.
+     */
+    focus(): void;
+    /**
+     * Take the focus away from the element, when it has it: it gets blur then focusout.
+     */
+    blur(): void;
 }

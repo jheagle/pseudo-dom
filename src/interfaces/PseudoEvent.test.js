@@ -68,8 +68,8 @@ describe('PseudoEvent', () => {
     expect(testEvent.timeStamp).toBeCloseTo(Math.floor(Date.now() / 1000))
   })
 
-  test('event has isTrusted as true', () => {
-    expect(testEvent.isTrusted).toBe(true)
+  test('event made by a script is not trusted', () => {
+    expect(testEvent.isTrusted).toBe(false)
   })
 
   test('event constants are readable', () => {

@@ -18,6 +18,17 @@ else, document fragments insert their children, and a node cannot be put inside 
 `DOMTokenListService`, `NamedNodeMapService`, `DocumentService` / `DocumentFragmentService`, `PseudoNodeList`, and
 `generateDocument` for creating a document.
 
+Standard events: `createEvent(type, init, { browser, trusted })` makes the kind of event which suits the type (a click is a
+`MouseEvent`, a keydown a `KeyboardEvent`, ...). Like the constructor in a browser it gives nothing (no bubbling, no
+cancelling, not trusted) unless asked, but with `browser: true` it uses `eventDefaults`, the table of how the browser
+creates each standard type (click bubbles and can be cancelled, focus does not bubble but focusin does, input bubbles
+but cannot be cancelled, ...), and `trusted: true` makes `isTrusted` true, as for a real user action. The kinds of event
+are `PseudoUIEvent`, `PseudoMouseEvent`, `PseudoPointerEvent`, `PseudoKeyboardEvent`, `PseudoFocusEvent`,
+`PseudoInputEvent` and `PseudoCustomEvent`. Elements have `click()` (an untrusted click, like a script's),
+`focus()` and `blur()` (with blur / focusout / focus / focusin and the related targets, and a focused element for each
+tree), and `simulate.click(element)` / `simulate.keyPress(element, key)` send what a user's action sends (pointerdown,
+mousedown, the focus moving, pointerup, mouseup, click; keydown, keyup), all trusted.
+
 Not implemented yet (these throw a "not implemented" error or are missing): `cloneNode`, `compareDocumentPosition`, `isEqualNode`, `querySelector` /
 `querySelectorAll`, `innerHTML` / `outerHTML` parsing, and most of the rest of the Element and Document APIs. The API
 will change before 1.0.

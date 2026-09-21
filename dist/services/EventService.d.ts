@@ -15,6 +15,8 @@ export type EventInner = {
     target: PseudoEventTarget;
     immediatePropagationStopped: boolean;
     propagationStopped: boolean;
+    /** True for an event which the browser created for a user action, an event which a script created is not trusted. */
+    trusted: boolean;
     /** True while the event is being dispatched. */
     dispatching: boolean;
     /** True while a passive listener is running, in which preventDefault does nothing. */

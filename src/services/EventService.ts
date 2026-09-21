@@ -35,6 +35,8 @@ export type EventInner = {
   target: PseudoEventTarget,
   immediatePropagationStopped: boolean,
   propagationStopped: boolean,
+  /** True for an event which the browser created for a user action, an event which a script created is not trusted. */
+  trusted: boolean,
   /** True while the event is being dispatched. */
   dispatching: boolean,
   /** True while a passive listener is running, in which preventDefault does nothing. */
@@ -91,7 +93,7 @@ export class EventService implements PseudoEvent {
     target: null,
     timeStamp: Math.floor(Date.now() / 1000),
     type: '',
-    isTrusted: true,
+    isTrusted: false,
     dispatching: false,
     inPassiveListener: false,
     path: []
@@ -184,6 +186,12 @@ export class EventService implements PseudoEvent {
       },
       get propagationStopped (): boolean {
         return self.properties.propagationStopped
+      },
+      get trusted (): boolean {
+        return self.properties.isTrusted
+      },
+      set trusted (trusted: boolean) {
+        self.properties.isTrusted = trusted
       },
       get dispatching (): boolean {
         return self.properties.dispatching
