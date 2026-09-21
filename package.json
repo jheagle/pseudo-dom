@@ -18,7 +18,7 @@
     "watch:test": "gulp watchTest"
   },
   "dependencies": {
-    "collect-your-stuff": "^1.2.7"
+    "collect-your-stuff": "^1.2.8"
   },
   "devDependencies": {
     "js-build-tools": "^5.0.0",

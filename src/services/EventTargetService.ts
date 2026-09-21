@@ -6,9 +6,11 @@
 import { EventService } from './EventService'
 import PseudoEventListener from '../classes/PseudoEventListener'
 import { listenerOptions, PseudoEventTarget } from '../interfaces/PseudoEventTarget'
+import { LinkedList } from 'collect-your-stuff/dist/collections/linked-list/LinkedList'
+import { Linker } from 'collect-your-stuff/dist/collections/linked-list/Linker'
 
-// The listeners for each event type, the first item is the next to run (the top of the stack).
-type registeredListeners = { [key: string]: Array<PseudoEventListener> }
+// The listeners for each event type, in the order they will run: the order they were added, with default listeners last.
+type registeredListeners = { [key: string]: LinkedList }
 
 type defaultEvents = { [key: string]: Function }
 
@@ -34,7 +36,21 @@ class EventTargetService implements PseudoEventTarget {
   }
 
   /**
+   * The listeners registered for a type of event, creating the (empty) list of them when there are none yet.
+   * @param {string} type
+   * @returns {LinkedList}
+   */
+  private listenersFor (type: string): LinkedList {
+    if (!(type in this.listeners)) {
+      this.listeners[type] = new LinkedList()
+    }
+    return this.listeners[type]
+  }
+
+  /**
    * Run each of the listeners registered on this target for the type of the event.
+   * Listeners which do not apply to the event's phase are skipped, running stops once immediate propagation is stopped,
+   * and listeners added or removed while running do not change which ones run for this event.
    * @param {EventService} event
    * @returns {*} true when there was nothing registered, otherwise the last value returned from a handler (null when none ran)
    */
@@ -42,29 +58,22 @@ class EventTargetService implements PseudoEventTarget {
     if (!(event.type in this.listeners)) {
       return true
     }
-    const stack = this.listeners[event.type]
+    const listeners = this.listeners[event.type]
     let eventReturn: any = null
-    if (stack.length === 0) {
-      return eventReturn
-    }
-    if (event.inner.immediatePropagationStopped || stack[0].rejectEvent(event)) {
-      return eventReturn
-    }
-    // Temporarily hold the listeners which have run
-    const runningListeners: Array<PseudoEventListener> = []
-    let currentListener: PseudoEventListener | undefined = stack.shift()
-    while (currentListener) {
-      eventReturn = currentListener.handleEvent(event)
-      if (!currentListener.once) {
-        runningListeners.push(currentListener)
-      }
-      if (stack.length === 0 || event.inner.immediatePropagationStopped || stack[0].rejectEvent(event)) {
+    // Work from a copy of the linkers so that removing a listener (for example a once listener) does not disturb the walk
+    for (const linker of Array.from(listeners)) {
+      const listener: PseudoEventListener = linker.data
+      if (event.inner.immediatePropagationStopped) {
         break
       }
-      currentListener = stack.shift()
+      if (listener.rejectEvent(event)) {
+        continue
+      }
+      eventReturn = listener.handleEvent(event)
+      if (listener.once) {
+        listeners.remove(linker)
+      }
     }
-    // Rebuild the stack, keeping the original order
-    stack.unshift(...runningListeners)
     return eventReturn
   }
 
@@ -74,9 +83,7 @@ class EventTargetService implements PseudoEventTarget {
    * @param {Function} callback
    */
   protected setDefaultEvent (type: string, callback: Function): void {
-    if (!(type in this.listeners)) {
-      this.listeners[type] = []
-    }
+    this.listenersFor(type)
     this.defaultEvent[type] = callback
   }
 
@@ -122,23 +129,25 @@ class EventTargetService implements PseudoEventTarget {
     } else {
       options.capture = useCapture
     }
-    if (!(type in this.listeners)) {
-      this.listeners[type] = []
-    }
     const listener: PseudoEventListener = new PseudoEventListener(type, options, (callback.handleEvent || callback).bind(this), callback)
-    this.listeners[type].push(listener)
+    const listeners = this.listenersFor(type)
     // Listeners run in the order they were added, except that listeners which are not defaults always come before the defaults
-    this.listeners[type] = [].concat(
-      this.listeners[type].filter(registered => !registered.isDefault),
-      this.listeners[type].filter(registered => registered.isDefault)
-    )
+    const firstDefault = Array.from(listeners).find((linker: Linker) => linker.data.isDefault)
+    if (firstDefault && !listener.isDefault) {
+      listeners.insertBefore(firstDefault, listener)
+    } else {
+      listeners.append(listener)
+    }
   }
 
   public removeEventListener (type: string, callback: Function): void {
     if (!(type in this.listeners)) {
       return
     }
-    this.listeners[type] = this.listeners[type].filter(listener => listener.isDefault || listener.callback !== callback)
+    const listeners = this.listeners[type]
+    Array.from(listeners)
+      .filter((linker: Linker) => !linker.data.isDefault && linker.data.callback === callback)
+      .forEach((linker: Linker) => listeners.remove(linker))
   }
 
   public dispatchEvent (event: EventService, target: EventTargetService = this): boolean {
