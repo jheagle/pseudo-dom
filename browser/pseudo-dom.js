@@ -423,13 +423,41 @@
     Object.defineProperty(exports, '__esModule', {
       value: true
     })
+    exports.PseudoHTMLDocument = exports.PseudoHTMLElement = exports.PseudoElement = exports.PseudoNode = exports.PseudoEventTarget = exports.PseudoEvent = exports.generateDocument = void 0
     const EventService_1 = require('./services/EventService')
+    Object.defineProperty(exports, 'PseudoEvent', {
+      enumerable: true,
+      get: function () {
+        return EventService_1.EventService
+      }
+    })
     const EventTargetService_1 = __importDefault(require('./services/EventTargetService'))
+    exports.PseudoEventTarget = EventTargetService_1.default
     const NodeService_1 = require('./services/NodeService')
+    Object.defineProperty(exports, 'PseudoNode', {
+      enumerable: true,
+      get: function () {
+        return NodeService_1.NodeService
+      }
+    })
     const ElementService_1 = require('./services/ElementService')
+    Object.defineProperty(exports, 'PseudoElement', {
+      enumerable: true,
+      get: function () {
+        return ElementService_1.ElementService
+      }
+    })
     const HTMLElementService_1 = require('./services/HTMLElementService')
+    Object.defineProperty(exports, 'PseudoHTMLElement', {
+      enumerable: true,
+      get: function () {
+        return HTMLElementService_1.HTMLElementService
+      }
+    })
     const PseudoHTMLDocument_1 = __importDefault(require('./classes/PseudoHTMLDocument'))
+    exports.PseudoHTMLDocument = PseudoHTMLDocument_1.default
     const generateDocument_1 = __importDefault(require('./factories/generateDocument'))
+    exports.generateDocument = generateDocument_1.default
     /**
  * All methods exported from this module are encapsulated within pseudoDom.
  * @author Joshua Heagle <joshuaheagle@gmail.com>

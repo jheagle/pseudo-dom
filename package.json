@@ -1,11 +1,11 @@
 {
   "name": "pseudo-dom",
   "description": "Mock the DOM on the server side for managing state and testing",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
   "author": "Joshua Heagle",
-  "license": "GNU",
+  "license": "GPL-3.0-only",
   "scripts": {
     "build": "gulp build",
     "dev": "gulp",
@@ -18,7 +18,8 @@
     "watch:test": "gulp watchTest"
   },
   "dependencies": {
-    "collect-your-stuff": "^1.2.8"
+    "collect-your-stuff": "^1.2.8",
+    "core-js": "^3.50.0"
   },
   "devDependencies": {
     "js-build-tools": "^5.0.0",
@@ -31,12 +32,20 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jheagle/PseudoDom.git"
+    "url": "git+https://github.com/jheagle/pseudo-dom.git"
   },
   "bugs": {
-    "url": "https://github.com/jheagle/PseudoDom/issues"
+    "url": "https://github.com/jheagle/pseudo-dom/issues"
   },
-  "homepage": "https://github.com/jheagle/PseudoDom#readme",
+  "homepage": "https://github.com/jheagle/pseudo-dom#readme",
+  "keywords": [
+    "dom",
+    "mock",
+    "pseudo-dom",
+    "testing",
+    "node",
+    "typescript"
+  ],
   "standard": {
     "env": [
       "jest"
