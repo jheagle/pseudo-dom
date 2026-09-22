@@ -30,6 +30,30 @@ class AttrService extends NodeService_1.NodeService {
     this.nodeNameValue = name
   }
 
+  get acceptsChildren () {
+    return false
+  }
+
+  get nodeValue () {
+    return this.value
+  }
+
+  set nodeValue (value) {
+    this.value = value === null ? '' : String(value)
+  }
+
+  get textContent () {
+    return this.value
+  }
+
+  set textContent (text) {
+    this.value = text === null ? '' : String(text)
+  }
+
+  cloneShallow () {
+    return new AttrService(this.localName, this.value, null, this.namespaceURI, this.prefix)
+  }
+
   get nodeType () {
     return NodeService_1.NodeService.ATTRIBUTE_NODE
   }

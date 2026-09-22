@@ -82,4 +82,13 @@ describe('ElementService', () => {
     parent.insertBefore(form, reference)
     expect(before).toHaveBeenCalledTimes(1)
   })
+
+  test('an attribute which is also a property shows what the property was set to', () => {
+    const div = new ElementService({ tagName: 'div' })
+    div.id = 'set-by-property'
+    div.className = 'a b'
+    expect(div.getAttribute('id')).toBe('set-by-property')
+    expect(div.getAttribute('className')).toBe('a b')
+    expect(div.attributes.getNamedItem('id').value).toBe('set-by-property')
+  })
 })

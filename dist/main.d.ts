@@ -20,6 +20,7 @@ import { FocusEventService as PseudoFocusEvent } from './services/FocusEventServ
 import { InputEventService as PseudoInputEvent } from './services/InputEventService';
 import { CustomEventService as PseudoCustomEvent } from './services/CustomEventService';
 import simulate from './simulate';
+import { TextService as PseudoText, CommentService as PseudoComment } from './services/NodeService';
 /**
  * All methods exported from this module are encapsulated within pseudoDom.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -52,9 +53,11 @@ declare const pseudoDom: {
     PseudoCustomEvent: typeof PseudoCustomEvent;
     PseudoEventTarget: typeof PseudoEventTarget;
     PseudoNode: typeof PseudoNode;
+    PseudoText: typeof PseudoText;
+    PseudoComment: typeof PseudoComment;
     PseudoElement: typeof PseudoElement;
     PseudoHTMLElement: typeof PseudoHTMLElement;
     PseudoHTMLDocument: typeof PseudoHTMLDocument;
 };
-export { generateDocument, createEvent, eventDefaults, simulate, PseudoEvent, PseudoUIEvent, PseudoMouseEvent, PseudoPointerEvent, PseudoKeyboardEvent, PseudoFocusEvent, PseudoInputEvent, PseudoCustomEvent, PseudoEventTarget, PseudoNode, PseudoElement, PseudoHTMLElement, PseudoHTMLDocument };
+export { generateDocument, createEvent, eventDefaults, simulate, PseudoEvent, PseudoUIEvent, PseudoMouseEvent, PseudoPointerEvent, PseudoKeyboardEvent, PseudoFocusEvent, PseudoInputEvent, PseudoCustomEvent, PseudoEventTarget, PseudoNode, PseudoText, PseudoComment, PseudoElement, PseudoHTMLElement, PseudoHTMLDocument };
 export default pseudoDom;

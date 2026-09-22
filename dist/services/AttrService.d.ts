@@ -22,6 +22,12 @@ export declare class AttrService extends NodeService implements PseudoAttr {
      * @constructor
      */
     constructor(name?: string, value?: string, ownerElement?: PseudoElement | null, namespaceURI?: string, prefix?: string | null);
+    protected get acceptsChildren(): boolean;
+    get nodeValue(): string | null;
+    set nodeValue(value: string | null);
+    get textContent(): string | null;
+    set textContent(text: string | null);
+    protected cloneShallow(): NodeService;
     get nodeType(): number;
     get localName(): string;
     get name(): string;

@@ -14,6 +14,8 @@ import { AttrService } from './AttrService'
 import { DOMTokenListService } from './DOMTokenListService'
 import { NamedNodeMapService } from './NamedNodeMapService'
 import getParentNodesFromAttribute from '../functions/getParentNodesFromAttribute'
+import cloneObject from 'si-funciona/dist/helpers/objects/cloneObject'
+import isEqual from 'si-funciona/dist/helpers/objects/isEqual'
 
 type attribute = { name: string, value: any }
 
@@ -79,6 +81,58 @@ export class ElementService extends NodeService implements Partial<PseudoElement
     }
   }
 
+  /**
+   * The attributes with the values they have now: the ones which are also properties (className, id, style, ...) can
+   * have been changed through the property, which does not change the stored list.
+   * @returns {Array<{name: string, value: *}>}
+   */
+  private currentAttributes (): Array<attribute> {
+    return this.attributeList.map(({ name, value }) => ({
+      name,
+      value: this.propertyAttributes.indexOf(name) >= 0 ? (this as any)[name] : value
+    }))
+  }
+
+  get nodeName (): string {
+    return this.tag
+  }
+
+  /**
+   * A copy of this element without its children: the same tag and attributes (the values which are objects, such as
+   * style, are copied too rather than shared), but not its parent or listeners.
+   * @returns {ElementService}
+   */
+  protected cloneShallow (): NodeService {
+    const copy: ElementService = new (this.constructor as any)({ tagName: this.tag })
+    copy.attributeList.length = 0
+    this.currentAttributes().forEach(({ name, value }) => {
+      const copied: any = typeof value === 'object' && value !== null ? cloneObject(value) : value
+      copy.attributeList.push({ name, value: copied })
+      if (copy.propertyAttributes.indexOf(name) >= 0) {
+        (copy as any)[name] = copied
+      }
+    })
+    copy.ownerDocumentStore = this.ownerDocumentStore
+    return copy
+  }
+
+  /**
+   * Elements are equal when they have the same tag and the same attributes (in any order), which is what isEqualNode
+   * checks before it compares the children.
+   * @param {NodeService} other The element to compare with
+   * @returns {boolean}
+   */
+  protected equalsShallow (other: NodeService): boolean {
+    const mine: Array<attribute> = this.currentAttributes()
+    const theirs: Array<attribute> = (other as ElementService).currentAttributes()
+    return this.nodeName === other.nodeName &&
+      mine.length === theirs.length &&
+      mine.every(({ name, value }) => {
+        const match: attribute | undefined = theirs.find(attributeOfOther => attributeOfOther.name === name)
+        return typeof match !== 'undefined' && isEqual(value, match.value)
+      })
+  }
+
   get tagName (): string {
     return this.tag
   }
@@ -88,7 +142,7 @@ export class ElementService extends NodeService implements Partial<PseudoElement
   }
 
   get attributes (): PseudoNamedNodeMap {
-    return new NamedNodeMapService(this.attributeList.map(({ name, value }) => new AttrService(name, String(value), this as unknown as PseudoElement)))
+    return new NamedNodeMapService(this.currentAttributes().map(({ name, value }) => new AttrService(name, String(value), this as unknown as PseudoElement)))
   }
 
   get classList (): PseudoDOMTokenList {
@@ -173,7 +227,7 @@ export class ElementService extends NodeService implements Partial<PseudoElement
    * @returns {string|null} The value, or null when there is no such attribute
    */
   getAttribute (attributeName: string): string | null {
-    const found = this.attributeList.find(({ name }) => name === attributeName)
+    const found = this.currentAttributes().find(({ name }) => name === attributeName)
     return found ? found.value : null
   }
 
