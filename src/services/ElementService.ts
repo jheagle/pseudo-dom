@@ -18,6 +18,7 @@ import { HTMLCollectionService } from './HTMLCollectionService'
 import { PseudoHTMLCollection } from '../interfaces/PseudoHTMLCollection'
 import cloneObject from 'si-funciona/dist/helpers/objects/cloneObject'
 import isEqual from 'si-funciona/dist/helpers/objects/isEqual'
+import { matches, closest } from '../factories/query'
 
 type attribute = { name: string, value: any }
 
@@ -283,6 +284,25 @@ export class ElementService extends NodeService implements Partial<PseudoElement
    */
   insertAdjacentHTML (position: string, text: string): void {
     throw new Error('ElementService.insertAdjacentHTML() is not implemented yet.')
+  }
+
+  /**
+   * Whether this element itself (not its descendants) matches the given CSS selector.
+   * @param {string} selectors A CSS selector
+   * @returns {boolean}
+   */
+  matches (selectors: string): boolean {
+    return matches(this, selectors)
+  }
+
+  /**
+   * The nearest ancestor of this element (starting with this element itself) which matches the CSS selector, or
+   * null when none of them do.
+   * @param {string} selectors A CSS selector
+   * @returns {PseudoElement|null}
+   */
+  closest (selectors: string): PseudoElement | null {
+    return closest(this, selectors)
   }
 
   applyDefaultEvent (): Function {

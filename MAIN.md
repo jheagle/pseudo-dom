@@ -45,6 +45,12 @@ children, \`childElementCount\`, \`firstElementChild\` / \`lastElementChild\` an
 a tree rather than duplicating it; \`insertAdjacentElement\` / \`insertAdjacentText\` insert at beforebegin / afterbegin
 / beforeend / afterend (\`insertAdjacentHTML\` is not implemented, no HTML parsing yet).
 
-Not implemented yet (these throw a "not implemented" error or are missing): `querySelector` /
-`querySelectorAll`, `innerHTML` / `outerHTML` parsing, and most of the rest of the Element and Document APIs. The API
-will change before 1.0.
+Selector queries work like the DOM's: \`getElementsByTagName\` / \`getElementsByClassName\` (live, on any node) and
+\`querySelector\` / \`querySelectorAll\` (real CSS selectors, via [css-select](https://www.npmjs.com/package/css-select)
+matched against pseudo-dom's own tree through a custom adapter - \`querySelectorAll\` is a plain array, a snapshot
+taken when it is called, like the DOM's) are on \`NodeService\` so \`Document\`, \`DocumentFragment\` and \`Element\`
+all have them; \`matches\` / \`closest\` are on \`ElementService\`; \`getElementById\` is on \`DocumentService\` only,
+matching the real DOM.
+
+Not implemented yet (these throw a "not implemented" error or are missing): \`getElementsByTagNameNS\`, \`innerHTML\` /
+\`outerHTML\` parsing, and most of the rest of the Element and Document APIs. The API will change before 1.0.

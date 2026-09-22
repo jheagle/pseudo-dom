@@ -623,8 +623,10 @@ export interface PseudoElement extends PseudoNode {
 
   /**
    * Returns the Element which is the closest ancestor of the current element (or the current element itself) which matches the selectors given in parameter.
+   * @param {string} selectors A CSS selector
+   * @returns {PseudoElement|null}
    */
-  closest (): string
+  closest (selectors: string): PseudoElement | null
 
   /**
    * Returns a StylePropertyMapReadOnly interface which provides a read-only representation of a CSS declaration block that is an alternative to CSSStyleDeclaration.
@@ -673,16 +675,21 @@ export interface PseudoElement extends PseudoNode {
 
   /**
    * Returns a live HTMLCollection that contains all descendants of the current element that possess the list of classes given in the parameter.
+   * @param {string} className One or more space separated classes
+   * @returns {PseudoHTMLCollection}
    */
-  getElementsByClassName (): string
+  getElementsByClassName (className: string): PseudoHTMLCollection
 
   /**
    * Returns a live HTMLCollection containing all descendant elements, of a particular tag name, from the current element.
+   * @param {string} tagName A tag name, or * for every element
+   * @returns {PseudoHTMLCollection}
    */
-  getElementsByTagName (): string
+  getElementsByTagName (tagName: string): PseudoHTMLCollection
 
   /**
-   * Returns a live HTMLCollection containing all descendant elements, of a particular tag name and namespace, from the current element.
+   * Returns a live HTMLCollection containing all descendant elements, of a particular tag name and namespace, from
+   * the current element. Not implemented yet (namespaces are out of scope for now).
    */
   getElementsByTagNameNS (): string
 
@@ -731,8 +738,10 @@ export interface PseudoElement extends PseudoNode {
 
   /**
    * Returns a boolean value indicating whether or not the element would be selected by the specified selector string.
+   * @param {string} selectors A CSS selector
+   * @returns {boolean}
    */
-  matches (): string
+  matches (selectors: string): boolean
 
   /**
    * Inserts a set of Node objects or strings before the first child of the element.
@@ -741,13 +750,17 @@ export interface PseudoElement extends PseudoNode {
 
   /**
    * Returns the first Node which matches the specified selector string relative to the element.
+   * @param {string} selectors A CSS selector
+   * @returns {PseudoElement|null}
    */
-  querySelector (): string
+  querySelector (selectors: string): PseudoElement | null
 
   /**
    * Returns a NodeList of nodes which match the specified selector string relative to the element.
+   * @param {string} selectors A CSS selector
+   * @returns {Array<PseudoElement>}
    */
-  querySelectorAll (): string
+  querySelectorAll (selectors: string): Array<PseudoElement>
 
   /**
    * Releases (stops) pointer capture that was previously set for a specific pointer event.

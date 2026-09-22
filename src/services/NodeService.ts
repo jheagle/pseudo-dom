@@ -12,6 +12,8 @@ import EventTargetService from './EventTargetService'
 import { PseudoElement } from '../interfaces/PseudoElement'
 import { PseudoDocument } from '../interfaces/PseudoDocument'
 import { PseudoDocumentFragment } from '../interfaces/PseudoDocumentFragment'
+import { HTMLCollectionService } from './HTMLCollectionService'
+import { querySelector, querySelectorAll } from '../factories/query'
 
 /**
  * Simulate the behaviour of the Node Class when there is no DOM available.
@@ -295,6 +297,45 @@ export class NodeService extends EventTargetService implements PseudoNode {
     const text: TextService = new TextService(value)
     text.ownerDocumentStore = this.ownerDocument
     return text
+  }
+
+  /**
+   * Every element below this node with the given tag name (or every element when tagName is *), live.
+   * @param {string} tagName
+   * @returns {PseudoHTMLCollection}
+   */
+  public getElementsByTagName (tagName: string): HTMLCollectionService {
+    const matchesTag = tagName === '*' ? () => true : (element: any) => element.tagName === tagName
+    return new HTMLCollectionService(this, matchesTag, true)
+  }
+
+  /**
+   * Every element below this node which has all of the given (space separated) classes, live.
+   * @param {string} className
+   * @returns {PseudoHTMLCollection}
+   */
+  public getElementsByClassName (className: string): HTMLCollectionService {
+    const names: Array<string> = className.trim().split(/\s+/).filter(Boolean)
+    return new HTMLCollectionService(this, (element: any) => names.every(name => element.classList.contains(name)), true)
+  }
+
+  /**
+   * The first element below this node which matches the CSS selector, in tree order, or null when there is none.
+   * @param {string} selectors A CSS selector
+   * @returns {PseudoElement|null}
+   */
+  public querySelector (selectors: string): PseudoElement | null {
+    return querySelector(selectors, this)
+  }
+
+  /**
+   * Every element below this node which matches the CSS selector, in tree order. A plain array (not a live
+   * collection): like the DOM's querySelectorAll, it is a snapshot taken when it is called.
+   * @param {string} selectors A CSS selector
+   * @returns {Array<PseudoElement>}
+   */
+  public querySelectorAll (selectors: string): Array<PseudoElement> {
+    return querySelectorAll(selectors, this)
   }
 
   /**

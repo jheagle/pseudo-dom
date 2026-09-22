@@ -1,7 +1,7 @@
 {
   "name": "pseudo-dom",
   "description": "Mock the DOM on the server side for managing state and testing",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
   "author": "Joshua Heagle",
@@ -20,10 +20,11 @@
   "dependencies": {
     "collect-your-stuff": "^2.1.1",
     "core-js": "^3.50.0",
+    "css-select": "^6.0.0",
     "si-funciona": "^2.6.1"
   },
   "devDependencies": {
-    "js-build-tools": "^5.0.0",
+    "js-build-tools": "^5.2.0",
     "jsdoc": "^4.0.5",
     "standard": "^17.1.2",
     "test-filesystem": "^1.5.1"

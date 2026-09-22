@@ -6,20 +6,25 @@
 import { NodeService } from './NodeService';
 import { PseudoHTMLCollection } from '../interfaces/PseudoHTMLCollection';
 /**
- * Simulate the behaviour of the HTMLCollection Class when there is no DOM available: a live view of the element
- * children of a node, recomputed from its childNodes each time it is used rather than kept in sync as they change.
+ * Simulate the behaviour of the HTMLCollection Class when there is no DOM available: a live view of some of a node's
+ * element descendants, recomputed each time it is used rather than kept in sync as they change.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @class
  */
 export declare class HTMLCollectionService implements PseudoHTMLCollection {
     private readonly owner;
+    private readonly predicate;
+    private readonly deep;
     /**
-     * @param {NodeService} owner The node whose element children this is a live view of
+     * @param {NodeService} owner The node this is a live view of a part of
+     * @param {function(*): boolean} [predicate] Only elements which pass this are included (every element by default)
+     * @param {boolean} [deep=false] Include every matching descendant (true, like getElementsByTagName), not just the
+     * direct element children (false, like Element.children)
      * @constructor
      */
-    constructor(owner: NodeService);
+    constructor(owner: NodeService, predicate?: (element: any) => boolean, deep?: boolean);
     /**
-     * The current element children of the owner, in order.
+     * The current elements the collection holds, in tree order.
      * @returns {Array<PseudoNode>}
      */
     private elements;
@@ -41,7 +46,7 @@ export declare class HTMLCollectionService implements PseudoHTMLCollection {
      */
     namedItem(name: string): any | null;
     /**
-     * Iterate over the current element children.
+     * Iterate over the current elements.
      * @returns {Iterator}
      */
     [Symbol.iterator](): Iterator<any>;
