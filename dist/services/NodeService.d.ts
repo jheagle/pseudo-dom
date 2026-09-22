@@ -36,7 +36,8 @@ export declare class NodeService extends EventTargetService implements PseudoNod
     static readonly DOCUMENT_POSITION_CONTAINED_BY = 16;
     static readonly DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC = 32;
     private static nextNodeId;
-    children: PseudoNodeList | LinkedTreeList;
+    /** The raw list of every child node (all types), used to implement childNodes/firstChild/lastChild/insertBefore/removeChild. Not the same thing as Element.children (an HTMLCollection of just the element children). */
+    protected childList: PseudoNodeList | LinkedTreeList;
     parent: PseudoNode | null;
     protected nodeNameValue: string;
     private nodeValueStore;
@@ -91,6 +92,53 @@ export declare class NodeService extends EventTargetService implements PseudoNod
      * @returns {boolean}
      */
     protected equalsShallow(other: NodeService): boolean;
+    /**
+     * Add nodes (strings become text nodes) as the last children of this node, in the order given.
+     * @param {...(PseudoNode|string)} nodes The nodes (or text) to add
+     * @throws {Error} When this kind of node cannot have children
+     */
+    append(...nodes: Array<PseudoNode | string>): void;
+    /**
+     * Add nodes (strings become text nodes) as the first children of this node, in the order given.
+     * @param {...(PseudoNode|string)} nodes The nodes (or text) to add
+     * @throws {Error} When this kind of node cannot have children
+     */
+    prepend(...nodes: Array<PseudoNode | string>): void;
+    /**
+     * Remove every child of this node and put the given nodes (strings become text nodes) in their place, in order.
+     * @param {...(PseudoNode|string)} nodes The nodes (or text) to add
+     * @throws {Error} When this kind of node cannot have children
+     */
+    replaceChildren(...nodes: Array<PseudoNode | string>): void;
+    /**
+     * Add nodes (strings become text nodes) as this node's previous siblings, in order. Does nothing when this node has
+     * no parent.
+     * @param {...(PseudoNode|string)} nodes The nodes (or text) to add
+     */
+    before(...nodes: Array<PseudoNode | string>): void;
+    /**
+     * Add nodes (strings become text nodes) as this node's next siblings, in order. Does nothing when this node has no
+     * parent.
+     * @param {...(PseudoNode|string)} nodes The nodes (or text) to add
+     */
+    after(...nodes: Array<PseudoNode | string>): void;
+    /**
+     * Put the given nodes (strings become text nodes) where this node is, in order, then remove this node. Does nothing
+     * when this node has no parent.
+     * @param {...(PseudoNode|string)} nodes The nodes (or text) to put in this node's place
+     */
+    replaceWith(...nodes: Array<PseudoNode | string>): void;
+    /**
+     * Remove this node from its parent. Does nothing when it has no parent.
+     */
+    remove(): void;
+    /**
+     * Turn a value given to append / prepend / before / after / replaceWith / replaceChildren into a node: a string
+     * becomes a text node belonging to this node's document, anything else is returned as it is.
+     * @param {PseudoNode|string} value The value to add
+     * @returns {PseudoNode}
+     */
+    private toChildNode;
     /**
      * Called each time a node has been inserted as a child of this node, so that nodes which need to react to children
      * (for example elements applying default events) can do so.

@@ -42,7 +42,7 @@ class NodeService extends EventTargetService_1.default {
     this.ownerDocumentStore = null
     this.nodeId = NodeService.nextNodeId++
     this.nodeNameValue = ''
-    this.children = (0, generateNodeList_1.default)()
+    this.childList = (0, generateNodeList_1.default)()
     this.parent = null
     this.listLinker = null
   }
@@ -52,11 +52,11 @@ class NodeService extends EventTargetService_1.default {
   }
 
   get childNodes () {
-    return this.children
+    return this.childList
   }
 
   get firstChild () {
-    return this.children.first ? this.children.first.data : null
+    return this.childList.first ? this.childList.first.data : null
   }
 
   get isConnected () {
@@ -65,7 +65,7 @@ class NodeService extends EventTargetService_1.default {
   }
 
   get lastChild () {
-    return this.children.last ? this.children.last.data : null
+    return this.childList.last ? this.childList.last.data : null
   }
 
   get nextSibling () {
@@ -179,6 +179,102 @@ class NodeService extends EventTargetService_1.default {
   }
 
   /**
+   * Add nodes (strings become text nodes) as the last children of this node, in the order given.
+   * @param {...(PseudoNode|string)} nodes The nodes (or text) to add
+   * @throws {Error} When this kind of node cannot have children
+   */
+  append (...nodes) {
+    nodes.forEach(node => this.appendChild(this.toChildNode(node)))
+  }
+
+  /**
+   * Add nodes (strings become text nodes) as the first children of this node, in the order given.
+   * @param {...(PseudoNode|string)} nodes The nodes (or text) to add
+   * @throws {Error} When this kind of node cannot have children
+   */
+  prepend (...nodes) {
+    const reference = this.firstChild
+    nodes.forEach(node => this.insertBefore(this.toChildNode(node), reference))
+  }
+
+  /**
+   * Remove every child of this node and put the given nodes (strings become text nodes) in their place, in order.
+   * @param {...(PseudoNode|string)} nodes The nodes (or text) to add
+   * @throws {Error} When this kind of node cannot have children
+   */
+  replaceChildren (...nodes) {
+    while (this.firstChild) {
+      this.removeChild(this.firstChild)
+    }
+    this.append(...nodes)
+  }
+
+  /**
+   * Add nodes (strings become text nodes) as this node's previous siblings, in order. Does nothing when this node has
+   * no parent.
+   * @param {...(PseudoNode|string)} nodes The nodes (or text) to add
+   */
+  before (...nodes) {
+    const parent = this.parentNode
+    if (!parent) {
+      return
+    }
+    nodes.forEach(node => parent.insertBefore(this.toChildNode(node), this))
+  }
+
+  /**
+   * Add nodes (strings become text nodes) as this node's next siblings, in order. Does nothing when this node has no
+   * parent.
+   * @param {...(PseudoNode|string)} nodes The nodes (or text) to add
+   */
+  after (...nodes) {
+    const parent = this.parentNode
+    if (!parent) {
+      return
+    }
+    const reference = this.nextSibling
+    nodes.forEach(node => parent.insertBefore(this.toChildNode(node), reference))
+  }
+
+  /**
+   * Put the given nodes (strings become text nodes) where this node is, in order, then remove this node. Does nothing
+   * when this node has no parent.
+   * @param {...(PseudoNode|string)} nodes The nodes (or text) to put in this node's place
+   */
+  replaceWith (...nodes) {
+    const parent = this.parentNode
+    if (!parent) {
+      return
+    }
+    nodes.forEach(node => parent.insertBefore(this.toChildNode(node), this))
+    parent.removeChild(this)
+  }
+
+  /**
+   * Remove this node from its parent. Does nothing when it has no parent.
+   */
+  remove () {
+    if (this.parentNode) {
+      this.parentNode.removeChild(this)
+    }
+  }
+
+  /**
+   * Turn a value given to append / prepend / before / after / replaceWith / replaceChildren into a node: a string
+   * becomes a text node belonging to this node's document, anything else is returned as it is.
+   * @param {PseudoNode|string} value The value to add
+   * @returns {PseudoNode}
+   */
+  toChildNode (value) {
+    if (typeof value !== 'string') {
+      return value
+    }
+    const text = new TextService(value)
+    text.ownerDocumentStore = this.ownerDocument
+    return text
+  }
+
+  /**
    * Called each time a node has been inserted as a child of this node, so that nodes which need to react to children
    * (for example elements applying default events) can do so.
    * @param {NodeService} child The node which was inserted
@@ -266,7 +362,7 @@ class NodeService extends EventTargetService_1.default {
   }
 
   hasChildNodes () {
-    return this.children.length > 0
+    return this.childList.length > 0
   }
 
   /**
@@ -305,7 +401,7 @@ class NodeService extends EventTargetService_1.default {
     const linker = new TreeLinker_1.TreeLinker({
       data: newNode
     })
-    this.children.insertBefore(referenceNode ? referenceNode.listLinker : null, linker)
+    this.childList.insertBefore(referenceNode ? referenceNode.listLinker : null, linker)
     const inserted = newNode
     inserted.parent = this
     inserted.listLinker = linker
@@ -383,7 +479,7 @@ class NodeService extends EventTargetService_1.default {
       throw new Error('The node to be removed is not a child of this node.')
     }
     const removed = childElement
-    this.children.remove(removed.listLinker)
+    this.childList.remove(removed.listLinker)
     removed.parent = null
     removed.listLinker = null
     return childElement
