@@ -1,7 +1,7 @@
 {
   "name": "pseudo-dom",
   "description": "Mock the DOM on the server side for managing state and testing",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
   "author": "Joshua Heagle",
@@ -18,9 +18,9 @@
     "watch:test": "gulp watchTest"
   },
   "dependencies": {
-    "collect-your-stuff": "^2.1.0",
+    "collect-your-stuff": "^2.1.1",
     "core-js": "^3.50.0",
-    "si-funciona": "^2.6.0"
+    "si-funciona": "^2.6.1"
   },
   "devDependencies": {
     "js-build-tools": "^5.0.0",
