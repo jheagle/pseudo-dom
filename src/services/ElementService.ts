@@ -14,7 +14,8 @@ import { AttrService } from './AttrService'
 import { DOMTokenListService } from './DOMTokenListService'
 import { NamedNodeMapService } from './NamedNodeMapService'
 import getParentNodesFromAttribute from '../functions/getParentNodesFromAttribute'
-import { cloneObject, isEqual } from 'si-funciona'
+import cloneObject from 'si-funciona/dist/helpers/objects/cloneObject'
+import isEqual from 'si-funciona/dist/helpers/objects/isEqual'
 
 type attribute = { name: string, value: any }
 

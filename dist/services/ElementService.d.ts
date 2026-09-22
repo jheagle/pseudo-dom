@@ -50,6 +50,26 @@ export declare class ElementService extends NodeService implements Partial<Pseud
         parent?: PseudoNode | null;
         children?: Array<any>;
     });
+    /**
+     * The attributes with the values they have now: the ones which are also properties (className, id, style, ...) can
+     * have been changed through the property, which does not change the stored list.
+     * @returns {Array<{name: string, value: *}>}
+     */
+    private currentAttributes;
+    get nodeName(): string;
+    /**
+     * A copy of this element without its children: the same tag and attributes (the values which are objects, such as
+     * style, are copied too rather than shared), but not its parent or listeners.
+     * @returns {ElementService}
+     */
+    protected cloneShallow(): NodeService;
+    /**
+     * Elements are equal when they have the same tag and the same attributes (in any order), which is what isEqualNode
+     * checks before it compares the children.
+     * @param {NodeService} other The element to compare with
+     * @returns {boolean}
+     */
+    protected equalsShallow(other: NodeService): boolean;
     get tagName(): string;
     get nodeType(): number;
     get attributes(): PseudoNamedNodeMap;

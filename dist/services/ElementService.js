@@ -1,6 +1,7 @@
 'use strict'
 
 require('core-js/modules/esnext.iterator.constructor.js')
+require('core-js/modules/esnext.iterator.every.js')
 require('core-js/modules/esnext.iterator.find.js')
 require('core-js/modules/esnext.iterator.for-each.js')
 require('core-js/modules/esnext.iterator.map.js')
@@ -22,6 +23,8 @@ const AttrService_1 = require('./AttrService')
 const DOMTokenListService_1 = require('./DOMTokenListService')
 const NamedNodeMapService_1 = require('./NamedNodeMapService')
 const getParentNodesFromAttribute_1 = __importDefault(require('../functions/getParentNodesFromAttribute'))
+const cloneObject_1 = __importDefault(require('si-funciona/dist/helpers/objects/cloneObject'))
+const isEqual_1 = __importDefault(require('si-funciona/dist/helpers/objects/isEqual'))
 /**
  * Simulate the behaviour of the Element Class when there is no DOM available.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -86,6 +89,70 @@ class ElementService extends NodeService_1.NodeService {
     }
   }
 
+  /**
+   * The attributes with the values they have now: the ones which are also properties (className, id, style, ...) can
+   * have been changed through the property, which does not change the stored list.
+   * @returns {Array<{name: string, value: *}>}
+   */
+  currentAttributes () {
+    return this.attributeList.map(({
+      name,
+      value
+    }) => ({
+      name,
+      value: this.propertyAttributes.indexOf(name) >= 0 ? this[name] : value
+    }))
+  }
+
+  get nodeName () {
+    return this.tag
+  }
+
+  /**
+   * A copy of this element without its children: the same tag and attributes (the values which are objects, such as
+   * style, are copied too rather than shared), but not its parent or listeners.
+   * @returns {ElementService}
+   */
+  cloneShallow () {
+    const copy = new this.constructor({
+      tagName: this.tag
+    })
+    copy.attributeList.length = 0
+    this.currentAttributes().forEach(({
+      name,
+      value
+    }) => {
+      const copied = typeof value === 'object' && value !== null ? (0, cloneObject_1.default)(value) : value
+      copy.attributeList.push({
+        name,
+        value: copied
+      })
+      if (copy.propertyAttributes.indexOf(name) >= 0) {
+        copy[name] = copied
+      }
+    })
+    copy.ownerDocumentStore = this.ownerDocumentStore
+    return copy
+  }
+
+  /**
+   * Elements are equal when they have the same tag and the same attributes (in any order), which is what isEqualNode
+   * checks before it compares the children.
+   * @param {NodeService} other The element to compare with
+   * @returns {boolean}
+   */
+  equalsShallow (other) {
+    const mine = this.currentAttributes()
+    const theirs = other.currentAttributes()
+    return this.nodeName === other.nodeName && mine.length === theirs.length && mine.every(({
+      name,
+      value
+    }) => {
+      const match = theirs.find(attributeOfOther => attributeOfOther.name === name)
+      return typeof match !== 'undefined' && (0, isEqual_1.default)(value, match.value)
+    })
+  }
+
   get tagName () {
     return this.tag
   }
@@ -95,7 +162,7 @@ class ElementService extends NodeService_1.NodeService {
   }
 
   get attributes () {
-    return new NamedNodeMapService_1.NamedNodeMapService(this.attributeList.map(({
+    return new NamedNodeMapService_1.NamedNodeMapService(this.currentAttributes().map(({
       name,
       value
     }) => new AttrService_1.AttrService(name, String(value), this)))
@@ -193,7 +260,7 @@ class ElementService extends NodeService_1.NodeService {
    * @returns {string|null} The value, or null when there is no such attribute
    */
   getAttribute (attributeName) {
-    const found = this.attributeList.find(({
+    const found = this.currentAttributes().find(({
       name
     }) => name === attributeName)
     return found ? found.value : null

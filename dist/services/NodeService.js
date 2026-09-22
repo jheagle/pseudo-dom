@@ -1,5 +1,8 @@
 'use strict'
 
+require('core-js/modules/esnext.iterator.constructor.js')
+require('core-js/modules/esnext.iterator.every.js')
+require('core-js/modules/esnext.iterator.for-each.js')
 const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
   return mod && mod.__esModule
     ? mod
@@ -10,7 +13,7 @@ const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
 Object.defineProperty(exports, '__esModule', {
   value: true
 })
-exports.NodeService = void 0
+exports.CommentService = exports.TextService = exports.NodeService = void 0
 /**
  * @file Substitute for the DOM Node Class.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -35,8 +38,9 @@ class NodeService extends EventTargetService_1.default {
    */
   constructor () {
     super()
-    this.nodeValueStore = ''
-    this.textContentStore = ''
+    this.nodeValueStore = null
+    this.ownerDocumentStore = null
+    this.nodeId = NodeService.nextNodeId++
     this.nodeNameValue = ''
     this.children = (0, generateNodeList_1.default)()
     this.parent = null
@@ -56,7 +60,8 @@ class NodeService extends EventTargetService_1.default {
   }
 
   get isConnected () {
-    return !!this.parent
+    // Connected means the tree the node is in has a document at the top
+    return this.getRootNode().nodeType === NodeService.DOCUMENT_NODE
   }
 
   get lastChild () {
@@ -84,7 +89,11 @@ class NodeService extends EventTargetService_1.default {
   }
 
   get ownerDocument () {
-    return null
+    if (this.nodeType === NodeService.DOCUMENT_NODE) {
+      return null
+    }
+    const root = this.getRootNode()
+    return root.nodeType === NodeService.DOCUMENT_NODE ? root : this.ownerDocumentStore
   }
 
   get parentNode () {
@@ -100,11 +109,34 @@ class NodeService extends EventTargetService_1.default {
   }
 
   get textContent () {
-    return this.textContentStore
+    if (this.nodeType === NodeService.DOCUMENT_NODE || this.nodeType === NodeService.DOCUMENT_TYPE_NODE) {
+      return null
+    }
+    // The text of everything below, in order (comments and the like do not count)
+    let text = ''
+    Array.from(this.childNodes).forEach(child => {
+      if (child.nodeType === NodeService.TEXT_NODE) {
+        text += child.nodeValue
+      } else if (child.nodeType !== NodeService.COMMENT_NODE) {
+        text += child.textContent
+      }
+    })
+    return text
   }
 
   set textContent (text) {
-    this.textContentStore = text
+    if (this.nodeType === NodeService.DOCUMENT_NODE || this.nodeType === NodeService.DOCUMENT_TYPE_NODE) {
+      return
+    }
+    // All the children are replaced by a single text node (or none for an empty text)
+    while (this.firstChild) {
+      this.removeChild(this.firstChild)
+    }
+    if (text !== null && typeof text !== 'undefined' && String(text) !== '') {
+      const textNode = new TextService(String(text))
+      textNode.ownerDocumentStore = this.ownerDocument
+      this.appendChild(textNode)
+    }
   }
 
   /**
@@ -117,25 +149,98 @@ class NodeService extends EventTargetService_1.default {
   }
 
   /**
+   * Whether this kind of node can have children (text, comments and attributes cannot).
+   * @returns {boolean}
+   */
+  get acceptsChildren () {
+    return true
+  }
+
+  /**
+   * Make a copy of this node without its children, its parent or its listeners, which is what cloneNode starts from.
+   * Kinds of node which are made with arguments override this to give them.
+   * @returns {NodeService}
+   */
+  cloneShallow () {
+    const copy = new this.constructor()
+    copy.nodeValue = this.nodeValue
+    copy.ownerDocumentStore = this.ownerDocumentStore
+    return copy
+  }
+
+  /**
+   * Whether another node of the same type is equal to this one apart from its children, which isEqualNode compares
+   * afterwards. Kinds of node with more to compare (an element has attributes) override this.
+   * @param {NodeService} other The node to compare with
+   * @returns {boolean}
+   */
+  equalsShallow (other) {
+    return this.nodeName === other.nodeName && this.nodeValue === other.nodeValue
+  }
+
+  /**
    * Called each time a node has been inserted as a child of this node, so that nodes which need to react to children
    * (for example elements applying default events) can do so.
    * @param {NodeService} child The node which was inserted
    */
   childInserted (child) {}
   /**
-   * Not implemented yet.
-   * @throws {Error}
+   * Make a copy of this node (without its parent, and without its event listeners). With deep the children are copied
+   * too, all the way down.
+   * @param {boolean} [deep=false] Copy the children as well
+   * @returns {PseudoNode}
    */
   cloneNode (deep = false) {
-    throw new Error(`NodeService.cloneNode(${deep}) is not implemented yet.`)
+    const copy = this.cloneShallow()
+    if (deep) {
+      Array.from(this.childNodes).forEach(child => copy.appendChild(child.cloneNode(true)))
+    }
+    return copy
   }
 
   /**
-   * Not implemented yet.
-   * @throws {Error}
+   * Say where another node is in relation to this one, as the bits of NodeService.DOCUMENT_POSITION_*: 0 for this node
+   * itself, DISCONNECTED (with IMPLEMENTATION_SPECIFIC and a consistent PRECEDING or FOLLOWING) for a node in another tree,
+   * CONTAINS + PRECEDING when the other node is an ancestor, CONTAINED_BY + FOLLOWING when it is a descendant,
+   * otherwise PRECEDING or FOLLOWING by their order in the tree.
+   * @param {PseudoNode} otherNode The node to locate
+   * @returns {number}
    */
   compareDocumentPosition (otherNode) {
-    throw new Error('NodeService.compareDocumentPosition() is not implemented yet.')
+    if (otherNode === this) {
+      return 0
+    }
+    const pathFromRoot = node => {
+      const path = []
+      for (let current = node; current; current = current.parentNode) {
+        path.unshift(current)
+      }
+      return path
+    }
+    const mine = pathFromRoot(this)
+    const theirs = pathFromRoot(otherNode)
+    if (mine[0] !== theirs[0]) {
+      // Not in the same tree, so there is no real order: use a consistent one (the order the nodes were made in)
+      const before = otherNode.nodeId < this.nodeId ? NodeService.DOCUMENT_POSITION_PRECEDING : NodeService.DOCUMENT_POSITION_FOLLOWING
+      return NodeService.DOCUMENT_POSITION_DISCONNECTED | NodeService.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC | before
+    }
+    if (theirs.length < mine.length && theirs.every((node, index) => mine[index] === node)) {
+      return NodeService.DOCUMENT_POSITION_CONTAINS | NodeService.DOCUMENT_POSITION_PRECEDING
+    }
+    if (mine.length < theirs.length && mine.every((node, index) => theirs[index] === node)) {
+      return NodeService.DOCUMENT_POSITION_CONTAINED_BY | NodeService.DOCUMENT_POSITION_FOLLOWING
+    }
+    // The paths part ways at siblings: whichever comes first among them is first in the tree
+    let depth = 0
+    while (mine[depth] === theirs[depth]) {
+      ++depth
+    }
+    for (let sibling = mine[depth].nextSibling; sibling; sibling = sibling.nextSibling) {
+      if (sibling === theirs[depth]) {
+        return NodeService.DOCUMENT_POSITION_FOLLOWING
+      }
+    }
+    return NodeService.DOCUMENT_POSITION_PRECEDING
   }
 
   /**
@@ -173,6 +278,9 @@ class NodeService extends EventTargetService_1.default {
    * @throws {Error} When the reference node is not a child of this node, or the new node is this node or contains it
    */
   insertBefore (newNode, referenceNode = null) {
+    if (!this.acceptsChildren) {
+      throw new Error('This kind of node cannot have children.')
+    }
     if (referenceNode !== null && referenceNode.parentNode !== this) {
       throw new Error('The node before which the new node is to be inserted is not a child of this node.')
     }
@@ -210,11 +318,18 @@ class NodeService extends EventTargetService_1.default {
   }
 
   /**
-   * Not implemented yet.
-   * @throws {Error}
+   * Whether another node is the same as this one, by what they hold: the same type, name and value (an element also
+   * needs the same attributes), and children which are equal in the same order.
+   * @param {PseudoNode|null} otherNode The node to compare with
+   * @returns {boolean}
    */
   isEqualNode (otherNode) {
-    throw new Error('NodeService.isEqualNode() is not implemented yet.')
+    if (!otherNode || otherNode.nodeType !== this.nodeType || !this.equalsShallow(otherNode)) {
+      return false
+    }
+    const mine = Array.from(this.childNodes)
+    const theirs = Array.from(otherNode.childNodes)
+    return mine.length === theirs.length && mine.every((child, index) => child.isEqualNode(theirs[index]))
   }
 
   isSameNode (otherNode) {
@@ -229,7 +344,34 @@ class NodeService extends EventTargetService_1.default {
     return null
   }
 
-  normalize () {}
+  /**
+   * Tidy the text below this node: neighbouring text nodes are joined into one and empty text nodes are removed.
+   */
+  normalize () {
+    let child = this.firstChild
+    while (child) {
+      if (child.nodeType === NodeService.TEXT_NODE) {
+        // Join the text nodes which follow into this one, and drop it when it is empty
+        let text = child.nodeValue
+        let following = child.nextSibling
+        while (following && following.nodeType === NodeService.TEXT_NODE) {
+          text += following.nodeValue
+          const after = following.nextSibling
+          this.removeChild(following)
+          following = after
+        }
+        child.nodeValue = text
+        if (text === '') {
+          this.removeChild(child)
+        }
+        child = following
+      } else {
+        child.normalize()
+        child = child.nextSibling
+      }
+    }
+  }
+
   /**
    * Remove a child from this node, it no longer has a parent or siblings afterwards.
    * @param {PseudoNode} childElement The child node to remove
@@ -285,3 +427,157 @@ NodeService.DOCUMENT_NODE = 9
 NodeService.DOCUMENT_TYPE_NODE = 10
 NodeService.DOCUMENT_FRAGMENT_NODE = 11
 NodeService.NOTATION_NODE = 12
+NodeService.DOCUMENT_POSITION_DISCONNECTED = 1
+NodeService.DOCUMENT_POSITION_PRECEDING = 2
+NodeService.DOCUMENT_POSITION_FOLLOWING = 4
+NodeService.DOCUMENT_POSITION_CONTAINS = 8
+NodeService.DOCUMENT_POSITION_CONTAINED_BY = 16
+NodeService.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC = 32
+NodeService.nextNodeId = 1
+/**
+ * Simulate the behaviour of the Text Class when there is no DOM available: the text in an element.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @class
+ * @augments NodeService
+ * @property {string} data - The text
+ * @property {number} length - How many characters there are
+ * @property {string} wholeText - The text of this node and of the text nodes next to it
+ */
+class TextService extends NodeService {
+  /**
+   * @param {string} [data=''] The text
+   * @constructor
+   */
+  constructor (data = '') {
+    super()
+    this.nodeValue = String(data)
+  }
+
+  get acceptsChildren () {
+    return false
+  }
+
+  get nodeName () {
+    return '#text'
+  }
+
+  get nodeType () {
+    return NodeService.TEXT_NODE
+  }
+
+  get data () {
+    return this.nodeValue
+  }
+
+  set data (data) {
+    this.nodeValue = String(data)
+  }
+
+  get length () {
+    return this.data.length
+  }
+
+  get textContent () {
+    return this.data
+  }
+
+  set textContent (text) {
+    this.data = text === null ? '' : String(text)
+  }
+
+  get wholeText () {
+    let first = this
+    while (first.previousSibling && first.previousSibling.nodeType === NodeService.TEXT_NODE) {
+      first = first.previousSibling
+    }
+    let text = ''
+    for (let current = first; current && current.nodeType === NodeService.TEXT_NODE; current = current.nextSibling) {
+      text += current.nodeValue
+    }
+    return text
+  }
+
+  /**
+   * Break this text node in two at a position: this node keeps the text before it and a new node with the rest is put
+   * after this one.
+   * @param {number} offset How many characters stay in this node
+   * @returns {TextService} The new node
+   * @throws {Error} When the offset is beyond the end of the text
+   */
+  splitText (offset) {
+    if (offset < 0 || offset > this.length) {
+      throw new Error('The offset is beyond the end of the text.')
+    }
+    const rest = new TextService(this.data.slice(offset))
+    rest.ownerDocumentStore = this.ownerDocumentStore
+    this.data = this.data.slice(0, offset)
+    if (this.parentNode) {
+      this.parentNode.insertBefore(rest, this.nextSibling)
+    }
+    return rest
+  }
+
+  cloneShallow () {
+    const copy = new TextService(this.data)
+    copy.ownerDocumentStore = this.ownerDocumentStore
+    return copy
+  }
+}
+exports.TextService = TextService
+/**
+ * Simulate the behaviour of the Comment Class when there is no DOM available: a note in the markup which is not shown.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @class
+ * @augments NodeService
+ * @property {string} data - The comment
+ * @property {number} length - How many characters there are
+ */
+class CommentService extends NodeService {
+  /**
+   * @param {string} [data=''] The comment
+   * @constructor
+   */
+  constructor (data = '') {
+    super()
+    this.nodeValue = String(data)
+  }
+
+  get acceptsChildren () {
+    return false
+  }
+
+  get nodeName () {
+    return '#comment'
+  }
+
+  get nodeType () {
+    return NodeService.COMMENT_NODE
+  }
+
+  get data () {
+    return this.nodeValue
+  }
+
+  set data (data) {
+    this.nodeValue = String(data)
+  }
+
+  get length () {
+    return this.data.length
+  }
+
+  get textContent () {
+    return this.data
+  }
+
+  set textContent (text) {
+    this.data = text === null ? '' : String(text)
+  }
+
+  cloneShallow () {
+    const copy = new CommentService(this.data)
+    copy.ownerDocumentStore = this.ownerDocumentStore
+    return copy
+  }
+}
+exports.CommentService = CommentService

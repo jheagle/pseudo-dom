@@ -29,7 +29,16 @@ are `PseudoUIEvent`, `PseudoMouseEvent`, `PseudoPointerEvent`, `PseudoKeyboardEv
 tree), and `simulate.click(element)` / `simulate.keyPress(element, key)` send what a user's action sends (pointerdown,
 mousedown, the focus moving, pointerup, mouseup, click; keydown, keyup), all trusted.
 
-Not implemented yet (these throw a "not implemented" error or are missing): `cloneNode`, `compareDocumentPosition`, `isEqualNode`, `querySelector` /
+Nodes can be copied and compared: `cloneNode(deep)` copies an element with its attributes (objects such as `style` are
+copied too, not shared) and, when deep, everything below it, without the parent or the event listeners; `isEqualNode`
+compares two nodes by what they hold (tag, attributes in any order, text and children in order);
+`compareDocumentPosition` says where another node is (`NodeService.DOCUMENT_POSITION_*`); `isConnected` is true when the
+tree has a document at the top and `ownerDocument` says which one made the node; `normalize` joins neighbouring text
+nodes. There are text and comment nodes (`PseudoText`, `PseudoComment`) and `textContent` works like the DOM's (the text
+of everything below, and setting it replaces the children with a text node); the document makes them with
+`createTextNode`, `createComment` and `createDocumentFragment`.
+
+Not implemented yet (these throw a "not implemented" error or are missing): `querySelector` /
 `querySelectorAll`, `innerHTML` / `outerHTML` parsing, and most of the rest of the Element and Document APIs. The API
 will change before 1.0.
 ## Modules
@@ -55,6 +64,12 @@ interface (the mouse, the keyboard, focus and input).</p>
 </dd>
 <dt><a href="#NodeService">NodeService</a> ⇐ <code>PseudoEventTarget</code></dt>
 <dd><p>Simulate the behaviour of the Node Class when there is no DOM available.</p>
+</dd>
+<dt><a href="#TextService">TextService</a> ⇐ <code><a href="#NodeService">NodeService</a></code></dt>
+<dd><p>Simulate the behaviour of the Text Class when there is no DOM available: the text in an element.</p>
+</dd>
+<dt><a href="#CommentService">CommentService</a> ⇐ <code><a href="#NodeService">NodeService</a></code></dt>
+<dd><p>Simulate the behaviour of the Comment Class when there is no DOM available: a note in the markup which is not shown.</p>
 </dd>
 <dt><a href="#NamedNodeMapService">NamedNodeMapService</a></dt>
 <dd><p>Simulate the behaviour of the NamedNodeMap Class when there is no DOM available.</p>
@@ -418,16 +433,26 @@ Simulate the behaviour of the Node Class when there is no DOM available.
 
 
 * [NodeService](#NodeService) ⇐ <code>PseudoEventTarget</code>
+    * [.acceptsChildren](#NodeService+acceptsChildren) ⇒ <code>boolean</code>
     * [.appendChild(childNode)](#NodeService+appendChild) ⇒ <code>PseudoNode</code>
+    * [.cloneShallow()](#NodeService+cloneShallow) ⇒ [<code>NodeService</code>](#NodeService)
+    * [.equalsShallow(other)](#NodeService+equalsShallow) ⇒ <code>boolean</code>
     * [.childInserted(child)](#NodeService+childInserted)
-    * [.cloneNode()](#NodeService+cloneNode)
-    * [.compareDocumentPosition()](#NodeService+compareDocumentPosition)
+    * [.cloneNode([deep])](#NodeService+cloneNode) ⇒ <code>PseudoNode</code>
+    * [.compareDocumentPosition(otherNode)](#NodeService+compareDocumentPosition) ⇒ <code>number</code>
     * [.contains(otherNode)](#NodeService+contains) ⇒ <code>boolean</code>
     * [.insertBefore(newNode, [referenceNode])](#NodeService+insertBefore) ⇒ <code>PseudoNode</code>
-    * [.isEqualNode()](#NodeService+isEqualNode)
+    * [.isEqualNode(otherNode)](#NodeService+isEqualNode) ⇒ <code>boolean</code>
+    * [.normalize()](#NodeService+normalize)
     * [.removeChild(childElement)](#NodeService+removeChild) ⇒ <code>PseudoNode</code>
     * [.replaceChild(newChild, oldChild)](#NodeService+replaceChild) ⇒ <code>PseudoNode</code>
 
+<a name="NodeService+acceptsChildren"></a>
+
+### nodeService.acceptsChildren ⇒ <code>boolean</code>
+Whether this kind of node can have children (text, comments and attributes cannot).
+
+**Kind**: instance property of [<code>NodeService</code>](#NodeService)  
 <a name="NodeService+appendChild"></a>
 
 ### nodeService.appendChild(childNode) ⇒ <code>PseudoNode</code>
@@ -439,6 +464,25 @@ Add a node as the last child of this node (a node which is already in a tree is 
 | Param | Type | Description |
 | --- | --- | --- |
 | childNode | <code>PseudoNode</code> | The node to add |
+
+<a name="NodeService+cloneShallow"></a>
+
+### nodeService.cloneShallow() ⇒ [<code>NodeService</code>](#NodeService)
+Make a copy of this node without its children, its parent or its listeners, which is what cloneNode starts from.
+Kinds of node which are made with arguments override this to give them.
+
+**Kind**: instance method of [<code>NodeService</code>](#NodeService)  
+<a name="NodeService+equalsShallow"></a>
+
+### nodeService.equalsShallow(other) ⇒ <code>boolean</code>
+Whether another node of the same type is equal to this one apart from its children, which isEqualNode compares
+afterwards. Kinds of node with more to compare (an element has attributes) override this.
+
+**Kind**: instance method of [<code>NodeService</code>](#NodeService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| other | [<code>NodeService</code>](#NodeService) | The node to compare with |
 
 <a name="NodeService+childInserted"></a>
 
@@ -454,23 +498,29 @@ Called each time a node has been inserted as a child of this node, so that nodes
 
 <a name="NodeService+cloneNode"></a>
 
-### nodeService.cloneNode()
-Not implemented yet.
+### nodeService.cloneNode([deep]) ⇒ <code>PseudoNode</code>
+Make a copy of this node (without its parent, and without its event listeners). With deep the children are copied
+too, all the way down.
 
 **Kind**: instance method of [<code>NodeService</code>](#NodeService)  
-**Throws**:
 
-- <code>Error</code> 
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [deep] | <code>boolean</code> | <code>false</code> | Copy the children as well |
 
 <a name="NodeService+compareDocumentPosition"></a>
 
-### nodeService.compareDocumentPosition()
-Not implemented yet.
+### nodeService.compareDocumentPosition(otherNode) ⇒ <code>number</code>
+Say where another node is in relation to this one, as the bits of NodeService.DOCUMENT_POSITION_*: 0 for this node
+itself, DISCONNECTED (with IMPLEMENTATION_SPECIFIC and a consistent PRECEDING or FOLLOWING) for a node in another tree,
+CONTAINS + PRECEDING when the other node is an ancestor, CONTAINED_BY + FOLLOWING when it is a descendant,
+otherwise PRECEDING or FOLLOWING by their order in the tree.
 
 **Kind**: instance method of [<code>NodeService</code>](#NodeService)  
-**Throws**:
 
-- <code>Error</code> 
+| Param | Type | Description |
+| --- | --- | --- |
+| otherNode | <code>PseudoNode</code> | The node to locate |
 
 <a name="NodeService+contains"></a>
 
@@ -503,14 +553,22 @@ already in a tree is moved, and the children of a document fragment are moved in
 
 <a name="NodeService+isEqualNode"></a>
 
-### nodeService.isEqualNode()
-Not implemented yet.
+### nodeService.isEqualNode(otherNode) ⇒ <code>boolean</code>
+Whether another node is the same as this one, by what they hold: the same type, name and value (an element also
+needs the same attributes), and children which are equal in the same order.
 
 **Kind**: instance method of [<code>NodeService</code>](#NodeService)  
-**Throws**:
 
-- <code>Error</code> 
+| Param | Type | Description |
+| --- | --- | --- |
+| otherNode | <code>PseudoNode</code> \| <code>null</code> | The node to compare with |
 
+<a name="NodeService+normalize"></a>
+
+### nodeService.normalize()
+Tidy the text below this node: neighbouring text nodes are joined into one and empty text nodes are removed.
+
+**Kind**: instance method of [<code>NodeService</code>](#NodeService)  
 <a name="NodeService+removeChild"></a>
 
 ### nodeService.removeChild(childElement) ⇒ <code>PseudoNode</code>
@@ -533,6 +591,441 @@ Remove a child from this node, it no longer has a parent or siblings afterwards.
 Replace a child of this node with another node (which is moved if it is already in a tree).
 
 **Kind**: instance method of [<code>NodeService</code>](#NodeService)  
+**Returns**: <code>PseudoNode</code> - The replaced node  
+**Throws**:
+
+- <code>Error</code> When the old node is not a child of this node
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| newChild | <code>PseudoNode</code> | The node which takes the place |
+| oldChild | <code>PseudoNode</code> | The child of this node to replace |
+
+<a name="TextService"></a>
+
+## TextService ⇐ [<code>NodeService</code>](#NodeService)
+Simulate the behaviour of the Text Class when there is no DOM available: the text in an element.
+
+**Kind**: global class  
+**Extends**: [<code>NodeService</code>](#NodeService)  
+**Author**: Joshua Heagle <joshuaheagle@gmail.com>  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| data | <code>string</code> | The text |
+| length | <code>number</code> | How many characters there are |
+| wholeText | <code>string</code> | The text of this node and of the text nodes next to it |
+
+
+* [TextService](#TextService) ⇐ [<code>NodeService</code>](#NodeService)
+    * [new TextService([data])](#new_TextService_new)
+    * [.acceptsChildren](#NodeService+acceptsChildren) ⇒ <code>boolean</code>
+    * [.splitText(offset)](#TextService+splitText) ⇒ [<code>TextService</code>](#TextService)
+    * [.appendChild(childNode)](#NodeService+appendChild) ⇒ <code>PseudoNode</code>
+    * [.cloneShallow()](#NodeService+cloneShallow) ⇒ [<code>NodeService</code>](#NodeService)
+    * [.equalsShallow(other)](#NodeService+equalsShallow) ⇒ <code>boolean</code>
+    * [.childInserted(child)](#NodeService+childInserted)
+    * [.cloneNode([deep])](#NodeService+cloneNode) ⇒ <code>PseudoNode</code>
+    * [.compareDocumentPosition(otherNode)](#NodeService+compareDocumentPosition) ⇒ <code>number</code>
+    * [.contains(otherNode)](#NodeService+contains) ⇒ <code>boolean</code>
+    * [.insertBefore(newNode, [referenceNode])](#NodeService+insertBefore) ⇒ <code>PseudoNode</code>
+    * [.isEqualNode(otherNode)](#NodeService+isEqualNode) ⇒ <code>boolean</code>
+    * [.normalize()](#NodeService+normalize)
+    * [.removeChild(childElement)](#NodeService+removeChild) ⇒ <code>PseudoNode</code>
+    * [.replaceChild(newChild, oldChild)](#NodeService+replaceChild) ⇒ <code>PseudoNode</code>
+
+<a name="new_TextService_new"></a>
+
+### new TextService([data])
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [data] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | The text |
+
+<a name="NodeService+acceptsChildren"></a>
+
+### textService.acceptsChildren ⇒ <code>boolean</code>
+Whether this kind of node can have children (text, comments and attributes cannot).
+
+**Kind**: instance property of [<code>TextService</code>](#TextService)  
+**Overrides**: [<code>acceptsChildren</code>](#NodeService+acceptsChildren)  
+<a name="TextService+splitText"></a>
+
+### textService.splitText(offset) ⇒ [<code>TextService</code>](#TextService)
+Break this text node in two at a position: this node keeps the text before it and a new node with the rest is put
+after this one.
+
+**Kind**: instance method of [<code>TextService</code>](#TextService)  
+**Returns**: [<code>TextService</code>](#TextService) - The new node  
+**Throws**:
+
+- <code>Error</code> When the offset is beyond the end of the text
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| offset | <code>number</code> | How many characters stay in this node |
+
+<a name="NodeService+appendChild"></a>
+
+### textService.appendChild(childNode) ⇒ <code>PseudoNode</code>
+Add a node as the last child of this node (a node which is already in a tree is moved).
+
+**Kind**: instance method of [<code>TextService</code>](#TextService)  
+**Overrides**: [<code>appendChild</code>](#NodeService+appendChild)  
+**Returns**: <code>PseudoNode</code> - The added node  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| childNode | <code>PseudoNode</code> | The node to add |
+
+<a name="NodeService+cloneShallow"></a>
+
+### textService.cloneShallow() ⇒ [<code>NodeService</code>](#NodeService)
+Make a copy of this node without its children, its parent or its listeners, which is what cloneNode starts from.
+Kinds of node which are made with arguments override this to give them.
+
+**Kind**: instance method of [<code>TextService</code>](#TextService)  
+**Overrides**: [<code>cloneShallow</code>](#NodeService+cloneShallow)  
+<a name="NodeService+equalsShallow"></a>
+
+### textService.equalsShallow(other) ⇒ <code>boolean</code>
+Whether another node of the same type is equal to this one apart from its children, which isEqualNode compares
+afterwards. Kinds of node with more to compare (an element has attributes) override this.
+
+**Kind**: instance method of [<code>TextService</code>](#TextService)  
+**Overrides**: [<code>equalsShallow</code>](#NodeService+equalsShallow)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| other | [<code>NodeService</code>](#NodeService) | The node to compare with |
+
+<a name="NodeService+childInserted"></a>
+
+### textService.childInserted(child)
+Called each time a node has been inserted as a child of this node, so that nodes which need to react to children
+(for example elements applying default events) can do so.
+
+**Kind**: instance method of [<code>TextService</code>](#TextService)  
+**Overrides**: [<code>childInserted</code>](#NodeService+childInserted)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| child | [<code>NodeService</code>](#NodeService) | The node which was inserted |
+
+<a name="NodeService+cloneNode"></a>
+
+### textService.cloneNode([deep]) ⇒ <code>PseudoNode</code>
+Make a copy of this node (without its parent, and without its event listeners). With deep the children are copied
+too, all the way down.
+
+**Kind**: instance method of [<code>TextService</code>](#TextService)  
+**Overrides**: [<code>cloneNode</code>](#NodeService+cloneNode)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [deep] | <code>boolean</code> | <code>false</code> | Copy the children as well |
+
+<a name="NodeService+compareDocumentPosition"></a>
+
+### textService.compareDocumentPosition(otherNode) ⇒ <code>number</code>
+Say where another node is in relation to this one, as the bits of NodeService.DOCUMENT_POSITION_*: 0 for this node
+itself, DISCONNECTED (with IMPLEMENTATION_SPECIFIC and a consistent PRECEDING or FOLLOWING) for a node in another tree,
+CONTAINS + PRECEDING when the other node is an ancestor, CONTAINED_BY + FOLLOWING when it is a descendant,
+otherwise PRECEDING or FOLLOWING by their order in the tree.
+
+**Kind**: instance method of [<code>TextService</code>](#TextService)  
+**Overrides**: [<code>compareDocumentPosition</code>](#NodeService+compareDocumentPosition)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| otherNode | <code>PseudoNode</code> | The node to locate |
+
+<a name="NodeService+contains"></a>
+
+### textService.contains(otherNode) ⇒ <code>boolean</code>
+Check whether a node is this node or one of its descendants.
+
+**Kind**: instance method of [<code>TextService</code>](#TextService)  
+**Overrides**: [<code>contains</code>](#NodeService+contains)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| otherNode | <code>PseudoNode</code> \| <code>null</code> | The node to look for |
+
+<a name="NodeService+insertBefore"></a>
+
+### textService.insertBefore(newNode, [referenceNode]) ⇒ <code>PseudoNode</code>
+Insert a node as a child of this node, before the given child (or at the end when there is none). A node which is
+already in a tree is moved, and the children of a document fragment are moved in order.
+
+**Kind**: instance method of [<code>TextService</code>](#TextService)  
+**Overrides**: [<code>insertBefore</code>](#NodeService+insertBefore)  
+**Returns**: <code>PseudoNode</code> - The inserted node  
+**Throws**:
+
+- <code>Error</code> When the reference node is not a child of this node, or the new node is this node or contains it
+
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| newNode | <code>PseudoNode</code> |  | The node to insert |
+| [referenceNode] | <code>PseudoNode</code> \| <code>null</code> | <code></code> | The child of this node to insert before, or null to insert at the end |
+
+<a name="NodeService+isEqualNode"></a>
+
+### textService.isEqualNode(otherNode) ⇒ <code>boolean</code>
+Whether another node is the same as this one, by what they hold: the same type, name and value (an element also
+needs the same attributes), and children which are equal in the same order.
+
+**Kind**: instance method of [<code>TextService</code>](#TextService)  
+**Overrides**: [<code>isEqualNode</code>](#NodeService+isEqualNode)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| otherNode | <code>PseudoNode</code> \| <code>null</code> | The node to compare with |
+
+<a name="NodeService+normalize"></a>
+
+### textService.normalize()
+Tidy the text below this node: neighbouring text nodes are joined into one and empty text nodes are removed.
+
+**Kind**: instance method of [<code>TextService</code>](#TextService)  
+**Overrides**: [<code>normalize</code>](#NodeService+normalize)  
+<a name="NodeService+removeChild"></a>
+
+### textService.removeChild(childElement) ⇒ <code>PseudoNode</code>
+Remove a child from this node, it no longer has a parent or siblings afterwards.
+
+**Kind**: instance method of [<code>TextService</code>](#TextService)  
+**Overrides**: [<code>removeChild</code>](#NodeService+removeChild)  
+**Returns**: <code>PseudoNode</code> - The removed node  
+**Throws**:
+
+- <code>Error</code> When the node is not a child of this node
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| childElement | <code>PseudoNode</code> | The child node to remove |
+
+<a name="NodeService+replaceChild"></a>
+
+### textService.replaceChild(newChild, oldChild) ⇒ <code>PseudoNode</code>
+Replace a child of this node with another node (which is moved if it is already in a tree).
+
+**Kind**: instance method of [<code>TextService</code>](#TextService)  
+**Overrides**: [<code>replaceChild</code>](#NodeService+replaceChild)  
+**Returns**: <code>PseudoNode</code> - The replaced node  
+**Throws**:
+
+- <code>Error</code> When the old node is not a child of this node
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| newChild | <code>PseudoNode</code> | The node which takes the place |
+| oldChild | <code>PseudoNode</code> | The child of this node to replace |
+
+<a name="CommentService"></a>
+
+## CommentService ⇐ [<code>NodeService</code>](#NodeService)
+Simulate the behaviour of the Comment Class when there is no DOM available: a note in the markup which is not shown.
+
+**Kind**: global class  
+**Extends**: [<code>NodeService</code>](#NodeService)  
+**Author**: Joshua Heagle <joshuaheagle@gmail.com>  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| data | <code>string</code> | The comment |
+| length | <code>number</code> | How many characters there are |
+
+
+* [CommentService](#CommentService) ⇐ [<code>NodeService</code>](#NodeService)
+    * [new CommentService([data])](#new_CommentService_new)
+    * [.acceptsChildren](#NodeService+acceptsChildren) ⇒ <code>boolean</code>
+    * [.appendChild(childNode)](#NodeService+appendChild) ⇒ <code>PseudoNode</code>
+    * [.cloneShallow()](#NodeService+cloneShallow) ⇒ [<code>NodeService</code>](#NodeService)
+    * [.equalsShallow(other)](#NodeService+equalsShallow) ⇒ <code>boolean</code>
+    * [.childInserted(child)](#NodeService+childInserted)
+    * [.cloneNode([deep])](#NodeService+cloneNode) ⇒ <code>PseudoNode</code>
+    * [.compareDocumentPosition(otherNode)](#NodeService+compareDocumentPosition) ⇒ <code>number</code>
+    * [.contains(otherNode)](#NodeService+contains) ⇒ <code>boolean</code>
+    * [.insertBefore(newNode, [referenceNode])](#NodeService+insertBefore) ⇒ <code>PseudoNode</code>
+    * [.isEqualNode(otherNode)](#NodeService+isEqualNode) ⇒ <code>boolean</code>
+    * [.normalize()](#NodeService+normalize)
+    * [.removeChild(childElement)](#NodeService+removeChild) ⇒ <code>PseudoNode</code>
+    * [.replaceChild(newChild, oldChild)](#NodeService+replaceChild) ⇒ <code>PseudoNode</code>
+
+<a name="new_CommentService_new"></a>
+
+### new CommentService([data])
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [data] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | The comment |
+
+<a name="NodeService+acceptsChildren"></a>
+
+### commentService.acceptsChildren ⇒ <code>boolean</code>
+Whether this kind of node can have children (text, comments and attributes cannot).
+
+**Kind**: instance property of [<code>CommentService</code>](#CommentService)  
+**Overrides**: [<code>acceptsChildren</code>](#NodeService+acceptsChildren)  
+<a name="NodeService+appendChild"></a>
+
+### commentService.appendChild(childNode) ⇒ <code>PseudoNode</code>
+Add a node as the last child of this node (a node which is already in a tree is moved).
+
+**Kind**: instance method of [<code>CommentService</code>](#CommentService)  
+**Overrides**: [<code>appendChild</code>](#NodeService+appendChild)  
+**Returns**: <code>PseudoNode</code> - The added node  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| childNode | <code>PseudoNode</code> | The node to add |
+
+<a name="NodeService+cloneShallow"></a>
+
+### commentService.cloneShallow() ⇒ [<code>NodeService</code>](#NodeService)
+Make a copy of this node without its children, its parent or its listeners, which is what cloneNode starts from.
+Kinds of node which are made with arguments override this to give them.
+
+**Kind**: instance method of [<code>CommentService</code>](#CommentService)  
+**Overrides**: [<code>cloneShallow</code>](#NodeService+cloneShallow)  
+<a name="NodeService+equalsShallow"></a>
+
+### commentService.equalsShallow(other) ⇒ <code>boolean</code>
+Whether another node of the same type is equal to this one apart from its children, which isEqualNode compares
+afterwards. Kinds of node with more to compare (an element has attributes) override this.
+
+**Kind**: instance method of [<code>CommentService</code>](#CommentService)  
+**Overrides**: [<code>equalsShallow</code>](#NodeService+equalsShallow)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| other | [<code>NodeService</code>](#NodeService) | The node to compare with |
+
+<a name="NodeService+childInserted"></a>
+
+### commentService.childInserted(child)
+Called each time a node has been inserted as a child of this node, so that nodes which need to react to children
+(for example elements applying default events) can do so.
+
+**Kind**: instance method of [<code>CommentService</code>](#CommentService)  
+**Overrides**: [<code>childInserted</code>](#NodeService+childInserted)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| child | [<code>NodeService</code>](#NodeService) | The node which was inserted |
+
+<a name="NodeService+cloneNode"></a>
+
+### commentService.cloneNode([deep]) ⇒ <code>PseudoNode</code>
+Make a copy of this node (without its parent, and without its event listeners). With deep the children are copied
+too, all the way down.
+
+**Kind**: instance method of [<code>CommentService</code>](#CommentService)  
+**Overrides**: [<code>cloneNode</code>](#NodeService+cloneNode)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [deep] | <code>boolean</code> | <code>false</code> | Copy the children as well |
+
+<a name="NodeService+compareDocumentPosition"></a>
+
+### commentService.compareDocumentPosition(otherNode) ⇒ <code>number</code>
+Say where another node is in relation to this one, as the bits of NodeService.DOCUMENT_POSITION_*: 0 for this node
+itself, DISCONNECTED (with IMPLEMENTATION_SPECIFIC and a consistent PRECEDING or FOLLOWING) for a node in another tree,
+CONTAINS + PRECEDING when the other node is an ancestor, CONTAINED_BY + FOLLOWING when it is a descendant,
+otherwise PRECEDING or FOLLOWING by their order in the tree.
+
+**Kind**: instance method of [<code>CommentService</code>](#CommentService)  
+**Overrides**: [<code>compareDocumentPosition</code>](#NodeService+compareDocumentPosition)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| otherNode | <code>PseudoNode</code> | The node to locate |
+
+<a name="NodeService+contains"></a>
+
+### commentService.contains(otherNode) ⇒ <code>boolean</code>
+Check whether a node is this node or one of its descendants.
+
+**Kind**: instance method of [<code>CommentService</code>](#CommentService)  
+**Overrides**: [<code>contains</code>](#NodeService+contains)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| otherNode | <code>PseudoNode</code> \| <code>null</code> | The node to look for |
+
+<a name="NodeService+insertBefore"></a>
+
+### commentService.insertBefore(newNode, [referenceNode]) ⇒ <code>PseudoNode</code>
+Insert a node as a child of this node, before the given child (or at the end when there is none). A node which is
+already in a tree is moved, and the children of a document fragment are moved in order.
+
+**Kind**: instance method of [<code>CommentService</code>](#CommentService)  
+**Overrides**: [<code>insertBefore</code>](#NodeService+insertBefore)  
+**Returns**: <code>PseudoNode</code> - The inserted node  
+**Throws**:
+
+- <code>Error</code> When the reference node is not a child of this node, or the new node is this node or contains it
+
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| newNode | <code>PseudoNode</code> |  | The node to insert |
+| [referenceNode] | <code>PseudoNode</code> \| <code>null</code> | <code></code> | The child of this node to insert before, or null to insert at the end |
+
+<a name="NodeService+isEqualNode"></a>
+
+### commentService.isEqualNode(otherNode) ⇒ <code>boolean</code>
+Whether another node is the same as this one, by what they hold: the same type, name and value (an element also
+needs the same attributes), and children which are equal in the same order.
+
+**Kind**: instance method of [<code>CommentService</code>](#CommentService)  
+**Overrides**: [<code>isEqualNode</code>](#NodeService+isEqualNode)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| otherNode | <code>PseudoNode</code> \| <code>null</code> | The node to compare with |
+
+<a name="NodeService+normalize"></a>
+
+### commentService.normalize()
+Tidy the text below this node: neighbouring text nodes are joined into one and empty text nodes are removed.
+
+**Kind**: instance method of [<code>CommentService</code>](#CommentService)  
+**Overrides**: [<code>normalize</code>](#NodeService+normalize)  
+<a name="NodeService+removeChild"></a>
+
+### commentService.removeChild(childElement) ⇒ <code>PseudoNode</code>
+Remove a child from this node, it no longer has a parent or siblings afterwards.
+
+**Kind**: instance method of [<code>CommentService</code>](#CommentService)  
+**Overrides**: [<code>removeChild</code>](#NodeService+removeChild)  
+**Returns**: <code>PseudoNode</code> - The removed node  
+**Throws**:
+
+- <code>Error</code> When the node is not a child of this node
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| childElement | <code>PseudoNode</code> | The child node to remove |
+
+<a name="NodeService+replaceChild"></a>
+
+### commentService.replaceChild(newChild, oldChild) ⇒ <code>PseudoNode</code>
+Replace a child of this node with another node (which is moved if it is already in a tree).
+
+**Kind**: instance method of [<code>CommentService</code>](#CommentService)  
+**Overrides**: [<code>replaceChild</code>](#NodeService+replaceChild)  
 **Returns**: <code>PseudoNode</code> - The replaced node  
 **Throws**:
 
@@ -1173,6 +1666,9 @@ Simulate the behaviour of the Element Class when there is no DOM available.
 
 * [ElementService](#ElementService) ⇐ <code>PseudoNode</code>
     * [new ElementService([settings])](#new_ElementService_new)
+    * [.currentAttributes()](#ElementService+currentAttributes) ⇒ <code>Array.&lt;{name: string, value: \*}&gt;</code>
+    * [.cloneShallow()](#ElementService+cloneShallow) ⇒ [<code>ElementService</code>](#ElementService)
+    * [.equalsShallow(other)](#ElementService+equalsShallow) ⇒ <code>boolean</code>
     * [.applyDefaultEvent()](#ElementService+applyDefaultEvent) ⇒ <code>function</code>
     * [.childInserted(child)](#ElementService+childInserted)
     * [.hasAttribute(attributeName)](#ElementService+hasAttribute) ⇒ <code>boolean</code>
@@ -1191,6 +1687,32 @@ Simulate the behaviour of the Element Class when there is no DOM available.
 | [settings.attributes] | <code>Array.&lt;{name: string, value: \*}&gt;</code> | <code>[]</code> | The attributes (also assigned as properties) to start with |
 | [settings.parent] | <code>PseudoNode</code> \| <code>null</code> | <code></code> | The node to add this element to as its last child |
 | [settings.children] | <code>Array.&lt;PseudoNode&gt;</code> | <code>[]</code> | The nodes to start as children |
+
+<a name="ElementService+currentAttributes"></a>
+
+### elementService.currentAttributes() ⇒ <code>Array.&lt;{name: string, value: \*}&gt;</code>
+The attributes with the values they have now: the ones which are also properties (className, id, style, ...) can
+have been changed through the property, which does not change the stored list.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+<a name="ElementService+cloneShallow"></a>
+
+### elementService.cloneShallow() ⇒ [<code>ElementService</code>](#ElementService)
+A copy of this element without its children: the same tag and attributes (the values which are objects, such as
+style, are copied too rather than shared), but not its parent or listeners.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+<a name="ElementService+equalsShallow"></a>
+
+### elementService.equalsShallow(other) ⇒ <code>boolean</code>
+Elements are equal when they have the same tag and the same attributes (in any order), which is what isEqualNode
+checks before it compares the children.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| other | [<code>NodeService</code>](#NodeService) | The element to compare with |
 
 <a name="ElementService+applyDefaultEvent"></a>
 
@@ -1265,16 +1787,26 @@ Simulate the behaviour of the Document Class when there is no DOM available.
 **Author**: Joshua Heagle <joshuaheagle@gmail.com>  
 
 * [DocumentService](#DocumentService) ⇐ [<code>NodeService</code>](#NodeService)
+    * [.acceptsChildren](#NodeService+acceptsChildren) ⇒ <code>boolean</code>
     * [.appendChild(childNode)](#NodeService+appendChild) ⇒ <code>PseudoNode</code>
+    * [.cloneShallow()](#NodeService+cloneShallow) ⇒ [<code>NodeService</code>](#NodeService)
+    * [.equalsShallow(other)](#NodeService+equalsShallow) ⇒ <code>boolean</code>
     * [.childInserted(child)](#NodeService+childInserted)
-    * [.cloneNode()](#NodeService+cloneNode)
-    * [.compareDocumentPosition()](#NodeService+compareDocumentPosition)
+    * [.cloneNode([deep])](#NodeService+cloneNode) ⇒ <code>PseudoNode</code>
+    * [.compareDocumentPosition(otherNode)](#NodeService+compareDocumentPosition) ⇒ <code>number</code>
     * [.contains(otherNode)](#NodeService+contains) ⇒ <code>boolean</code>
     * [.insertBefore(newNode, [referenceNode])](#NodeService+insertBefore) ⇒ <code>PseudoNode</code>
-    * [.isEqualNode()](#NodeService+isEqualNode)
+    * [.isEqualNode(otherNode)](#NodeService+isEqualNode) ⇒ <code>boolean</code>
+    * [.normalize()](#NodeService+normalize)
     * [.removeChild(childElement)](#NodeService+removeChild) ⇒ <code>PseudoNode</code>
     * [.replaceChild(newChild, oldChild)](#NodeService+replaceChild) ⇒ <code>PseudoNode</code>
 
+<a name="NodeService+acceptsChildren"></a>
+
+### documentService.acceptsChildren ⇒ <code>boolean</code>
+Whether this kind of node can have children (text, comments and attributes cannot).
+
+**Kind**: instance property of [<code>DocumentService</code>](#DocumentService)  
 <a name="NodeService+appendChild"></a>
 
 ### documentService.appendChild(childNode) ⇒ <code>PseudoNode</code>
@@ -1286,6 +1818,25 @@ Add a node as the last child of this node (a node which is already in a tree is 
 | Param | Type | Description |
 | --- | --- | --- |
 | childNode | <code>PseudoNode</code> | The node to add |
+
+<a name="NodeService+cloneShallow"></a>
+
+### documentService.cloneShallow() ⇒ [<code>NodeService</code>](#NodeService)
+Make a copy of this node without its children, its parent or its listeners, which is what cloneNode starts from.
+Kinds of node which are made with arguments override this to give them.
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
+<a name="NodeService+equalsShallow"></a>
+
+### documentService.equalsShallow(other) ⇒ <code>boolean</code>
+Whether another node of the same type is equal to this one apart from its children, which isEqualNode compares
+afterwards. Kinds of node with more to compare (an element has attributes) override this.
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| other | [<code>NodeService</code>](#NodeService) | The node to compare with |
 
 <a name="NodeService+childInserted"></a>
 
@@ -1301,23 +1852,29 @@ Called each time a node has been inserted as a child of this node, so that nodes
 
 <a name="NodeService+cloneNode"></a>
 
-### documentService.cloneNode()
-Not implemented yet.
+### documentService.cloneNode([deep]) ⇒ <code>PseudoNode</code>
+Make a copy of this node (without its parent, and without its event listeners). With deep the children are copied
+too, all the way down.
 
 **Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
-**Throws**:
 
-- <code>Error</code> 
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [deep] | <code>boolean</code> | <code>false</code> | Copy the children as well |
 
 <a name="NodeService+compareDocumentPosition"></a>
 
-### documentService.compareDocumentPosition()
-Not implemented yet.
+### documentService.compareDocumentPosition(otherNode) ⇒ <code>number</code>
+Say where another node is in relation to this one, as the bits of NodeService.DOCUMENT_POSITION_*: 0 for this node
+itself, DISCONNECTED (with IMPLEMENTATION_SPECIFIC and a consistent PRECEDING or FOLLOWING) for a node in another tree,
+CONTAINS + PRECEDING when the other node is an ancestor, CONTAINED_BY + FOLLOWING when it is a descendant,
+otherwise PRECEDING or FOLLOWING by their order in the tree.
 
 **Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
-**Throws**:
 
-- <code>Error</code> 
+| Param | Type | Description |
+| --- | --- | --- |
+| otherNode | <code>PseudoNode</code> | The node to locate |
 
 <a name="NodeService+contains"></a>
 
@@ -1350,14 +1907,22 @@ already in a tree is moved, and the children of a document fragment are moved in
 
 <a name="NodeService+isEqualNode"></a>
 
-### documentService.isEqualNode()
-Not implemented yet.
+### documentService.isEqualNode(otherNode) ⇒ <code>boolean</code>
+Whether another node is the same as this one, by what they hold: the same type, name and value (an element also
+needs the same attributes), and children which are equal in the same order.
 
 **Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
-**Throws**:
 
-- <code>Error</code> 
+| Param | Type | Description |
+| --- | --- | --- |
+| otherNode | <code>PseudoNode</code> \| <code>null</code> | The node to compare with |
 
+<a name="NodeService+normalize"></a>
+
+### documentService.normalize()
+Tidy the text below this node: neighbouring text nodes are joined into one and empty text nodes are removed.
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
 <a name="NodeService+removeChild"></a>
 
 ### documentService.removeChild(childElement) ⇒ <code>PseudoNode</code>
@@ -1402,16 +1967,26 @@ not part of a tree, when it is inserted its children are moved into the tree ins
 **Author**: Joshua Heagle <joshuaheagle@gmail.com>  
 
 * [DocumentFragmentService](#DocumentFragmentService) ⇐ [<code>NodeService</code>](#NodeService)
+    * [.acceptsChildren](#NodeService+acceptsChildren) ⇒ <code>boolean</code>
     * [.appendChild(childNode)](#NodeService+appendChild) ⇒ <code>PseudoNode</code>
+    * [.cloneShallow()](#NodeService+cloneShallow) ⇒ [<code>NodeService</code>](#NodeService)
+    * [.equalsShallow(other)](#NodeService+equalsShallow) ⇒ <code>boolean</code>
     * [.childInserted(child)](#NodeService+childInserted)
-    * [.cloneNode()](#NodeService+cloneNode)
-    * [.compareDocumentPosition()](#NodeService+compareDocumentPosition)
+    * [.cloneNode([deep])](#NodeService+cloneNode) ⇒ <code>PseudoNode</code>
+    * [.compareDocumentPosition(otherNode)](#NodeService+compareDocumentPosition) ⇒ <code>number</code>
     * [.contains(otherNode)](#NodeService+contains) ⇒ <code>boolean</code>
     * [.insertBefore(newNode, [referenceNode])](#NodeService+insertBefore) ⇒ <code>PseudoNode</code>
-    * [.isEqualNode()](#NodeService+isEqualNode)
+    * [.isEqualNode(otherNode)](#NodeService+isEqualNode) ⇒ <code>boolean</code>
+    * [.normalize()](#NodeService+normalize)
     * [.removeChild(childElement)](#NodeService+removeChild) ⇒ <code>PseudoNode</code>
     * [.replaceChild(newChild, oldChild)](#NodeService+replaceChild) ⇒ <code>PseudoNode</code>
 
+<a name="NodeService+acceptsChildren"></a>
+
+### documentFragmentService.acceptsChildren ⇒ <code>boolean</code>
+Whether this kind of node can have children (text, comments and attributes cannot).
+
+**Kind**: instance property of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
 <a name="NodeService+appendChild"></a>
 
 ### documentFragmentService.appendChild(childNode) ⇒ <code>PseudoNode</code>
@@ -1423,6 +1998,25 @@ Add a node as the last child of this node (a node which is already in a tree is 
 | Param | Type | Description |
 | --- | --- | --- |
 | childNode | <code>PseudoNode</code> | The node to add |
+
+<a name="NodeService+cloneShallow"></a>
+
+### documentFragmentService.cloneShallow() ⇒ [<code>NodeService</code>](#NodeService)
+Make a copy of this node without its children, its parent or its listeners, which is what cloneNode starts from.
+Kinds of node which are made with arguments override this to give them.
+
+**Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
+<a name="NodeService+equalsShallow"></a>
+
+### documentFragmentService.equalsShallow(other) ⇒ <code>boolean</code>
+Whether another node of the same type is equal to this one apart from its children, which isEqualNode compares
+afterwards. Kinds of node with more to compare (an element has attributes) override this.
+
+**Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| other | [<code>NodeService</code>](#NodeService) | The node to compare with |
 
 <a name="NodeService+childInserted"></a>
 
@@ -1438,23 +2032,29 @@ Called each time a node has been inserted as a child of this node, so that nodes
 
 <a name="NodeService+cloneNode"></a>
 
-### documentFragmentService.cloneNode()
-Not implemented yet.
+### documentFragmentService.cloneNode([deep]) ⇒ <code>PseudoNode</code>
+Make a copy of this node (without its parent, and without its event listeners). With deep the children are copied
+too, all the way down.
 
 **Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
-**Throws**:
 
-- <code>Error</code> 
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [deep] | <code>boolean</code> | <code>false</code> | Copy the children as well |
 
 <a name="NodeService+compareDocumentPosition"></a>
 
-### documentFragmentService.compareDocumentPosition()
-Not implemented yet.
+### documentFragmentService.compareDocumentPosition(otherNode) ⇒ <code>number</code>
+Say where another node is in relation to this one, as the bits of NodeService.DOCUMENT_POSITION_*: 0 for this node
+itself, DISCONNECTED (with IMPLEMENTATION_SPECIFIC and a consistent PRECEDING or FOLLOWING) for a node in another tree,
+CONTAINS + PRECEDING when the other node is an ancestor, CONTAINED_BY + FOLLOWING when it is a descendant,
+otherwise PRECEDING or FOLLOWING by their order in the tree.
 
 **Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
-**Throws**:
 
-- <code>Error</code> 
+| Param | Type | Description |
+| --- | --- | --- |
+| otherNode | <code>PseudoNode</code> | The node to locate |
 
 <a name="NodeService+contains"></a>
 
@@ -1487,14 +2087,22 @@ already in a tree is moved, and the children of a document fragment are moved in
 
 <a name="NodeService+isEqualNode"></a>
 
-### documentFragmentService.isEqualNode()
-Not implemented yet.
+### documentFragmentService.isEqualNode(otherNode) ⇒ <code>boolean</code>
+Whether another node is the same as this one, by what they hold: the same type, name and value (an element also
+needs the same attributes), and children which are equal in the same order.
 
 **Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
-**Throws**:
 
-- <code>Error</code> 
+| Param | Type | Description |
+| --- | --- | --- |
+| otherNode | <code>PseudoNode</code> \| <code>null</code> | The node to compare with |
 
+<a name="NodeService+normalize"></a>
+
+### documentFragmentService.normalize()
+Tidy the text below this node: neighbouring text nodes are joined into one and empty text nodes are removed.
+
+**Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
 <a name="NodeService+removeChild"></a>
 
 ### documentFragmentService.removeChild(childElement) ⇒ <code>PseudoNode</code>
@@ -1624,13 +2232,17 @@ Simulate the behaviour of the Attr Class when there is no DOM available.
 
 * [AttrService](#AttrService) ⇐ [<code>NodeService</code>](#NodeService)
     * [new AttrService(name, [value], [ownerElement], [namespaceURI], [prefix])](#new_AttrService_new)
+    * [.acceptsChildren](#NodeService+acceptsChildren) ⇒ <code>boolean</code>
     * [.appendChild(childNode)](#NodeService+appendChild) ⇒ <code>PseudoNode</code>
+    * [.cloneShallow()](#NodeService+cloneShallow) ⇒ [<code>NodeService</code>](#NodeService)
+    * [.equalsShallow(other)](#NodeService+equalsShallow) ⇒ <code>boolean</code>
     * [.childInserted(child)](#NodeService+childInserted)
-    * [.cloneNode()](#NodeService+cloneNode)
-    * [.compareDocumentPosition()](#NodeService+compareDocumentPosition)
+    * [.cloneNode([deep])](#NodeService+cloneNode) ⇒ <code>PseudoNode</code>
+    * [.compareDocumentPosition(otherNode)](#NodeService+compareDocumentPosition) ⇒ <code>number</code>
     * [.contains(otherNode)](#NodeService+contains) ⇒ <code>boolean</code>
     * [.insertBefore(newNode, [referenceNode])](#NodeService+insertBefore) ⇒ <code>PseudoNode</code>
-    * [.isEqualNode()](#NodeService+isEqualNode)
+    * [.isEqualNode(otherNode)](#NodeService+isEqualNode) ⇒ <code>boolean</code>
+    * [.normalize()](#NodeService+normalize)
     * [.removeChild(childElement)](#NodeService+removeChild) ⇒ <code>PseudoNode</code>
     * [.replaceChild(newChild, oldChild)](#NodeService+replaceChild) ⇒ <code>PseudoNode</code>
 
@@ -1646,6 +2258,13 @@ Simulate the behaviour of the Attr Class when there is no DOM available.
 | [namespaceURI] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | The namespace of the attribute |
 | [prefix] | <code>string</code> \| <code>null</code> | <code>null</code> | The namespace prefix of the attribute |
 
+<a name="NodeService+acceptsChildren"></a>
+
+### attrService.acceptsChildren ⇒ <code>boolean</code>
+Whether this kind of node can have children (text, comments and attributes cannot).
+
+**Kind**: instance property of [<code>AttrService</code>](#AttrService)  
+**Overrides**: [<code>acceptsChildren</code>](#NodeService+acceptsChildren)  
 <a name="NodeService+appendChild"></a>
 
 ### attrService.appendChild(childNode) ⇒ <code>PseudoNode</code>
@@ -1658,6 +2277,27 @@ Add a node as the last child of this node (a node which is already in a tree is 
 | Param | Type | Description |
 | --- | --- | --- |
 | childNode | <code>PseudoNode</code> | The node to add |
+
+<a name="NodeService+cloneShallow"></a>
+
+### attrService.cloneShallow() ⇒ [<code>NodeService</code>](#NodeService)
+Make a copy of this node without its children, its parent or its listeners, which is what cloneNode starts from.
+Kinds of node which are made with arguments override this to give them.
+
+**Kind**: instance method of [<code>AttrService</code>](#AttrService)  
+**Overrides**: [<code>cloneShallow</code>](#NodeService+cloneShallow)  
+<a name="NodeService+equalsShallow"></a>
+
+### attrService.equalsShallow(other) ⇒ <code>boolean</code>
+Whether another node of the same type is equal to this one apart from its children, which isEqualNode compares
+afterwards. Kinds of node with more to compare (an element has attributes) override this.
+
+**Kind**: instance method of [<code>AttrService</code>](#AttrService)  
+**Overrides**: [<code>equalsShallow</code>](#NodeService+equalsShallow)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| other | [<code>NodeService</code>](#NodeService) | The node to compare with |
 
 <a name="NodeService+childInserted"></a>
 
@@ -1674,25 +2314,31 @@ Called each time a node has been inserted as a child of this node, so that nodes
 
 <a name="NodeService+cloneNode"></a>
 
-### attrService.cloneNode()
-Not implemented yet.
+### attrService.cloneNode([deep]) ⇒ <code>PseudoNode</code>
+Make a copy of this node (without its parent, and without its event listeners). With deep the children are copied
+too, all the way down.
 
 **Kind**: instance method of [<code>AttrService</code>](#AttrService)  
 **Overrides**: [<code>cloneNode</code>](#NodeService+cloneNode)  
-**Throws**:
 
-- <code>Error</code> 
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [deep] | <code>boolean</code> | <code>false</code> | Copy the children as well |
 
 <a name="NodeService+compareDocumentPosition"></a>
 
-### attrService.compareDocumentPosition()
-Not implemented yet.
+### attrService.compareDocumentPosition(otherNode) ⇒ <code>number</code>
+Say where another node is in relation to this one, as the bits of NodeService.DOCUMENT_POSITION_*: 0 for this node
+itself, DISCONNECTED (with IMPLEMENTATION_SPECIFIC and a consistent PRECEDING or FOLLOWING) for a node in another tree,
+CONTAINS + PRECEDING when the other node is an ancestor, CONTAINED_BY + FOLLOWING when it is a descendant,
+otherwise PRECEDING or FOLLOWING by their order in the tree.
 
 **Kind**: instance method of [<code>AttrService</code>](#AttrService)  
 **Overrides**: [<code>compareDocumentPosition</code>](#NodeService+compareDocumentPosition)  
-**Throws**:
 
-- <code>Error</code> 
+| Param | Type | Description |
+| --- | --- | --- |
+| otherNode | <code>PseudoNode</code> | The node to locate |
 
 <a name="NodeService+contains"></a>
 
@@ -1727,15 +2373,24 @@ already in a tree is moved, and the children of a document fragment are moved in
 
 <a name="NodeService+isEqualNode"></a>
 
-### attrService.isEqualNode()
-Not implemented yet.
+### attrService.isEqualNode(otherNode) ⇒ <code>boolean</code>
+Whether another node is the same as this one, by what they hold: the same type, name and value (an element also
+needs the same attributes), and children which are equal in the same order.
 
 **Kind**: instance method of [<code>AttrService</code>](#AttrService)  
 **Overrides**: [<code>isEqualNode</code>](#NodeService+isEqualNode)  
-**Throws**:
 
-- <code>Error</code> 
+| Param | Type | Description |
+| --- | --- | --- |
+| otherNode | <code>PseudoNode</code> \| <code>null</code> | The node to compare with |
 
+<a name="NodeService+normalize"></a>
+
+### attrService.normalize()
+Tidy the text below this node: neighbouring text nodes are joined into one and empty text nodes are removed.
+
+**Kind**: instance method of [<code>AttrService</code>](#AttrService)  
+**Overrides**: [<code>normalize</code>](#NodeService+normalize)  
 <a name="NodeService+removeChild"></a>
 
 ### attrService.removeChild(childElement) ⇒ <code>PseudoNode</code>
@@ -1783,13 +2438,17 @@ from that linker, and its parent from the linker's parent when it has not been g
 
 * [LinkedNode](#LinkedNode) ⇐ [<code>NodeService</code>](#NodeService)
     * [new LinkedNode(linker, value)](#new_LinkedNode_new)
+    * [.acceptsChildren](#NodeService+acceptsChildren) ⇒ <code>boolean</code>
     * [.appendChild(childNode)](#NodeService+appendChild) ⇒ <code>PseudoNode</code>
+    * [.cloneShallow()](#NodeService+cloneShallow) ⇒ [<code>NodeService</code>](#NodeService)
+    * [.equalsShallow(other)](#NodeService+equalsShallow) ⇒ <code>boolean</code>
     * [.childInserted(child)](#NodeService+childInserted)
-    * [.cloneNode()](#NodeService+cloneNode)
-    * [.compareDocumentPosition()](#NodeService+compareDocumentPosition)
+    * [.cloneNode([deep])](#NodeService+cloneNode) ⇒ <code>PseudoNode</code>
+    * [.compareDocumentPosition(otherNode)](#NodeService+compareDocumentPosition) ⇒ <code>number</code>
     * [.contains(otherNode)](#NodeService+contains) ⇒ <code>boolean</code>
     * [.insertBefore(newNode, [referenceNode])](#NodeService+insertBefore) ⇒ <code>PseudoNode</code>
-    * [.isEqualNode()](#NodeService+isEqualNode)
+    * [.isEqualNode(otherNode)](#NodeService+isEqualNode) ⇒ <code>boolean</code>
+    * [.normalize()](#NodeService+normalize)
     * [.removeChild(childElement)](#NodeService+removeChild) ⇒ <code>PseudoNode</code>
     * [.replaceChild(newChild, oldChild)](#NodeService+replaceChild) ⇒ <code>PseudoNode</code>
 
@@ -1802,6 +2461,13 @@ from that linker, and its parent from the linker's parent when it has not been g
 | linker | <code>TreeLinker</code> | The linker holding this node |
 | value | <code>string</code> \| <code>null</code> | The value of the node |
 
+<a name="NodeService+acceptsChildren"></a>
+
+### linkedNode.acceptsChildren ⇒ <code>boolean</code>
+Whether this kind of node can have children (text, comments and attributes cannot).
+
+**Kind**: instance property of [<code>LinkedNode</code>](#LinkedNode)  
+**Overrides**: [<code>acceptsChildren</code>](#NodeService+acceptsChildren)  
 <a name="NodeService+appendChild"></a>
 
 ### linkedNode.appendChild(childNode) ⇒ <code>PseudoNode</code>
@@ -1814,6 +2480,27 @@ Add a node as the last child of this node (a node which is already in a tree is 
 | Param | Type | Description |
 | --- | --- | --- |
 | childNode | <code>PseudoNode</code> | The node to add |
+
+<a name="NodeService+cloneShallow"></a>
+
+### linkedNode.cloneShallow() ⇒ [<code>NodeService</code>](#NodeService)
+Make a copy of this node without its children, its parent or its listeners, which is what cloneNode starts from.
+Kinds of node which are made with arguments override this to give them.
+
+**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
+**Overrides**: [<code>cloneShallow</code>](#NodeService+cloneShallow)  
+<a name="NodeService+equalsShallow"></a>
+
+### linkedNode.equalsShallow(other) ⇒ <code>boolean</code>
+Whether another node of the same type is equal to this one apart from its children, which isEqualNode compares
+afterwards. Kinds of node with more to compare (an element has attributes) override this.
+
+**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
+**Overrides**: [<code>equalsShallow</code>](#NodeService+equalsShallow)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| other | [<code>NodeService</code>](#NodeService) | The node to compare with |
 
 <a name="NodeService+childInserted"></a>
 
@@ -1830,25 +2517,31 @@ Called each time a node has been inserted as a child of this node, so that nodes
 
 <a name="NodeService+cloneNode"></a>
 
-### linkedNode.cloneNode()
-Not implemented yet.
+### linkedNode.cloneNode([deep]) ⇒ <code>PseudoNode</code>
+Make a copy of this node (without its parent, and without its event listeners). With deep the children are copied
+too, all the way down.
 
 **Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
 **Overrides**: [<code>cloneNode</code>](#NodeService+cloneNode)  
-**Throws**:
 
-- <code>Error</code> 
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [deep] | <code>boolean</code> | <code>false</code> | Copy the children as well |
 
 <a name="NodeService+compareDocumentPosition"></a>
 
-### linkedNode.compareDocumentPosition()
-Not implemented yet.
+### linkedNode.compareDocumentPosition(otherNode) ⇒ <code>number</code>
+Say where another node is in relation to this one, as the bits of NodeService.DOCUMENT_POSITION_*: 0 for this node
+itself, DISCONNECTED (with IMPLEMENTATION_SPECIFIC and a consistent PRECEDING or FOLLOWING) for a node in another tree,
+CONTAINS + PRECEDING when the other node is an ancestor, CONTAINED_BY + FOLLOWING when it is a descendant,
+otherwise PRECEDING or FOLLOWING by their order in the tree.
 
 **Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
 **Overrides**: [<code>compareDocumentPosition</code>](#NodeService+compareDocumentPosition)  
-**Throws**:
 
-- <code>Error</code> 
+| Param | Type | Description |
+| --- | --- | --- |
+| otherNode | <code>PseudoNode</code> | The node to locate |
 
 <a name="NodeService+contains"></a>
 
@@ -1883,15 +2576,24 @@ already in a tree is moved, and the children of a document fragment are moved in
 
 <a name="NodeService+isEqualNode"></a>
 
-### linkedNode.isEqualNode()
-Not implemented yet.
+### linkedNode.isEqualNode(otherNode) ⇒ <code>boolean</code>
+Whether another node is the same as this one, by what they hold: the same type, name and value (an element also
+needs the same attributes), and children which are equal in the same order.
 
 **Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
 **Overrides**: [<code>isEqualNode</code>](#NodeService+isEqualNode)  
-**Throws**:
 
-- <code>Error</code> 
+| Param | Type | Description |
+| --- | --- | --- |
+| otherNode | <code>PseudoNode</code> \| <code>null</code> | The node to compare with |
 
+<a name="NodeService+normalize"></a>
+
+### linkedNode.normalize()
+Tidy the text below this node: neighbouring text nodes are joined into one and empty text nodes are removed.
+
+**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
+**Overrides**: [<code>normalize</code>](#NodeService+normalize)  
 <a name="NodeService+removeChild"></a>
 
 ### linkedNode.removeChild(childElement) ⇒ <code>PseudoNode</code>
@@ -1981,6 +2683,10 @@ Simulate the behaviour of the HTMLDocument Class when there is no DOM available.
     * [.head](#PseudoHTMLDocument+head) : <code>PseudoHTMLElement</code>
     * [.body](#PseudoHTMLDocument+body) : <code>PseudoHTMLElement</code>
     * [.createElement(tagName)](#PseudoHTMLDocument+createElement) ⇒ <code>PseudoHTMLElement</code>
+    * [.createTextNode([data])](#PseudoHTMLDocument+createTextNode) ⇒ [<code>TextService</code>](#TextService)
+    * [.createComment([data])](#PseudoHTMLDocument+createComment) ⇒ [<code>CommentService</code>](#CommentService)
+    * [.createDocumentFragment()](#PseudoHTMLDocument+createDocumentFragment) ⇒ [<code>DocumentFragmentService</code>](#DocumentFragmentService)
+    * [.cloneNode([deep])](#PseudoHTMLDocument+cloneNode) ⇒ <code>PseudoNode</code>
 
 <a name="new_PseudoHTMLDocument_new"></a>
 
@@ -2002,13 +2708,54 @@ Create document body element
 <a name="PseudoHTMLDocument+createElement"></a>
 
 ### pseudoHTMLDocument.createElement(tagName) ⇒ <code>PseudoHTMLElement</code>
-Create and return a PseudoHTMLElement, which is not added to the document until it is appended somewhere
+Make an element of the given type which belongs to this document but is not added anywhere until it is appended.
 
 **Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | tagName | <code>string</code> | <code>&quot;div&quot;</code> | Tag Name is a string representing the type of Dom element this represents |
+
+<a name="PseudoHTMLDocument+createTextNode"></a>
+
+### pseudoHTMLDocument.createTextNode([data]) ⇒ [<code>TextService</code>](#TextService)
+Make a text node which belongs to this document.
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [data] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | The text |
+
+<a name="PseudoHTMLDocument+createComment"></a>
+
+### pseudoHTMLDocument.createComment([data]) ⇒ [<code>CommentService</code>](#CommentService)
+Make a comment which belongs to this document.
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [data] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | The comment |
+
+<a name="PseudoHTMLDocument+createDocumentFragment"></a>
+
+### pseudoHTMLDocument.createDocumentFragment() ⇒ [<code>DocumentFragmentService</code>](#DocumentFragmentService)
+Make an empty document fragment which belongs to this document, a container for nodes which can be built up and
+then inserted in one go.
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+<a name="PseudoHTMLDocument+cloneNode"></a>
+
+### pseudoHTMLDocument.cloneNode([deep]) ⇒ <code>PseudoNode</code>
+Make a copy of this document. The copy has no parent or listeners, and a deep copy has copies of everything in the
+document (a shallow one is an empty document).
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [deep] | <code>boolean</code> | <code>false</code> | Copy everything in the document as well |
 
 <a name="PseudoEventListener"></a>
 

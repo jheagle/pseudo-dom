@@ -15,7 +15,7 @@ const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
 Object.defineProperty(exports, '__esModule', {
   value: true
 })
-exports.PseudoHTMLDocument = exports.PseudoHTMLElement = exports.PseudoElement = exports.PseudoNode = exports.PseudoEventTarget = exports.PseudoCustomEvent = exports.PseudoInputEvent = exports.PseudoFocusEvent = exports.PseudoKeyboardEvent = exports.PseudoPointerEvent = exports.PseudoMouseEvent = exports.PseudoUIEvent = exports.PseudoEvent = exports.simulate = exports.eventDefaults = exports.createEvent = exports.generateDocument = void 0
+exports.PseudoHTMLDocument = exports.PseudoHTMLElement = exports.PseudoElement = exports.PseudoComment = exports.PseudoText = exports.PseudoNode = exports.PseudoEventTarget = exports.PseudoCustomEvent = exports.PseudoInputEvent = exports.PseudoFocusEvent = exports.PseudoKeyboardEvent = exports.PseudoPointerEvent = exports.PseudoMouseEvent = exports.PseudoUIEvent = exports.PseudoEvent = exports.simulate = exports.eventDefaults = exports.createEvent = exports.generateDocument = void 0
 const EventService_1 = require('./services/EventService')
 Object.defineProperty(exports, 'PseudoEvent', {
   enumerable: true,
@@ -105,6 +105,19 @@ Object.defineProperty(exports, 'PseudoCustomEvent', {
 })
 const simulate_1 = __importDefault(require('./simulate'))
 exports.simulate = simulate_1.default
+const NodeService_2 = require('./services/NodeService')
+Object.defineProperty(exports, 'PseudoText', {
+  enumerable: true,
+  get: function () {
+    return NodeService_2.TextService
+  }
+})
+Object.defineProperty(exports, 'PseudoComment', {
+  enumerable: true,
+  get: function () {
+    return NodeService_2.CommentService
+  }
+})
 /**
  * All methods exported from this module are encapsulated within pseudoDom.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -126,6 +139,8 @@ const pseudoDom = {
   PseudoCustomEvent: CustomEventService_1.CustomEventService,
   PseudoEventTarget: EventTargetService_1.default,
   PseudoNode: NodeService_1.NodeService,
+  PseudoText: NodeService_2.TextService,
+  PseudoComment: NodeService_2.CommentService,
   PseudoElement: ElementService_1.ElementService,
   PseudoHTMLElement: HTMLElementService_1.HTMLElementService,
   PseudoHTMLDocument: PseudoHTMLDocument_1.default

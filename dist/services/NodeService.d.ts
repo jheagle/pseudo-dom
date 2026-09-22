@@ -29,11 +29,21 @@ export declare class NodeService extends EventTargetService implements PseudoNod
     static readonly DOCUMENT_TYPE_NODE = 10;
     static readonly DOCUMENT_FRAGMENT_NODE = 11;
     static readonly NOTATION_NODE = 12;
+    static readonly DOCUMENT_POSITION_DISCONNECTED = 1;
+    static readonly DOCUMENT_POSITION_PRECEDING = 2;
+    static readonly DOCUMENT_POSITION_FOLLOWING = 4;
+    static readonly DOCUMENT_POSITION_CONTAINS = 8;
+    static readonly DOCUMENT_POSITION_CONTAINED_BY = 16;
+    static readonly DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC = 32;
+    private static nextNodeId;
     children: PseudoNodeList | LinkedTreeList;
     parent: PseudoNode | null;
     protected nodeNameValue: string;
     private nodeValueStore;
-    private textContentStore;
+    /** The document which made this node (createElement and the like), for when it is not in a tree yet. */
+    protected ownerDocumentStore: PseudoDocument | null;
+    /** A number for each node in the order they were made, used to give nodes which are in different trees a consistent order. */
+    private readonly nodeId;
     /** The linker which holds this node in the children list of its parent, from which its siblings are found (null while it has no parent). */
     protected listLinker: TreeLinker | null;
     /**
@@ -64,19 +74,43 @@ export declare class NodeService extends EventTargetService implements PseudoNod
      */
     appendChild(childNode: PseudoNode): PseudoNode;
     /**
+     * Whether this kind of node can have children (text, comments and attributes cannot).
+     * @returns {boolean}
+     */
+    protected get acceptsChildren(): boolean;
+    /**
+     * Make a copy of this node without its children, its parent or its listeners, which is what cloneNode starts from.
+     * Kinds of node which are made with arguments override this to give them.
+     * @returns {NodeService}
+     */
+    protected cloneShallow(): NodeService;
+    /**
+     * Whether another node of the same type is equal to this one apart from its children, which isEqualNode compares
+     * afterwards. Kinds of node with more to compare (an element has attributes) override this.
+     * @param {NodeService} other The node to compare with
+     * @returns {boolean}
+     */
+    protected equalsShallow(other: NodeService): boolean;
+    /**
      * Called each time a node has been inserted as a child of this node, so that nodes which need to react to children
      * (for example elements applying default events) can do so.
      * @param {NodeService} child The node which was inserted
      */
     protected childInserted(child: NodeService): void;
     /**
-     * Not implemented yet.
-     * @throws {Error}
+     * Make a copy of this node (without its parent, and without its event listeners). With deep the children are copied
+     * too, all the way down.
+     * @param {boolean} [deep=false] Copy the children as well
+     * @returns {PseudoNode}
      */
     cloneNode(deep?: boolean): PseudoNode;
     /**
-     * Not implemented yet.
-     * @throws {Error}
+     * Say where another node is in relation to this one, as the bits of NodeService.DOCUMENT_POSITION_*: 0 for this node
+     * itself, DISCONNECTED (with IMPLEMENTATION_SPECIFIC and a consistent PRECEDING or FOLLOWING) for a node in another tree,
+     * CONTAINS + PRECEDING when the other node is an ancestor, CONTAINED_BY + FOLLOWING when it is a descendant,
+     * otherwise PRECEDING or FOLLOWING by their order in the tree.
+     * @param {PseudoNode} otherNode The node to locate
+     * @returns {number}
      */
     compareDocumentPosition(otherNode: PseudoNode): number;
     /**
@@ -100,13 +134,18 @@ export declare class NodeService extends EventTargetService implements PseudoNod
     insertBefore(newNode: PseudoNode, referenceNode?: PseudoNode | null): PseudoNode | PseudoDocumentFragment;
     isDefaultNamespace(namespaceURI: string | null): boolean;
     /**
-     * Not implemented yet.
-     * @throws {Error}
+     * Whether another node is the same as this one, by what they hold: the same type, name and value (an element also
+     * needs the same attributes), and children which are equal in the same order.
+     * @param {PseudoNode|null} otherNode The node to compare with
+     * @returns {boolean}
      */
-    isEqualNode(otherNode: PseudoNode): boolean;
+    isEqualNode(otherNode: PseudoNode | null): boolean;
     isSameNode(otherNode: PseudoNode): boolean;
     lookupPrefix(namespace: string): string | null;
     lookupNamespaceURI(prefix: string): string | null;
+    /**
+     * Tidy the text below this node: neighbouring text nodes are joined into one and empty text nodes are removed.
+     */
     normalize(): void;
     /**
      * Remove a child from this node, it no longer has a parent or siblings afterwards.
@@ -123,4 +162,62 @@ export declare class NodeService extends EventTargetService implements PseudoNod
      * @throws {Error} When the old node is not a child of this node
      */
     replaceChild(newChild: PseudoNode, oldChild: PseudoNode): PseudoNode;
+}
+/**
+ * Simulate the behaviour of the Text Class when there is no DOM available: the text in an element.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @class
+ * @augments NodeService
+ * @property {string} data - The text
+ * @property {number} length - How many characters there are
+ * @property {string} wholeText - The text of this node and of the text nodes next to it
+ */
+export declare class TextService extends NodeService {
+    /**
+     * @param {string} [data=''] The text
+     * @constructor
+     */
+    constructor(data?: string);
+    protected get acceptsChildren(): boolean;
+    get nodeName(): string;
+    get nodeType(): number;
+    get data(): string;
+    set data(data: string);
+    get length(): number;
+    get textContent(): string | null;
+    set textContent(text: string | null);
+    get wholeText(): string;
+    /**
+     * Break this text node in two at a position: this node keeps the text before it and a new node with the rest is put
+     * after this one.
+     * @param {number} offset How many characters stay in this node
+     * @returns {TextService} The new node
+     * @throws {Error} When the offset is beyond the end of the text
+     */
+    splitText(offset: number): TextService;
+    protected cloneShallow(): NodeService;
+}
+/**
+ * Simulate the behaviour of the Comment Class when there is no DOM available: a note in the markup which is not shown.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @class
+ * @augments NodeService
+ * @property {string} data - The comment
+ * @property {number} length - How many characters there are
+ */
+export declare class CommentService extends NodeService {
+    /**
+     * @param {string} [data=''] The comment
+     * @constructor
+     */
+    constructor(data?: string);
+    protected get acceptsChildren(): boolean;
+    get nodeName(): string;
+    get nodeType(): number;
+    get data(): string;
+    set data(data: string);
+    get length(): number;
+    get textContent(): string | null;
+    set textContent(text: string | null);
+    protected cloneShallow(): NodeService;
 }
