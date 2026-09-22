@@ -23,6 +23,7 @@ const AttrService_1 = require('./AttrService')
 const DOMTokenListService_1 = require('./DOMTokenListService')
 const NamedNodeMapService_1 = require('./NamedNodeMapService')
 const getParentNodesFromAttribute_1 = __importDefault(require('../functions/getParentNodesFromAttribute'))
+const HTMLCollectionService_1 = require('./HTMLCollectionService')
 const cloneObject_1 = __importDefault(require('si-funciona/dist/helpers/objects/cloneObject'))
 const isEqual_1 = __importDefault(require('si-funciona/dist/helpers/objects/isEqual'))
 /**
@@ -184,6 +185,128 @@ class ElementService extends NodeService_1.NodeService {
    * Some elements have default behaviour, this registers it when the element is added.
    * @returns {Function}
    */
+  /**
+   * A live view of this element's element children (text, comments and the like are not included).
+   * @returns {PseudoHTMLCollection}
+   */
+  get children () {
+    return new HTMLCollectionService_1.HTMLCollectionService(this)
+  }
+
+  /**
+   * How many element children this element has.
+   * @returns {number}
+   */
+  get childElementCount () {
+    return this.children.length
+  }
+
+  /**
+   * The first child of this element which is an element, or null when there is none.
+   * @returns {PseudoElement|null}
+   */
+  get firstElementChild () {
+    return this.children.item(0)
+  }
+
+  /**
+   * The last child of this element which is an element, or null when there is none.
+   * @returns {PseudoElement|null}
+   */
+  get lastElementChild () {
+    const elementChildren = this.children
+    return elementChildren.item(elementChildren.length - 1)
+  }
+
+  /**
+   * The sibling after this one which is an element, or null when there is none.
+   * @returns {PseudoElement|null}
+   */
+  get nextElementSibling () {
+    let sibling = this.nextSibling
+    while (sibling && sibling.nodeType !== NodeService_1.NodeService.ELEMENT_NODE) {
+      sibling = sibling.nextSibling
+    }
+    return sibling
+  }
+
+  /**
+   * The sibling before this one which is an element, or null when there is none.
+   * @returns {PseudoElement|null}
+   */
+  get previousElementSibling () {
+    let sibling = this.previousSibling
+    while (sibling && sibling.nodeType !== NodeService_1.NodeService.ELEMENT_NODE) {
+      sibling = sibling.previousSibling
+    }
+    return sibling
+  }
+
+  /**
+   * Put an element at a position relative to this one: beforebegin (before this element, as its previous sibling),
+   * afterbegin (as this element's first child), beforeend (as this element's last child) or afterend (after this
+   * element, as its next sibling).
+   * @param {string} position beforebegin, afterbegin, beforeend or afterend
+   * @param {ElementService} element The element to insert
+   * @returns {ElementService|null} The inserted element, or null when the position needed a parent this element does not have
+   * @throws {Error} When the position is not one of the four above
+   */
+  insertAdjacentElement (position, element) {
+    return this.insertAdjacent(position, element)
+  }
+
+  /**
+   * Put text at a position relative to this element, the same as insertAdjacentElement but the text becomes a text node.
+   * @param {string} position beforebegin, afterbegin, beforeend or afterend
+   * @param {string} text The text to insert
+   * @throws {Error} When the position is not one of the four above
+   */
+  insertAdjacentText (position, text) {
+    this.insertAdjacent(position, text)
+  }
+
+  /**
+   * Shared implementation for insertAdjacentElement / insertAdjacentText.
+   * @param {string} position beforebegin, afterbegin, beforeend or afterend
+   * @param {PseudoNode|string} node The node (or text) to insert
+   * @returns {PseudoNode|null} The inserted node, or null when the position needed a parent this element does not have
+   * @throws {Error} When the position is not one of the four above
+   */
+  insertAdjacent (position, node) {
+    switch (position) {
+      case 'beforebegin':
+        if (!this.parentNode) {
+          return null
+        }
+        this.before(node)
+        return node
+      case 'afterbegin':
+        this.prepend(node)
+        return node
+      case 'beforeend':
+        this.append(node)
+        return node
+      case 'afterend':
+        if (!this.parentNode) {
+          return null
+        }
+        this.after(node)
+        return node
+      default:
+        throw new Error(`"${position}" is not one of beforebegin, afterbegin, beforeend or afterend.`)
+    }
+  }
+
+  /**
+   * Not implemented yet (HTML parsing is out of scope for now).
+   * @param {string} position beforebegin, afterbegin, beforeend or afterend
+   * @param {string} text The markup which would be parsed
+   * @throws {Error}
+   */
+  insertAdjacentHTML (position, text) {
+    throw new Error('ElementService.insertAdjacentHTML() is not implemented yet.')
+  }
+
   applyDefaultEvent () {
     let callback = event => undefined
     if (this.defaultEventApplied) {

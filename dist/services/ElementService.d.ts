@@ -4,10 +4,11 @@
  * @version 1.0.0
  */
 import { PseudoNode } from '../interfaces/PseudoNode';
-import { NodeService } from './NodeService';
 import { PseudoElement } from '../interfaces/PseudoElement';
+import { NodeService } from './NodeService';
 import { PseudoNamedNodeMap } from '../interfaces/PseudoNamedNodeMap';
 import { PseudoDOMTokenList } from '../interfaces/PseudoDOMTokenList';
+import { PseudoHTMLCollection } from '../interfaces/PseudoHTMLCollection';
 type attribute = {
     name: string;
     value: any;
@@ -80,6 +81,68 @@ export declare class ElementService extends NodeService implements Partial<Pseud
      * Some elements have default behaviour, this registers it when the element is added.
      * @returns {Function}
      */
+    /**
+     * A live view of this element's element children (text, comments and the like are not included).
+     * @returns {PseudoHTMLCollection}
+     */
+    get children(): PseudoHTMLCollection;
+    /**
+     * How many element children this element has.
+     * @returns {number}
+     */
+    get childElementCount(): number;
+    /**
+     * The first child of this element which is an element, or null when there is none.
+     * @returns {PseudoElement|null}
+     */
+    get firstElementChild(): PseudoElement | null;
+    /**
+     * The last child of this element which is an element, or null when there is none.
+     * @returns {PseudoElement|null}
+     */
+    get lastElementChild(): PseudoElement | null;
+    /**
+     * The sibling after this one which is an element, or null when there is none.
+     * @returns {PseudoElement|null}
+     */
+    get nextElementSibling(): PseudoElement | null;
+    /**
+     * The sibling before this one which is an element, or null when there is none.
+     * @returns {PseudoElement|null}
+     */
+    get previousElementSibling(): PseudoElement | null;
+    /**
+     * Put an element at a position relative to this one: beforebegin (before this element, as its previous sibling),
+     * afterbegin (as this element's first child), beforeend (as this element's last child) or afterend (after this
+     * element, as its next sibling).
+     * @param {string} position beforebegin, afterbegin, beforeend or afterend
+     * @param {ElementService} element The element to insert
+     * @returns {ElementService|null} The inserted element, or null when the position needed a parent this element does not have
+     * @throws {Error} When the position is not one of the four above
+     */
+    insertAdjacentElement(position: string, element: PseudoElement): PseudoElement | null;
+    /**
+     * Put text at a position relative to this element, the same as insertAdjacentElement but the text becomes a text node.
+     * @param {string} position beforebegin, afterbegin, beforeend or afterend
+     * @param {string} text The text to insert
+     * @throws {Error} When the position is not one of the four above
+     */
+    insertAdjacentText(position: string, text: string): void;
+    /**
+     * Shared implementation for insertAdjacentElement / insertAdjacentText.
+     * @param {string} position beforebegin, afterbegin, beforeend or afterend
+     * @param {PseudoNode|string} node The node (or text) to insert
+     * @returns {PseudoNode|null} The inserted node, or null when the position needed a parent this element does not have
+     * @throws {Error} When the position is not one of the four above
+     */
+    private insertAdjacent;
+    /**
+     * Not implemented yet (HTML parsing is out of scope for now).
+     * @param {string} position beforebegin, afterbegin, beforeend or afterend
+     * @param {string} text The markup which would be parsed
+     * @throws {Error}
+     */
+    insertAdjacentHTML(position: string, text: string): void;
     applyDefaultEvent(): Function;
     /**
      * An element which is added as a child gets its default events (for example a submit button submits its form).

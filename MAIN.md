@@ -38,6 +38,13 @@ nodes. There are text and comment nodes (`PseudoText`, `PseudoComment`) and `tex
 of everything below, and setting it replaces the children with a text node); the document makes them with
 `createTextNode`, `createComment` and `createDocumentFragment`.
 
+Elements can be walked and changed like the DOM: \`children\` is a live \`HTMLCollection\` of just the element
+children, \`childElementCount\`, \`firstElementChild\` / \`lastElementChild\` and \`nextElementSibling\` /
+\`previousElementSibling\` skip text and comment nodes. \`append\` / \`prepend\` / \`before\` / \`after\` / \`remove\` /
+\`replaceWith\` / \`replaceChildren\` accept nodes or strings (a string becomes a text node) and move a node already in
+a tree rather than duplicating it; \`insertAdjacentElement\` / \`insertAdjacentText\` insert at beforebegin / afterbegin
+/ beforeend / afterend (\`insertAdjacentHTML\` is not implemented, no HTML parsing yet).
+
 Not implemented yet (these throw a "not implemented" error or are missing): `querySelector` /
 `querySelectorAll`, `innerHTML` / `outerHTML` parsing, and most of the rest of the Element and Document APIs. The API
 will change before 1.0.

@@ -43,7 +43,8 @@ export class NodeService extends EventTargetService implements PseudoNode {
   public static readonly DOCUMENT_POSITION_CONTAINED_BY = 16
   public static readonly DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC = 32
   private static nextNodeId: number = 1
-  public children: PseudoNodeList | LinkedTreeList
+  /** The raw list of every child node (all types), used to implement childNodes/firstChild/lastChild/insertBefore/removeChild. Not the same thing as Element.children (an HTMLCollection of just the element children). */
+  protected childList: PseudoNodeList | LinkedTreeList
   public parent: PseudoNode | null
   protected nodeNameValue: string
   private nodeValueStore: string | null
@@ -64,7 +65,7 @@ export class NodeService extends EventTargetService implements PseudoNode {
     this.ownerDocumentStore = null
     this.nodeId = NodeService.nextNodeId++
     this.nodeNameValue = ''
-    this.children = generateNodeList()
+    this.childList = generateNodeList()
     this.parent = null
     this.listLinker = null
   }
@@ -74,11 +75,11 @@ export class NodeService extends EventTargetService implements PseudoNode {
   }
 
   get childNodes (): PseudoNodeList | LinkedTreeList {
-    return this.children
+    return this.childList
   }
 
   get firstChild (): PseudoNode | null {
-    return this.children.first ? this.children.first.data : null
+    return this.childList.first ? this.childList.first.data : null
   }
 
   get isConnected (): boolean {
@@ -87,7 +88,7 @@ export class NodeService extends EventTargetService implements PseudoNode {
   }
 
   get lastChild (): PseudoNode | null {
-    return this.children.last ? this.children.last.data : null
+    return this.childList.last ? this.childList.last.data : null
   }
 
   get nextSibling (): PseudoNode | null {
@@ -201,6 +202,102 @@ export class NodeService extends EventTargetService implements PseudoNode {
   }
 
   /**
+   * Add nodes (strings become text nodes) as the last children of this node, in the order given.
+   * @param {...(PseudoNode|string)} nodes The nodes (or text) to add
+   * @throws {Error} When this kind of node cannot have children
+   */
+  public append (...nodes: Array<PseudoNode | string>): void {
+    nodes.forEach(node => this.appendChild(this.toChildNode(node)))
+  }
+
+  /**
+   * Add nodes (strings become text nodes) as the first children of this node, in the order given.
+   * @param {...(PseudoNode|string)} nodes The nodes (or text) to add
+   * @throws {Error} When this kind of node cannot have children
+   */
+  public prepend (...nodes: Array<PseudoNode | string>): void {
+    const reference: PseudoNode | null = this.firstChild
+    nodes.forEach(node => this.insertBefore(this.toChildNode(node), reference))
+  }
+
+  /**
+   * Remove every child of this node and put the given nodes (strings become text nodes) in their place, in order.
+   * @param {...(PseudoNode|string)} nodes The nodes (or text) to add
+   * @throws {Error} When this kind of node cannot have children
+   */
+  public replaceChildren (...nodes: Array<PseudoNode | string>): void {
+    while (this.firstChild) {
+      this.removeChild(this.firstChild)
+    }
+    this.append(...nodes)
+  }
+
+  /**
+   * Add nodes (strings become text nodes) as this node's previous siblings, in order. Does nothing when this node has
+   * no parent.
+   * @param {...(PseudoNode|string)} nodes The nodes (or text) to add
+   */
+  public before (...nodes: Array<PseudoNode | string>): void {
+    const parent: PseudoNode | null = this.parentNode
+    if (!parent) {
+      return
+    }
+    nodes.forEach(node => parent.insertBefore(this.toChildNode(node), this))
+  }
+
+  /**
+   * Add nodes (strings become text nodes) as this node's next siblings, in order. Does nothing when this node has no
+   * parent.
+   * @param {...(PseudoNode|string)} nodes The nodes (or text) to add
+   */
+  public after (...nodes: Array<PseudoNode | string>): void {
+    const parent: PseudoNode | null = this.parentNode
+    if (!parent) {
+      return
+    }
+    const reference: PseudoNode | null = this.nextSibling
+    nodes.forEach(node => parent.insertBefore(this.toChildNode(node), reference))
+  }
+
+  /**
+   * Put the given nodes (strings become text nodes) where this node is, in order, then remove this node. Does nothing
+   * when this node has no parent.
+   * @param {...(PseudoNode|string)} nodes The nodes (or text) to put in this node's place
+   */
+  public replaceWith (...nodes: Array<PseudoNode | string>): void {
+    const parent: PseudoNode | null = this.parentNode
+    if (!parent) {
+      return
+    }
+    nodes.forEach(node => parent.insertBefore(this.toChildNode(node), this))
+    parent.removeChild(this)
+  }
+
+  /**
+   * Remove this node from its parent. Does nothing when it has no parent.
+   */
+  public remove (): void {
+    if (this.parentNode) {
+      this.parentNode.removeChild(this)
+    }
+  }
+
+  /**
+   * Turn a value given to append / prepend / before / after / replaceWith / replaceChildren into a node: a string
+   * becomes a text node belonging to this node's document, anything else is returned as it is.
+   * @param {PseudoNode|string} value The value to add
+   * @returns {PseudoNode}
+   */
+  private toChildNode (value: PseudoNode | string): PseudoNode {
+    if (typeof value !== 'string') {
+      return value
+    }
+    const text: TextService = new TextService(value)
+    text.ownerDocumentStore = this.ownerDocument
+    return text
+  }
+
+  /**
    * Called each time a node has been inserted as a child of this node, so that nodes which need to react to children
    * (for example elements applying default events) can do so.
    * @param {NodeService} child The node which was inserted
@@ -289,7 +386,7 @@ export class NodeService extends EventTargetService implements PseudoNode {
   }
 
   hasChildNodes (): boolean {
-    return this.children.length > 0
+    return this.childList.length > 0
   }
 
   /**
@@ -326,7 +423,7 @@ export class NodeService extends EventTargetService implements PseudoNode {
       newNode.parentNode.removeChild(newNode)
     }
     const linker: TreeLinker = new TreeLinker({ data: newNode })
-    this.children.insertBefore(referenceNode ? (referenceNode as NodeService).listLinker : null, linker)
+    this.childList.insertBefore(referenceNode ? (referenceNode as NodeService).listLinker : null, linker)
     const inserted: NodeService = newNode as NodeService
     inserted.parent = this
     inserted.listLinker = linker
@@ -404,7 +501,7 @@ export class NodeService extends EventTargetService implements PseudoNode {
       throw new Error('The node to be removed is not a child of this node.')
     }
     const removed: NodeService = childElement as NodeService
-    this.children.remove(removed.listLinker as TreeLinker)
+    this.childList.remove(removed.listLinker as TreeLinker)
     removed.parent = null
     removed.listLinker = null
     return childElement

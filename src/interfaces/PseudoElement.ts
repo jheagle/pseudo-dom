@@ -580,9 +580,10 @@ export interface PseudoElement extends PseudoNode {
   set ariaValueText (value: string)
 
   /**
-   * Inserts a set of Node objects or strings in the children list of the Element's parent, just after the Element.
+   * Inserts a set of Node objects or strings in the children list of the Element's parent, just after the Element. Does
+   * nothing when the element has no parent.
    */
-  after (...nodes: PseudoNode[]): void
+  after (...nodes: Array<PseudoNode | string>): void
 
   /**
    * A shortcut method to create and run an animation on an element. Returns the created Animation object instance.
@@ -597,7 +598,7 @@ export interface PseudoElement extends PseudoNode {
   /**
    * Inserts a set of Node objects or strings after the last child of the element.
    */
-  append (...params: PseudoNode[]): void
+  append (...nodes: Array<PseudoNode | string>): void
 
   /**
    * Attaches a shadow DOM tree to the specified element and returns a reference to its ShadowRoot.
@@ -610,9 +611,10 @@ export interface PseudoElement extends PseudoNode {
   }): PseudoShadowRoot
 
   /**
-   * Inserts a set of Node objects or strings in the children list of the Element's parent, just before the Element.
+   * Inserts a set of Node objects or strings in the children list of the Element's parent, just before the Element. Does
+   * nothing when the element has no parent.
    */
-  before (...params: PseudoNode[]): void
+  before (...nodes: Array<PseudoNode | string>): void
 
   /**
    * Returns whether an element is  expected to be visible or not based on configurable checks.
@@ -705,19 +707,27 @@ export interface PseudoElement extends PseudoNode {
   hasPointerCapture (): string
 
   /**
-   * Inserts a given element node at a given position relative to the element it is invoked upon.
+   * Inserts a given element at a given position relative to the element it is invoked upon.
+   * @param {string} position beforebegin, afterbegin, beforeend or afterend
+   * @param {PseudoElement} element The element to insert
+   * @returns {PseudoElement|null} The inserted element, or null when the position needs a parent this element does not have
    */
-  insertAdjacentElement (): string
+  insertAdjacentElement (position: string, element: PseudoElement): PseudoElement | null
 
   /**
-   * Parses the text as HTML or XML and inserts the resulting nodes into the tree in the position given.
+   * Parses the text as HTML or XML and inserts the resulting nodes into the tree in the position given. Not implemented
+   * yet (HTML parsing is out of scope for now).
+   * @param {string} position beforebegin, afterbegin, beforeend or afterend
+   * @param {string} text The markup to parse
    */
-  insertAdjacentHTML (): string
+  insertAdjacentHTML (position: string, text: string): void
 
   /**
-   * Inserts a given text node at a given position relative to the element it is invoked upon.
+   * Inserts a given text at a given position relative to the element it is invoked upon.
+   * @param {string} position beforebegin, afterbegin, beforeend or afterend
+   * @param {string} text The text to insert
    */
-  insertAdjacentText (): string
+  insertAdjacentText (position: string, text: string): void
 
   /**
    * Returns a boolean value indicating whether or not the element would be selected by the specified selector string.
@@ -727,7 +737,7 @@ export interface PseudoElement extends PseudoNode {
   /**
    * Inserts a set of Node objects or strings before the first child of the element.
    */
-  prepend (): string
+  prepend (...nodes: Array<PseudoNode | string>): void
 
   /**
    * Returns the first Node which matches the specified selector string relative to the element.
@@ -745,9 +755,9 @@ export interface PseudoElement extends PseudoNode {
   releasePointerCapture (): string
 
   /**
-   * Removes the element from the children list of its parent.
+   * Removes the element from the children list of its parent. Does nothing when it has no parent.
    */
-  remove (): string
+  remove (): void
 
   /**
    * Removes the named attribute from the current node.
@@ -767,12 +777,13 @@ export interface PseudoElement extends PseudoNode {
   /**
    * Replaces the existing children of a Node with a specified new set of children.
    */
-  replaceChildren (): string
+  replaceChildren (...nodes: Array<PseudoNode | string>): void
 
   /**
-   * Replaces the element in the children list of its parent with a set of Node objects or strings.
+   * Replaces the element in the children list of its parent with a set of Node objects or strings. Does nothing when it
+   * has no parent.
    */
-  replaceWith (): string
+  replaceWith (...nodes: Array<PseudoNode | string>): void
 
   /**
    * Asynchronously asks the browser to make the element fullscreen.

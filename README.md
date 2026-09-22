@@ -38,6 +38,13 @@ nodes. There are text and comment nodes (`PseudoText`, `PseudoComment`) and `tex
 of everything below, and setting it replaces the children with a text node); the document makes them with
 `createTextNode`, `createComment` and `createDocumentFragment`.
 
+Elements can be walked and changed like the DOM: \`children\` is a live \`HTMLCollection\` of just the element
+children, \`childElementCount\`, \`firstElementChild\` / \`lastElementChild\` and \`nextElementSibling\` /
+\`previousElementSibling\` skip text and comment nodes. \`append\` / \`prepend\` / \`before\` / \`after\` / \`remove\` /
+\`replaceWith\` / \`replaceChildren\` accept nodes or strings (a string becomes a text node) and move a node already in
+a tree rather than duplicating it; \`insertAdjacentElement\` / \`insertAdjacentText\` insert at beforebegin / afterbegin
+/ beforeend / afterend (\`insertAdjacentHTML\` is not implemented, no HTML parsing yet).
+
 Not implemented yet (these throw a "not implemented" error or are missing): `querySelector` /
 `querySelectorAll`, `innerHTML` / `outerHTML` parsing, and most of the rest of the Element and Document APIs. The API
 will change before 1.0.
@@ -85,6 +92,10 @@ interface (the mouse, the keyboard, focus and input).</p>
 </dd>
 <dt><a href="#HTMLElementService">HTMLElementService</a> ⇐ <code>PseudoElement</code></dt>
 <dd><p>Simulate the behaviour of the HTMLElement Class when there is no DOM available.</p>
+</dd>
+<dt><a href="#HTMLCollectionService">HTMLCollectionService</a></dt>
+<dd><p>Simulate the behaviour of the HTMLCollection Class when there is no DOM available: a live view of the element
+children of a node, recomputed from its childNodes each time it is used rather than kept in sync as they change.</p>
 </dd>
 <dt><a href="#FocusEventService">FocusEventService</a> ⇐ <code><a href="#UIEventService">UIEventService</a></code></dt>
 <dd><p>Simulate the behaviour of the FocusEvent Class when there is no DOM available.</p>
@@ -437,6 +448,14 @@ Simulate the behaviour of the Node Class when there is no DOM available.
     * [.appendChild(childNode)](#NodeService+appendChild) ⇒ <code>PseudoNode</code>
     * [.cloneShallow()](#NodeService+cloneShallow) ⇒ [<code>NodeService</code>](#NodeService)
     * [.equalsShallow(other)](#NodeService+equalsShallow) ⇒ <code>boolean</code>
+    * [.append(...nodes)](#NodeService+append)
+    * [.prepend(...nodes)](#NodeService+prepend)
+    * [.replaceChildren(...nodes)](#NodeService+replaceChildren)
+    * [.before(...nodes)](#NodeService+before)
+    * [.after(...nodes)](#NodeService+after)
+    * [.replaceWith(...nodes)](#NodeService+replaceWith)
+    * [.remove()](#NodeService+remove)
+    * [.toChildNode(value)](#NodeService+toChildNode) ⇒ <code>PseudoNode</code>
     * [.childInserted(child)](#NodeService+childInserted)
     * [.cloneNode([deep])](#NodeService+cloneNode) ⇒ <code>PseudoNode</code>
     * [.compareDocumentPosition(otherNode)](#NodeService+compareDocumentPosition) ⇒ <code>number</code>
@@ -483,6 +502,105 @@ afterwards. Kinds of node with more to compare (an element has attributes) overr
 | Param | Type | Description |
 | --- | --- | --- |
 | other | [<code>NodeService</code>](#NodeService) | The node to compare with |
+
+<a name="NodeService+append"></a>
+
+### nodeService.append(...nodes)
+Add nodes (strings become text nodes) as the last children of this node, in the order given.
+
+**Kind**: instance method of [<code>NodeService</code>](#NodeService)  
+**Throws**:
+
+- <code>Error</code> When this kind of node cannot have children
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+prepend"></a>
+
+### nodeService.prepend(...nodes)
+Add nodes (strings become text nodes) as the first children of this node, in the order given.
+
+**Kind**: instance method of [<code>NodeService</code>](#NodeService)  
+**Throws**:
+
+- <code>Error</code> When this kind of node cannot have children
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+replaceChildren"></a>
+
+### nodeService.replaceChildren(...nodes)
+Remove every child of this node and put the given nodes (strings become text nodes) in their place, in order.
+
+**Kind**: instance method of [<code>NodeService</code>](#NodeService)  
+**Throws**:
+
+- <code>Error</code> When this kind of node cannot have children
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+before"></a>
+
+### nodeService.before(...nodes)
+Add nodes (strings become text nodes) as this node's previous siblings, in order. Does nothing when this node has
+no parent.
+
+**Kind**: instance method of [<code>NodeService</code>](#NodeService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+after"></a>
+
+### nodeService.after(...nodes)
+Add nodes (strings become text nodes) as this node's next siblings, in order. Does nothing when this node has no
+parent.
+
+**Kind**: instance method of [<code>NodeService</code>](#NodeService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+replaceWith"></a>
+
+### nodeService.replaceWith(...nodes)
+Put the given nodes (strings become text nodes) where this node is, in order, then remove this node. Does nothing
+when this node has no parent.
+
+**Kind**: instance method of [<code>NodeService</code>](#NodeService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to put in this node's place |
+
+<a name="NodeService+remove"></a>
+
+### nodeService.remove()
+Remove this node from its parent. Does nothing when it has no parent.
+
+**Kind**: instance method of [<code>NodeService</code>](#NodeService)  
+<a name="NodeService+toChildNode"></a>
+
+### nodeService.toChildNode(value) ⇒ <code>PseudoNode</code>
+Turn a value given to append / prepend / before / after / replaceWith / replaceChildren into a node: a string
+becomes a text node belonging to this node's document, anything else is returned as it is.
+
+**Kind**: instance method of [<code>NodeService</code>](#NodeService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| value | <code>PseudoNode</code> \| <code>string</code> | The value to add |
 
 <a name="NodeService+childInserted"></a>
 
@@ -626,6 +744,14 @@ Simulate the behaviour of the Text Class when there is no DOM available: the tex
     * [.appendChild(childNode)](#NodeService+appendChild) ⇒ <code>PseudoNode</code>
     * [.cloneShallow()](#NodeService+cloneShallow) ⇒ [<code>NodeService</code>](#NodeService)
     * [.equalsShallow(other)](#NodeService+equalsShallow) ⇒ <code>boolean</code>
+    * [.append(...nodes)](#NodeService+append)
+    * [.prepend(...nodes)](#NodeService+prepend)
+    * [.replaceChildren(...nodes)](#NodeService+replaceChildren)
+    * [.before(...nodes)](#NodeService+before)
+    * [.after(...nodes)](#NodeService+after)
+    * [.replaceWith(...nodes)](#NodeService+replaceWith)
+    * [.remove()](#NodeService+remove)
+    * [.toChildNode(value)](#NodeService+toChildNode) ⇒ <code>PseudoNode</code>
     * [.childInserted(child)](#NodeService+childInserted)
     * [.cloneNode([deep])](#NodeService+cloneNode) ⇒ <code>PseudoNode</code>
     * [.compareDocumentPosition(otherNode)](#NodeService+compareDocumentPosition) ⇒ <code>number</code>
@@ -701,6 +827,113 @@ afterwards. Kinds of node with more to compare (an element has attributes) overr
 | Param | Type | Description |
 | --- | --- | --- |
 | other | [<code>NodeService</code>](#NodeService) | The node to compare with |
+
+<a name="NodeService+append"></a>
+
+### textService.append(...nodes)
+Add nodes (strings become text nodes) as the last children of this node, in the order given.
+
+**Kind**: instance method of [<code>TextService</code>](#TextService)  
+**Overrides**: [<code>append</code>](#NodeService+append)  
+**Throws**:
+
+- <code>Error</code> When this kind of node cannot have children
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+prepend"></a>
+
+### textService.prepend(...nodes)
+Add nodes (strings become text nodes) as the first children of this node, in the order given.
+
+**Kind**: instance method of [<code>TextService</code>](#TextService)  
+**Overrides**: [<code>prepend</code>](#NodeService+prepend)  
+**Throws**:
+
+- <code>Error</code> When this kind of node cannot have children
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+replaceChildren"></a>
+
+### textService.replaceChildren(...nodes)
+Remove every child of this node and put the given nodes (strings become text nodes) in their place, in order.
+
+**Kind**: instance method of [<code>TextService</code>](#TextService)  
+**Overrides**: [<code>replaceChildren</code>](#NodeService+replaceChildren)  
+**Throws**:
+
+- <code>Error</code> When this kind of node cannot have children
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+before"></a>
+
+### textService.before(...nodes)
+Add nodes (strings become text nodes) as this node's previous siblings, in order. Does nothing when this node has
+no parent.
+
+**Kind**: instance method of [<code>TextService</code>](#TextService)  
+**Overrides**: [<code>before</code>](#NodeService+before)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+after"></a>
+
+### textService.after(...nodes)
+Add nodes (strings become text nodes) as this node's next siblings, in order. Does nothing when this node has no
+parent.
+
+**Kind**: instance method of [<code>TextService</code>](#TextService)  
+**Overrides**: [<code>after</code>](#NodeService+after)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+replaceWith"></a>
+
+### textService.replaceWith(...nodes)
+Put the given nodes (strings become text nodes) where this node is, in order, then remove this node. Does nothing
+when this node has no parent.
+
+**Kind**: instance method of [<code>TextService</code>](#TextService)  
+**Overrides**: [<code>replaceWith</code>](#NodeService+replaceWith)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to put in this node's place |
+
+<a name="NodeService+remove"></a>
+
+### textService.remove()
+Remove this node from its parent. Does nothing when it has no parent.
+
+**Kind**: instance method of [<code>TextService</code>](#TextService)  
+**Overrides**: [<code>remove</code>](#NodeService+remove)  
+<a name="NodeService+toChildNode"></a>
+
+### textService.toChildNode(value) ⇒ <code>PseudoNode</code>
+Turn a value given to append / prepend / before / after / replaceWith / replaceChildren into a node: a string
+becomes a text node belonging to this node's document, anything else is returned as it is.
+
+**Kind**: instance method of [<code>TextService</code>](#TextService)  
+**Overrides**: [<code>toChildNode</code>](#NodeService+toChildNode)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| value | <code>PseudoNode</code> \| <code>string</code> | The value to add |
 
 <a name="NodeService+childInserted"></a>
 
@@ -851,6 +1084,14 @@ Simulate the behaviour of the Comment Class when there is no DOM available: a no
     * [.appendChild(childNode)](#NodeService+appendChild) ⇒ <code>PseudoNode</code>
     * [.cloneShallow()](#NodeService+cloneShallow) ⇒ [<code>NodeService</code>](#NodeService)
     * [.equalsShallow(other)](#NodeService+equalsShallow) ⇒ <code>boolean</code>
+    * [.append(...nodes)](#NodeService+append)
+    * [.prepend(...nodes)](#NodeService+prepend)
+    * [.replaceChildren(...nodes)](#NodeService+replaceChildren)
+    * [.before(...nodes)](#NodeService+before)
+    * [.after(...nodes)](#NodeService+after)
+    * [.replaceWith(...nodes)](#NodeService+replaceWith)
+    * [.remove()](#NodeService+remove)
+    * [.toChildNode(value)](#NodeService+toChildNode) ⇒ <code>PseudoNode</code>
     * [.childInserted(child)](#NodeService+childInserted)
     * [.cloneNode([deep])](#NodeService+cloneNode) ⇒ <code>PseudoNode</code>
     * [.compareDocumentPosition(otherNode)](#NodeService+compareDocumentPosition) ⇒ <code>number</code>
@@ -909,6 +1150,113 @@ afterwards. Kinds of node with more to compare (an element has attributes) overr
 | Param | Type | Description |
 | --- | --- | --- |
 | other | [<code>NodeService</code>](#NodeService) | The node to compare with |
+
+<a name="NodeService+append"></a>
+
+### commentService.append(...nodes)
+Add nodes (strings become text nodes) as the last children of this node, in the order given.
+
+**Kind**: instance method of [<code>CommentService</code>](#CommentService)  
+**Overrides**: [<code>append</code>](#NodeService+append)  
+**Throws**:
+
+- <code>Error</code> When this kind of node cannot have children
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+prepend"></a>
+
+### commentService.prepend(...nodes)
+Add nodes (strings become text nodes) as the first children of this node, in the order given.
+
+**Kind**: instance method of [<code>CommentService</code>](#CommentService)  
+**Overrides**: [<code>prepend</code>](#NodeService+prepend)  
+**Throws**:
+
+- <code>Error</code> When this kind of node cannot have children
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+replaceChildren"></a>
+
+### commentService.replaceChildren(...nodes)
+Remove every child of this node and put the given nodes (strings become text nodes) in their place, in order.
+
+**Kind**: instance method of [<code>CommentService</code>](#CommentService)  
+**Overrides**: [<code>replaceChildren</code>](#NodeService+replaceChildren)  
+**Throws**:
+
+- <code>Error</code> When this kind of node cannot have children
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+before"></a>
+
+### commentService.before(...nodes)
+Add nodes (strings become text nodes) as this node's previous siblings, in order. Does nothing when this node has
+no parent.
+
+**Kind**: instance method of [<code>CommentService</code>](#CommentService)  
+**Overrides**: [<code>before</code>](#NodeService+before)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+after"></a>
+
+### commentService.after(...nodes)
+Add nodes (strings become text nodes) as this node's next siblings, in order. Does nothing when this node has no
+parent.
+
+**Kind**: instance method of [<code>CommentService</code>](#CommentService)  
+**Overrides**: [<code>after</code>](#NodeService+after)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+replaceWith"></a>
+
+### commentService.replaceWith(...nodes)
+Put the given nodes (strings become text nodes) where this node is, in order, then remove this node. Does nothing
+when this node has no parent.
+
+**Kind**: instance method of [<code>CommentService</code>](#CommentService)  
+**Overrides**: [<code>replaceWith</code>](#NodeService+replaceWith)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to put in this node's place |
+
+<a name="NodeService+remove"></a>
+
+### commentService.remove()
+Remove this node from its parent. Does nothing when it has no parent.
+
+**Kind**: instance method of [<code>CommentService</code>](#CommentService)  
+**Overrides**: [<code>remove</code>](#NodeService+remove)  
+<a name="NodeService+toChildNode"></a>
+
+### commentService.toChildNode(value) ⇒ <code>PseudoNode</code>
+Turn a value given to append / prepend / before / after / replaceWith / replaceChildren into a node: a string
+becomes a text node belonging to this node's document, anything else is returned as it is.
+
+**Kind**: instance method of [<code>CommentService</code>](#CommentService)  
+**Overrides**: [<code>toChildNode</code>](#NodeService+toChildNode)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| value | <code>PseudoNode</code> \| <code>string</code> | The value to add |
 
 <a name="NodeService+childInserted"></a>
 
@@ -1364,6 +1712,64 @@ focus or already has it.
 Take the focus away from the element, when it has it: it gets blur then focusout.
 
 **Kind**: instance method of [<code>HTMLElementService</code>](#HTMLElementService)  
+<a name="HTMLCollectionService"></a>
+
+## HTMLCollectionService
+Simulate the behaviour of the HTMLCollection Class when there is no DOM available: a live view of the element
+children of a node, recomputed from its childNodes each time it is used rather than kept in sync as they change.
+
+**Kind**: global class  
+**Author**: Joshua Heagle <joshuaheagle@gmail.com>  
+
+* [HTMLCollectionService](#HTMLCollectionService)
+    * [new HTMLCollectionService(owner)](#new_HTMLCollectionService_new)
+    * [.length](#HTMLCollectionService+length) ⇒ <code>number</code>
+    * [.elements()](#HTMLCollectionService+elements) ⇒ <code>Array.&lt;PseudoNode&gt;</code>
+    * [.item(index)](#HTMLCollectionService+item) ⇒ <code>\*</code>
+    * [.namedItem(name)](#HTMLCollectionService+namedItem) ⇒ <code>\*</code>
+
+<a name="new_HTMLCollectionService_new"></a>
+
+### new HTMLCollectionService(owner)
+
+| Param | Type | Description |
+| --- | --- | --- |
+| owner | [<code>NodeService</code>](#NodeService) | The node whose element children this is a live view of |
+
+<a name="HTMLCollectionService+length"></a>
+
+### htmlCollectionService.length ⇒ <code>number</code>
+How many elements are in the collection right now.
+
+**Kind**: instance property of [<code>HTMLCollectionService</code>](#HTMLCollectionService)  
+<a name="HTMLCollectionService+elements"></a>
+
+### htmlCollectionService.elements() ⇒ <code>Array.&lt;PseudoNode&gt;</code>
+The current element children of the owner, in order.
+
+**Kind**: instance method of [<code>HTMLCollectionService</code>](#HTMLCollectionService)  
+<a name="HTMLCollectionService+item"></a>
+
+### htmlCollectionService.item(index) ⇒ <code>\*</code>
+The element at the given index, or null when there is none.
+
+**Kind**: instance method of [<code>HTMLCollectionService</code>](#HTMLCollectionService)  
+
+| Param | Type |
+| --- | --- |
+| index | <code>number</code> | 
+
+<a name="HTMLCollectionService+namedItem"></a>
+
+### htmlCollectionService.namedItem(name) ⇒ <code>\*</code>
+The element whose id, or (failing that) whose name attribute, is the given value, or null when there is none.
+
+**Kind**: instance method of [<code>HTMLCollectionService</code>](#HTMLCollectionService)  
+
+| Param | Type |
+| --- | --- |
+| name | <code>string</code> | 
+
 <a name="FocusEventService"></a>
 
 ## FocusEventService ⇐ [<code>UIEventService</code>](#UIEventService)
@@ -1666,10 +2072,19 @@ Simulate the behaviour of the Element Class when there is no DOM available.
 
 * [ElementService](#ElementService) ⇐ <code>PseudoNode</code>
     * [new ElementService([settings])](#new_ElementService_new)
+    * [.children](#ElementService+children) ⇒ <code>PseudoHTMLCollection</code>
+    * [.childElementCount](#ElementService+childElementCount) ⇒ <code>number</code>
+    * [.firstElementChild](#ElementService+firstElementChild) ⇒ <code>PseudoElement</code> \| <code>null</code>
+    * [.lastElementChild](#ElementService+lastElementChild) ⇒ <code>PseudoElement</code> \| <code>null</code>
+    * [.nextElementSibling](#ElementService+nextElementSibling) ⇒ <code>PseudoElement</code> \| <code>null</code>
+    * [.previousElementSibling](#ElementService+previousElementSibling) ⇒ <code>PseudoElement</code> \| <code>null</code>
     * [.currentAttributes()](#ElementService+currentAttributes) ⇒ <code>Array.&lt;{name: string, value: \*}&gt;</code>
     * [.cloneShallow()](#ElementService+cloneShallow) ⇒ [<code>ElementService</code>](#ElementService)
     * [.equalsShallow(other)](#ElementService+equalsShallow) ⇒ <code>boolean</code>
-    * [.applyDefaultEvent()](#ElementService+applyDefaultEvent) ⇒ <code>function</code>
+    * [.insertAdjacentElement(position, element)](#ElementService+insertAdjacentElement) ⇒ [<code>ElementService</code>](#ElementService) \| <code>null</code>
+    * [.insertAdjacentText(position, text)](#ElementService+insertAdjacentText)
+    * [.insertAdjacent(position, node)](#ElementService+insertAdjacent) ⇒ <code>PseudoNode</code> \| <code>null</code>
+    * [.insertAdjacentHTML(position, text)](#ElementService+insertAdjacentHTML)
     * [.childInserted(child)](#ElementService+childInserted)
     * [.hasAttribute(attributeName)](#ElementService+hasAttribute) ⇒ <code>boolean</code>
     * [.setAttribute(attributeName, attributeValue)](#ElementService+setAttribute) ⇒ <code>undefined</code>
@@ -1688,6 +2103,42 @@ Simulate the behaviour of the Element Class when there is no DOM available.
 | [settings.parent] | <code>PseudoNode</code> \| <code>null</code> | <code></code> | The node to add this element to as its last child |
 | [settings.children] | <code>Array.&lt;PseudoNode&gt;</code> | <code>[]</code> | The nodes to start as children |
 
+<a name="ElementService+children"></a>
+
+### elementService.children ⇒ <code>PseudoHTMLCollection</code>
+A live view of this element's element children (text, comments and the like are not included).
+
+**Kind**: instance property of [<code>ElementService</code>](#ElementService)  
+<a name="ElementService+childElementCount"></a>
+
+### elementService.childElementCount ⇒ <code>number</code>
+How many element children this element has.
+
+**Kind**: instance property of [<code>ElementService</code>](#ElementService)  
+<a name="ElementService+firstElementChild"></a>
+
+### elementService.firstElementChild ⇒ <code>PseudoElement</code> \| <code>null</code>
+The first child of this element which is an element, or null when there is none.
+
+**Kind**: instance property of [<code>ElementService</code>](#ElementService)  
+<a name="ElementService+lastElementChild"></a>
+
+### elementService.lastElementChild ⇒ <code>PseudoElement</code> \| <code>null</code>
+The last child of this element which is an element, or null when there is none.
+
+**Kind**: instance property of [<code>ElementService</code>](#ElementService)  
+<a name="ElementService+nextElementSibling"></a>
+
+### elementService.nextElementSibling ⇒ <code>PseudoElement</code> \| <code>null</code>
+The sibling after this one which is an element, or null when there is none.
+
+**Kind**: instance property of [<code>ElementService</code>](#ElementService)  
+<a name="ElementService+previousElementSibling"></a>
+
+### elementService.previousElementSibling ⇒ <code>PseudoElement</code> \| <code>null</code>
+The sibling before this one which is an element, or null when there is none.
+
+**Kind**: instance property of [<code>ElementService</code>](#ElementService)  
 <a name="ElementService+currentAttributes"></a>
 
 ### elementService.currentAttributes() ⇒ <code>Array.&lt;{name: string, value: \*}&gt;</code>
@@ -1714,12 +2165,74 @@ checks before it compares the children.
 | --- | --- | --- |
 | other | [<code>NodeService</code>](#NodeService) | The element to compare with |
 
-<a name="ElementService+applyDefaultEvent"></a>
+<a name="ElementService+insertAdjacentElement"></a>
 
-### elementService.applyDefaultEvent() ⇒ <code>function</code>
-Some elements have default behaviour, this registers it when the element is added.
+### elementService.insertAdjacentElement(position, element) ⇒ [<code>ElementService</code>](#ElementService) \| <code>null</code>
+Put an element at a position relative to this one: beforebegin (before this element, as its previous sibling),
+afterbegin (as this element's first child), beforeend (as this element's last child) or afterend (after this
+element, as its next sibling).
 
 **Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+**Returns**: [<code>ElementService</code>](#ElementService) \| <code>null</code> - The inserted element, or null when the position needed a parent this element does not have  
+**Throws**:
+
+- <code>Error</code> When the position is not one of the four above
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| position | <code>string</code> | beforebegin, afterbegin, beforeend or afterend |
+| element | [<code>ElementService</code>](#ElementService) | The element to insert |
+
+<a name="ElementService+insertAdjacentText"></a>
+
+### elementService.insertAdjacentText(position, text)
+Put text at a position relative to this element, the same as insertAdjacentElement but the text becomes a text node.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+**Throws**:
+
+- <code>Error</code> When the position is not one of the four above
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| position | <code>string</code> | beforebegin, afterbegin, beforeend or afterend |
+| text | <code>string</code> | The text to insert |
+
+<a name="ElementService+insertAdjacent"></a>
+
+### elementService.insertAdjacent(position, node) ⇒ <code>PseudoNode</code> \| <code>null</code>
+Shared implementation for insertAdjacentElement / insertAdjacentText.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+**Returns**: <code>PseudoNode</code> \| <code>null</code> - The inserted node, or null when the position needed a parent this element does not have  
+**Throws**:
+
+- <code>Error</code> When the position is not one of the four above
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| position | <code>string</code> | beforebegin, afterbegin, beforeend or afterend |
+| node | <code>PseudoNode</code> \| <code>string</code> | The node (or text) to insert |
+
+<a name="ElementService+insertAdjacentHTML"></a>
+
+### elementService.insertAdjacentHTML(position, text)
+Not implemented yet (HTML parsing is out of scope for now).
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+**Throws**:
+
+- <code>Error</code> 
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| position | <code>string</code> | beforebegin, afterbegin, beforeend or afterend |
+| text | <code>string</code> | The markup which would be parsed |
+
 <a name="ElementService+childInserted"></a>
 
 ### elementService.childInserted(child)
@@ -1791,6 +2304,14 @@ Simulate the behaviour of the Document Class when there is no DOM available.
     * [.appendChild(childNode)](#NodeService+appendChild) ⇒ <code>PseudoNode</code>
     * [.cloneShallow()](#NodeService+cloneShallow) ⇒ [<code>NodeService</code>](#NodeService)
     * [.equalsShallow(other)](#NodeService+equalsShallow) ⇒ <code>boolean</code>
+    * [.append(...nodes)](#NodeService+append)
+    * [.prepend(...nodes)](#NodeService+prepend)
+    * [.replaceChildren(...nodes)](#NodeService+replaceChildren)
+    * [.before(...nodes)](#NodeService+before)
+    * [.after(...nodes)](#NodeService+after)
+    * [.replaceWith(...nodes)](#NodeService+replaceWith)
+    * [.remove()](#NodeService+remove)
+    * [.toChildNode(value)](#NodeService+toChildNode) ⇒ <code>PseudoNode</code>
     * [.childInserted(child)](#NodeService+childInserted)
     * [.cloneNode([deep])](#NodeService+cloneNode) ⇒ <code>PseudoNode</code>
     * [.compareDocumentPosition(otherNode)](#NodeService+compareDocumentPosition) ⇒ <code>number</code>
@@ -1837,6 +2358,105 @@ afterwards. Kinds of node with more to compare (an element has attributes) overr
 | Param | Type | Description |
 | --- | --- | --- |
 | other | [<code>NodeService</code>](#NodeService) | The node to compare with |
+
+<a name="NodeService+append"></a>
+
+### documentService.append(...nodes)
+Add nodes (strings become text nodes) as the last children of this node, in the order given.
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
+**Throws**:
+
+- <code>Error</code> When this kind of node cannot have children
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+prepend"></a>
+
+### documentService.prepend(...nodes)
+Add nodes (strings become text nodes) as the first children of this node, in the order given.
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
+**Throws**:
+
+- <code>Error</code> When this kind of node cannot have children
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+replaceChildren"></a>
+
+### documentService.replaceChildren(...nodes)
+Remove every child of this node and put the given nodes (strings become text nodes) in their place, in order.
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
+**Throws**:
+
+- <code>Error</code> When this kind of node cannot have children
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+before"></a>
+
+### documentService.before(...nodes)
+Add nodes (strings become text nodes) as this node's previous siblings, in order. Does nothing when this node has
+no parent.
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+after"></a>
+
+### documentService.after(...nodes)
+Add nodes (strings become text nodes) as this node's next siblings, in order. Does nothing when this node has no
+parent.
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+replaceWith"></a>
+
+### documentService.replaceWith(...nodes)
+Put the given nodes (strings become text nodes) where this node is, in order, then remove this node. Does nothing
+when this node has no parent.
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to put in this node's place |
+
+<a name="NodeService+remove"></a>
+
+### documentService.remove()
+Remove this node from its parent. Does nothing when it has no parent.
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
+<a name="NodeService+toChildNode"></a>
+
+### documentService.toChildNode(value) ⇒ <code>PseudoNode</code>
+Turn a value given to append / prepend / before / after / replaceWith / replaceChildren into a node: a string
+becomes a text node belonging to this node's document, anything else is returned as it is.
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| value | <code>PseudoNode</code> \| <code>string</code> | The value to add |
 
 <a name="NodeService+childInserted"></a>
 
@@ -1971,6 +2591,14 @@ not part of a tree, when it is inserted its children are moved into the tree ins
     * [.appendChild(childNode)](#NodeService+appendChild) ⇒ <code>PseudoNode</code>
     * [.cloneShallow()](#NodeService+cloneShallow) ⇒ [<code>NodeService</code>](#NodeService)
     * [.equalsShallow(other)](#NodeService+equalsShallow) ⇒ <code>boolean</code>
+    * [.append(...nodes)](#NodeService+append)
+    * [.prepend(...nodes)](#NodeService+prepend)
+    * [.replaceChildren(...nodes)](#NodeService+replaceChildren)
+    * [.before(...nodes)](#NodeService+before)
+    * [.after(...nodes)](#NodeService+after)
+    * [.replaceWith(...nodes)](#NodeService+replaceWith)
+    * [.remove()](#NodeService+remove)
+    * [.toChildNode(value)](#NodeService+toChildNode) ⇒ <code>PseudoNode</code>
     * [.childInserted(child)](#NodeService+childInserted)
     * [.cloneNode([deep])](#NodeService+cloneNode) ⇒ <code>PseudoNode</code>
     * [.compareDocumentPosition(otherNode)](#NodeService+compareDocumentPosition) ⇒ <code>number</code>
@@ -2017,6 +2645,105 @@ afterwards. Kinds of node with more to compare (an element has attributes) overr
 | Param | Type | Description |
 | --- | --- | --- |
 | other | [<code>NodeService</code>](#NodeService) | The node to compare with |
+
+<a name="NodeService+append"></a>
+
+### documentFragmentService.append(...nodes)
+Add nodes (strings become text nodes) as the last children of this node, in the order given.
+
+**Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
+**Throws**:
+
+- <code>Error</code> When this kind of node cannot have children
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+prepend"></a>
+
+### documentFragmentService.prepend(...nodes)
+Add nodes (strings become text nodes) as the first children of this node, in the order given.
+
+**Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
+**Throws**:
+
+- <code>Error</code> When this kind of node cannot have children
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+replaceChildren"></a>
+
+### documentFragmentService.replaceChildren(...nodes)
+Remove every child of this node and put the given nodes (strings become text nodes) in their place, in order.
+
+**Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
+**Throws**:
+
+- <code>Error</code> When this kind of node cannot have children
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+before"></a>
+
+### documentFragmentService.before(...nodes)
+Add nodes (strings become text nodes) as this node's previous siblings, in order. Does nothing when this node has
+no parent.
+
+**Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+after"></a>
+
+### documentFragmentService.after(...nodes)
+Add nodes (strings become text nodes) as this node's next siblings, in order. Does nothing when this node has no
+parent.
+
+**Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+replaceWith"></a>
+
+### documentFragmentService.replaceWith(...nodes)
+Put the given nodes (strings become text nodes) where this node is, in order, then remove this node. Does nothing
+when this node has no parent.
+
+**Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to put in this node's place |
+
+<a name="NodeService+remove"></a>
+
+### documentFragmentService.remove()
+Remove this node from its parent. Does nothing when it has no parent.
+
+**Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
+<a name="NodeService+toChildNode"></a>
+
+### documentFragmentService.toChildNode(value) ⇒ <code>PseudoNode</code>
+Turn a value given to append / prepend / before / after / replaceWith / replaceChildren into a node: a string
+becomes a text node belonging to this node's document, anything else is returned as it is.
+
+**Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| value | <code>PseudoNode</code> \| <code>string</code> | The value to add |
 
 <a name="NodeService+childInserted"></a>
 
@@ -2236,6 +2963,14 @@ Simulate the behaviour of the Attr Class when there is no DOM available.
     * [.appendChild(childNode)](#NodeService+appendChild) ⇒ <code>PseudoNode</code>
     * [.cloneShallow()](#NodeService+cloneShallow) ⇒ [<code>NodeService</code>](#NodeService)
     * [.equalsShallow(other)](#NodeService+equalsShallow) ⇒ <code>boolean</code>
+    * [.append(...nodes)](#NodeService+append)
+    * [.prepend(...nodes)](#NodeService+prepend)
+    * [.replaceChildren(...nodes)](#NodeService+replaceChildren)
+    * [.before(...nodes)](#NodeService+before)
+    * [.after(...nodes)](#NodeService+after)
+    * [.replaceWith(...nodes)](#NodeService+replaceWith)
+    * [.remove()](#NodeService+remove)
+    * [.toChildNode(value)](#NodeService+toChildNode) ⇒ <code>PseudoNode</code>
     * [.childInserted(child)](#NodeService+childInserted)
     * [.cloneNode([deep])](#NodeService+cloneNode) ⇒ <code>PseudoNode</code>
     * [.compareDocumentPosition(otherNode)](#NodeService+compareDocumentPosition) ⇒ <code>number</code>
@@ -2298,6 +3033,113 @@ afterwards. Kinds of node with more to compare (an element has attributes) overr
 | Param | Type | Description |
 | --- | --- | --- |
 | other | [<code>NodeService</code>](#NodeService) | The node to compare with |
+
+<a name="NodeService+append"></a>
+
+### attrService.append(...nodes)
+Add nodes (strings become text nodes) as the last children of this node, in the order given.
+
+**Kind**: instance method of [<code>AttrService</code>](#AttrService)  
+**Overrides**: [<code>append</code>](#NodeService+append)  
+**Throws**:
+
+- <code>Error</code> When this kind of node cannot have children
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+prepend"></a>
+
+### attrService.prepend(...nodes)
+Add nodes (strings become text nodes) as the first children of this node, in the order given.
+
+**Kind**: instance method of [<code>AttrService</code>](#AttrService)  
+**Overrides**: [<code>prepend</code>](#NodeService+prepend)  
+**Throws**:
+
+- <code>Error</code> When this kind of node cannot have children
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+replaceChildren"></a>
+
+### attrService.replaceChildren(...nodes)
+Remove every child of this node and put the given nodes (strings become text nodes) in their place, in order.
+
+**Kind**: instance method of [<code>AttrService</code>](#AttrService)  
+**Overrides**: [<code>replaceChildren</code>](#NodeService+replaceChildren)  
+**Throws**:
+
+- <code>Error</code> When this kind of node cannot have children
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+before"></a>
+
+### attrService.before(...nodes)
+Add nodes (strings become text nodes) as this node's previous siblings, in order. Does nothing when this node has
+no parent.
+
+**Kind**: instance method of [<code>AttrService</code>](#AttrService)  
+**Overrides**: [<code>before</code>](#NodeService+before)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+after"></a>
+
+### attrService.after(...nodes)
+Add nodes (strings become text nodes) as this node's next siblings, in order. Does nothing when this node has no
+parent.
+
+**Kind**: instance method of [<code>AttrService</code>](#AttrService)  
+**Overrides**: [<code>after</code>](#NodeService+after)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+replaceWith"></a>
+
+### attrService.replaceWith(...nodes)
+Put the given nodes (strings become text nodes) where this node is, in order, then remove this node. Does nothing
+when this node has no parent.
+
+**Kind**: instance method of [<code>AttrService</code>](#AttrService)  
+**Overrides**: [<code>replaceWith</code>](#NodeService+replaceWith)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to put in this node's place |
+
+<a name="NodeService+remove"></a>
+
+### attrService.remove()
+Remove this node from its parent. Does nothing when it has no parent.
+
+**Kind**: instance method of [<code>AttrService</code>](#AttrService)  
+**Overrides**: [<code>remove</code>](#NodeService+remove)  
+<a name="NodeService+toChildNode"></a>
+
+### attrService.toChildNode(value) ⇒ <code>PseudoNode</code>
+Turn a value given to append / prepend / before / after / replaceWith / replaceChildren into a node: a string
+becomes a text node belonging to this node's document, anything else is returned as it is.
+
+**Kind**: instance method of [<code>AttrService</code>](#AttrService)  
+**Overrides**: [<code>toChildNode</code>](#NodeService+toChildNode)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| value | <code>PseudoNode</code> \| <code>string</code> | The value to add |
 
 <a name="NodeService+childInserted"></a>
 
@@ -2442,6 +3284,14 @@ from that linker, and its parent from the linker's parent when it has not been g
     * [.appendChild(childNode)](#NodeService+appendChild) ⇒ <code>PseudoNode</code>
     * [.cloneShallow()](#NodeService+cloneShallow) ⇒ [<code>NodeService</code>](#NodeService)
     * [.equalsShallow(other)](#NodeService+equalsShallow) ⇒ <code>boolean</code>
+    * [.append(...nodes)](#NodeService+append)
+    * [.prepend(...nodes)](#NodeService+prepend)
+    * [.replaceChildren(...nodes)](#NodeService+replaceChildren)
+    * [.before(...nodes)](#NodeService+before)
+    * [.after(...nodes)](#NodeService+after)
+    * [.replaceWith(...nodes)](#NodeService+replaceWith)
+    * [.remove()](#NodeService+remove)
+    * [.toChildNode(value)](#NodeService+toChildNode) ⇒ <code>PseudoNode</code>
     * [.childInserted(child)](#NodeService+childInserted)
     * [.cloneNode([deep])](#NodeService+cloneNode) ⇒ <code>PseudoNode</code>
     * [.compareDocumentPosition(otherNode)](#NodeService+compareDocumentPosition) ⇒ <code>number</code>
@@ -2501,6 +3351,113 @@ afterwards. Kinds of node with more to compare (an element has attributes) overr
 | Param | Type | Description |
 | --- | --- | --- |
 | other | [<code>NodeService</code>](#NodeService) | The node to compare with |
+
+<a name="NodeService+append"></a>
+
+### linkedNode.append(...nodes)
+Add nodes (strings become text nodes) as the last children of this node, in the order given.
+
+**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
+**Overrides**: [<code>append</code>](#NodeService+append)  
+**Throws**:
+
+- <code>Error</code> When this kind of node cannot have children
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+prepend"></a>
+
+### linkedNode.prepend(...nodes)
+Add nodes (strings become text nodes) as the first children of this node, in the order given.
+
+**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
+**Overrides**: [<code>prepend</code>](#NodeService+prepend)  
+**Throws**:
+
+- <code>Error</code> When this kind of node cannot have children
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+replaceChildren"></a>
+
+### linkedNode.replaceChildren(...nodes)
+Remove every child of this node and put the given nodes (strings become text nodes) in their place, in order.
+
+**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
+**Overrides**: [<code>replaceChildren</code>](#NodeService+replaceChildren)  
+**Throws**:
+
+- <code>Error</code> When this kind of node cannot have children
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+before"></a>
+
+### linkedNode.before(...nodes)
+Add nodes (strings become text nodes) as this node's previous siblings, in order. Does nothing when this node has
+no parent.
+
+**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
+**Overrides**: [<code>before</code>](#NodeService+before)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+after"></a>
+
+### linkedNode.after(...nodes)
+Add nodes (strings become text nodes) as this node's next siblings, in order. Does nothing when this node has no
+parent.
+
+**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
+**Overrides**: [<code>after</code>](#NodeService+after)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+replaceWith"></a>
+
+### linkedNode.replaceWith(...nodes)
+Put the given nodes (strings become text nodes) where this node is, in order, then remove this node. Does nothing
+when this node has no parent.
+
+**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
+**Overrides**: [<code>replaceWith</code>](#NodeService+replaceWith)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to put in this node's place |
+
+<a name="NodeService+remove"></a>
+
+### linkedNode.remove()
+Remove this node from its parent. Does nothing when it has no parent.
+
+**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
+**Overrides**: [<code>remove</code>](#NodeService+remove)  
+<a name="NodeService+toChildNode"></a>
+
+### linkedNode.toChildNode(value) ⇒ <code>PseudoNode</code>
+Turn a value given to append / prepend / before / after / replaceWith / replaceChildren into a node: a string
+becomes a text node belonging to this node's document, anything else is returned as it is.
+
+**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
+**Overrides**: [<code>toChildNode</code>](#NodeService+toChildNode)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| value | <code>PseudoNode</code> \| <code>string</code> | The value to add |
 
 <a name="NodeService+childInserted"></a>
 
