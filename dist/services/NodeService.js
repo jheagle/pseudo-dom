@@ -2,6 +2,7 @@
 
 require('core-js/modules/esnext.iterator.constructor.js')
 require('core-js/modules/esnext.iterator.every.js')
+require('core-js/modules/esnext.iterator.filter.js')
 require('core-js/modules/esnext.iterator.for-each.js')
 const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
   return mod && mod.__esModule
@@ -22,6 +23,8 @@ exports.CommentService = exports.TextService = exports.NodeService = void 0
 const generateNodeList_1 = __importDefault(require('../factories/generateNodeList'))
 const TreeLinker_1 = require('collect-your-stuff/dist/collections/linked-tree-list/TreeLinker')
 const EventTargetService_1 = __importDefault(require('./EventTargetService'))
+const HTMLCollectionService_1 = require('./HTMLCollectionService')
+const query_1 = require('../factories/query')
 /**
  * Simulate the behaviour of the Node Class when there is no DOM available.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -272,6 +275,45 @@ class NodeService extends EventTargetService_1.default {
     const text = new TextService(value)
     text.ownerDocumentStore = this.ownerDocument
     return text
+  }
+
+  /**
+   * Every element below this node with the given tag name (or every element when tagName is *), live.
+   * @param {string} tagName
+   * @returns {PseudoHTMLCollection}
+   */
+  getElementsByTagName (tagName) {
+    const matchesTag = tagName === '*' ? () => true : element => element.tagName === tagName
+    return new HTMLCollectionService_1.HTMLCollectionService(this, matchesTag, true)
+  }
+
+  /**
+   * Every element below this node which has all of the given (space separated) classes, live.
+   * @param {string} className
+   * @returns {PseudoHTMLCollection}
+   */
+  getElementsByClassName (className) {
+    const names = className.trim().split(/\s+/).filter(Boolean)
+    return new HTMLCollectionService_1.HTMLCollectionService(this, element => names.every(name => element.classList.contains(name)), true)
+  }
+
+  /**
+   * The first element below this node which matches the CSS selector, in tree order, or null when there is none.
+   * @param {string} selectors A CSS selector
+   * @returns {PseudoElement|null}
+   */
+  querySelector (selectors) {
+    return (0, query_1.querySelector)(selectors, this)
+  }
+
+  /**
+   * Every element below this node which matches the CSS selector, in tree order. A plain array (not a live
+   * collection): like the DOM's querySelectorAll, it is a snapshot taken when it is called.
+   * @param {string} selectors A CSS selector
+   * @returns {Array<PseudoElement>}
+   */
+  querySelectorAll (selectors) {
+    return (0, query_1.querySelectorAll)(selectors, this)
   }
 
   /**

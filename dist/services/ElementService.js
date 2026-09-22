@@ -26,6 +26,7 @@ const getParentNodesFromAttribute_1 = __importDefault(require('../functions/getP
 const HTMLCollectionService_1 = require('./HTMLCollectionService')
 const cloneObject_1 = __importDefault(require('si-funciona/dist/helpers/objects/cloneObject'))
 const isEqual_1 = __importDefault(require('si-funciona/dist/helpers/objects/isEqual'))
+const query_1 = require('../factories/query')
 /**
  * Simulate the behaviour of the Element Class when there is no DOM available.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -305,6 +306,25 @@ class ElementService extends NodeService_1.NodeService {
    */
   insertAdjacentHTML (position, text) {
     throw new Error('ElementService.insertAdjacentHTML() is not implemented yet.')
+  }
+
+  /**
+   * Whether this element itself (not its descendants) matches the given CSS selector.
+   * @param {string} selectors A CSS selector
+   * @returns {boolean}
+   */
+  matches (selectors) {
+    return (0, query_1.matches)(this, selectors)
+  }
+
+  /**
+   * The nearest ancestor of this element (starting with this element itself) which matches the CSS selector, or
+   * null when none of them do.
+   * @param {string} selectors A CSS selector
+   * @returns {PseudoElement|null}
+   */
+  closest (selectors) {
+    return (0, query_1.closest)(this, selectors)
   }
 
   applyDefaultEvent () {

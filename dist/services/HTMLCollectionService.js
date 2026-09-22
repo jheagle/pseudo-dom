@@ -1,8 +1,8 @@
 'use strict'
 
 require('core-js/modules/esnext.iterator.constructor.js')
-require('core-js/modules/esnext.iterator.filter.js')
 require('core-js/modules/esnext.iterator.find.js')
+require('core-js/modules/esnext.iterator.for-each.js')
 Object.defineProperty(exports, '__esModule', {
   value: true
 })
@@ -14,26 +14,43 @@ exports.HTMLCollectionService = void 0
  */
 const NodeService_1 = require('./NodeService')
 /**
- * Simulate the behaviour of the HTMLCollection Class when there is no DOM available: a live view of the element
- * children of a node, recomputed from its childNodes each time it is used rather than kept in sync as they change.
+ * Simulate the behaviour of the HTMLCollection Class when there is no DOM available: a live view of some of a node's
+ * element descendants, recomputed each time it is used rather than kept in sync as they change.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @class
  */
 class HTMLCollectionService {
   /**
-   * @param {NodeService} owner The node whose element children this is a live view of
+   * @param {NodeService} owner The node this is a live view of a part of
+   * @param {function(*): boolean} [predicate] Only elements which pass this are included (every element by default)
+   * @param {boolean} [deep=false] Include every matching descendant (true, like getElementsByTagName), not just the
+   * direct element children (false, like Element.children)
    * @constructor
    */
-  constructor (owner) {
+  constructor (owner, predicate = () => true, deep = false) {
     this.owner = owner
+    this.predicate = predicate
+    this.deep = deep
   }
 
   /**
-   * The current element children of the owner, in order.
+   * The current elements the collection holds, in tree order.
    * @returns {Array<PseudoNode>}
    */
   elements () {
-    return Array.from(this.owner.childNodes).filter(node => node.nodeType === NodeService_1.NodeService.ELEMENT_NODE)
+    const results = []
+    const visit = node => {
+      Array.from(node.childNodes).forEach(child => {
+        if (child.nodeType === NodeService_1.NodeService.ELEMENT_NODE && this.predicate(child)) {
+          results.push(child)
+        }
+        if (this.deep && child.nodeType === NodeService_1.NodeService.ELEMENT_NODE) {
+          visit(child)
+        }
+      })
+    }
+    visit(this.owner)
+    return results
   }
 
   /**
@@ -64,7 +81,7 @@ class HTMLCollectionService {
   }
 
   /**
-   * Iterate over the current element children.
+   * Iterate over the current elements.
    * @returns {Iterator}
    */
   [Symbol.iterator] () {

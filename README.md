@@ -45,9 +45,15 @@ children, \`childElementCount\`, \`firstElementChild\` / \`lastElementChild\` an
 a tree rather than duplicating it; \`insertAdjacentElement\` / \`insertAdjacentText\` insert at beforebegin / afterbegin
 / beforeend / afterend (\`insertAdjacentHTML\` is not implemented, no HTML parsing yet).
 
-Not implemented yet (these throw a "not implemented" error or are missing): `querySelector` /
-`querySelectorAll`, `innerHTML` / `outerHTML` parsing, and most of the rest of the Element and Document APIs. The API
-will change before 1.0.
+Selector queries work like the DOM's: \`getElementsByTagName\` / \`getElementsByClassName\` (live, on any node) and
+\`querySelector\` / \`querySelectorAll\` (real CSS selectors, via [css-select](https://www.npmjs.com/package/css-select)
+matched against pseudo-dom's own tree through a custom adapter - \`querySelectorAll\` is a plain array, a snapshot
+taken when it is called, like the DOM's) are on \`NodeService\` so \`Document\`, \`DocumentFragment\` and \`Element\`
+all have them; \`matches\` / \`closest\` are on \`ElementService\`; \`getElementById\` is on \`DocumentService\` only,
+matching the real DOM.
+
+Not implemented yet (these throw a "not implemented" error or are missing): \`getElementsByTagNameNS\`, \`innerHTML\` /
+\`outerHTML\` parsing, and most of the rest of the Element and Document APIs. The API will change before 1.0.
 ## Modules
 
 <dl>
@@ -94,8 +100,8 @@ interface (the mouse, the keyboard, focus and input).</p>
 <dd><p>Simulate the behaviour of the HTMLElement Class when there is no DOM available.</p>
 </dd>
 <dt><a href="#HTMLCollectionService">HTMLCollectionService</a></dt>
-<dd><p>Simulate the behaviour of the HTMLCollection Class when there is no DOM available: a live view of the element
-children of a node, recomputed from its childNodes each time it is used rather than kept in sync as they change.</p>
+<dd><p>Simulate the behaviour of the HTMLCollection Class when there is no DOM available: a live view of some of a node&#39;s
+element descendants, recomputed each time it is used rather than kept in sync as they change.</p>
 </dd>
 <dt><a href="#FocusEventService">FocusEventService</a> ⇐ <code><a href="#UIEventService">UIEventService</a></code></dt>
 <dd><p>Simulate the behaviour of the FocusEvent Class when there is no DOM available.</p>
@@ -199,6 +205,9 @@ tree (or list) of nodes from plain values.</p>
 <dt><a href="#generateDocument">generateDocument(root, context)</a> ⇒ <code>Window</code> | <code>PseudoEventTarget</code></dt>
 <dd><p>Construct the Pseudo Dom to provide access to Dom objects which are otherwise not available outside the browser
 context.</p>
+</dd>
+<dt><a href="#nearestElementSibling">nearestElementSibling(node, direction)</a> ⇒ <code>*</code> | <code>null</code></dt>
+<dd><p>Walk up from a node (not including it) to find the nearest element, in the given direction.</p>
 </dd>
 <dt><a href="#createEvent">createEvent(type, [init], [options])</a> ⇒ <code><a href="#EventService">EventService</a></code></dt>
 <dd><p>Create an event of the kind which suits its type (a click is a MouseEvent, a keydown a KeyboardEvent, ...).
@@ -456,6 +465,10 @@ Simulate the behaviour of the Node Class when there is no DOM available.
     * [.replaceWith(...nodes)](#NodeService+replaceWith)
     * [.remove()](#NodeService+remove)
     * [.toChildNode(value)](#NodeService+toChildNode) ⇒ <code>PseudoNode</code>
+    * [.getElementsByTagName(tagName)](#NodeService+getElementsByTagName) ⇒ <code>PseudoHTMLCollection</code>
+    * [.getElementsByClassName(className)](#NodeService+getElementsByClassName) ⇒ <code>PseudoHTMLCollection</code>
+    * [.querySelector(selectors)](#NodeService+querySelector) ⇒ <code>PseudoElement</code> \| <code>null</code>
+    * [.querySelectorAll(selectors)](#NodeService+querySelectorAll) ⇒ <code>Array.&lt;PseudoElement&gt;</code>
     * [.childInserted(child)](#NodeService+childInserted)
     * [.cloneNode([deep])](#NodeService+cloneNode) ⇒ <code>PseudoNode</code>
     * [.compareDocumentPosition(otherNode)](#NodeService+compareDocumentPosition) ⇒ <code>number</code>
@@ -601,6 +614,51 @@ becomes a text node belonging to this node's document, anything else is returned
 | Param | Type | Description |
 | --- | --- | --- |
 | value | <code>PseudoNode</code> \| <code>string</code> | The value to add |
+
+<a name="NodeService+getElementsByTagName"></a>
+
+### nodeService.getElementsByTagName(tagName) ⇒ <code>PseudoHTMLCollection</code>
+Every element below this node with the given tag name (or every element when tagName is *), live.
+
+**Kind**: instance method of [<code>NodeService</code>](#NodeService)  
+
+| Param | Type |
+| --- | --- |
+| tagName | <code>string</code> | 
+
+<a name="NodeService+getElementsByClassName"></a>
+
+### nodeService.getElementsByClassName(className) ⇒ <code>PseudoHTMLCollection</code>
+Every element below this node which has all of the given (space separated) classes, live.
+
+**Kind**: instance method of [<code>NodeService</code>](#NodeService)  
+
+| Param | Type |
+| --- | --- |
+| className | <code>string</code> | 
+
+<a name="NodeService+querySelector"></a>
+
+### nodeService.querySelector(selectors) ⇒ <code>PseudoElement</code> \| <code>null</code>
+The first element below this node which matches the CSS selector, in tree order, or null when there is none.
+
+**Kind**: instance method of [<code>NodeService</code>](#NodeService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selectors | <code>string</code> | A CSS selector |
+
+<a name="NodeService+querySelectorAll"></a>
+
+### nodeService.querySelectorAll(selectors) ⇒ <code>Array.&lt;PseudoElement&gt;</code>
+Every element below this node which matches the CSS selector, in tree order. A plain array (not a live
+collection): like the DOM's querySelectorAll, it is a snapshot taken when it is called.
+
+**Kind**: instance method of [<code>NodeService</code>](#NodeService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selectors | <code>string</code> | A CSS selector |
 
 <a name="NodeService+childInserted"></a>
 
@@ -752,6 +810,10 @@ Simulate the behaviour of the Text Class when there is no DOM available: the tex
     * [.replaceWith(...nodes)](#NodeService+replaceWith)
     * [.remove()](#NodeService+remove)
     * [.toChildNode(value)](#NodeService+toChildNode) ⇒ <code>PseudoNode</code>
+    * [.getElementsByTagName(tagName)](#NodeService+getElementsByTagName) ⇒ <code>PseudoHTMLCollection</code>
+    * [.getElementsByClassName(className)](#NodeService+getElementsByClassName) ⇒ <code>PseudoHTMLCollection</code>
+    * [.querySelector(selectors)](#NodeService+querySelector) ⇒ <code>PseudoElement</code> \| <code>null</code>
+    * [.querySelectorAll(selectors)](#NodeService+querySelectorAll) ⇒ <code>Array.&lt;PseudoElement&gt;</code>
     * [.childInserted(child)](#NodeService+childInserted)
     * [.cloneNode([deep])](#NodeService+cloneNode) ⇒ <code>PseudoNode</code>
     * [.compareDocumentPosition(otherNode)](#NodeService+compareDocumentPosition) ⇒ <code>number</code>
@@ -935,6 +997,55 @@ becomes a text node belonging to this node's document, anything else is returned
 | --- | --- | --- |
 | value | <code>PseudoNode</code> \| <code>string</code> | The value to add |
 
+<a name="NodeService+getElementsByTagName"></a>
+
+### textService.getElementsByTagName(tagName) ⇒ <code>PseudoHTMLCollection</code>
+Every element below this node with the given tag name (or every element when tagName is *), live.
+
+**Kind**: instance method of [<code>TextService</code>](#TextService)  
+**Overrides**: [<code>getElementsByTagName</code>](#NodeService+getElementsByTagName)  
+
+| Param | Type |
+| --- | --- |
+| tagName | <code>string</code> | 
+
+<a name="NodeService+getElementsByClassName"></a>
+
+### textService.getElementsByClassName(className) ⇒ <code>PseudoHTMLCollection</code>
+Every element below this node which has all of the given (space separated) classes, live.
+
+**Kind**: instance method of [<code>TextService</code>](#TextService)  
+**Overrides**: [<code>getElementsByClassName</code>](#NodeService+getElementsByClassName)  
+
+| Param | Type |
+| --- | --- |
+| className | <code>string</code> | 
+
+<a name="NodeService+querySelector"></a>
+
+### textService.querySelector(selectors) ⇒ <code>PseudoElement</code> \| <code>null</code>
+The first element below this node which matches the CSS selector, in tree order, or null when there is none.
+
+**Kind**: instance method of [<code>TextService</code>](#TextService)  
+**Overrides**: [<code>querySelector</code>](#NodeService+querySelector)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selectors | <code>string</code> | A CSS selector |
+
+<a name="NodeService+querySelectorAll"></a>
+
+### textService.querySelectorAll(selectors) ⇒ <code>Array.&lt;PseudoElement&gt;</code>
+Every element below this node which matches the CSS selector, in tree order. A plain array (not a live
+collection): like the DOM's querySelectorAll, it is a snapshot taken when it is called.
+
+**Kind**: instance method of [<code>TextService</code>](#TextService)  
+**Overrides**: [<code>querySelectorAll</code>](#NodeService+querySelectorAll)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selectors | <code>string</code> | A CSS selector |
+
 <a name="NodeService+childInserted"></a>
 
 ### textService.childInserted(child)
@@ -1092,6 +1203,10 @@ Simulate the behaviour of the Comment Class when there is no DOM available: a no
     * [.replaceWith(...nodes)](#NodeService+replaceWith)
     * [.remove()](#NodeService+remove)
     * [.toChildNode(value)](#NodeService+toChildNode) ⇒ <code>PseudoNode</code>
+    * [.getElementsByTagName(tagName)](#NodeService+getElementsByTagName) ⇒ <code>PseudoHTMLCollection</code>
+    * [.getElementsByClassName(className)](#NodeService+getElementsByClassName) ⇒ <code>PseudoHTMLCollection</code>
+    * [.querySelector(selectors)](#NodeService+querySelector) ⇒ <code>PseudoElement</code> \| <code>null</code>
+    * [.querySelectorAll(selectors)](#NodeService+querySelectorAll) ⇒ <code>Array.&lt;PseudoElement&gt;</code>
     * [.childInserted(child)](#NodeService+childInserted)
     * [.cloneNode([deep])](#NodeService+cloneNode) ⇒ <code>PseudoNode</code>
     * [.compareDocumentPosition(otherNode)](#NodeService+compareDocumentPosition) ⇒ <code>number</code>
@@ -1257,6 +1372,55 @@ becomes a text node belonging to this node's document, anything else is returned
 | Param | Type | Description |
 | --- | --- | --- |
 | value | <code>PseudoNode</code> \| <code>string</code> | The value to add |
+
+<a name="NodeService+getElementsByTagName"></a>
+
+### commentService.getElementsByTagName(tagName) ⇒ <code>PseudoHTMLCollection</code>
+Every element below this node with the given tag name (or every element when tagName is *), live.
+
+**Kind**: instance method of [<code>CommentService</code>](#CommentService)  
+**Overrides**: [<code>getElementsByTagName</code>](#NodeService+getElementsByTagName)  
+
+| Param | Type |
+| --- | --- |
+| tagName | <code>string</code> | 
+
+<a name="NodeService+getElementsByClassName"></a>
+
+### commentService.getElementsByClassName(className) ⇒ <code>PseudoHTMLCollection</code>
+Every element below this node which has all of the given (space separated) classes, live.
+
+**Kind**: instance method of [<code>CommentService</code>](#CommentService)  
+**Overrides**: [<code>getElementsByClassName</code>](#NodeService+getElementsByClassName)  
+
+| Param | Type |
+| --- | --- |
+| className | <code>string</code> | 
+
+<a name="NodeService+querySelector"></a>
+
+### commentService.querySelector(selectors) ⇒ <code>PseudoElement</code> \| <code>null</code>
+The first element below this node which matches the CSS selector, in tree order, or null when there is none.
+
+**Kind**: instance method of [<code>CommentService</code>](#CommentService)  
+**Overrides**: [<code>querySelector</code>](#NodeService+querySelector)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selectors | <code>string</code> | A CSS selector |
+
+<a name="NodeService+querySelectorAll"></a>
+
+### commentService.querySelectorAll(selectors) ⇒ <code>Array.&lt;PseudoElement&gt;</code>
+Every element below this node which matches the CSS selector, in tree order. A plain array (not a live
+collection): like the DOM's querySelectorAll, it is a snapshot taken when it is called.
+
+**Kind**: instance method of [<code>CommentService</code>](#CommentService)  
+**Overrides**: [<code>querySelectorAll</code>](#NodeService+querySelectorAll)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selectors | <code>string</code> | A CSS selector |
 
 <a name="NodeService+childInserted"></a>
 
@@ -1715,14 +1879,14 @@ Take the focus away from the element, when it has it: it gets blur then focusout
 <a name="HTMLCollectionService"></a>
 
 ## HTMLCollectionService
-Simulate the behaviour of the HTMLCollection Class when there is no DOM available: a live view of the element
-children of a node, recomputed from its childNodes each time it is used rather than kept in sync as they change.
+Simulate the behaviour of the HTMLCollection Class when there is no DOM available: a live view of some of a node's
+element descendants, recomputed each time it is used rather than kept in sync as they change.
 
 **Kind**: global class  
 **Author**: Joshua Heagle <joshuaheagle@gmail.com>  
 
 * [HTMLCollectionService](#HTMLCollectionService)
-    * [new HTMLCollectionService(owner)](#new_HTMLCollectionService_new)
+    * [new HTMLCollectionService(owner, [predicate], [deep])](#new_HTMLCollectionService_new)
     * [.length](#HTMLCollectionService+length) ⇒ <code>number</code>
     * [.elements()](#HTMLCollectionService+elements) ⇒ <code>Array.&lt;PseudoNode&gt;</code>
     * [.item(index)](#HTMLCollectionService+item) ⇒ <code>\*</code>
@@ -1730,11 +1894,13 @@ children of a node, recomputed from its childNodes each time it is used rather t
 
 <a name="new_HTMLCollectionService_new"></a>
 
-### new HTMLCollectionService(owner)
+### new HTMLCollectionService(owner, [predicate], [deep])
 
-| Param | Type | Description |
-| --- | --- | --- |
-| owner | [<code>NodeService</code>](#NodeService) | The node whose element children this is a live view of |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| owner | [<code>NodeService</code>](#NodeService) |  | The node this is a live view of a part of |
+| [predicate] | <code>function</code> |  | Only elements which pass this are included (every element by default) |
+| [deep] | <code>boolean</code> | <code>false</code> | Include every matching descendant (true, like getElementsByTagName), not just the direct element children (false, like Element.children) |
 
 <a name="HTMLCollectionService+length"></a>
 
@@ -1745,7 +1911,7 @@ How many elements are in the collection right now.
 <a name="HTMLCollectionService+elements"></a>
 
 ### htmlCollectionService.elements() ⇒ <code>Array.&lt;PseudoNode&gt;</code>
-The current element children of the owner, in order.
+The current elements the collection holds, in tree order.
 
 **Kind**: instance method of [<code>HTMLCollectionService</code>](#HTMLCollectionService)  
 <a name="HTMLCollectionService+item"></a>
@@ -2085,6 +2251,8 @@ Simulate the behaviour of the Element Class when there is no DOM available.
     * [.insertAdjacentText(position, text)](#ElementService+insertAdjacentText)
     * [.insertAdjacent(position, node)](#ElementService+insertAdjacent) ⇒ <code>PseudoNode</code> \| <code>null</code>
     * [.insertAdjacentHTML(position, text)](#ElementService+insertAdjacentHTML)
+    * [.matches(selectors)](#ElementService+matches) ⇒ <code>boolean</code>
+    * [.closest(selectors)](#ElementService+closest) ⇒ <code>PseudoElement</code> \| <code>null</code>
     * [.childInserted(child)](#ElementService+childInserted)
     * [.hasAttribute(attributeName)](#ElementService+hasAttribute) ⇒ <code>boolean</code>
     * [.setAttribute(attributeName, attributeValue)](#ElementService+setAttribute) ⇒ <code>undefined</code>
@@ -2233,6 +2401,29 @@ Not implemented yet (HTML parsing is out of scope for now).
 | position | <code>string</code> | beforebegin, afterbegin, beforeend or afterend |
 | text | <code>string</code> | The markup which would be parsed |
 
+<a name="ElementService+matches"></a>
+
+### elementService.matches(selectors) ⇒ <code>boolean</code>
+Whether this element itself (not its descendants) matches the given CSS selector.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selectors | <code>string</code> | A CSS selector |
+
+<a name="ElementService+closest"></a>
+
+### elementService.closest(selectors) ⇒ <code>PseudoElement</code> \| <code>null</code>
+The nearest ancestor of this element (starting with this element itself) which matches the CSS selector, or
+null when none of them do.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selectors | <code>string</code> | A CSS selector |
+
 <a name="ElementService+childInserted"></a>
 
 ### elementService.childInserted(child)
@@ -2301,6 +2492,7 @@ Simulate the behaviour of the Document Class when there is no DOM available.
 
 * [DocumentService](#DocumentService) ⇐ [<code>NodeService</code>](#NodeService)
     * [.acceptsChildren](#NodeService+acceptsChildren) ⇒ <code>boolean</code>
+    * [.getElementById(id)](#DocumentService+getElementById) ⇒ <code>PseudoElement</code> \| <code>null</code>
     * [.appendChild(childNode)](#NodeService+appendChild) ⇒ <code>PseudoNode</code>
     * [.cloneShallow()](#NodeService+cloneShallow) ⇒ [<code>NodeService</code>](#NodeService)
     * [.equalsShallow(other)](#NodeService+equalsShallow) ⇒ <code>boolean</code>
@@ -2312,6 +2504,10 @@ Simulate the behaviour of the Document Class when there is no DOM available.
     * [.replaceWith(...nodes)](#NodeService+replaceWith)
     * [.remove()](#NodeService+remove)
     * [.toChildNode(value)](#NodeService+toChildNode) ⇒ <code>PseudoNode</code>
+    * [.getElementsByTagName(tagName)](#NodeService+getElementsByTagName) ⇒ <code>PseudoHTMLCollection</code>
+    * [.getElementsByClassName(className)](#NodeService+getElementsByClassName) ⇒ <code>PseudoHTMLCollection</code>
+    * [.querySelector(selectors)](#NodeService+querySelector) ⇒ <code>PseudoElement</code> \| <code>null</code>
+    * [.querySelectorAll(selectors)](#NodeService+querySelectorAll) ⇒ <code>Array.&lt;PseudoElement&gt;</code>
     * [.childInserted(child)](#NodeService+childInserted)
     * [.cloneNode([deep])](#NodeService+cloneNode) ⇒ <code>PseudoNode</code>
     * [.compareDocumentPosition(otherNode)](#NodeService+compareDocumentPosition) ⇒ <code>number</code>
@@ -2328,6 +2524,17 @@ Simulate the behaviour of the Document Class when there is no DOM available.
 Whether this kind of node can have children (text, comments and attributes cannot).
 
 **Kind**: instance property of [<code>DocumentService</code>](#DocumentService)  
+<a name="DocumentService+getElementById"></a>
+
+### documentService.getElementById(id) ⇒ <code>PseudoElement</code> \| <code>null</code>
+The first element, in tree order, whose id matches the given value, or null when there is none.
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
+
+| Param | Type |
+| --- | --- |
+| id | <code>string</code> | 
+
 <a name="NodeService+appendChild"></a>
 
 ### documentService.appendChild(childNode) ⇒ <code>PseudoNode</code>
@@ -2457,6 +2664,51 @@ becomes a text node belonging to this node's document, anything else is returned
 | Param | Type | Description |
 | --- | --- | --- |
 | value | <code>PseudoNode</code> \| <code>string</code> | The value to add |
+
+<a name="NodeService+getElementsByTagName"></a>
+
+### documentService.getElementsByTagName(tagName) ⇒ <code>PseudoHTMLCollection</code>
+Every element below this node with the given tag name (or every element when tagName is *), live.
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
+
+| Param | Type |
+| --- | --- |
+| tagName | <code>string</code> | 
+
+<a name="NodeService+getElementsByClassName"></a>
+
+### documentService.getElementsByClassName(className) ⇒ <code>PseudoHTMLCollection</code>
+Every element below this node which has all of the given (space separated) classes, live.
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
+
+| Param | Type |
+| --- | --- |
+| className | <code>string</code> | 
+
+<a name="NodeService+querySelector"></a>
+
+### documentService.querySelector(selectors) ⇒ <code>PseudoElement</code> \| <code>null</code>
+The first element below this node which matches the CSS selector, in tree order, or null when there is none.
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selectors | <code>string</code> | A CSS selector |
+
+<a name="NodeService+querySelectorAll"></a>
+
+### documentService.querySelectorAll(selectors) ⇒ <code>Array.&lt;PseudoElement&gt;</code>
+Every element below this node which matches the CSS selector, in tree order. A plain array (not a live
+collection): like the DOM's querySelectorAll, it is a snapshot taken when it is called.
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selectors | <code>string</code> | A CSS selector |
 
 <a name="NodeService+childInserted"></a>
 
@@ -2599,6 +2851,10 @@ not part of a tree, when it is inserted its children are moved into the tree ins
     * [.replaceWith(...nodes)](#NodeService+replaceWith)
     * [.remove()](#NodeService+remove)
     * [.toChildNode(value)](#NodeService+toChildNode) ⇒ <code>PseudoNode</code>
+    * [.getElementsByTagName(tagName)](#NodeService+getElementsByTagName) ⇒ <code>PseudoHTMLCollection</code>
+    * [.getElementsByClassName(className)](#NodeService+getElementsByClassName) ⇒ <code>PseudoHTMLCollection</code>
+    * [.querySelector(selectors)](#NodeService+querySelector) ⇒ <code>PseudoElement</code> \| <code>null</code>
+    * [.querySelectorAll(selectors)](#NodeService+querySelectorAll) ⇒ <code>Array.&lt;PseudoElement&gt;</code>
     * [.childInserted(child)](#NodeService+childInserted)
     * [.cloneNode([deep])](#NodeService+cloneNode) ⇒ <code>PseudoNode</code>
     * [.compareDocumentPosition(otherNode)](#NodeService+compareDocumentPosition) ⇒ <code>number</code>
@@ -2744,6 +3000,51 @@ becomes a text node belonging to this node's document, anything else is returned
 | Param | Type | Description |
 | --- | --- | --- |
 | value | <code>PseudoNode</code> \| <code>string</code> | The value to add |
+
+<a name="NodeService+getElementsByTagName"></a>
+
+### documentFragmentService.getElementsByTagName(tagName) ⇒ <code>PseudoHTMLCollection</code>
+Every element below this node with the given tag name (or every element when tagName is *), live.
+
+**Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
+
+| Param | Type |
+| --- | --- |
+| tagName | <code>string</code> | 
+
+<a name="NodeService+getElementsByClassName"></a>
+
+### documentFragmentService.getElementsByClassName(className) ⇒ <code>PseudoHTMLCollection</code>
+Every element below this node which has all of the given (space separated) classes, live.
+
+**Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
+
+| Param | Type |
+| --- | --- |
+| className | <code>string</code> | 
+
+<a name="NodeService+querySelector"></a>
+
+### documentFragmentService.querySelector(selectors) ⇒ <code>PseudoElement</code> \| <code>null</code>
+The first element below this node which matches the CSS selector, in tree order, or null when there is none.
+
+**Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selectors | <code>string</code> | A CSS selector |
+
+<a name="NodeService+querySelectorAll"></a>
+
+### documentFragmentService.querySelectorAll(selectors) ⇒ <code>Array.&lt;PseudoElement&gt;</code>
+Every element below this node which matches the CSS selector, in tree order. A plain array (not a live
+collection): like the DOM's querySelectorAll, it is a snapshot taken when it is called.
+
+**Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selectors | <code>string</code> | A CSS selector |
 
 <a name="NodeService+childInserted"></a>
 
@@ -2971,6 +3272,10 @@ Simulate the behaviour of the Attr Class when there is no DOM available.
     * [.replaceWith(...nodes)](#NodeService+replaceWith)
     * [.remove()](#NodeService+remove)
     * [.toChildNode(value)](#NodeService+toChildNode) ⇒ <code>PseudoNode</code>
+    * [.getElementsByTagName(tagName)](#NodeService+getElementsByTagName) ⇒ <code>PseudoHTMLCollection</code>
+    * [.getElementsByClassName(className)](#NodeService+getElementsByClassName) ⇒ <code>PseudoHTMLCollection</code>
+    * [.querySelector(selectors)](#NodeService+querySelector) ⇒ <code>PseudoElement</code> \| <code>null</code>
+    * [.querySelectorAll(selectors)](#NodeService+querySelectorAll) ⇒ <code>Array.&lt;PseudoElement&gt;</code>
     * [.childInserted(child)](#NodeService+childInserted)
     * [.cloneNode([deep])](#NodeService+cloneNode) ⇒ <code>PseudoNode</code>
     * [.compareDocumentPosition(otherNode)](#NodeService+compareDocumentPosition) ⇒ <code>number</code>
@@ -3141,6 +3446,55 @@ becomes a text node belonging to this node's document, anything else is returned
 | --- | --- | --- |
 | value | <code>PseudoNode</code> \| <code>string</code> | The value to add |
 
+<a name="NodeService+getElementsByTagName"></a>
+
+### attrService.getElementsByTagName(tagName) ⇒ <code>PseudoHTMLCollection</code>
+Every element below this node with the given tag name (or every element when tagName is *), live.
+
+**Kind**: instance method of [<code>AttrService</code>](#AttrService)  
+**Overrides**: [<code>getElementsByTagName</code>](#NodeService+getElementsByTagName)  
+
+| Param | Type |
+| --- | --- |
+| tagName | <code>string</code> | 
+
+<a name="NodeService+getElementsByClassName"></a>
+
+### attrService.getElementsByClassName(className) ⇒ <code>PseudoHTMLCollection</code>
+Every element below this node which has all of the given (space separated) classes, live.
+
+**Kind**: instance method of [<code>AttrService</code>](#AttrService)  
+**Overrides**: [<code>getElementsByClassName</code>](#NodeService+getElementsByClassName)  
+
+| Param | Type |
+| --- | --- |
+| className | <code>string</code> | 
+
+<a name="NodeService+querySelector"></a>
+
+### attrService.querySelector(selectors) ⇒ <code>PseudoElement</code> \| <code>null</code>
+The first element below this node which matches the CSS selector, in tree order, or null when there is none.
+
+**Kind**: instance method of [<code>AttrService</code>](#AttrService)  
+**Overrides**: [<code>querySelector</code>](#NodeService+querySelector)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selectors | <code>string</code> | A CSS selector |
+
+<a name="NodeService+querySelectorAll"></a>
+
+### attrService.querySelectorAll(selectors) ⇒ <code>Array.&lt;PseudoElement&gt;</code>
+Every element below this node which matches the CSS selector, in tree order. A plain array (not a live
+collection): like the DOM's querySelectorAll, it is a snapshot taken when it is called.
+
+**Kind**: instance method of [<code>AttrService</code>](#AttrService)  
+**Overrides**: [<code>querySelectorAll</code>](#NodeService+querySelectorAll)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selectors | <code>string</code> | A CSS selector |
+
 <a name="NodeService+childInserted"></a>
 
 ### attrService.childInserted(child)
@@ -3292,6 +3646,10 @@ from that linker, and its parent from the linker's parent when it has not been g
     * [.replaceWith(...nodes)](#NodeService+replaceWith)
     * [.remove()](#NodeService+remove)
     * [.toChildNode(value)](#NodeService+toChildNode) ⇒ <code>PseudoNode</code>
+    * [.getElementsByTagName(tagName)](#NodeService+getElementsByTagName) ⇒ <code>PseudoHTMLCollection</code>
+    * [.getElementsByClassName(className)](#NodeService+getElementsByClassName) ⇒ <code>PseudoHTMLCollection</code>
+    * [.querySelector(selectors)](#NodeService+querySelector) ⇒ <code>PseudoElement</code> \| <code>null</code>
+    * [.querySelectorAll(selectors)](#NodeService+querySelectorAll) ⇒ <code>Array.&lt;PseudoElement&gt;</code>
     * [.childInserted(child)](#NodeService+childInserted)
     * [.cloneNode([deep])](#NodeService+cloneNode) ⇒ <code>PseudoNode</code>
     * [.compareDocumentPosition(otherNode)](#NodeService+compareDocumentPosition) ⇒ <code>number</code>
@@ -3458,6 +3816,55 @@ becomes a text node belonging to this node's document, anything else is returned
 | Param | Type | Description |
 | --- | --- | --- |
 | value | <code>PseudoNode</code> \| <code>string</code> | The value to add |
+
+<a name="NodeService+getElementsByTagName"></a>
+
+### linkedNode.getElementsByTagName(tagName) ⇒ <code>PseudoHTMLCollection</code>
+Every element below this node with the given tag name (or every element when tagName is *), live.
+
+**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
+**Overrides**: [<code>getElementsByTagName</code>](#NodeService+getElementsByTagName)  
+
+| Param | Type |
+| --- | --- |
+| tagName | <code>string</code> | 
+
+<a name="NodeService+getElementsByClassName"></a>
+
+### linkedNode.getElementsByClassName(className) ⇒ <code>PseudoHTMLCollection</code>
+Every element below this node which has all of the given (space separated) classes, live.
+
+**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
+**Overrides**: [<code>getElementsByClassName</code>](#NodeService+getElementsByClassName)  
+
+| Param | Type |
+| --- | --- |
+| className | <code>string</code> | 
+
+<a name="NodeService+querySelector"></a>
+
+### linkedNode.querySelector(selectors) ⇒ <code>PseudoElement</code> \| <code>null</code>
+The first element below this node which matches the CSS selector, in tree order, or null when there is none.
+
+**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
+**Overrides**: [<code>querySelector</code>](#NodeService+querySelector)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selectors | <code>string</code> | A CSS selector |
+
+<a name="NodeService+querySelectorAll"></a>
+
+### linkedNode.querySelectorAll(selectors) ⇒ <code>Array.&lt;PseudoElement&gt;</code>
+Every element below this node which matches the CSS selector, in tree order. A plain array (not a live
+collection): like the DOM's querySelectorAll, it is a snapshot taken when it is called.
+
+**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
+**Overrides**: [<code>querySelectorAll</code>](#NodeService+querySelectorAll)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selectors | <code>string</code> | A CSS selector |
 
 <a name="NodeService+childInserted"></a>
 
@@ -3998,6 +4405,18 @@ Create an instance of HTMLElement if not available
 Define document when not available
 
 **Kind**: inner constant of [<code>generateDocument</code>](#generateDocument)  
+<a name="nearestElementSibling"></a>
+
+## nearestElementSibling(node, direction) ⇒ <code>\*</code> \| <code>null</code>
+Walk up from a node (not including it) to find the nearest element, in the given direction.
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| node | <code>\*</code> | The node to start from |
+| direction | <code>&#x27;nextSibling&#x27;</code> \| <code>&#x27;previousSibling&#x27;</code> | Which sibling reference to follow |
+
 <a name="createEvent"></a>
 
 ## createEvent(type, [init], [options]) ⇒ [<code>EventService</code>](#EventService)

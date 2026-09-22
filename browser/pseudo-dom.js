@@ -151,7 +151,7 @@
       }
     }
     exports.default = PseudoEventListener
-  }, { '../services/EventService': 18 }],
+  }, { '../services/EventService': 20 }],
   2: [function (require, module, exports) {
     'use strict'
 
@@ -297,7 +297,7 @@
       }
     }
     exports.default = PseudoHTMLDocument
-  }, { '../services/DocumentFragmentService': 16, '../services/HTMLElementService': 22, '../services/NodeService': 27, 'core-js/modules/esnext.iterator.constructor.js': 178, 'core-js/modules/esnext.iterator.find.js': 181, 'core-js/modules/esnext.iterator.for-each.js': 182 }],
+  }, { '../services/DocumentFragmentService': 18, '../services/HTMLElementService': 24, '../services/NodeService': 29, 'core-js/modules/esnext.iterator.constructor.js': 182, 'core-js/modules/esnext.iterator.find.js': 185, 'core-js/modules/esnext.iterator.for-each.js': 186 }],
   3: [function (require, module, exports) {
     'use strict'
 
@@ -370,7 +370,7 @@
       }
     }
     exports.PseudoNodeList = PseudoNodeList
-  }, { 'collect-your-stuff/dist/collections/linked-tree-list/LinkedTreeList': 37, 'core-js/modules/esnext.iterator.constructor.js': 178, 'core-js/modules/esnext.iterator.map.js': 183 }],
+  }, { 'collect-your-stuff/dist/collections/linked-tree-list/LinkedTreeList': 41, 'core-js/modules/esnext.iterator.constructor.js': 182, 'core-js/modules/esnext.iterator.map.js': 187 }],
   4: [function (require, module, exports) {
     'use strict'
 
@@ -428,8 +428,97 @@
     }
     exports.createEvent = createEvent
     exports.default = exports.createEvent
-  }, { '../services/CustomEventService': 14, '../services/EventService': 18, '../services/FocusEventService': 20, '../services/InputEventService': 23, '../services/KeyboardEventService': 24, '../services/MouseEventService': 25, '../services/PointerEventService': 28, '../services/UIEventService': 29, './eventDefaults': 5 }],
+  }, { '../services/CustomEventService': 16, '../services/EventService': 20, '../services/FocusEventService': 22, '../services/InputEventService': 25, '../services/KeyboardEventService': 26, '../services/MouseEventService': 27, '../services/PointerEventService': 30, '../services/UIEventService': 31, './eventDefaults': 6 }],
   5: [function (require, module, exports) {
+    'use strict'
+
+    require('core-js/modules/esnext.iterator.constructor.js')
+    require('core-js/modules/esnext.iterator.filter.js')
+    require('core-js/modules/esnext.iterator.for-each.js')
+    require('core-js/modules/esnext.iterator.some.js')
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.cssSelectAdapter = void 0
+    /**
+ * @file The css-select Adapter which lets it query pseudo-dom's own tree, instead of the domutils-based tree it
+ * defaults to.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @version 1.0.0
+ */
+    const NodeService_1 = require('../services/NodeService')
+    /**
+ * Walk up from a node (not including it) to find the nearest element, in the given direction.
+ * @param {*} node The node to start from
+ * @param {'nextSibling'|'previousSibling'} direction Which sibling reference to follow
+ * @returns {*|null}
+ */
+    const nearestElementSibling = (node, direction) => {
+      let current = node ? node[direction] : null
+      while (current && current.nodeType !== NodeService_1.NodeService.ELEMENT_NODE) {
+        current = current[direction]
+      }
+      return current || null
+    }
+    /**
+ * Maps pseudo-dom's own Node / Element API onto the Adapter interface css-select needs to query a tree which is not
+ * domutils' own (css-select's own Adapter<Node, ElementNode> type). Every method here is one pseudo-dom already has
+ * under a different name; nothing here reimplements DOM behaviour.
+ * @memberOf module:factories
+ * @type {Object}
+ */
+    exports.cssSelectAdapter = {
+      isTag: node => !!node && node.nodeType === NodeService_1.NodeService.ELEMENT_NODE,
+      existsOne: (test, elems) => elems.some(elem => exports.cssSelectAdapter.isTag(elem) && (test(elem) || exports.cssSelectAdapter.existsOne(test, exports.cssSelectAdapter.getChildren(elem)))),
+      // pseudo-dom's className / classList are kept in sync with each other, but not with a literal 'class' attribute
+      // (there is no such special-cased attribute here, unlike a real DOM) - so the 'class' css-select needs for class
+      // selectors is read from className instead.
+      getAttributeValue: (elem, name) => {
+        const value = name === 'class' ? elem.className : elem.getAttribute(name)
+        return value === null || value === undefined ? undefined : value
+      },
+      getChildren: node => Array.from(node.childNodes),
+      getName: elem => elem.tagName,
+      getParent: node => node.parentNode,
+      // Unlike jQuery's siblings(), this is expected to include the node itself
+      getSiblings: node => node.parentNode ? Array.from(node.parentNode.childNodes) : [node],
+      prevElementSibling: node => nearestElementSibling(node, 'previousSibling'),
+      getText: node => node.textContent || '',
+      hasAttrib: (elem, name) => elem.hasAttribute(name),
+      removeSubsets: nodes => nodes.filter((node, index) => !nodes.some((other, otherIndex) => otherIndex !== index && typeof other.contains === 'function' && other !== node && other.contains(node))),
+      findAll: (test, nodes) => {
+        const found = []
+        const visit = list => list.forEach(node => {
+          if (!exports.cssSelectAdapter.isTag(node)) {
+            return
+          }
+          if (test(node)) {
+            found.push(node)
+          }
+          visit(exports.cssSelectAdapter.getChildren(node))
+        })
+        visit(nodes)
+        return found
+      },
+      findOne: (test, nodes) => {
+        for (const node of nodes) {
+          if (!exports.cssSelectAdapter.isTag(node)) {
+            continue
+          }
+          if (test(node)) {
+            return node
+          }
+          const inChildren = exports.cssSelectAdapter.findOne(test, exports.cssSelectAdapter.getChildren(node))
+          if (inChildren) {
+            return inChildren
+          }
+        }
+        return null
+      }
+    }
+    exports.default = exports.cssSelectAdapter
+  }, { '../services/NodeService': 29, 'core-js/modules/esnext.iterator.constructor.js': 182, 'core-js/modules/esnext.iterator.filter.js': 184, 'core-js/modules/esnext.iterator.for-each.js': 186, 'core-js/modules/esnext.iterator.some.js': 189 }],
+  6: [function (require, module, exports) {
     'use strict'
 
     /**
@@ -536,7 +625,7 @@
     }
     exports.default = exports.eventDefaults
   }, {}],
-  6: [function (require, module, exports) {
+  7: [function (require, module, exports) {
     'use strict'
 
     const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
@@ -602,8 +691,8 @@
       return context ? Object.assign(context, newWindow) : Object.assign(root, newWindow)
     }
     exports.default = generateDocument
-  }, { '../classes/PseudoHTMLDocument': 2, '../services/ElementService': 17, '../services/EventTargetService': 19, '../services/HTMLElementService': 22, '../services/NodeService': 27 }],
-  7: [function (require, module, exports) {
+  }, { '../classes/PseudoHTMLDocument': 2, '../services/ElementService': 19, '../services/EventTargetService': 21, '../services/HTMLElementService': 24, '../services/NodeService': 29 }],
+  8: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -618,7 +707,75 @@
     const generateNodeList = (innerList = null) => new PseudoNodeList_1.PseudoNodeList().initialize(innerList)
     exports.default = generateNodeList
   }, { '../classes/PseudoNodeList': 3 }],
-  8: [function (require, module, exports) {
+  9: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
+    exports.closest = exports.matches = exports.querySelector = exports.querySelectorAll = void 0
+    /**
+ * @file Selector queries (querySelector, querySelectorAll, matches, closest), built on css-select and the
+ * cssSelectAdapter which lets it query pseudo-dom's own tree.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @version 1.0.0
+ */
+    const css_select_1 = require('css-select')
+    const cssSelectAdapter_1 = require('./cssSelectAdapter')
+    /**
+ * All of the elements below (not including) scope which match the selector, in tree order.
+ * @memberOf module:factories
+ * @param {string} selector A CSS selector
+ * @param {*} scope The node to search below
+ * @returns {Array<*>}
+ */
+    const querySelectorAll = (selector, scope) => (0, css_select_1.selectAll)(selector, scope, {
+      adapter: cssSelectAdapter_1.cssSelectAdapter
+    })
+    exports.querySelectorAll = querySelectorAll
+    /**
+ * The first element below (not including) scope which matches the selector, in tree order, or null when there is none.
+ * @memberOf module:factories
+ * @param {string} selector A CSS selector
+ * @param {*} scope The node to search below
+ * @returns {*|null}
+ */
+    const querySelector = (selector, scope) => (0, css_select_1.selectOne)(selector, scope, {
+      adapter: cssSelectAdapter_1.cssSelectAdapter
+    })
+    exports.querySelector = querySelector
+    /**
+ * Whether an element itself (not its descendants) matches the selector.
+ * @memberOf module:factories
+ * @param {*} element The element to test
+ * @param {string} selector A CSS selector
+ * @returns {boolean}
+ */
+    const matches = (element, selector) => (0, css_select_1.is)(element, selector, {
+      adapter: cssSelectAdapter_1.cssSelectAdapter
+    })
+    exports.matches = matches
+    /**
+ * The nearest ancestor of an element (starting with the element itself) which matches the selector, or null when
+ * none of them do.
+ * @memberOf module:factories
+ * @param {*} element The element to start from
+ * @param {string} selector A CSS selector
+ * @returns {*|null}
+ */
+    const closest = (element, selector) => {
+      let current = element
+      while (current && cssSelectAdapter_1.cssSelectAdapter.isTag(current)) {
+        if ((0, exports.matches)(current, selector)) {
+          return current
+        }
+        current = current.parentNode
+      }
+      return null
+    }
+    exports.closest = closest
+  }, { './cssSelectAdapter': 5, 'css-select': 228 }],
+  10: [function (require, module, exports) {
     'use strict'
 
     require('core-js/modules/esnext.weak-map.delete-all.js')
@@ -652,8 +809,8 @@
       }
     }
     exports.setActiveElement = setActiveElement
-  }, { 'core-js/modules/esnext.weak-map.delete-all.js': 215 }],
-  9: [function (require, module, exports) {
+  }, { 'core-js/modules/esnext.weak-map.delete-all.js': 219 }],
+  11: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -677,7 +834,7 @@
     }
     exports.default = getParentNodes
   }, {}],
-  10: [function (require, module, exports) {
+  12: [function (require, module, exports) {
     'use strict'
 
     require('core-js/modules/esnext.iterator.constructor.js')
@@ -707,8 +864,8 @@
       return (0, getParentNodes_1.default)(node).filter(parent => (parent[attr] || false) === value)
     }
     exports.default = getParentNodesFromAttribute
-  }, { './getParentNodes': 9, 'core-js/modules/esnext.iterator.constructor.js': 178, 'core-js/modules/esnext.iterator.filter.js': 180 }],
-  11: [function (require, module, exports) {
+  }, { './getParentNodes': 11, 'core-js/modules/esnext.iterator.constructor.js': 182, 'core-js/modules/esnext.iterator.filter.js': 184 }],
+  13: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -751,7 +908,7 @@
     }
     exports.modifierState = modifierState
   }, {}],
-  12: [function (require, module, exports) {
+  14: [function (require, module, exports) {
     'use strict'
 
     /**
@@ -907,8 +1064,8 @@
       // @ts-ignore
       window.pseudoDom = pseudoDom
     }
-  }, { './classes/PseudoHTMLDocument': 2, './factories/createEvent': 4, './factories/eventDefaults': 5, './factories/generateDocument': 6, './services/CustomEventService': 14, './services/ElementService': 17, './services/EventService': 18, './services/EventTargetService': 19, './services/FocusEventService': 20, './services/HTMLElementService': 22, './services/InputEventService': 23, './services/KeyboardEventService': 24, './services/MouseEventService': 25, './services/NodeService': 27, './services/PointerEventService': 28, './services/UIEventService': 29, './simulate': 30 }],
-  13: [function (require, module, exports) {
+  }, { './classes/PseudoHTMLDocument': 2, './factories/createEvent': 4, './factories/eventDefaults': 6, './factories/generateDocument': 7, './services/CustomEventService': 16, './services/ElementService': 19, './services/EventService': 20, './services/EventTargetService': 21, './services/FocusEventService': 22, './services/HTMLElementService': 24, './services/InputEventService': 25, './services/KeyboardEventService': 26, './services/MouseEventService': 27, './services/NodeService': 29, './services/PointerEventService': 30, './services/UIEventService': 31, './simulate': 32 }],
+  15: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -990,8 +1147,8 @@
       }
     }
     exports.AttrService = AttrService
-  }, { './NodeService': 27 }],
-  14: [function (require, module, exports) {
+  }, { './NodeService': 29 }],
+  16: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -1027,8 +1184,8 @@
       }
     }
     exports.CustomEventService = CustomEventService
-  }, { './EventService': 18 }],
-  15: [function (require, module, exports) {
+  }, { './EventService': 20 }],
+  17: [function (require, module, exports) {
     'use strict'
 
     require('core-js/modules/esnext.iterator.constructor.js')
@@ -1146,8 +1303,8 @@
       }
     }
     exports.DOMTokenListService = DOMTokenListService
-  }, { 'core-js/modules/esnext.iterator.constructor.js': 178, 'core-js/modules/esnext.iterator.filter.js': 180, 'core-js/modules/esnext.iterator.for-each.js': 182, 'core-js/modules/esnext.iterator.map.js': 183 }],
-  16: [function (require, module, exports) {
+  }, { 'core-js/modules/esnext.iterator.constructor.js': 182, 'core-js/modules/esnext.iterator.filter.js': 184, 'core-js/modules/esnext.iterator.for-each.js': 186, 'core-js/modules/esnext.iterator.map.js': 187 }],
+  18: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -1172,8 +1329,8 @@
       }
     }
     exports.DocumentFragmentService = DocumentFragmentService
-  }, { './NodeService': 27 }],
-  17: [function (require, module, exports) {
+  }, { './NodeService': 29 }],
+  19: [function (require, module, exports) {
     'use strict'
 
     require('core-js/modules/esnext.iterator.constructor.js')
@@ -1202,6 +1359,7 @@
     const HTMLCollectionService_1 = require('./HTMLCollectionService')
     const cloneObject_1 = __importDefault(require('si-funciona/dist/helpers/objects/cloneObject'))
     const isEqual_1 = __importDefault(require('si-funciona/dist/helpers/objects/isEqual'))
+    const query_1 = require('../factories/query')
     /**
  * Simulate the behaviour of the Element Class when there is no DOM available.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -1483,6 +1641,25 @@
         throw new Error('ElementService.insertAdjacentHTML() is not implemented yet.')
       }
 
+      /**
+   * Whether this element itself (not its descendants) matches the given CSS selector.
+   * @param {string} selectors A CSS selector
+   * @returns {boolean}
+   */
+      matches (selectors) {
+        return (0, query_1.matches)(this, selectors)
+      }
+
+      /**
+   * The nearest ancestor of this element (starting with this element itself) which matches the CSS selector, or
+   * null when none of them do.
+   * @param {string} selectors A CSS selector
+   * @returns {PseudoElement|null}
+   */
+      closest (selectors) {
+        return (0, query_1.closest)(this, selectors)
+      }
+
       applyDefaultEvent () {
         let callback = event => undefined
         if (this.defaultEventApplied) {
@@ -1580,8 +1757,8 @@
       }
     }
     exports.ElementService = ElementService
-  }, { '../factories/createEvent': 4, '../functions/getParentNodesFromAttribute': 10, './AttrService': 13, './DOMTokenListService': 15, './HTMLCollectionService': 21, './NamedNodeMapService': 26, './NodeService': 27, 'core-js/modules/esnext.iterator.constructor.js': 178, 'core-js/modules/esnext.iterator.every.js': 179, 'core-js/modules/esnext.iterator.find.js': 181, 'core-js/modules/esnext.iterator.for-each.js': 182, 'core-js/modules/esnext.iterator.map.js': 183, 'core-js/modules/esnext.iterator.some.js': 185, 'si-funciona/dist/helpers/objects/cloneObject': 220, 'si-funciona/dist/helpers/objects/isEqual': 222 }],
-  18: [function (require, module, exports) {
+  }, { '../factories/createEvent': 4, '../factories/query': 9, '../functions/getParentNodesFromAttribute': 12, './AttrService': 15, './DOMTokenListService': 17, './HTMLCollectionService': 23, './NamedNodeMapService': 28, './NodeService': 29, 'core-js/modules/esnext.iterator.constructor.js': 182, 'core-js/modules/esnext.iterator.every.js': 183, 'core-js/modules/esnext.iterator.find.js': 185, 'core-js/modules/esnext.iterator.for-each.js': 186, 'core-js/modules/esnext.iterator.map.js': 187, 'core-js/modules/esnext.iterator.some.js': 189, 'si-funciona/dist/helpers/objects/cloneObject': 243, 'si-funciona/dist/helpers/objects/isEqual': 245 }],
+  20: [function (require, module, exports) {
     'use strict'
 
     /**
@@ -1833,7 +2010,7 @@
     EventService.AT_TARGET = 2
     EventService.BUBBLING_PHASE = 3
   }, {}],
-  19: [function (require, module, exports) {
+  21: [function (require, module, exports) {
     'use strict'
 
     require('core-js/modules/esnext.iterator.constructor.js')
@@ -2066,8 +2243,8 @@
       }
     }
     exports.default = EventTargetService
-  }, { '../classes/PseudoEventListener': 1, '../functions/getParentNodes': 9, './EventService': 18, 'collect-your-stuff/dist/collections/linked-list/LinkedList': 35, 'core-js/modules/esnext.iterator.constructor.js': 178, 'core-js/modules/esnext.iterator.filter.js': 180, 'core-js/modules/esnext.iterator.find.js': 181, 'core-js/modules/esnext.iterator.for-each.js': 182, 'core-js/modules/esnext.iterator.map.js': 183, 'core-js/modules/esnext.iterator.some.js': 185 }],
-  20: [function (require, module, exports) {
+  }, { '../classes/PseudoEventListener': 1, '../functions/getParentNodes': 11, './EventService': 20, 'collect-your-stuff/dist/collections/linked-list/LinkedList': 39, 'core-js/modules/esnext.iterator.constructor.js': 182, 'core-js/modules/esnext.iterator.filter.js': 184, 'core-js/modules/esnext.iterator.find.js': 185, 'core-js/modules/esnext.iterator.for-each.js': 186, 'core-js/modules/esnext.iterator.map.js': 187, 'core-js/modules/esnext.iterator.some.js': 189 }],
+  22: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -2103,13 +2280,13 @@
       }
     }
     exports.FocusEventService = FocusEventService
-  }, { './UIEventService': 29 }],
-  21: [function (require, module, exports) {
+  }, { './UIEventService': 31 }],
+  23: [function (require, module, exports) {
     'use strict'
 
     require('core-js/modules/esnext.iterator.constructor.js')
-    require('core-js/modules/esnext.iterator.filter.js')
     require('core-js/modules/esnext.iterator.find.js')
+    require('core-js/modules/esnext.iterator.for-each.js')
     Object.defineProperty(exports, '__esModule', {
       value: true
     })
@@ -2121,26 +2298,43 @@
  */
     const NodeService_1 = require('./NodeService')
     /**
- * Simulate the behaviour of the HTMLCollection Class when there is no DOM available: a live view of the element
- * children of a node, recomputed from its childNodes each time it is used rather than kept in sync as they change.
+ * Simulate the behaviour of the HTMLCollection Class when there is no DOM available: a live view of some of a node's
+ * element descendants, recomputed each time it is used rather than kept in sync as they change.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @class
  */
     class HTMLCollectionService {
       /**
-   * @param {NodeService} owner The node whose element children this is a live view of
+   * @param {NodeService} owner The node this is a live view of a part of
+   * @param {function(*): boolean} [predicate] Only elements which pass this are included (every element by default)
+   * @param {boolean} [deep=false] Include every matching descendant (true, like getElementsByTagName), not just the
+   * direct element children (false, like Element.children)
    * @constructor
    */
-      constructor (owner) {
+      constructor (owner, predicate = () => true, deep = false) {
         this.owner = owner
+        this.predicate = predicate
+        this.deep = deep
       }
 
       /**
-   * The current element children of the owner, in order.
+   * The current elements the collection holds, in tree order.
    * @returns {Array<PseudoNode>}
    */
       elements () {
-        return Array.from(this.owner.childNodes).filter(node => node.nodeType === NodeService_1.NodeService.ELEMENT_NODE)
+        const results = []
+        const visit = node => {
+          Array.from(node.childNodes).forEach(child => {
+            if (child.nodeType === NodeService_1.NodeService.ELEMENT_NODE && this.predicate(child)) {
+              results.push(child)
+            }
+            if (this.deep && child.nodeType === NodeService_1.NodeService.ELEMENT_NODE) {
+              visit(child)
+            }
+          })
+        }
+        visit(this.owner)
+        return results
       }
 
       /**
@@ -2171,7 +2365,7 @@
       }
 
       /**
-   * Iterate over the current element children.
+   * Iterate over the current elements.
    * @returns {Iterator}
    */
       [Symbol.iterator] () {
@@ -2180,8 +2374,8 @@
     }
     exports.HTMLCollectionService = HTMLCollectionService
     exports.default = HTMLCollectionService
-  }, { './NodeService': 27, 'core-js/modules/esnext.iterator.constructor.js': 178, 'core-js/modules/esnext.iterator.filter.js': 180, 'core-js/modules/esnext.iterator.find.js': 181 }],
-  22: [function (require, module, exports) {
+  }, { './NodeService': 29, 'core-js/modules/esnext.iterator.constructor.js': 182, 'core-js/modules/esnext.iterator.find.js': 185, 'core-js/modules/esnext.iterator.for-each.js': 186 }],
+  24: [function (require, module, exports) {
     'use strict'
 
     const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
@@ -2345,8 +2539,8 @@
       }
     }
     exports.HTMLElementService = HTMLElementService
-  }, { '../factories/createEvent': 4, '../functions/activeElement': 8, './ElementService': 17 }],
-  23: [function (require, module, exports) {
+  }, { '../factories/createEvent': 4, '../functions/activeElement': 10, './ElementService': 19 }],
+  25: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -2394,8 +2588,8 @@
       }
     }
     exports.InputEventService = InputEventService
-  }, { './UIEventService': 29 }],
-  24: [function (require, module, exports) {
+  }, { './UIEventService': 31 }],
+  26: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -2482,8 +2676,8 @@
       }
     }
     exports.KeyboardEventService = KeyboardEventService
-  }, { '../functions/modifierState': 11, './UIEventService': 29 }],
-  25: [function (require, module, exports) {
+  }, { '../functions/modifierState': 13, './UIEventService': 31 }],
+  27: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -2592,8 +2786,8 @@
       }
     }
     exports.MouseEventService = MouseEventService
-  }, { '../functions/modifierState': 11, './UIEventService': 29 }],
-  26: [function (require, module, exports) {
+  }, { '../functions/modifierState': 13, './UIEventService': 31 }],
+  28: [function (require, module, exports) {
     'use strict'
 
     require('core-js/modules/esnext.iterator.constructor.js')
@@ -2671,12 +2865,13 @@
       }
     }
     exports.NamedNodeMapService = NamedNodeMapService
-  }, { 'core-js/modules/esnext.iterator.constructor.js': 178, 'core-js/modules/esnext.iterator.find.js': 181 }],
-  27: [function (require, module, exports) {
+  }, { 'core-js/modules/esnext.iterator.constructor.js': 182, 'core-js/modules/esnext.iterator.find.js': 185 }],
+  29: [function (require, module, exports) {
     'use strict'
 
     require('core-js/modules/esnext.iterator.constructor.js')
     require('core-js/modules/esnext.iterator.every.js')
+    require('core-js/modules/esnext.iterator.filter.js')
     require('core-js/modules/esnext.iterator.for-each.js')
     const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
       return mod && mod.__esModule
@@ -2697,6 +2892,8 @@
     const generateNodeList_1 = __importDefault(require('../factories/generateNodeList'))
     const TreeLinker_1 = require('collect-your-stuff/dist/collections/linked-tree-list/TreeLinker')
     const EventTargetService_1 = __importDefault(require('./EventTargetService'))
+    const HTMLCollectionService_1 = require('./HTMLCollectionService')
+    const query_1 = require('../factories/query')
     /**
  * Simulate the behaviour of the Node Class when there is no DOM available.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -2947,6 +3144,45 @@
         const text = new TextService(value)
         text.ownerDocumentStore = this.ownerDocument
         return text
+      }
+
+      /**
+   * Every element below this node with the given tag name (or every element when tagName is *), live.
+   * @param {string} tagName
+   * @returns {PseudoHTMLCollection}
+   */
+      getElementsByTagName (tagName) {
+        const matchesTag = tagName === '*' ? () => true : element => element.tagName === tagName
+        return new HTMLCollectionService_1.HTMLCollectionService(this, matchesTag, true)
+      }
+
+      /**
+   * Every element below this node which has all of the given (space separated) classes, live.
+   * @param {string} className
+   * @returns {PseudoHTMLCollection}
+   */
+      getElementsByClassName (className) {
+        const names = className.trim().split(/\s+/).filter(Boolean)
+        return new HTMLCollectionService_1.HTMLCollectionService(this, element => names.every(name => element.classList.contains(name)), true)
+      }
+
+      /**
+   * The first element below this node which matches the CSS selector, in tree order, or null when there is none.
+   * @param {string} selectors A CSS selector
+   * @returns {PseudoElement|null}
+   */
+      querySelector (selectors) {
+        return (0, query_1.querySelector)(selectors, this)
+      }
+
+      /**
+   * Every element below this node which matches the CSS selector, in tree order. A plain array (not a live
+   * collection): like the DOM's querySelectorAll, it is a snapshot taken when it is called.
+   * @param {string} selectors A CSS selector
+   * @returns {Array<PseudoElement>}
+   */
+      querySelectorAll (selectors) {
+        return (0, query_1.querySelectorAll)(selectors, this)
       }
 
       /**
@@ -3352,8 +3588,8 @@
       }
     }
     exports.CommentService = CommentService
-  }, { '../factories/generateNodeList': 7, './EventTargetService': 19, 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker': 38, 'core-js/modules/esnext.iterator.constructor.js': 178, 'core-js/modules/esnext.iterator.every.js': 179, 'core-js/modules/esnext.iterator.for-each.js': 182 }],
-  28: [function (require, module, exports) {
+  }, { '../factories/generateNodeList': 8, '../factories/query': 9, './EventTargetService': 21, './HTMLCollectionService': 23, 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker': 42, 'core-js/modules/esnext.iterator.constructor.js': 182, 'core-js/modules/esnext.iterator.every.js': 183, 'core-js/modules/esnext.iterator.filter.js': 184, 'core-js/modules/esnext.iterator.for-each.js': 186 }],
+  30: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -3421,8 +3657,8 @@
       }
     }
     exports.PointerEventService = PointerEventService
-  }, { './MouseEventService': 25 }],
-  29: [function (require, module, exports) {
+  }, { './MouseEventService': 27 }],
+  31: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -3465,8 +3701,8 @@
       }
     }
     exports.UIEventService = UIEventService
-  }, { './EventService': 18 }],
-  30: [function (require, module, exports) {
+  }, { './EventService': 20 }],
+  32: [function (require, module, exports) {
     'use strict'
 
     const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
@@ -3582,8 +3818,21 @@
       click: exports.click,
       keyPress: exports.keyPress
     }
-  }, { './factories/createEvent': 4, './functions/activeElement': 8 }],
-  31: [function (require, module, exports) {
+  }, { './factories/createEvent': 4, './functions/activeElement': 10 }],
+  33: [function (require, module, exports) {
+    module.exports = {
+      trueFunc: function trueFunc () {
+        return true
+      },
+      falseFunc: function falseFunc () {
+        return false
+      }
+    }
+  }, {}],
+  34: [function (require, module, exports) {
+
+  }, {}],
+  35: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -3650,8 +3899,8 @@
       head: [],
       tail: null
     })
-  }, { 'core-js/modules/esnext.iterator.constructor.js': 178, 'core-js/modules/esnext.iterator.reduce.js': 184 }],
-  32: [function (require, module, exports) {
+  }, { 'core-js/modules/esnext.iterator.constructor.js': 182, 'core-js/modules/esnext.iterator.reduce.js': 188 }],
+  36: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -3875,8 +4124,8 @@
       const list = new classType(elementClass)
       return list.initialize(elementClass.fromArray(values).head)
     }
-  }, { '../../recipes/ArrayIterator': 39, './ArrayElement': 31 }],
-  33: [function (require, module, exports) {
+  }, { '../../recipes/ArrayIterator': 43, './ArrayElement': 35 }],
+  37: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -3950,8 +4199,8 @@
       head: null,
       tail: null
     })
-  }, { '../linked-list/Linker': 36, 'core-js/modules/esnext.iterator.constructor.js': 178, 'core-js/modules/esnext.iterator.reduce.js': 184 }],
-  34: [function (require, module, exports) {
+  }, { '../linked-list/Linker': 40, 'core-js/modules/esnext.iterator.constructor.js': 182, 'core-js/modules/esnext.iterator.reduce.js': 188 }],
+  38: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -4279,8 +4528,8 @@
     DoublyLinkedList.fromArray = (values = [], linkerClass = _DoubleLinker.DoubleLinker, classType = DoublyLinkedList) => {
       return _LinkedList.LinkedList.fromArray(values, linkerClass, classType)
     }
-  }, { '../../recipes/DoubleLinkerIterator': 40, '../linked-list/LinkedList': 35, './DoubleLinker': 33, 'core-js/modules/esnext.iterator.constructor.js': 178, 'core-js/modules/esnext.iterator.for-each.js': 182 }],
-  35: [function (require, module, exports) {
+  }, { '../../recipes/DoubleLinkerIterator': 44, '../linked-list/LinkedList': 39, './DoubleLinker': 37, 'core-js/modules/esnext.iterator.constructor.js': 182, 'core-js/modules/esnext.iterator.for-each.js': 186 }],
+  39: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -4577,8 +4826,8 @@
       const list = new classType(linkerClass)
       return list.initialize(linkerClass.fromArray(values).head)
     }
-  }, { '../../recipes/LinkerIterator': 41, '../arrayable/Arrayable': 32, './Linker': 36 }],
-  36: [function (require, module, exports) {
+  }, { '../../recipes/LinkerIterator': 45, '../arrayable/Arrayable': 36, './Linker': 40 }],
+  40: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -4663,8 +4912,8 @@
       head: null,
       tail: null
     })
-  }, { '../arrayable/ArrayElement': 31, 'core-js/modules/esnext.iterator.constructor.js': 178, 'core-js/modules/esnext.iterator.reduce.js': 184 }],
-  37: [function (require, module, exports) {
+  }, { '../arrayable/ArrayElement': 35, 'core-js/modules/esnext.iterator.constructor.js': 182, 'core-js/modules/esnext.iterator.reduce.js': 188 }],
+  41: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -4959,8 +5208,8 @@
       const list = new classType(linkerClass)
       return list.initialize(linkerClass.fromArray(values).head)
     }
-  }, { '../../recipes/TreeLinkerIterator': 42, '../doubly-linked-list/DoublyLinkedList': 34, './TreeLinker': 38, 'core-js/modules/esnext.iterator.constructor.js': 178, 'core-js/modules/esnext.iterator.for-each.js': 182 }],
-  38: [function (require, module, exports) {
+  }, { '../../recipes/TreeLinkerIterator': 46, '../doubly-linked-list/DoublyLinkedList': 38, './TreeLinker': 42, 'core-js/modules/esnext.iterator.constructor.js': 182, 'core-js/modules/esnext.iterator.for-each.js': 186 }],
+  42: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -5055,8 +5304,8 @@
  * @returns {{head: TreeLinker, tail: TreeLinker}}
  */
     TreeLinker.fromArray = (values = [], classType = TreeLinker) => _DoubleLinker.DoubleLinker.fromArray(values, classType)
-  }, { '../doubly-linked-list/DoubleLinker': 33, './LinkedTreeList': 37, 'core-js/modules/esnext.iterator.constructor.js': 178, 'core-js/modules/esnext.iterator.map.js': 183 }],
-  39: [function (require, module, exports) {
+  }, { '../doubly-linked-list/DoubleLinker': 37, './LinkedTreeList': 41, 'core-js/modules/esnext.iterator.constructor.js': 182, 'core-js/modules/esnext.iterator.map.js': 187 }],
+  43: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -5097,7 +5346,7 @@
     }
     exports.ArrayIterator = ArrayIterator
   }, {}],
-  40: [function (require, module, exports) {
+  44: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -5132,7 +5381,7 @@
     }
     exports.DoubleLinkerIterator = DoubleLinkerIterator
   }, {}],
-  41: [function (require, module, exports) {
+  45: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -5167,7 +5416,7 @@
     }
     exports.LinkerIterator = LinkerIterator
   }, {}],
-  42: [function (require, module, exports) {
+  46: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -5204,8 +5453,8 @@
       }
     }
     exports.TreeLinkerIterator = TreeLinkerIterator
-  }, { '../services/parseTreeNext': 43 }],
-  43: [function (require, module, exports) {
+  }, { '../services/parseTreeNext': 47 }],
+  47: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -5249,7 +5498,7 @@
     }
     exports.parseTreeNext = parseTreeNext
   }, {}],
-  44: [function (require, module, exports) {
+  48: [function (require, module, exports) {
     'use strict'
     const isCallable = require('../internals/is-callable')
     const tryToString = require('../internals/try-to-string')
@@ -5261,8 +5510,8 @@
       if (isCallable(argument)) return argument
       throw new $TypeError(tryToString(argument) + ' is not a function')
     }
-  }, { '../internals/is-callable': 96, '../internals/try-to-string': 160 }],
-  45: [function (require, module, exports) {
+  }, { '../internals/is-callable': 100, '../internals/try-to-string': 164 }],
+  49: [function (require, module, exports) {
     'use strict'
     const has = require('../internals/map-helpers').has
 
@@ -5271,8 +5520,8 @@
       has(it)
       return it
     }
-  }, { '../internals/map-helpers': 115 }],
-  46: [function (require, module, exports) {
+  }, { '../internals/map-helpers': 119 }],
+  50: [function (require, module, exports) {
     'use strict'
     const has = require('../internals/set-helpers').has
 
@@ -5281,8 +5530,8 @@
       has(it)
       return it
     }
-  }, { '../internals/set-helpers': 137 }],
-  47: [function (require, module, exports) {
+  }, { '../internals/set-helpers': 141 }],
+  51: [function (require, module, exports) {
     'use strict'
     const has = require('../internals/weak-map-helpers').has
 
@@ -5291,8 +5540,8 @@
       has(it)
       return it
     }
-  }, { '../internals/weak-map-helpers': 165 }],
-  48: [function (require, module, exports) {
+  }, { '../internals/weak-map-helpers': 169 }],
+  52: [function (require, module, exports) {
     'use strict'
     const has = require('../internals/weak-set-helpers').has
 
@@ -5301,8 +5550,8 @@
       has(it)
       return it
     }
-  }, { '../internals/weak-set-helpers': 166 }],
-  49: [function (require, module, exports) {
+  }, { '../internals/weak-set-helpers': 170 }],
+  53: [function (require, module, exports) {
     'use strict'
     const wellKnownSymbol = require('../internals/well-known-symbol')
     const create = require('../internals/object-create')
@@ -5324,8 +5573,8 @@
     module.exports = function (key) {
       ArrayPrototype[UNSCOPABLES][key] = true
     }
-  }, { '../internals/object-create': 118, '../internals/object-define-property': 120, '../internals/well-known-symbol': 167 }],
-  50: [function (require, module, exports) {
+  }, { '../internals/object-create': 122, '../internals/object-define-property': 124, '../internals/well-known-symbol': 171 }],
+  54: [function (require, module, exports) {
     'use strict'
     const isPrototypeOf = require('../internals/object-is-prototype-of')
 
@@ -5335,8 +5584,8 @@
       if (isPrototypeOf(Prototype, it)) return it
       throw new $TypeError('Incorrect invocation')
     }
-  }, { '../internals/object-is-prototype-of': 125 }],
-  51: [function (require, module, exports) {
+  }, { '../internals/object-is-prototype-of': 129 }],
+  55: [function (require, module, exports) {
     'use strict'
     const isObject = require('../internals/is-object')
 
@@ -5348,8 +5597,8 @@
       if (isObject(argument)) return argument
       throw new $TypeError($String(argument) + ' is not an object')
     }
-  }, { '../internals/is-object': 100 }],
-  52: [function (require, module, exports) {
+  }, { '../internals/is-object': 104 }],
+  56: [function (require, module, exports) {
     'use strict'
     const toIndexedObject = require('../internals/to-indexed-object')
     const toAbsoluteIndex = require('../internals/to-absolute-index')
@@ -5388,8 +5637,8 @@
       // https://tc39.es/ecma262/#sec-array.prototype.indexof
       indexOf: createMethod(false)
     }
-  }, { '../internals/length-of-array-like': 113, '../internals/to-absolute-index': 150, '../internals/to-indexed-object': 151 }],
-  53: [function (require, module, exports) {
+  }, { '../internals/length-of-array-like': 117, '../internals/to-absolute-index': 154, '../internals/to-indexed-object': 155 }],
+  57: [function (require, module, exports) {
     'use strict'
     const anObject = require('../internals/an-object')
     const iteratorClose = require('../internals/iterator-close')
@@ -5402,8 +5651,8 @@
         iteratorClose(iterator, 'throw', error)
       }
     }
-  }, { '../internals/an-object': 51, '../internals/iterator-close': 107 }],
-  54: [function (require, module, exports) {
+  }, { '../internals/an-object': 55, '../internals/iterator-close': 111 }],
+  58: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
 
@@ -5413,8 +5662,8 @@
     module.exports = function (it) {
       return stringSlice(toString(it), 8, -1)
     }
-  }, { '../internals/function-uncurry-this': 80 }],
-  55: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 84 }],
+  59: [function (require, module, exports) {
     'use strict'
     const TO_STRING_TAG_SUPPORT = require('../internals/to-string-tag-support')
     const isCallable = require('../internals/is-callable')
@@ -5445,8 +5694,8 @@
           // ES3 arguments fallback
             : (result = classofRaw(O)) === 'Object' && isCallable(O.callee) ? 'Arguments' : result
     }
-  }, { '../internals/classof-raw': 54, '../internals/is-callable': 96, '../internals/to-string-tag-support': 158, '../internals/well-known-symbol': 167 }],
-  56: [function (require, module, exports) {
+  }, { '../internals/classof-raw': 58, '../internals/is-callable': 100, '../internals/to-string-tag-support': 162, '../internals/well-known-symbol': 171 }],
+  60: [function (require, module, exports) {
     'use strict'
     const hasOwn = require('../internals/has-own-property')
     const ownKeys = require('../internals/own-keys')
@@ -5464,8 +5713,8 @@
         }
       }
     }
-  }, { '../internals/has-own-property': 88, '../internals/object-define-property': 120, '../internals/object-get-own-property-descriptor': 121, '../internals/own-keys': 130 }],
-  57: [function (require, module, exports) {
+  }, { '../internals/has-own-property': 92, '../internals/object-define-property': 124, '../internals/object-get-own-property-descriptor': 125, '../internals/own-keys': 134 }],
+  61: [function (require, module, exports) {
     'use strict'
     const fails = require('../internals/fails')
 
@@ -5475,8 +5724,8 @@
       // eslint-disable-next-line es/no-object-getprototypeof -- required for testing
       return Object.getPrototypeOf(new F()) !== F.prototype
     })
-  }, { '../internals/fails': 72 }],
-  58: [function (require, module, exports) {
+  }, { '../internals/fails': 76 }],
+  62: [function (require, module, exports) {
     'use strict'
     // `CreateIterResultObject` abstract operation
     // https://tc39.es/ecma262/#sec-createiterresultobject
@@ -5484,7 +5733,7 @@
       return { value, done }
     }
   }, {}],
-  59: [function (require, module, exports) {
+  63: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const definePropertyModule = require('../internals/object-define-property')
@@ -5498,8 +5747,8 @@
         object[key] = value
         return object
       }
-  }, { '../internals/create-property-descriptor': 60, '../internals/descriptors': 66, '../internals/object-define-property': 120 }],
-  60: [function (require, module, exports) {
+  }, { '../internals/create-property-descriptor': 64, '../internals/descriptors': 70, '../internals/object-define-property': 124 }],
+  64: [function (require, module, exports) {
     'use strict'
     module.exports = function (bitmap, value) {
       return {
@@ -5510,7 +5759,7 @@
       }
     }
   }, {}],
-  61: [function (require, module, exports) {
+  65: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const definePropertyModule = require('../internals/object-define-property')
@@ -5520,8 +5769,8 @@
       if (DESCRIPTORS) definePropertyModule.f(object, key, createPropertyDescriptor(0, value))
       else object[key] = value
     }
-  }, { '../internals/create-property-descriptor': 60, '../internals/descriptors': 66, '../internals/object-define-property': 120 }],
-  62: [function (require, module, exports) {
+  }, { '../internals/create-property-descriptor': 64, '../internals/descriptors': 70, '../internals/object-define-property': 124 }],
+  66: [function (require, module, exports) {
     'use strict'
     const makeBuiltIn = require('../internals/make-built-in')
     const defineProperty = require('../internals/object-define-property')
@@ -5531,8 +5780,8 @@
       if (descriptor.set) makeBuiltIn(descriptor.set, name, { setter: true })
       return defineProperty.f(target, name, descriptor)
     }
-  }, { '../internals/make-built-in': 114, '../internals/object-define-property': 120 }],
-  63: [function (require, module, exports) {
+  }, { '../internals/make-built-in': 118, '../internals/object-define-property': 124 }],
+  67: [function (require, module, exports) {
     'use strict'
     const isCallable = require('../internals/is-callable')
     const definePropertyModule = require('../internals/object-define-property')
@@ -5563,8 +5812,8 @@
         }
       } return O
     }
-  }, { '../internals/define-global-property': 65, '../internals/is-callable': 96, '../internals/make-built-in': 114, '../internals/object-define-property': 120 }],
-  64: [function (require, module, exports) {
+  }, { '../internals/define-global-property': 69, '../internals/is-callable': 100, '../internals/make-built-in': 118, '../internals/object-define-property': 124 }],
+  68: [function (require, module, exports) {
     'use strict'
     const defineBuiltIn = require('../internals/define-built-in')
 
@@ -5572,8 +5821,8 @@
       for (const key in src) defineBuiltIn(target, key, src[key], options)
       return target
     }
-  }, { '../internals/define-built-in': 63 }],
-  65: [function (require, module, exports) {
+  }, { '../internals/define-built-in': 67 }],
+  69: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
 
@@ -5587,8 +5836,8 @@
         globalThis[key] = value
       } return value
     }
-  }, { '../internals/global-this': 87 }],
-  66: [function (require, module, exports) {
+  }, { '../internals/global-this': 91 }],
+  70: [function (require, module, exports) {
     'use strict'
     const fails = require('../internals/fails')
 
@@ -5597,8 +5846,8 @@
       // eslint-disable-next-line es/no-object-defineproperty -- required for testing
       return Object.defineProperty({}, 1, { get: function () { return 7 } })[1] !== 7
     })
-  }, { '../internals/fails': 72 }],
-  67: [function (require, module, exports) {
+  }, { '../internals/fails': 76 }],
+  71: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
     const isObject = require('../internals/is-object')
@@ -5610,8 +5859,8 @@
     module.exports = function (it) {
       return EXISTS ? document.createElement(it) : {}
     }
-  }, { '../internals/global-this': 87, '../internals/is-object': 100 }],
-  68: [function (require, module, exports) {
+  }, { '../internals/global-this': 91, '../internals/is-object': 104 }],
+  72: [function (require, module, exports) {
     'use strict'
     // IE8- don't enum bug keys
     module.exports = [
@@ -5624,7 +5873,7 @@
       'valueOf'
     ]
   }, {}],
-  69: [function (require, module, exports) {
+  73: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
 
@@ -5632,8 +5881,8 @@
     const userAgent = navigator && navigator.userAgent
 
     module.exports = userAgent ? String(userAgent) : ''
-  }, { '../internals/global-this': 87 }],
-  70: [function (require, module, exports) {
+  }, { '../internals/global-this': 91 }],
+  74: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
     const userAgent = require('../internals/environment-user-agent')
@@ -5662,8 +5911,8 @@
     }
 
     module.exports = version
-  }, { '../internals/environment-user-agent': 69, '../internals/global-this': 87 }],
-  71: [function (require, module, exports) {
+  }, { '../internals/environment-user-agent': 73, '../internals/global-this': 91 }],
+  75: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
     const getOwnPropertyDescriptor = require('../internals/object-get-own-property-descriptor').f
@@ -5721,8 +5970,8 @@
         }
       }
     }
-  }, { '../internals/copy-constructor-properties': 56, '../internals/create-non-enumerable-property': 59, '../internals/define-built-in': 63, '../internals/define-global-property': 65, '../internals/global-this': 87, '../internals/is-forced': 97, '../internals/object-get-own-property-descriptor': 121 }],
-  72: [function (require, module, exports) {
+  }, { '../internals/copy-constructor-properties': 60, '../internals/create-non-enumerable-property': 63, '../internals/define-built-in': 67, '../internals/define-global-property': 69, '../internals/global-this': 91, '../internals/is-forced': 101, '../internals/object-get-own-property-descriptor': 125 }],
+  76: [function (require, module, exports) {
     'use strict'
     module.exports = function (exec) {
       try {
@@ -5732,7 +5981,7 @@
       }
     }
   }, {}],
-  73: [function (require, module, exports) {
+  77: [function (require, module, exports) {
     'use strict'
     const NATIVE_BIND = require('../internals/function-bind-native')
 
@@ -5746,8 +5995,8 @@
       : function () {
         return call.apply(apply, arguments)
       })
-  }, { '../internals/function-bind-native': 75 }],
-  74: [function (require, module, exports) {
+  }, { '../internals/function-bind-native': 79 }],
+  78: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this-clause')
     const aCallable = require('../internals/a-callable')
@@ -5762,8 +6011,8 @@
         return fn.apply(that, arguments)
       }
     }
-  }, { '../internals/a-callable': 44, '../internals/function-bind-native': 75, '../internals/function-uncurry-this-clause': 79 }],
-  75: [function (require, module, exports) {
+  }, { '../internals/a-callable': 48, '../internals/function-bind-native': 79, '../internals/function-uncurry-this-clause': 83 }],
+  79: [function (require, module, exports) {
     'use strict'
     const fails = require('../internals/fails')
 
@@ -5773,8 +6022,8 @@
       // eslint-disable-next-line no-prototype-builtins -- safe
       return typeof test !== 'function' || test.hasOwnProperty('prototype')
     })
-  }, { '../internals/fails': 72 }],
-  76: [function (require, module, exports) {
+  }, { '../internals/fails': 76 }],
+  80: [function (require, module, exports) {
     'use strict'
     const NATIVE_BIND = require('../internals/function-bind-native')
 
@@ -5785,8 +6034,8 @@
       : function () {
         return call.apply(call, arguments)
       }
-  }, { '../internals/function-bind-native': 75 }],
-  77: [function (require, module, exports) {
+  }, { '../internals/function-bind-native': 79 }],
+  81: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const hasOwn = require('../internals/has-own-property')
@@ -5805,8 +6054,8 @@
       PROPER,
       CONFIGURABLE
     }
-  }, { '../internals/descriptors': 66, '../internals/has-own-property': 88 }],
-  78: [function (require, module, exports) {
+  }, { '../internals/descriptors': 70, '../internals/has-own-property': 92 }],
+  82: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
     const aCallable = require('../internals/a-callable')
@@ -5817,8 +6066,8 @@
         return uncurryThis(aCallable(Object.getOwnPropertyDescriptor(object, key)[method]))
       } catch (error) { /* empty */ }
     }
-  }, { '../internals/a-callable': 44, '../internals/function-uncurry-this': 80 }],
-  79: [function (require, module, exports) {
+  }, { '../internals/a-callable': 48, '../internals/function-uncurry-this': 84 }],
+  83: [function (require, module, exports) {
     'use strict'
     const classofRaw = require('../internals/classof-raw')
     const uncurryThis = require('../internals/function-uncurry-this')
@@ -5829,8 +6078,8 @@
       //   https://github.com/zloirock/core-js/issues/1130
       if (classofRaw(fn) === 'Function') return uncurryThis(fn)
     }
-  }, { '../internals/classof-raw': 54, '../internals/function-uncurry-this': 80 }],
-  80: [function (require, module, exports) {
+  }, { '../internals/classof-raw': 58, '../internals/function-uncurry-this': 84 }],
+  84: [function (require, module, exports) {
     'use strict'
     const NATIVE_BIND = require('../internals/function-bind-native')
 
@@ -5846,8 +6095,8 @@
           return call.apply(fn, arguments)
         }
       }
-  }, { '../internals/function-bind-native': 75 }],
-  81: [function (require, module, exports) {
+  }, { '../internals/function-bind-native': 79 }],
+  85: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
     const isCallable = require('../internals/is-callable')
@@ -5859,8 +6108,8 @@
     module.exports = function (namespace, method) {
       return arguments.length < 2 ? aFunction(globalThis[namespace]) : globalThis[namespace] && globalThis[namespace][method]
     }
-  }, { '../internals/global-this': 87, '../internals/is-callable': 96 }],
-  82: [function (require, module, exports) {
+  }, { '../internals/global-this': 91, '../internals/is-callable': 100 }],
+  86: [function (require, module, exports) {
     'use strict'
     // `GetIteratorDirect(obj)` abstract operation
     // https://tc39.es/ecma262/#sec-getiteratordirect
@@ -5872,7 +6121,7 @@
       }
     }
   }, {}],
-  83: [function (require, module, exports) {
+  87: [function (require, module, exports) {
     'use strict'
     const call = require('../internals/function-call')
     const isCallable = require('../internals/is-callable')
@@ -5887,8 +6136,8 @@
       if (isCallable(iteratorMethod)) return anObject(call(iteratorMethod, argument))
       throw new $TypeError(tryToString(argument) + ' is not iterable')
     }
-  }, { '../internals/an-object': 51, '../internals/function-call': 76, '../internals/get-iterator-method-internal': 84, '../internals/is-callable': 96, '../internals/try-to-string': 160 }],
-  84: [function (require, module, exports) {
+  }, { '../internals/an-object': 55, '../internals/function-call': 80, '../internals/get-iterator-method-internal': 88, '../internals/is-callable': 100, '../internals/try-to-string': 164 }],
+  88: [function (require, module, exports) {
     'use strict'
     const classof = require('../internals/classof-raw')
     const isNullOrUndefined = require('../internals/is-null-or-undefined')
@@ -5905,8 +6154,8 @@
     (classof(it) === 'Arguments' ? ArrayPrototype[ITERATOR] : undefined)
       }
     }
-  }, { '../internals/classof-raw': 54, '../internals/get-method': 85, '../internals/is-null-or-undefined': 99, '../internals/well-known-symbol': 167 }],
-  85: [function (require, module, exports) {
+  }, { '../internals/classof-raw': 58, '../internals/get-method': 89, '../internals/is-null-or-undefined': 103, '../internals/well-known-symbol': 171 }],
+  89: [function (require, module, exports) {
     'use strict'
     const aCallable = require('../internals/a-callable')
     const isNullOrUndefined = require('../internals/is-null-or-undefined')
@@ -5917,8 +6166,8 @@
       const func = V[P]
       return isNullOrUndefined(func) ? undefined : aCallable(func)
     }
-  }, { '../internals/a-callable': 44, '../internals/is-null-or-undefined': 99 }],
-  86: [function (require, module, exports) {
+  }, { '../internals/a-callable': 48, '../internals/is-null-or-undefined': 103 }],
+  90: [function (require, module, exports) {
     'use strict'
     const aCallable = require('../internals/a-callable')
     const anObject = require('../internals/an-object')
@@ -5959,8 +6208,8 @@
       if (intSize < 0) throw new $RangeError(INVALID_SIZE)
       return new SetRecord(obj, intSize)
     }
-  }, { '../internals/a-callable': 44, '../internals/an-object': 51, '../internals/function-call': 76, '../internals/get-iterator-direct': 82, '../internals/to-integer-or-infinity': 152 }],
-  87: [function (require, module, exports) {
+  }, { '../internals/a-callable': 48, '../internals/an-object': 55, '../internals/function-call': 80, '../internals/get-iterator-direct': 86, '../internals/to-integer-or-infinity': 156 }],
+  91: [function (require, module, exports) {
     (function (global) {
       (function () {
         'use strict'
@@ -5982,7 +6231,7 @@
       }).call(this)
     }).call(this, typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : typeof window !== 'undefined' ? window : {})
   }, {}],
-  88: [function (require, module, exports) {
+  92: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
     const toObject = require('../internals/to-object')
@@ -5995,18 +6244,18 @@
     module.exports = Object.hasOwn || function hasOwn (it, key) {
       return hasOwnProperty(toObject(it), key)
     }
-  }, { '../internals/function-uncurry-this': 80, '../internals/to-object': 154 }],
-  89: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 84, '../internals/to-object': 158 }],
+  93: [function (require, module, exports) {
     'use strict'
     module.exports = {}
   }, {}],
-  90: [function (require, module, exports) {
+  94: [function (require, module, exports) {
     'use strict'
     const getBuiltIn = require('../internals/get-built-in')
 
     module.exports = getBuiltIn('document', 'documentElement')
-  }, { '../internals/get-built-in': 81 }],
-  91: [function (require, module, exports) {
+  }, { '../internals/get-built-in': 85 }],
+  95: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const fails = require('../internals/fails')
@@ -6019,8 +6268,8 @@
         get: function () { return 7 }
       }).a !== 7
     })
-  }, { '../internals/descriptors': 66, '../internals/document-create-element': 67, '../internals/fails': 72 }],
-  92: [function (require, module, exports) {
+  }, { '../internals/descriptors': 70, '../internals/document-create-element': 71, '../internals/fails': 76 }],
+  96: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
     const fails = require('../internals/fails')
@@ -6037,8 +6286,8 @@
     }) ? function (it) {
         return classof(it) === 'String' ? split(it, '') : $Object(it)
       } : $Object
-  }, { '../internals/classof-raw': 54, '../internals/fails': 72, '../internals/function-uncurry-this': 80 }],
-  93: [function (require, module, exports) {
+  }, { '../internals/classof-raw': 58, '../internals/fails': 76, '../internals/function-uncurry-this': 84 }],
+  97: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
     const isCallable = require('../internals/is-callable')
@@ -6054,8 +6303,8 @@
     }
 
     module.exports = store.inspectSource
-  }, { '../internals/function-uncurry-this': 80, '../internals/is-callable': 96, '../internals/shared-store': 147 }],
-  94: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 84, '../internals/is-callable': 100, '../internals/shared-store': 151 }],
+  98: [function (require, module, exports) {
     'use strict'
     const NATIVE_WEAK_MAP = require('../internals/weak-map-basic-detection')
     const globalThis = require('../internals/global-this')
@@ -6127,8 +6376,8 @@
       enforce,
       getterFor
     }
-  }, { '../internals/create-non-enumerable-property': 59, '../internals/global-this': 87, '../internals/has-own-property': 88, '../internals/hidden-keys': 89, '../internals/is-object': 100, '../internals/shared-key': 146, '../internals/shared-store': 147, '../internals/weak-map-basic-detection': 164 }],
-  95: [function (require, module, exports) {
+  }, { '../internals/create-non-enumerable-property': 63, '../internals/global-this': 91, '../internals/has-own-property': 92, '../internals/hidden-keys': 93, '../internals/is-object': 104, '../internals/shared-key': 150, '../internals/shared-store': 151, '../internals/weak-map-basic-detection': 168 }],
+  99: [function (require, module, exports) {
     'use strict'
     const wellKnownSymbol = require('../internals/well-known-symbol')
     const Iterators = require('../internals/iterators')
@@ -6140,8 +6389,8 @@
     module.exports = function (it) {
       return it !== undefined && (Iterators.Array === it || ArrayPrototype[ITERATOR] === it)
     }
-  }, { '../internals/iterators': 112, '../internals/well-known-symbol': 167 }],
-  96: [function (require, module, exports) {
+  }, { '../internals/iterators': 116, '../internals/well-known-symbol': 171 }],
+  100: [function (require, module, exports) {
     'use strict'
     // https://tc39.es/ecma262/#sec-IsHTMLDDA-internal-slot
     const documentAll = typeof document === 'object' && document.all
@@ -6157,7 +6406,7 @@
         return typeof argument === 'function'
       }
   }, {}],
-  97: [function (require, module, exports) {
+  101: [function (require, module, exports) {
     'use strict'
     const fails = require('../internals/fails')
     const isCallable = require('../internals/is-callable')
@@ -6184,8 +6433,8 @@
     var POLYFILL = isForced.POLYFILL = 'P'
 
     module.exports = isForced
-  }, { '../internals/fails': 72, '../internals/is-callable': 96 }],
-  98: [function (require, module, exports) {
+  }, { '../internals/fails': 76, '../internals/is-callable': 100 }],
+  102: [function (require, module, exports) {
     'use strict'
     const classof = require('../internals/classof-raw')
     const wellKnownSymbol = require('../internals/well-known-symbol')
@@ -6197,8 +6446,8 @@
     it['@@iterator'] !== undefined ||
     classof(it) === 'Arguments'
     }
-  }, { '../internals/classof-raw': 54, '../internals/well-known-symbol': 167 }],
-  99: [function (require, module, exports) {
+  }, { '../internals/classof-raw': 58, '../internals/well-known-symbol': 171 }],
+  103: [function (require, module, exports) {
     'use strict'
     // we can't use just `it == null` since of `document.all` special case
     // https://tc39.es/ecma262/#sec-IsHTMLDDA-internal-slot-aec
@@ -6206,19 +6455,19 @@
       return it === null || it === undefined
     }
   }, {}],
-  100: [function (require, module, exports) {
+  104: [function (require, module, exports) {
     'use strict'
     const isCallable = require('../internals/is-callable')
 
     module.exports = function (it) {
       return typeof it === 'object' ? it !== null : isCallable(it)
     }
-  }, { '../internals/is-callable': 96 }],
-  101: [function (require, module, exports) {
+  }, { '../internals/is-callable': 100 }],
+  105: [function (require, module, exports) {
     'use strict'
     module.exports = false
   }, {}],
-  102: [function (require, module, exports) {
+  106: [function (require, module, exports) {
     'use strict'
     const getBuiltIn = require('../internals/get-built-in')
     const isCallable = require('../internals/is-callable')
@@ -6235,8 +6484,8 @@
         const $Symbol = getBuiltIn('Symbol')
         return isCallable($Symbol) && isPrototypeOf($Symbol.prototype, $Object(it))
       }
-  }, { '../internals/get-built-in': 81, '../internals/is-callable': 96, '../internals/object-is-prototype-of': 125, '../internals/use-symbol-as-uid': 162 }],
-  103: [function (require, module, exports) {
+  }, { '../internals/get-built-in': 85, '../internals/is-callable': 100, '../internals/object-is-prototype-of': 129, '../internals/use-symbol-as-uid': 166 }],
+  107: [function (require, module, exports) {
     'use strict'
     const call = require('../internals/function-call')
 
@@ -6249,8 +6498,8 @@
         if (result !== undefined) return result
       }
     }
-  }, { '../internals/function-call': 76 }],
-  104: [function (require, module, exports) {
+  }, { '../internals/function-call': 80 }],
+  108: [function (require, module, exports) {
     'use strict'
     const bind = require('../internals/function-bind-context')
     const call = require('../internals/function-call')
@@ -6325,8 +6574,8 @@
         if (typeof result === 'object' && result && isPrototypeOf(ResultPrototype, result)) return result
       } return new Result(false)
     }
-  }, { '../internals/an-object': 51, '../internals/function-bind-context': 74, '../internals/function-call': 76, '../internals/get-iterator-internal': 83, '../internals/get-iterator-method-internal': 84, '../internals/is-array-iterator-method': 95, '../internals/iterator-close': 107, '../internals/length-of-array-like': 113, '../internals/object-is-prototype-of': 125, '../internals/try-to-string': 160 }],
-  105: [function (require, module, exports) {
+  }, { '../internals/an-object': 55, '../internals/function-bind-context': 78, '../internals/function-call': 80, '../internals/get-iterator-internal': 87, '../internals/get-iterator-method-internal': 88, '../internals/is-array-iterator-method': 99, '../internals/iterator-close': 111, '../internals/length-of-array-like': 117, '../internals/object-is-prototype-of': 129, '../internals/try-to-string': 164 }],
+  109: [function (require, module, exports) {
     'use strict'
     // release references held by exhausted / closed iterator helpers to allow GC of the source chain
     module.exports = function (state) {
@@ -6334,7 +6583,7 @@
     state.iterables = state.iters = state.openIters = state.padding = state.finishResults = state.buffer = null
     }
   }, {}],
-  106: [function (require, module, exports) {
+  110: [function (require, module, exports) {
     'use strict'
     const iteratorClose = require('../internals/iterator-close')
 
@@ -6351,8 +6600,8 @@
       if (kind === 'throw') throw value
       return value
     }
-  }, { '../internals/iterator-close': 107 }],
-  107: [function (require, module, exports) {
+  }, { '../internals/iterator-close': 111 }],
+  111: [function (require, module, exports) {
     'use strict'
     const call = require('../internals/function-call')
     const anObject = require('../internals/an-object')
@@ -6377,8 +6626,8 @@
       anObject(innerResult)
       return value
     }
-  }, { '../internals/an-object': 51, '../internals/function-call': 76, '../internals/get-method': 85 }],
-  108: [function (require, module, exports) {
+  }, { '../internals/an-object': 55, '../internals/function-call': 80, '../internals/get-method': 89 }],
+  112: [function (require, module, exports) {
     'use strict'
     const call = require('../internals/function-call')
     const create = require('../internals/object-create')
@@ -6478,8 +6727,8 @@
 
       return IteratorProxy
     }
-  }, { '../internals/create-iter-result-object': 58, '../internals/create-non-enumerable-property': 59, '../internals/define-built-ins': 64, '../internals/function-call': 76, '../internals/get-method': 85, '../internals/internal-state': 94, '../internals/iterator-cleanup-state': 105, '../internals/iterator-close': 107, '../internals/iterator-close-all': 106, '../internals/iterators-core': 111, '../internals/object-create': 118, '../internals/well-known-symbol': 167 }],
-  109: [function (require, module, exports) {
+  }, { '../internals/create-iter-result-object': 62, '../internals/create-non-enumerable-property': 63, '../internals/define-built-ins': 68, '../internals/function-call': 80, '../internals/get-method': 89, '../internals/internal-state': 98, '../internals/iterator-cleanup-state': 109, '../internals/iterator-close': 111, '../internals/iterator-close-all': 110, '../internals/iterators-core': 115, '../internals/object-create': 122, '../internals/well-known-symbol': 171 }],
+  113: [function (require, module, exports) {
     'use strict'
     // Should throw an error on invalid iterator
     // https://issues.chromium.org/issues/336839115
@@ -6495,7 +6744,7 @@
       }
     }
   }, {}],
-  110: [function (require, module, exports) {
+  114: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
 
@@ -6521,8 +6770,8 @@
 
       if (!CLOSED) return method
     }
-  }, { '../internals/global-this': 87 }],
-  111: [function (require, module, exports) {
+  }, { '../internals/global-this': 91 }],
+  115: [function (require, module, exports) {
     'use strict'
     const fails = require('../internals/fails')
     const isCallable = require('../internals/is-callable')
@@ -6572,12 +6821,12 @@
       IteratorPrototype,
       BUGGY_SAFARI_ITERATORS
     }
-  }, { '../internals/define-built-in': 63, '../internals/fails': 72, '../internals/is-callable': 96, '../internals/is-object': 100, '../internals/is-pure': 101, '../internals/object-create': 118, '../internals/object-get-prototype-of': 124, '../internals/well-known-symbol': 167 }],
-  112: [function (require, module, exports) {
+  }, { '../internals/define-built-in': 67, '../internals/fails': 76, '../internals/is-callable': 100, '../internals/is-object': 104, '../internals/is-pure': 105, '../internals/object-create': 122, '../internals/object-get-prototype-of': 128, '../internals/well-known-symbol': 171 }],
+  116: [function (require, module, exports) {
     'use strict'
     module.exports = Object.create ? Object.create(null) : {}
   }, {}],
-  113: [function (require, module, exports) {
+  117: [function (require, module, exports) {
     'use strict'
     const toLength = require('../internals/to-length')
 
@@ -6586,8 +6835,8 @@
     module.exports = function (obj) {
       return toLength(obj.length)
     }
-  }, { '../internals/to-length': 153 }],
-  114: [function (require, module, exports) {
+  }, { '../internals/to-length': 157 }],
+  118: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
     const fails = require('../internals/fails')
@@ -6643,8 +6892,8 @@
     Function.prototype.toString = makeBuiltIn(function toString () {
       return isCallable(this) && getInternalState(this).source || inspectSource(this)
     }, 'toString')
-  }, { '../internals/descriptors': 66, '../internals/fails': 72, '../internals/function-name': 77, '../internals/function-uncurry-this': 80, '../internals/has-own-property': 88, '../internals/inspect-source': 93, '../internals/internal-state': 94, '../internals/is-callable': 96 }],
-  115: [function (require, module, exports) {
+  }, { '../internals/descriptors': 70, '../internals/fails': 76, '../internals/function-name': 81, '../internals/function-uncurry-this': 84, '../internals/has-own-property': 92, '../internals/inspect-source': 97, '../internals/internal-state': 98, '../internals/is-callable': 100 }],
+  119: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
 
@@ -6660,8 +6909,8 @@
       remove: uncurryThis(MapPrototype.delete),
       proto: MapPrototype
     }
-  }, { '../internals/function-uncurry-this': 80 }],
-  116: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 84 }],
+  120: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
     const iterateSimple = require('../internals/iterate-simple')
@@ -6680,8 +6929,8 @@
         })
         : forEach(map, fn)
     }
-  }, { '../internals/function-uncurry-this': 80, '../internals/iterate-simple': 103, '../internals/map-helpers': 115 }],
-  117: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 84, '../internals/iterate-simple': 107, '../internals/map-helpers': 119 }],
+  121: [function (require, module, exports) {
     'use strict'
     const ceil = Math.ceil
     const floor = Math.floor
@@ -6694,7 +6943,7 @@
       return (n > 0 ? floor : ceil)(n)
     }
   }, {}],
-  118: [function (require, module, exports) {
+  122: [function (require, module, exports) {
     'use strict'
     /* global ActiveXObject -- old IE, WSH */
     const anObject = require('../internals/an-object')
@@ -6780,8 +7029,8 @@
       } else result = NullProtoObject()
       return Properties === undefined ? result : definePropertiesModule.f(result, Properties)
     }
-  }, { '../internals/an-object': 51, '../internals/document-create-element': 67, '../internals/enum-bug-keys': 68, '../internals/hidden-keys': 89, '../internals/html': 90, '../internals/object-define-properties': 119, '../internals/shared-key': 146 }],
-  119: [function (require, module, exports) {
+  }, { '../internals/an-object': 55, '../internals/document-create-element': 71, '../internals/enum-bug-keys': 72, '../internals/hidden-keys': 93, '../internals/html': 94, '../internals/object-define-properties': 123, '../internals/shared-key': 150 }],
+  123: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const V8_PROTOTYPE_DEFINE_BUG = require('../internals/v8-prototype-define-bug')
@@ -6805,8 +7054,8 @@
         while (length > index) definePropertyModule.f(O, key = keys[index++], props[key])
         return O
       }
-  }, { '../internals/an-object': 51, '../internals/descriptors': 66, '../internals/object-define-property': 120, '../internals/object-keys': 127, '../internals/to-indexed-object': 151, '../internals/v8-prototype-define-bug': 163 }],
-  120: [function (require, module, exports) {
+  }, { '../internals/an-object': 55, '../internals/descriptors': 70, '../internals/object-define-property': 124, '../internals/object-keys': 131, '../internals/to-indexed-object': 155, '../internals/v8-prototype-define-bug': 167 }],
+  124: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const IE8_DOM_DEFINE = require('../internals/ie8-dom-define')
@@ -6855,8 +7104,8 @@
       if ('value' in Attributes) O[P] = Attributes.value
       return O
     }
-  }, { '../internals/an-object': 51, '../internals/descriptors': 66, '../internals/ie8-dom-define': 91, '../internals/to-property-key': 156, '../internals/v8-prototype-define-bug': 163 }],
-  121: [function (require, module, exports) {
+  }, { '../internals/an-object': 55, '../internals/descriptors': 70, '../internals/ie8-dom-define': 95, '../internals/to-property-key': 160, '../internals/v8-prototype-define-bug': 167 }],
+  125: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const call = require('../internals/function-call')
@@ -6882,8 +7131,8 @@
       }
       if (hasOwn(O, P)) return createPropertyDescriptor(!call(propertyIsEnumerableModule.f, O, P), O[P])
     }
-  }, { '../internals/create-property-descriptor': 60, '../internals/descriptors': 66, '../internals/function-call': 76, '../internals/has-own-property': 88, '../internals/ie8-dom-define': 91, '../internals/object-property-is-enumerable': 128, '../internals/to-indexed-object': 151, '../internals/to-property-key': 156 }],
-  122: [function (require, module, exports) {
+  }, { '../internals/create-property-descriptor': 64, '../internals/descriptors': 70, '../internals/function-call': 80, '../internals/has-own-property': 92, '../internals/ie8-dom-define': 95, '../internals/object-property-is-enumerable': 132, '../internals/to-indexed-object': 155, '../internals/to-property-key': 160 }],
+  126: [function (require, module, exports) {
     'use strict'
     const internalObjectKeys = require('../internals/object-keys-internal')
     const enumBugKeys = require('../internals/enum-bug-keys')
@@ -6896,13 +7145,13 @@
     exports.f = Object.getOwnPropertyNames || function getOwnPropertyNames (O) {
       return internalObjectKeys(O, hiddenKeys)
     }
-  }, { '../internals/enum-bug-keys': 68, '../internals/object-keys-internal': 126 }],
-  123: [function (require, module, exports) {
+  }, { '../internals/enum-bug-keys': 72, '../internals/object-keys-internal': 130 }],
+  127: [function (require, module, exports) {
     'use strict'
     // eslint-disable-next-line es/no-object-getownpropertysymbols -- safe
     exports.f = Object.getOwnPropertySymbols
   }, {}],
-  124: [function (require, module, exports) {
+  128: [function (require, module, exports) {
     'use strict'
     const hasOwn = require('../internals/has-own-property')
     const isCallable = require('../internals/is-callable')
@@ -6927,14 +7176,14 @@
           return constructor.prototype
         } return object instanceof $Object ? ObjectPrototype : null
       }
-  }, { '../internals/correct-prototype-getter': 57, '../internals/has-own-property': 88, '../internals/is-callable': 96, '../internals/shared-key': 146, '../internals/to-object': 154 }],
-  125: [function (require, module, exports) {
+  }, { '../internals/correct-prototype-getter': 61, '../internals/has-own-property': 92, '../internals/is-callable': 100, '../internals/shared-key': 150, '../internals/to-object': 158 }],
+  129: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
 
     module.exports = uncurryThis({}.isPrototypeOf)
-  }, { '../internals/function-uncurry-this': 80 }],
-  126: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 84 }],
+  130: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
     const hasOwn = require('../internals/has-own-property')
@@ -6958,8 +7207,8 @@
       }
       return result
     }
-  }, { '../internals/array-includes': 52, '../internals/function-uncurry-this': 80, '../internals/has-own-property': 88, '../internals/hidden-keys': 89, '../internals/to-indexed-object': 151 }],
-  127: [function (require, module, exports) {
+  }, { '../internals/array-includes': 56, '../internals/function-uncurry-this': 84, '../internals/has-own-property': 92, '../internals/hidden-keys': 93, '../internals/to-indexed-object': 155 }],
+  131: [function (require, module, exports) {
     'use strict'
     const internalObjectKeys = require('../internals/object-keys-internal')
     const enumBugKeys = require('../internals/enum-bug-keys')
@@ -6970,8 +7219,8 @@
     module.exports = Object.keys || function keys (O) {
       return internalObjectKeys(O, enumBugKeys)
     }
-  }, { '../internals/enum-bug-keys': 68, '../internals/object-keys-internal': 126 }],
-  128: [function (require, module, exports) {
+  }, { '../internals/enum-bug-keys': 72, '../internals/object-keys-internal': 130 }],
+  132: [function (require, module, exports) {
     'use strict'
     const $propertyIsEnumerable = {}.propertyIsEnumerable
     // eslint-disable-next-line es/no-object-getownpropertydescriptor -- safe
@@ -6989,7 +7238,7 @@
       }
       : $propertyIsEnumerable
   }, {}],
-  129: [function (require, module, exports) {
+  133: [function (require, module, exports) {
     'use strict'
     const call = require('../internals/function-call')
     const isCallable = require('../internals/is-callable')
@@ -7006,8 +7255,8 @@
       if (pref !== 'string' && isCallable(fn = input.toString) && !isObject(val = call(fn, input))) return val
       throw new $TypeError("Can't convert object to primitive value")
     }
-  }, { '../internals/function-call': 76, '../internals/is-callable': 96, '../internals/is-object': 100 }],
-  130: [function (require, module, exports) {
+  }, { '../internals/function-call': 80, '../internals/is-callable': 100, '../internals/is-object': 104 }],
+  134: [function (require, module, exports) {
     'use strict'
     const getBuiltIn = require('../internals/get-built-in')
     const uncurryThis = require('../internals/function-uncurry-this')
@@ -7023,8 +7272,8 @@
       const getOwnPropertySymbols = getOwnPropertySymbolsModule.f
       return getOwnPropertySymbols ? concat(keys, getOwnPropertySymbols(it)) : keys
     }
-  }, { '../internals/an-object': 51, '../internals/function-uncurry-this': 80, '../internals/get-built-in': 81, '../internals/object-get-own-property-names': 122, '../internals/object-get-own-property-symbols': 123 }],
-  131: [function (require, module, exports) {
+  }, { '../internals/an-object': 55, '../internals/function-uncurry-this': 84, '../internals/get-built-in': 85, '../internals/object-get-own-property-names': 126, '../internals/object-get-own-property-symbols': 127 }],
+  135: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
     const fails = require('../internals/fails')
@@ -7074,8 +7323,8 @@
     })
 
     module.exports = { correct: FLAGS_GETTER_IS_CORRECT }
-  }, { '../internals/fails': 72, '../internals/global-this': 87 }],
-  132: [function (require, module, exports) {
+  }, { '../internals/fails': 76, '../internals/global-this': 91 }],
+  136: [function (require, module, exports) {
     'use strict'
     const anObject = require('../internals/an-object')
 
@@ -7094,8 +7343,8 @@
       if (that.sticky) result += 'y'
       return result
     }
-  }, { '../internals/an-object': 51 }],
-  133: [function (require, module, exports) {
+  }, { '../internals/an-object': 55 }],
+  137: [function (require, module, exports) {
     'use strict'
     const isNullOrUndefined = require('../internals/is-null-or-undefined')
 
@@ -7107,8 +7356,8 @@
       if (isNullOrUndefined(it)) throw new $TypeError("Can't call method on " + it)
       return it
     }
-  }, { '../internals/is-null-or-undefined': 99 }],
-  134: [function (require, module, exports) {
+  }, { '../internals/is-null-or-undefined': 103 }],
+  138: [function (require, module, exports) {
     'use strict'
     // `SameValueZero` abstract operation
     // https://tc39.es/ecma262/#sec-samevaluezero
@@ -7117,7 +7366,7 @@
       return x === y || x !== x && y !== y
     }
   }, {}],
-  135: [function (require, module, exports) {
+  139: [function (require, module, exports) {
     'use strict'
     const SetHelpers = require('../internals/set-helpers')
     const iterate = require('../internals/set-iterate')
@@ -7132,8 +7381,8 @@
       })
       return result
     }
-  }, { '../internals/set-helpers': 137, '../internals/set-iterate': 142 }],
-  136: [function (require, module, exports) {
+  }, { '../internals/set-helpers': 141, '../internals/set-iterate': 146 }],
+  140: [function (require, module, exports) {
     'use strict'
     const aSet = require('../internals/a-set')
     const SetHelpers = require('../internals/set-helpers')
@@ -7163,8 +7412,8 @@
       }
       return result
     }
-  }, { '../internals/a-set': 46, '../internals/get-set-record': 86, '../internals/iterate-simple': 103, '../internals/set-clone': 135, '../internals/set-helpers': 137, '../internals/set-iterate': 142, '../internals/set-size': 143 }],
-  137: [function (require, module, exports) {
+  }, { '../internals/a-set': 50, '../internals/get-set-record': 90, '../internals/iterate-simple': 107, '../internals/set-clone': 139, '../internals/set-helpers': 141, '../internals/set-iterate': 146, '../internals/set-size': 147 }],
+  141: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
 
@@ -7179,8 +7428,8 @@
       remove: uncurryThis(SetPrototype.delete),
       proto: SetPrototype
     }
-  }, { '../internals/function-uncurry-this': 80 }],
-  138: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 84 }],
+  142: [function (require, module, exports) {
     'use strict'
     const aSet = require('../internals/a-set')
     const SetHelpers = require('../internals/set-helpers')
@@ -7212,8 +7461,8 @@
 
       return result
     }
-  }, { '../internals/a-set': 46, '../internals/get-set-record': 86, '../internals/iterate-simple': 103, '../internals/set-helpers': 137, '../internals/set-iterate': 142, '../internals/set-size': 143 }],
-  139: [function (require, module, exports) {
+  }, { '../internals/a-set': 50, '../internals/get-set-record': 90, '../internals/iterate-simple': 107, '../internals/set-helpers': 141, '../internals/set-iterate': 146, '../internals/set-size': 147 }],
+  143: [function (require, module, exports) {
     'use strict'
     const aSet = require('../internals/a-set')
     const has = require('../internals/set-helpers').has
@@ -7238,8 +7487,8 @@
         if (has(O, e)) return iteratorClose(iterator.iterator, 'normal', false)
       }) !== false
     }
-  }, { '../internals/a-set': 46, '../internals/get-set-record': 86, '../internals/iterate-simple': 103, '../internals/iterator-close': 107, '../internals/set-helpers': 137, '../internals/set-iterate': 142, '../internals/set-size': 143 }],
-  140: [function (require, module, exports) {
+  }, { '../internals/a-set': 50, '../internals/get-set-record': 90, '../internals/iterate-simple': 107, '../internals/iterator-close': 111, '../internals/set-helpers': 141, '../internals/set-iterate': 146, '../internals/set-size': 147 }],
+  144: [function (require, module, exports) {
     'use strict'
     const aSet = require('../internals/a-set')
     const size = require('../internals/set-size')
@@ -7256,8 +7505,8 @@
         if (!otherRec.includes(e)) return false
       }, true) !== false
     }
-  }, { '../internals/a-set': 46, '../internals/get-set-record': 86, '../internals/set-iterate': 142, '../internals/set-size': 143 }],
-  141: [function (require, module, exports) {
+  }, { '../internals/a-set': 50, '../internals/get-set-record': 90, '../internals/set-iterate': 146, '../internals/set-size': 147 }],
+  145: [function (require, module, exports) {
     'use strict'
     const aSet = require('../internals/a-set')
     const has = require('../internals/set-helpers').has
@@ -7277,8 +7526,8 @@
         if (!has(O, e)) return iteratorClose(iterator.iterator, 'normal', false)
       }) !== false
     }
-  }, { '../internals/a-set': 46, '../internals/get-set-record': 86, '../internals/iterate-simple': 103, '../internals/iterator-close': 107, '../internals/set-helpers': 137, '../internals/set-size': 143 }],
-  142: [function (require, module, exports) {
+  }, { '../internals/a-set': 50, '../internals/get-set-record': 90, '../internals/iterate-simple': 107, '../internals/iterator-close': 111, '../internals/set-helpers': 141, '../internals/set-size': 147 }],
+  146: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
     const iterateSimple = require('../internals/iterate-simple')
@@ -7293,8 +7542,8 @@
     module.exports = function (set, fn, interruptible) {
       return interruptible ? iterateSimple({ iterator: keys(set), next }, fn) : forEach(set, fn)
     }
-  }, { '../internals/function-uncurry-this': 80, '../internals/iterate-simple': 103, '../internals/set-helpers': 137 }],
-  143: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 84, '../internals/iterate-simple': 107, '../internals/set-helpers': 141 }],
+  147: [function (require, module, exports) {
     'use strict'
     const uncurryThisAccessor = require('../internals/function-uncurry-this-accessor')
     const SetHelpers = require('../internals/set-helpers')
@@ -7302,8 +7551,8 @@
     module.exports = uncurryThisAccessor(SetHelpers.proto, 'size', 'get') || function (set) {
       return set.size
     }
-  }, { '../internals/function-uncurry-this-accessor': 78, '../internals/set-helpers': 137 }],
-  144: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this-accessor': 82, '../internals/set-helpers': 141 }],
+  148: [function (require, module, exports) {
     'use strict'
     const aSet = require('../internals/a-set')
     const SetHelpers = require('../internals/set-helpers')
@@ -7327,8 +7576,8 @@
       })
       return result
     }
-  }, { '../internals/a-set': 46, '../internals/get-set-record': 86, '../internals/iterate-simple': 103, '../internals/set-clone': 135, '../internals/set-helpers': 137 }],
-  145: [function (require, module, exports) {
+  }, { '../internals/a-set': 50, '../internals/get-set-record': 90, '../internals/iterate-simple': 107, '../internals/set-clone': 139, '../internals/set-helpers': 141 }],
+  149: [function (require, module, exports) {
     'use strict'
     const aSet = require('../internals/a-set')
     const add = require('../internals/set-helpers').add
@@ -7347,8 +7596,8 @@
       })
       return result
     }
-  }, { '../internals/a-set': 46, '../internals/get-set-record': 86, '../internals/iterate-simple': 103, '../internals/set-clone': 135, '../internals/set-helpers': 137 }],
-  146: [function (require, module, exports) {
+  }, { '../internals/a-set': 50, '../internals/get-set-record': 90, '../internals/iterate-simple': 107, '../internals/set-clone': 139, '../internals/set-helpers': 141 }],
+  150: [function (require, module, exports) {
     'use strict'
     const shared = require('../internals/shared')
     const uid = require('../internals/uid')
@@ -7358,8 +7607,8 @@
     module.exports = function (key) {
       return keys[key] || (keys[key] = uid(key))
     }
-  }, { '../internals/shared': 148, '../internals/uid': 161 }],
-  147: [function (require, module, exports) {
+  }, { '../internals/shared': 152, '../internals/uid': 165 }],
+  151: [function (require, module, exports) {
     'use strict'
     const IS_PURE = require('../internals/is-pure')
     const globalThis = require('../internals/global-this')
@@ -7375,8 +7624,8 @@
       license: 'https://github.com/zloirock/core-js/blob/v3.50.0/LICENSE',
       source: 'https://github.com/zloirock/core-js'
     })
-  }, { '../internals/define-global-property': 65, '../internals/global-this': 87, '../internals/is-pure': 101 }],
-  148: [function (require, module, exports) {
+  }, { '../internals/define-global-property': 69, '../internals/global-this': 91, '../internals/is-pure': 105 }],
+  152: [function (require, module, exports) {
     'use strict'
     const store = require('../internals/shared-store')
     // eslint-disable-next-line es/no-object-create -- safe
@@ -7385,8 +7634,8 @@
     module.exports = function (key, value) {
       return store[key] || (store[key] = value || create(null))
     }
-  }, { '../internals/shared-store': 147 }],
-  149: [function (require, module, exports) {
+  }, { '../internals/shared-store': 151 }],
+  153: [function (require, module, exports) {
     'use strict'
     /* eslint-disable es/no-symbol -- required for testing */
     const V8_VERSION = require('../internals/environment-v8-version')
@@ -7406,8 +7655,8 @@
     // Chrome 38-40 symbols are not inherited from DOM collections prototypes to instances
     !Symbol.sham && V8_VERSION && V8_VERSION < 41
     })
-  }, { '../internals/environment-v8-version': 70, '../internals/fails': 72, '../internals/global-this': 87 }],
-  150: [function (require, module, exports) {
+  }, { '../internals/environment-v8-version': 74, '../internals/fails': 76, '../internals/global-this': 91 }],
+  154: [function (require, module, exports) {
     'use strict'
     const toIntegerOrInfinity = require('../internals/to-integer-or-infinity')
 
@@ -7421,8 +7670,8 @@
       const integer = toIntegerOrInfinity(index)
       return integer < 0 ? max(integer + length, 0) : min(integer, length)
     }
-  }, { '../internals/to-integer-or-infinity': 152 }],
-  151: [function (require, module, exports) {
+  }, { '../internals/to-integer-or-infinity': 156 }],
+  155: [function (require, module, exports) {
     'use strict'
     // toObject with fallback for non-array-like ES3 strings
     const IndexedObject = require('../internals/indexed-object')
@@ -7431,8 +7680,8 @@
     module.exports = function (it) {
       return IndexedObject(requireObjectCoercible(it))
     }
-  }, { '../internals/indexed-object': 92, '../internals/require-object-coercible': 133 }],
-  152: [function (require, module, exports) {
+  }, { '../internals/indexed-object': 96, '../internals/require-object-coercible': 137 }],
+  156: [function (require, module, exports) {
     'use strict'
     const trunc = require('../internals/math-trunc')
 
@@ -7443,8 +7692,8 @@
       // eslint-disable-next-line no-self-compare -- NaN check
       return number !== number || number === 0 ? 0 : trunc(number)
     }
-  }, { '../internals/math-trunc': 117 }],
-  153: [function (require, module, exports) {
+  }, { '../internals/math-trunc': 121 }],
+  157: [function (require, module, exports) {
     'use strict'
     const toIntegerOrInfinity = require('../internals/to-integer-or-infinity')
 
@@ -7456,8 +7705,8 @@
       const len = toIntegerOrInfinity(argument)
       return len > 0 ? min(len, 0x1FFFFFFFFFFFFF) : 0 // 2 ** 53 - 1 == 9007199254740991
     }
-  }, { '../internals/to-integer-or-infinity': 152 }],
-  154: [function (require, module, exports) {
+  }, { '../internals/to-integer-or-infinity': 156 }],
+  158: [function (require, module, exports) {
     'use strict'
     const requireObjectCoercible = require('../internals/require-object-coercible')
 
@@ -7468,8 +7717,8 @@
     module.exports = function (argument) {
       return $Object(requireObjectCoercible(argument))
     }
-  }, { '../internals/require-object-coercible': 133 }],
-  155: [function (require, module, exports) {
+  }, { '../internals/require-object-coercible': 137 }],
+  159: [function (require, module, exports) {
     'use strict'
     const call = require('../internals/function-call')
     const isObject = require('../internals/is-object')
@@ -7496,8 +7745,8 @@
       if (pref === undefined) pref = 'number'
       return ordinaryToPrimitive(input, pref)
     }
-  }, { '../internals/function-call': 76, '../internals/get-method': 85, '../internals/is-object': 100, '../internals/is-symbol': 102, '../internals/ordinary-to-primitive': 129, '../internals/well-known-symbol': 167 }],
-  156: [function (require, module, exports) {
+  }, { '../internals/function-call': 80, '../internals/get-method': 89, '../internals/is-object': 104, '../internals/is-symbol': 106, '../internals/ordinary-to-primitive': 133, '../internals/well-known-symbol': 171 }],
+  160: [function (require, module, exports) {
     'use strict'
     const toPrimitive = require('../internals/to-primitive')
     const isSymbol = require('../internals/is-symbol')
@@ -7508,8 +7757,8 @@
       const key = toPrimitive(argument, 'string')
       return isSymbol(key) ? key : key + ''
     }
-  }, { '../internals/is-symbol': 102, '../internals/to-primitive': 155 }],
-  157: [function (require, module, exports) {
+  }, { '../internals/is-symbol': 106, '../internals/to-primitive': 159 }],
+  161: [function (require, module, exports) {
     'use strict'
     const getBuiltIn = require('../internals/get-built-in')
     const isCallable = require('../internals/is-callable')
@@ -7530,8 +7779,8 @@
       if (isSetLike(it)) return it
       return isIterable(it) ? new Set(it) : it
     }
-  }, { '../internals/get-built-in': 81, '../internals/is-callable': 96, '../internals/is-iterable': 98, '../internals/is-object': 100 }],
-  158: [function (require, module, exports) {
+  }, { '../internals/get-built-in': 85, '../internals/is-callable': 100, '../internals/is-iterable': 102, '../internals/is-object': 104 }],
+  162: [function (require, module, exports) {
     'use strict'
     const wellKnownSymbol = require('../internals/well-known-symbol')
 
@@ -7541,8 +7790,8 @@
     test[TO_STRING_TAG] = 'z'
 
     module.exports = String(test) === '[object z]'
-  }, { '../internals/well-known-symbol': 167 }],
-  159: [function (require, module, exports) {
+  }, { '../internals/well-known-symbol': 171 }],
+  163: [function (require, module, exports) {
     'use strict'
     const classof = require('../internals/classof')
 
@@ -7552,8 +7801,8 @@
       if (classof(argument) === 'Symbol') throw new TypeError('Cannot convert a Symbol value to a string')
       return $String(argument)
     }
-  }, { '../internals/classof': 55 }],
-  160: [function (require, module, exports) {
+  }, { '../internals/classof': 59 }],
+  164: [function (require, module, exports) {
     'use strict'
     const $String = String
 
@@ -7565,7 +7814,7 @@
       }
     }
   }, {}],
-  161: [function (require, module, exports) {
+  165: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
 
@@ -7576,8 +7825,8 @@
     module.exports = function (key) {
       return 'Symbol(' + (key === undefined ? '' : key) + ')_' + toString(++id + postfix, 36)
     }
-  }, { '../internals/function-uncurry-this': 80 }],
-  162: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 84 }],
+  166: [function (require, module, exports) {
     'use strict'
     /* eslint-disable es/no-symbol -- required for testing */
     const NATIVE_SYMBOL = require('../internals/symbol-constructor-detection')
@@ -7585,8 +7834,8 @@
     module.exports = NATIVE_SYMBOL &&
   !Symbol.sham &&
   typeof Symbol.iterator === 'symbol'
-  }, { '../internals/symbol-constructor-detection': 149 }],
-  163: [function (require, module, exports) {
+  }, { '../internals/symbol-constructor-detection': 153 }],
+  167: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const fails = require('../internals/fails')
@@ -7600,8 +7849,8 @@
         writable: false
       }).prototype !== 42
     })
-  }, { '../internals/descriptors': 66, '../internals/fails': 72 }],
-  164: [function (require, module, exports) {
+  }, { '../internals/descriptors': 70, '../internals/fails': 76 }],
+  168: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
     const isCallable = require('../internals/is-callable')
@@ -7609,8 +7858,8 @@
     const WeakMap = globalThis.WeakMap
 
     module.exports = isCallable(WeakMap) && /native code/.test(String(WeakMap))
-  }, { '../internals/global-this': 87, '../internals/is-callable': 96 }],
-  165: [function (require, module, exports) {
+  }, { '../internals/global-this': 91, '../internals/is-callable': 100 }],
+  169: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
 
@@ -7625,8 +7874,8 @@
       has: uncurryThis(WeakMapPrototype.has),
       remove: uncurryThis(WeakMapPrototype.delete)
     }
-  }, { '../internals/function-uncurry-this': 80 }],
-  166: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 84 }],
+  170: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
 
@@ -7640,8 +7889,8 @@
       has: uncurryThis(WeakSetPrototype.has),
       remove: uncurryThis(WeakSetPrototype.delete)
     }
-  }, { '../internals/function-uncurry-this': 80 }],
-  167: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 84 }],
+  171: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
     const shared = require('../internals/shared')
@@ -7661,8 +7910,8 @@
           : createWellKnownSymbol('Symbol.' + name)
       } return WellKnownSymbolsStore[name]
     }
-  }, { '../internals/global-this': 87, '../internals/has-own-property': 88, '../internals/shared': 148, '../internals/symbol-constructor-detection': 149, '../internals/uid': 161, '../internals/use-symbol-as-uid': 162 }],
-  168: [function (require, module, exports) {
+  }, { '../internals/global-this': 91, '../internals/has-own-property': 92, '../internals/shared': 152, '../internals/symbol-constructor-detection': 153, '../internals/uid': 165, '../internals/use-symbol-as-uid': 166 }],
+  172: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const $includes = require('../internals/array-includes').includes
@@ -7691,8 +7940,8 @@
 
     // https://tc39.es/ecma262/#sec-array.prototype-@@unscopables
     addToUnscopables('includes')
-  }, { '../internals/add-to-unscopables': 49, '../internals/array-includes': 52, '../internals/export': 71, '../internals/fails': 72 }],
-  169: [function (require, module, exports) {
+  }, { '../internals/add-to-unscopables': 53, '../internals/array-includes': 56, '../internals/export': 75, '../internals/fails': 76 }],
+  173: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const globalThis = require('../internals/global-this')
@@ -7758,8 +8007,8 @@
     $({ global: true, constructor: true, forced: FORCED }, {
       Iterator: IteratorConstructor
     })
-  }, { '../internals/an-instance': 50, '../internals/an-object': 51, '../internals/create-property': 61, '../internals/define-built-in-accessor': 62, '../internals/descriptors': 66, '../internals/export': 71, '../internals/fails': 72, '../internals/global-this': 87, '../internals/has-own-property': 88, '../internals/is-callable': 96, '../internals/is-pure': 101, '../internals/iterators-core': 111, '../internals/object-get-prototype-of': 124, '../internals/well-known-symbol': 167 }],
-  170: [function (require, module, exports) {
+  }, { '../internals/an-instance': 54, '../internals/an-object': 55, '../internals/create-property': 65, '../internals/define-built-in-accessor': 66, '../internals/descriptors': 70, '../internals/export': 75, '../internals/fails': 76, '../internals/global-this': 91, '../internals/has-own-property': 92, '../internals/is-callable': 100, '../internals/is-pure': 105, '../internals/iterators-core': 115, '../internals/object-get-prototype-of': 128, '../internals/well-known-symbol': 171 }],
+  174: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -7792,8 +8041,8 @@
         }, { IS_RECORD: true, INTERRUPTED: true }).stopped
       }
     })
-  }, { '../internals/a-callable': 44, '../internals/an-object': 51, '../internals/export': 71, '../internals/function-call': 76, '../internals/get-iterator-direct': 82, '../internals/iterate': 104, '../internals/iterator-close': 107, '../internals/iterator-helper-without-closing-on-early-error': 110 }],
-  171: [function (require, module, exports) {
+  }, { '../internals/a-callable': 48, '../internals/an-object': 55, '../internals/export': 75, '../internals/function-call': 80, '../internals/get-iterator-direct': 86, '../internals/iterate': 108, '../internals/iterator-close': 111, '../internals/iterator-helper-without-closing-on-early-error': 114 }],
+  175: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -7845,8 +8094,8 @@
         })
       }
     })
-  }, { '../internals/a-callable': 44, '../internals/an-object': 51, '../internals/call-with-safe-iteration-closing': 53, '../internals/export': 71, '../internals/function-call': 76, '../internals/get-iterator-direct': 82, '../internals/is-pure': 101, '../internals/iterator-close': 107, '../internals/iterator-create-proxy': 108, '../internals/iterator-helper-throws-on-invalid-iterator': 109, '../internals/iterator-helper-without-closing-on-early-error': 110 }],
-  172: [function (require, module, exports) {
+  }, { '../internals/a-callable': 48, '../internals/an-object': 55, '../internals/call-with-safe-iteration-closing': 57, '../internals/export': 75, '../internals/function-call': 80, '../internals/get-iterator-direct': 86, '../internals/is-pure': 105, '../internals/iterator-close': 111, '../internals/iterator-create-proxy': 112, '../internals/iterator-helper-throws-on-invalid-iterator': 113, '../internals/iterator-helper-without-closing-on-early-error': 114 }],
+  176: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -7879,8 +8128,8 @@
         }, { IS_RECORD: true, INTERRUPTED: true }).result
       }
     })
-  }, { '../internals/a-callable': 44, '../internals/an-object': 51, '../internals/export': 71, '../internals/function-call': 76, '../internals/get-iterator-direct': 82, '../internals/iterate': 104, '../internals/iterator-close': 107, '../internals/iterator-helper-without-closing-on-early-error': 110 }],
-  173: [function (require, module, exports) {
+  }, { '../internals/a-callable': 48, '../internals/an-object': 55, '../internals/export': 75, '../internals/function-call': 80, '../internals/get-iterator-direct': 86, '../internals/iterate': 108, '../internals/iterator-close': 111, '../internals/iterator-helper-without-closing-on-early-error': 114 }],
+  177: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -7913,8 +8162,8 @@
         }, { IS_RECORD: true })
       }
     })
-  }, { '../internals/a-callable': 44, '../internals/an-object': 51, '../internals/export': 71, '../internals/function-call': 76, '../internals/get-iterator-direct': 82, '../internals/iterate': 104, '../internals/iterator-close': 107, '../internals/iterator-helper-without-closing-on-early-error': 110 }],
-  174: [function (require, module, exports) {
+  }, { '../internals/a-callable': 48, '../internals/an-object': 55, '../internals/export': 75, '../internals/function-call': 80, '../internals/get-iterator-direct': 86, '../internals/iterate': 108, '../internals/iterator-close': 111, '../internals/iterator-helper-without-closing-on-early-error': 114 }],
+  178: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -7959,8 +8208,8 @@
         })
       }
     })
-  }, { '../internals/a-callable': 44, '../internals/an-object': 51, '../internals/call-with-safe-iteration-closing': 53, '../internals/export': 71, '../internals/function-call': 76, '../internals/get-iterator-direct': 82, '../internals/is-pure': 101, '../internals/iterator-close': 107, '../internals/iterator-create-proxy': 108, '../internals/iterator-helper-throws-on-invalid-iterator': 109, '../internals/iterator-helper-without-closing-on-early-error': 110 }],
-  175: [function (require, module, exports) {
+  }, { '../internals/a-callable': 48, '../internals/an-object': 55, '../internals/call-with-safe-iteration-closing': 57, '../internals/export': 75, '../internals/function-call': 80, '../internals/get-iterator-direct': 86, '../internals/is-pure': 105, '../internals/iterator-close': 111, '../internals/iterator-create-proxy': 112, '../internals/iterator-helper-throws-on-invalid-iterator': 113, '../internals/iterator-helper-without-closing-on-early-error': 114 }],
+  179: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const iterate = require('../internals/iterate')
@@ -8013,8 +8262,8 @@
         return accumulator
       }
     })
-  }, { '../internals/a-callable': 44, '../internals/an-object': 51, '../internals/export': 71, '../internals/fails': 72, '../internals/function-apply': 73, '../internals/get-iterator-direct': 82, '../internals/iterate': 104, '../internals/iterator-close': 107, '../internals/iterator-helper-without-closing-on-early-error': 110 }],
-  176: [function (require, module, exports) {
+  }, { '../internals/a-callable': 48, '../internals/an-object': 55, '../internals/export': 75, '../internals/fails': 76, '../internals/function-apply': 77, '../internals/get-iterator-direct': 86, '../internals/iterate': 108, '../internals/iterator-close': 111, '../internals/iterator-helper-without-closing-on-early-error': 114 }],
+  180: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -8047,8 +8296,8 @@
         }, { IS_RECORD: true, INTERRUPTED: true }).stopped
       }
     })
-  }, { '../internals/a-callable': 44, '../internals/an-object': 51, '../internals/export': 71, '../internals/function-call': 76, '../internals/get-iterator-direct': 82, '../internals/iterate': 104, '../internals/iterator-close': 107, '../internals/iterator-helper-without-closing-on-early-error': 110 }],
-  177: [function (require, module, exports) {
+  }, { '../internals/a-callable': 48, '../internals/an-object': 55, '../internals/export': 75, '../internals/function-call': 80, '../internals/get-iterator-direct': 86, '../internals/iterate': 108, '../internals/iterator-close': 111, '../internals/iterator-helper-without-closing-on-early-error': 114 }],
+  181: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const defineBuiltInAccessor = require('../internals/define-built-in-accessor')
@@ -8065,48 +8314,48 @@
 
       regExpFlagsDetection.correct = true
     }
-  }, { '../internals/define-built-in-accessor': 62, '../internals/descriptors': 66, '../internals/regexp-flags': 132, '../internals/regexp-flags-detection': 131 }],
-  178: [function (require, module, exports) {
-    'use strict'
-    // TODO: Remove from `core-js@4`
-    require('../modules/es.iterator.constructor')
-  }, { '../modules/es.iterator.constructor': 169 }],
-  179: [function (require, module, exports) {
-    'use strict'
-    // TODO: Remove from `core-js@4`
-    require('../modules/es.iterator.every')
-  }, { '../modules/es.iterator.every': 170 }],
-  180: [function (require, module, exports) {
-    'use strict'
-    // TODO: Remove from `core-js@4`
-    require('../modules/es.iterator.filter')
-  }, { '../modules/es.iterator.filter': 171 }],
-  181: [function (require, module, exports) {
-    'use strict'
-    // TODO: Remove from `core-js@4`
-    require('../modules/es.iterator.find')
-  }, { '../modules/es.iterator.find': 172 }],
+  }, { '../internals/define-built-in-accessor': 66, '../internals/descriptors': 70, '../internals/regexp-flags': 136, '../internals/regexp-flags-detection': 135 }],
   182: [function (require, module, exports) {
     'use strict'
     // TODO: Remove from `core-js@4`
-    require('../modules/es.iterator.for-each')
-  }, { '../modules/es.iterator.for-each': 173 }],
+    require('../modules/es.iterator.constructor')
+  }, { '../modules/es.iterator.constructor': 173 }],
   183: [function (require, module, exports) {
     'use strict'
     // TODO: Remove from `core-js@4`
-    require('../modules/es.iterator.map')
-  }, { '../modules/es.iterator.map': 174 }],
+    require('../modules/es.iterator.every')
+  }, { '../modules/es.iterator.every': 174 }],
   184: [function (require, module, exports) {
     'use strict'
     // TODO: Remove from `core-js@4`
-    require('../modules/es.iterator.reduce')
-  }, { '../modules/es.iterator.reduce': 175 }],
+    require('../modules/es.iterator.filter')
+  }, { '../modules/es.iterator.filter': 175 }],
   185: [function (require, module, exports) {
     'use strict'
     // TODO: Remove from `core-js@4`
-    require('../modules/es.iterator.some')
-  }, { '../modules/es.iterator.some': 176 }],
+    require('../modules/es.iterator.find')
+  }, { '../modules/es.iterator.find': 176 }],
   186: [function (require, module, exports) {
+    'use strict'
+    // TODO: Remove from `core-js@4`
+    require('../modules/es.iterator.for-each')
+  }, { '../modules/es.iterator.for-each': 177 }],
+  187: [function (require, module, exports) {
+    'use strict'
+    // TODO: Remove from `core-js@4`
+    require('../modules/es.iterator.map')
+  }, { '../modules/es.iterator.map': 178 }],
+  188: [function (require, module, exports) {
+    'use strict'
+    // TODO: Remove from `core-js@4`
+    require('../modules/es.iterator.reduce')
+  }, { '../modules/es.iterator.reduce': 179 }],
+  189: [function (require, module, exports) {
+    'use strict'
+    // TODO: Remove from `core-js@4`
+    require('../modules/es.iterator.some')
+  }, { '../modules/es.iterator.some': 180 }],
+  190: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const aMap = require('../internals/a-map')
@@ -8125,8 +8374,8 @@
         } return !!allDeleted
       }
     })
-  }, { '../internals/a-map': 45, '../internals/export': 71, '../internals/map-helpers': 115 }],
-  187: [function (require, module, exports) {
+  }, { '../internals/a-map': 49, '../internals/export': 75, '../internals/map-helpers': 119 }],
+  191: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const bind = require('../internals/function-bind-context')
@@ -8144,8 +8393,8 @@
         }, true) !== false
       }
     })
-  }, { '../internals/a-map': 45, '../internals/export': 71, '../internals/function-bind-context': 74, '../internals/map-iterate': 116 }],
-  188: [function (require, module, exports) {
+  }, { '../internals/a-map': 49, '../internals/export': 75, '../internals/function-bind-context': 78, '../internals/map-iterate': 120 }],
+  192: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const bind = require('../internals/function-bind-context')
@@ -8169,8 +8418,8 @@
         return newMap
       }
     })
-  }, { '../internals/a-map': 45, '../internals/export': 71, '../internals/function-bind-context': 74, '../internals/map-helpers': 115, '../internals/map-iterate': 116 }],
-  189: [function (require, module, exports) {
+  }, { '../internals/a-map': 49, '../internals/export': 75, '../internals/function-bind-context': 78, '../internals/map-helpers': 119, '../internals/map-iterate': 120 }],
+  193: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const bind = require('../internals/function-bind-context')
@@ -8189,8 +8438,8 @@
         return result && result.key
       }
     })
-  }, { '../internals/a-map': 45, '../internals/export': 71, '../internals/function-bind-context': 74, '../internals/map-iterate': 116 }],
-  190: [function (require, module, exports) {
+  }, { '../internals/a-map': 49, '../internals/export': 75, '../internals/function-bind-context': 78, '../internals/map-iterate': 120 }],
+  194: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const bind = require('../internals/function-bind-context')
@@ -8209,8 +8458,8 @@
         return result && result.value
       }
     })
-  }, { '../internals/a-map': 45, '../internals/export': 71, '../internals/function-bind-context': 74, '../internals/map-iterate': 116 }],
-  191: [function (require, module, exports) {
+  }, { '../internals/a-map': 49, '../internals/export': 75, '../internals/function-bind-context': 78, '../internals/map-iterate': 120 }],
+  195: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const sameValueZero = require('../internals/same-value-zero')
@@ -8226,8 +8475,8 @@
         }, true) === true
       }
     })
-  }, { '../internals/a-map': 45, '../internals/export': 71, '../internals/map-iterate': 116, '../internals/same-value-zero': 134 }],
-  192: [function (require, module, exports) {
+  }, { '../internals/a-map': 49, '../internals/export': 75, '../internals/map-iterate': 120, '../internals/same-value-zero': 138 }],
+  196: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const aMap = require('../internals/a-map')
@@ -8243,8 +8492,8 @@
         return result && result.key
       }
     })
-  }, { '../internals/a-map': 45, '../internals/export': 71, '../internals/map-iterate': 116 }],
-  193: [function (require, module, exports) {
+  }, { '../internals/a-map': 49, '../internals/export': 75, '../internals/map-iterate': 120 }],
+  197: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const bind = require('../internals/function-bind-context')
@@ -8268,8 +8517,8 @@
         return newMap
       }
     })
-  }, { '../internals/a-map': 45, '../internals/export': 71, '../internals/function-bind-context': 74, '../internals/map-helpers': 115, '../internals/map-iterate': 116 }],
-  194: [function (require, module, exports) {
+  }, { '../internals/a-map': 49, '../internals/export': 75, '../internals/function-bind-context': 78, '../internals/map-helpers': 119, '../internals/map-iterate': 120 }],
+  198: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const bind = require('../internals/function-bind-context')
@@ -8293,8 +8542,8 @@
         return newMap
       }
     })
-  }, { '../internals/a-map': 45, '../internals/export': 71, '../internals/function-bind-context': 74, '../internals/map-helpers': 115, '../internals/map-iterate': 116 }],
-  195: [function (require, module, exports) {
+  }, { '../internals/a-map': 49, '../internals/export': 75, '../internals/function-bind-context': 78, '../internals/map-helpers': 119, '../internals/map-iterate': 120 }],
+  199: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const aMap = require('../internals/a-map')
@@ -8317,8 +8566,8 @@
         return map
       }
     })
-  }, { '../internals/a-map': 45, '../internals/export': 71, '../internals/iterate': 104, '../internals/map-helpers': 115 }],
-  196: [function (require, module, exports) {
+  }, { '../internals/a-map': 49, '../internals/export': 75, '../internals/iterate': 108, '../internals/map-helpers': 119 }],
+  200: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const aCallable = require('../internals/a-callable')
@@ -8347,8 +8596,8 @@
         return accumulator
       }
     })
-  }, { '../internals/a-callable': 44, '../internals/a-map': 45, '../internals/export': 71, '../internals/map-iterate': 116 }],
-  197: [function (require, module, exports) {
+  }, { '../internals/a-callable': 48, '../internals/a-map': 49, '../internals/export': 75, '../internals/map-iterate': 120 }],
+  201: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const bind = require('../internals/function-bind-context')
@@ -8366,8 +8615,8 @@
         }, true) === true
       }
     })
-  }, { '../internals/a-map': 45, '../internals/export': 71, '../internals/function-bind-context': 74, '../internals/map-iterate': 116 }],
-  198: [function (require, module, exports) {
+  }, { '../internals/a-map': 49, '../internals/export': 75, '../internals/function-bind-context': 78, '../internals/map-iterate': 120 }],
+  202: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const aCallable = require('../internals/a-callable')
@@ -8395,8 +8644,8 @@
         return map
       }
     })
-  }, { '../internals/a-callable': 44, '../internals/a-map': 45, '../internals/export': 71, '../internals/map-helpers': 115 }],
-  199: [function (require, module, exports) {
+  }, { '../internals/a-callable': 48, '../internals/a-map': 49, '../internals/export': 75, '../internals/map-helpers': 119 }],
+  203: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const aSet = require('../internals/a-set')
@@ -8412,8 +8661,8 @@
         } return set
       }
     })
-  }, { '../internals/a-set': 46, '../internals/export': 71, '../internals/set-helpers': 137 }],
-  200: [function (require, module, exports) {
+  }, { '../internals/a-set': 50, '../internals/export': 75, '../internals/set-helpers': 141 }],
+  204: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const aSet = require('../internals/a-set')
@@ -8432,8 +8681,8 @@
         } return !!allDeleted
       }
     })
-  }, { '../internals/a-set': 46, '../internals/export': 71, '../internals/set-helpers': 137 }],
-  201: [function (require, module, exports) {
+  }, { '../internals/a-set': 50, '../internals/export': 75, '../internals/set-helpers': 141 }],
+  205: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -8448,8 +8697,8 @@
         return call($difference, this, toSetLike(other))
       }
     })
-  }, { '../internals/export': 71, '../internals/function-call': 76, '../internals/set-difference': 136, '../internals/to-set-like': 157 }],
-  202: [function (require, module, exports) {
+  }, { '../internals/export': 75, '../internals/function-call': 80, '../internals/set-difference': 140, '../internals/to-set-like': 161 }],
+  206: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const bind = require('../internals/function-bind-context')
@@ -8467,8 +8716,8 @@
         }, true) !== false
       }
     })
-  }, { '../internals/a-set': 46, '../internals/export': 71, '../internals/function-bind-context': 74, '../internals/set-iterate': 142 }],
-  203: [function (require, module, exports) {
+  }, { '../internals/a-set': 50, '../internals/export': 75, '../internals/function-bind-context': 78, '../internals/set-iterate': 146 }],
+  207: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const bind = require('../internals/function-bind-context')
@@ -8492,8 +8741,8 @@
         return newSet
       }
     })
-  }, { '../internals/a-set': 46, '../internals/export': 71, '../internals/function-bind-context': 74, '../internals/set-helpers': 137, '../internals/set-iterate': 142 }],
-  204: [function (require, module, exports) {
+  }, { '../internals/a-set': 50, '../internals/export': 75, '../internals/function-bind-context': 78, '../internals/set-helpers': 141, '../internals/set-iterate': 146 }],
+  208: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const bind = require('../internals/function-bind-context')
@@ -8512,8 +8761,8 @@
         return result && result.value
       }
     })
-  }, { '../internals/a-set': 46, '../internals/export': 71, '../internals/function-bind-context': 74, '../internals/set-iterate': 142 }],
-  205: [function (require, module, exports) {
+  }, { '../internals/a-set': 50, '../internals/export': 75, '../internals/function-bind-context': 78, '../internals/set-iterate': 146 }],
+  209: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -8528,8 +8777,8 @@
         return call($intersection, this, toSetLike(other))
       }
     })
-  }, { '../internals/export': 71, '../internals/function-call': 76, '../internals/set-intersection': 138, '../internals/to-set-like': 157 }],
-  206: [function (require, module, exports) {
+  }, { '../internals/export': 75, '../internals/function-call': 80, '../internals/set-intersection': 142, '../internals/to-set-like': 161 }],
+  210: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -8544,8 +8793,8 @@
         return call($isDisjointFrom, this, toSetLike(other))
       }
     })
-  }, { '../internals/export': 71, '../internals/function-call': 76, '../internals/set-is-disjoint-from': 139, '../internals/to-set-like': 157 }],
-  207: [function (require, module, exports) {
+  }, { '../internals/export': 75, '../internals/function-call': 80, '../internals/set-is-disjoint-from': 143, '../internals/to-set-like': 161 }],
+  211: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -8560,8 +8809,8 @@
         return call($isSubsetOf, this, toSetLike(other))
       }
     })
-  }, { '../internals/export': 71, '../internals/function-call': 76, '../internals/set-is-subset-of': 140, '../internals/to-set-like': 157 }],
-  208: [function (require, module, exports) {
+  }, { '../internals/export': 75, '../internals/function-call': 80, '../internals/set-is-subset-of': 144, '../internals/to-set-like': 161 }],
+  212: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -8576,8 +8825,8 @@
         return call($isSupersetOf, this, toSetLike(other))
       }
     })
-  }, { '../internals/export': 71, '../internals/function-call': 76, '../internals/set-is-superset-of': 141, '../internals/to-set-like': 157 }],
-  209: [function (require, module, exports) {
+  }, { '../internals/export': 75, '../internals/function-call': 80, '../internals/set-is-superset-of': 145, '../internals/to-set-like': 161 }],
+  213: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const uncurryThis = require('../internals/function-uncurry-this')
@@ -8601,8 +8850,8 @@
         return arrayJoin(array, sep)
       }
     })
-  }, { '../internals/a-set': 46, '../internals/export': 71, '../internals/function-uncurry-this': 80, '../internals/set-iterate': 142, '../internals/to-string': 159 }],
-  210: [function (require, module, exports) {
+  }, { '../internals/a-set': 50, '../internals/export': 75, '../internals/function-uncurry-this': 84, '../internals/set-iterate': 146, '../internals/to-string': 163 }],
+  214: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const bind = require('../internals/function-bind-context')
@@ -8626,8 +8875,8 @@
         return newSet
       }
     })
-  }, { '../internals/a-set': 46, '../internals/export': 71, '../internals/function-bind-context': 74, '../internals/set-helpers': 137, '../internals/set-iterate': 142 }],
-  211: [function (require, module, exports) {
+  }, { '../internals/a-set': 50, '../internals/export': 75, '../internals/function-bind-context': 78, '../internals/set-helpers': 141, '../internals/set-iterate': 146 }],
+  215: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const aCallable = require('../internals/a-callable')
@@ -8656,8 +8905,8 @@
         return accumulator
       }
     })
-  }, { '../internals/a-callable': 44, '../internals/a-set': 46, '../internals/export': 71, '../internals/set-iterate': 142 }],
-  212: [function (require, module, exports) {
+  }, { '../internals/a-callable': 48, '../internals/a-set': 50, '../internals/export': 75, '../internals/set-iterate': 146 }],
+  216: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const bind = require('../internals/function-bind-context')
@@ -8675,8 +8924,8 @@
         }, true) === true
       }
     })
-  }, { '../internals/a-set': 46, '../internals/export': 71, '../internals/function-bind-context': 74, '../internals/set-iterate': 142 }],
-  213: [function (require, module, exports) {
+  }, { '../internals/a-set': 50, '../internals/export': 75, '../internals/function-bind-context': 78, '../internals/set-iterate': 146 }],
+  217: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -8691,8 +8940,8 @@
         return call($symmetricDifference, this, toSetLike(other))
       }
     })
-  }, { '../internals/export': 71, '../internals/function-call': 76, '../internals/set-symmetric-difference': 144, '../internals/to-set-like': 157 }],
-  214: [function (require, module, exports) {
+  }, { '../internals/export': 75, '../internals/function-call': 80, '../internals/set-symmetric-difference': 148, '../internals/to-set-like': 161 }],
+  218: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -8707,8 +8956,8 @@
         return call($union, this, toSetLike(other))
       }
     })
-  }, { '../internals/export': 71, '../internals/function-call': 76, '../internals/set-union': 145, '../internals/to-set-like': 157 }],
-  215: [function (require, module, exports) {
+  }, { '../internals/export': 75, '../internals/function-call': 80, '../internals/set-union': 149, '../internals/to-set-like': 161 }],
+  219: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const aWeakMap = require('../internals/a-weak-map')
@@ -8727,8 +8976,8 @@
         } return !!allDeleted
       }
     })
-  }, { '../internals/a-weak-map': 47, '../internals/export': 71, '../internals/weak-map-helpers': 165 }],
-  216: [function (require, module, exports) {
+  }, { '../internals/a-weak-map': 51, '../internals/export': 75, '../internals/weak-map-helpers': 169 }],
+  220: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const aWeakSet = require('../internals/a-weak-set')
@@ -8744,8 +8993,8 @@
         } return set
       }
     })
-  }, { '../internals/a-weak-set': 48, '../internals/export': 71, '../internals/weak-set-helpers': 166 }],
-  217: [function (require, module, exports) {
+  }, { '../internals/a-weak-set': 52, '../internals/export': 75, '../internals/weak-set-helpers': 170 }],
+  221: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const aWeakSet = require('../internals/a-weak-set')
@@ -8764,8 +9013,2520 @@
         } return !!allDeleted
       }
     })
-  }, { '../internals/a-weak-set': 48, '../internals/export': 71, '../internals/weak-set-helpers': 166 }],
-  218: [function (require, module, exports) {
+  }, { '../internals/a-weak-set': 52, '../internals/export': 75, '../internals/weak-set-helpers': 170 }],
+  222: [function (require, module, exports) {
+    'use strict'
+    const __createBinding = (this && this.__createBinding) || (Object.create
+      ? function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k
+        let desc = Object.getOwnPropertyDescriptor(m, k)
+        if (!desc || ('get' in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+          desc = { enumerable: true, get: function () { return m[k] } }
+        }
+        Object.defineProperty(o, k2, desc)
+      }
+      : function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k
+        o[k2] = m[k]
+      })
+    const __setModuleDefault = (this && this.__setModuleDefault) || (Object.create
+      ? function (o, v) {
+        Object.defineProperty(o, 'default', { enumerable: true, value: v })
+      }
+      : function (o, v) {
+        o.default = v
+      })
+    const __importStar = (this && this.__importStar) || (function () {
+      let ownKeys = function (o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+          const ar = []
+          for (const k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k
+          return ar
+        }
+        return ownKeys(o)
+      }
+      return function (mod) {
+        if (mod && mod.__esModule) return mod
+        const result = {}
+        if (mod != null) for (let k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== 'default') __createBinding(result, mod, k[i])
+        __setModuleDefault(result, mod)
+        return result
+      }
+    })()
+    Object.defineProperty(exports, '__esModule', { value: true })
+    exports.attributeRules = void 0
+    const boolbase = __importStar(require('boolbase'))
+    /**
+ * All reserved characters in a regex, used for escaping.
+ *
+ * Taken from XRegExp, (c) 2007-2020 Steven Levithan under the MIT license
+ * https://github.com/slevithan/xregexp/blob/95eeebeb8fac8754d54eafe2b4743661ac1cf028/src/xregexp.js#L794
+ */
+    const reChars = /[-[\]{}()*+?.,\\^$|#\s]/g
+    function escapeRegex (value) {
+      return value.replace(reChars, '\\$&')
+    }
+    /**
+ * Attributes that are case-insensitive in HTML.
+ *
+ * @private
+ * @see https://html.spec.whatwg.org/multipage/semantics-other.html#case-sensitivity-of-selectors
+ */
+    const caseInsensitiveAttributes = new Set([
+      'accept',
+      'accept-charset',
+      'align',
+      'alink',
+      'axis',
+      'bgcolor',
+      'charset',
+      'checked',
+      'clear',
+      'codetype',
+      'color',
+      'compact',
+      'declare',
+      'defer',
+      'dir',
+      'direction',
+      'disabled',
+      'enctype',
+      'face',
+      'frame',
+      'hreflang',
+      'http-equiv',
+      'lang',
+      'language',
+      'link',
+      'media',
+      'method',
+      'multiple',
+      'nohref',
+      'noresize',
+      'noshade',
+      'nowrap',
+      'readonly',
+      'rel',
+      'rev',
+      'rules',
+      'scope',
+      'scrolling',
+      'selected',
+      'shape',
+      'target',
+      'text',
+      'type',
+      'valign',
+      'valuetype',
+      'vlink'
+    ])
+    function shouldIgnoreCase (selector, options) {
+      return typeof selector.ignoreCase === 'boolean'
+        ? selector.ignoreCase
+        : selector.ignoreCase === 'quirks'
+          ? !!options.quirksMode
+          : !options.xmlMode && caseInsensitiveAttributes.has(selector.name)
+    }
+    /**
+ * Attribute selectors
+ */
+    exports.attributeRules = {
+      equals (next, data, options) {
+        const { adapter } = options
+        const { name } = data
+        let { value } = data
+        if (shouldIgnoreCase(data, options)) {
+          value = value.toLowerCase()
+          return (elem) => {
+            const attr = adapter.getAttributeValue(elem, name)
+            return (attr != null &&
+                    attr.length === value.length &&
+                    attr.toLowerCase() === value &&
+                    next(elem))
+          }
+        }
+        return (elem) => adapter.getAttributeValue(elem, name) === value && next(elem)
+      },
+      hyphen (next, data, options) {
+        const { adapter } = options
+        const { name } = data
+        let { value } = data
+        const len = value.length
+        if (shouldIgnoreCase(data, options)) {
+          value = value.toLowerCase()
+          return function hyphenIC (elem) {
+            const attr = adapter.getAttributeValue(elem, name)
+            return (attr != null &&
+                    (attr.length === len || attr.charAt(len) === '-') &&
+                    attr.substr(0, len).toLowerCase() === value &&
+                    next(elem))
+          }
+        }
+        return function hyphen (elem) {
+          const attr = adapter.getAttributeValue(elem, name)
+          return (attr != null &&
+                (attr.length === len || attr.charAt(len) === '-') &&
+                attr.substr(0, len) === value &&
+                next(elem))
+        }
+      },
+      element (next, data, options) {
+        const { adapter } = options
+        const { name, value } = data
+        if (/\s/.test(value)) {
+          return boolbase.falseFunc
+        }
+        const regex = new RegExp(`(?:^|\\s)${escapeRegex(value)}(?:$|\\s)`, shouldIgnoreCase(data, options) ? 'i' : '')
+        return function element (elem) {
+          const attr = adapter.getAttributeValue(elem, name)
+          return (attr != null &&
+                attr.length >= value.length &&
+                regex.test(attr) &&
+                next(elem))
+        }
+      },
+      exists (next, { name }, { adapter }) {
+        return (elem) => adapter.hasAttrib(elem, name) && next(elem)
+      },
+      start (next, data, options) {
+        const { adapter } = options
+        const { name } = data
+        let { value } = data
+        const len = value.length
+        if (len === 0) {
+          return boolbase.falseFunc
+        }
+        if (shouldIgnoreCase(data, options)) {
+          value = value.toLowerCase()
+          return (elem) => {
+            const attr = adapter.getAttributeValue(elem, name)
+            return (attr != null &&
+                    attr.length >= len &&
+                    attr.substr(0, len).toLowerCase() === value &&
+                    next(elem))
+          }
+        }
+        return (elem) => !!adapter.getAttributeValue(elem, name)?.startsWith(value) &&
+            next(elem)
+      },
+      end (next, data, options) {
+        const { adapter } = options
+        const { name } = data
+        let { value } = data
+        const len = -value.length
+        if (len === 0) {
+          return boolbase.falseFunc
+        }
+        if (shouldIgnoreCase(data, options)) {
+          value = value.toLowerCase()
+          return (elem) => adapter
+            .getAttributeValue(elem, name)
+            ?.substr(len)
+            .toLowerCase() === value && next(elem)
+        }
+        return (elem) => !!adapter.getAttributeValue(elem, name)?.endsWith(value) &&
+            next(elem)
+      },
+      any (next, data, options) {
+        const { adapter } = options
+        const { name, value } = data
+        if (value === '') {
+          return boolbase.falseFunc
+        }
+        if (shouldIgnoreCase(data, options)) {
+          const regex = new RegExp(escapeRegex(value), 'i')
+          return function anyIC (elem) {
+            const attr = adapter.getAttributeValue(elem, name)
+            return (attr != null &&
+                    attr.length >= value.length &&
+                    regex.test(attr) &&
+                    next(elem))
+          }
+        }
+        return (elem) => !!adapter.getAttributeValue(elem, name)?.includes(value) &&
+            next(elem)
+      },
+      not (next, data, options) {
+        const { adapter } = options
+        const { name } = data
+        let { value } = data
+        if (value === '') {
+          return (elem) => !!adapter.getAttributeValue(elem, name) && next(elem)
+        }
+        if (shouldIgnoreCase(data, options)) {
+          value = value.toLowerCase()
+          return (elem) => {
+            const attr = adapter.getAttributeValue(elem, name)
+            return ((attr == null ||
+                    attr.length !== value.length ||
+                    attr.toLowerCase() !== value) &&
+                    next(elem))
+          }
+        }
+        return (elem) => adapter.getAttributeValue(elem, name) !== value && next(elem)
+      }
+    }
+  }, { boolbase: 33 }],
+  223: [function (require, module, exports) {
+    'use strict'
+    const __createBinding = (this && this.__createBinding) || (Object.create
+      ? function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k
+        let desc = Object.getOwnPropertyDescriptor(m, k)
+        if (!desc || ('get' in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+          desc = { enumerable: true, get: function () { return m[k] } }
+        }
+        Object.defineProperty(o, k2, desc)
+      }
+      : function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k
+        o[k2] = m[k]
+      })
+    const __setModuleDefault = (this && this.__setModuleDefault) || (Object.create
+      ? function (o, v) {
+        Object.defineProperty(o, 'default', { enumerable: true, value: v })
+      }
+      : function (o, v) {
+        o.default = v
+      })
+    const __importStar = (this && this.__importStar) || (function () {
+      let ownKeys = function (o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+          const ar = []
+          for (const k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k
+          return ar
+        }
+        return ownKeys(o)
+      }
+      return function (mod) {
+        if (mod && mod.__esModule) return mod
+        const result = {}
+        if (mod != null) for (let k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== 'default') __createBinding(result, mod, k[i])
+        __setModuleDefault(result, mod)
+        return result
+      }
+    })()
+    Object.defineProperty(exports, '__esModule', { value: true })
+    exports.compileToken = compileToken
+    const boolbase = __importStar(require('boolbase'))
+    const css_what_1 = require('css-what')
+    const general_js_1 = require('./general.js')
+    const querying_js_1 = require('./helpers/querying.js')
+    const selectors_js_1 = require('./helpers/selectors.js')
+    const subselects_js_1 = require('./pseudo-selectors/subselects.js')
+    const DESCENDANT_TOKEN = { type: css_what_1.SelectorType.Descendant }
+    const FLEXIBLE_DESCENDANT_TOKEN = {
+      type: '_flexibleDescendant'
+    }
+    const SCOPE_TOKEN = {
+      type: css_what_1.SelectorType.Pseudo,
+      name: 'scope',
+      data: null
+    }
+    /*
+ * CSS 4 Spec (Draft): 3.4.1. Absolutizing a Relative Selector
+ * http://www.w3.org/TR/selectors4/#absolutizing
+ */
+    function absolutize (token, { adapter }, context) {
+    // TODO Use better check if the context is a document
+      const hasContext = !!context?.every((e) => e === subselects_js_1.PLACEHOLDER_ELEMENT ||
+        (adapter.isTag(e) && (0, querying_js_1.getElementParent)(e, adapter) !== null))
+      for (const t of token) {
+        if (t.length > 0 &&
+            (0, selectors_js_1.isTraversal)(t[0]) &&
+            t[0].type !== css_what_1.SelectorType.Descendant) {
+        // Don't continue in else branch
+        } else if (hasContext && !t.some(selectors_js_1.includesScopePseudo)) {
+          t.unshift(DESCENDANT_TOKEN)
+        } else {
+          continue
+        }
+        t.unshift(SCOPE_TOKEN)
+      }
+    }
+    function compileToken (token, options, ctx) {
+      token.forEach(selectors_js_1.sortRules)
+      const { context = ctx, rootFunc = boolbase.trueFunc } = options
+      const isArrayContext = Array.isArray(context)
+      const finalContext = context && (Array.isArray(context) ? context : [context])
+      // Check if the selector is relative
+      if (options.relativeSelector !== false) {
+        absolutize(token, options, finalContext)
+      } else if (token.some((t) => t.length > 0 && (0, selectors_js_1.isTraversal)(t[0]))) {
+        throw new Error('Relative selectors are not allowed when the `relativeSelector` option is disabled')
+      }
+      let shouldTestNextSiblings = false
+      let query = boolbase.falseFunc
+      combineLoop: for (const rules of token) {
+        if (rules.length >= 2) {
+          const [first, second] = rules
+          if (first.type !== css_what_1.SelectorType.Pseudo || first.name !== 'scope') {
+          // Ignore
+          } else if (isArrayContext &&
+                second.type === css_what_1.SelectorType.Descendant) {
+            rules[1] = FLEXIBLE_DESCENDANT_TOKEN
+          } else if (second.type === css_what_1.SelectorType.Adjacent ||
+                second.type === css_what_1.SelectorType.Sibling) {
+            shouldTestNextSiblings = true
+          }
+        }
+        let next = rootFunc
+        let hasExpensiveSubselector = false
+        for (const rule of rules) {
+          next = (0, general_js_1.compileGeneralSelector)(next, rule, options, finalContext, compileToken, hasExpensiveSubselector)
+          const quality = (0, selectors_js_1.getQuality)(rule)
+          if (quality === 0) {
+            hasExpensiveSubselector = true
+          }
+          // If the sub-selector won't match any elements, skip it.
+          if (next === boolbase.falseFunc) {
+            continue combineLoop
+          }
+        }
+        // If we have a function that always returns true, we can stop here.
+        if (next === rootFunc) {
+          return rootFunc
+        }
+        query = query === boolbase.falseFunc ? next : or(query, next)
+      }
+      query.shouldTestNextSiblings = shouldTestNextSiblings
+      return query
+    }
+    function or (a, b) {
+      return (elem) => a(elem) || b(elem)
+    }
+  }, { './general.js': 224, './helpers/querying.js': 226, './helpers/selectors.js': 227, './pseudo-selectors/subselects.js': 233, boolbase: 33, 'css-what': 234 }],
+  224: [function (require, module, exports) {
+    'use strict'
+    Object.defineProperty(exports, '__esModule', { value: true })
+    exports.compileGeneralSelector = compileGeneralSelector
+    const css_what_1 = require('css-what')
+    const attributes_js_1 = require('./attributes.js')
+    const querying_js_1 = require('./helpers/querying.js')
+    const index_js_1 = require('./pseudo-selectors/index.js')
+    /*
+ * All available rules
+ */
+    function compileGeneralSelector (next, selector, options, context, compileToken, hasExpensiveSubselector) {
+      const { adapter, equals, cacheResults } = options
+      switch (selector.type) {
+        case css_what_1.SelectorType.PseudoElement: {
+          throw new Error('Pseudo-elements are not supported by css-select')
+        }
+        case css_what_1.SelectorType.ColumnCombinator: {
+          throw new Error('Column combinators are not yet supported by css-select')
+        }
+        case css_what_1.SelectorType.Attribute: {
+          if (selector.namespace != null) {
+            throw new Error('Namespaced attributes are not yet supported by css-select')
+          }
+          if (!options.xmlMode || options.lowerCaseAttributeNames) {
+            selector.name = selector.name.toLowerCase()
+          }
+          return attributes_js_1.attributeRules[selector.action](next, selector, options)
+        }
+        case css_what_1.SelectorType.Pseudo: {
+          return (0, index_js_1.compilePseudoSelector)(next, selector, options, context, compileToken)
+        }
+        // Tags
+        case css_what_1.SelectorType.Tag: {
+          if (selector.namespace != null) {
+            throw new Error('Namespaced tag names are not yet supported by css-select')
+          }
+          let { name } = selector
+          if (!options.xmlMode || options.lowerCaseTags) {
+            name = name.toLowerCase()
+          }
+          return function tag (elem) {
+            return adapter.getName(elem) === name && next(elem)
+          }
+        }
+        // Traversal
+        case css_what_1.SelectorType.Descendant: {
+          if (!hasExpensiveSubselector ||
+                cacheResults === false ||
+                typeof WeakMap === 'undefined') {
+            return function descendant (elem) {
+              let current = elem
+              // biome-ignore lint/suspicious/noAssignInExpressions: TODO
+              while ((current = (0, querying_js_1.getElementParent)(current, adapter))) {
+                if (next(current)) {
+                  return true
+                }
+              }
+              return false
+            }
+          }
+          const resultCache = new WeakMap()
+          return function cachedDescendant (elem) {
+            let current = elem
+            let result
+            // biome-ignore lint/suspicious/noAssignInExpressions: TODO
+            while ((current = (0, querying_js_1.getElementParent)(current, adapter))) {
+              const cached = resultCache.get(current)
+              if (cached === undefined) {
+                result ?? (result = { matches: false })
+                result.matches = next(current)
+                resultCache.set(current, result)
+                if (result.matches) {
+                  return true
+                }
+              } else {
+                if (result) {
+                  result.matches = cached.matches
+                }
+                return cached.matches
+              }
+            }
+            return false
+          }
+        }
+        case '_flexibleDescendant': {
+        // Include element itself, only used while querying an array
+          return function flexibleDescendant (elem) {
+            let current = elem
+            do {
+              if (next(current)) {
+                return true
+              }
+              current = (0, querying_js_1.getElementParent)(current, adapter)
+            } while (current)
+            return false
+          }
+        }
+        case css_what_1.SelectorType.Parent: {
+          return function parent (elem) {
+            return adapter
+              .getChildren(elem)
+              .some((elem) => adapter.isTag(elem) && next(elem))
+          }
+        }
+        case css_what_1.SelectorType.Child: {
+          return function child (elem) {
+            const parent = (0, querying_js_1.getElementParent)(elem, adapter)
+            return parent !== null && next(parent)
+          }
+        }
+        case css_what_1.SelectorType.Sibling: {
+          return function sibling (elem) {
+            const siblings = adapter.getSiblings(elem)
+            for (let i = 0; i < siblings.length; i++) {
+              const currentSibling = siblings[i]
+              if (equals(elem, currentSibling)) {
+                break
+              }
+              if (adapter.isTag(currentSibling) && next(currentSibling)) {
+                return true
+              }
+            }
+            return false
+          }
+        }
+        case css_what_1.SelectorType.Adjacent: {
+          if (adapter.prevElementSibling) {
+            return function adjacent (elem) {
+              const previous = adapter.prevElementSibling(elem)
+              return previous != null && next(previous)
+            }
+          }
+          return function adjacent (elem) {
+            const siblings = adapter.getSiblings(elem)
+            let lastElement
+            for (let i = 0; i < siblings.length; i++) {
+              const currentSibling = siblings[i]
+              if (equals(elem, currentSibling)) {
+                break
+              }
+              if (adapter.isTag(currentSibling)) {
+                lastElement = currentSibling
+              }
+            }
+            return !!lastElement && next(lastElement)
+          }
+        }
+        case css_what_1.SelectorType.Universal: {
+          if (selector.namespace != null && selector.namespace !== '*') {
+            throw new Error('Namespaced universal selectors are not yet supported by css-select')
+          }
+          return next
+        }
+      }
+    }
+  }, { './attributes.js': 222, './helpers/querying.js': 226, './pseudo-selectors/index.js': 231, 'css-what': 234 }],
+  225: [function (require, module, exports) {
+    'use strict'
+    Object.defineProperty(exports, '__esModule', { value: true })
+    exports.cacheParentResults = cacheParentResults
+    const querying_js_1 = require('./querying.js')
+    /**
+ * Some selectors such as `:contains` and (non-relative) `:has` will only be
+ * able to match elements if their parents match the selector (as they contain
+ * a subset of the elements that the parent contains).
+ *
+ * This function wraps the given `matches` function in a function that caches
+ * the results of the parent elements, so that the `matches` function only
+ * needs to be called once for each subtree.
+ */
+    function cacheParentResults (next, { adapter, cacheResults }, matches) {
+      if (cacheResults === false || typeof WeakMap === 'undefined') {
+        return (elem) => next(elem) && matches(elem)
+      }
+      // Use a cache to avoid re-checking children of an element.
+      // @ts-expect-error `Node` is not extending object
+      const resultCache = new WeakMap()
+      function addResultToCache (elem) {
+        const result = matches(elem)
+        resultCache.set(elem, result)
+        return result
+      }
+      return function cachedMatcher (elem) {
+        if (!next(elem)) {
+          return false
+        }
+        if (resultCache.has(elem)) {
+          return resultCache.get(elem)
+        }
+        // Check all of the element's parents.
+        let node = elem
+        do {
+          const parent = (0, querying_js_1.getElementParent)(node, adapter)
+          if (parent === null) {
+            return addResultToCache(elem)
+          }
+          node = parent
+        } while (!resultCache.has(node))
+        return resultCache.get(node) && addResultToCache(elem)
+      }
+    }
+  }, { './querying.js': 226 }],
+  226: [function (require, module, exports) {
+    'use strict'
+    Object.defineProperty(exports, '__esModule', { value: true })
+    exports.findAll = findAll
+    exports.findOne = findOne
+    exports.getNextSiblings = getNextSiblings
+    exports.getElementParent = getElementParent
+    /**
+ * Find all elements matching the query. If not in XML mode, the query will ignore
+ * the contents of `<template>` elements.
+ *
+ * @param query - Function that returns true if the element matches the query.
+ * @param elems - Nodes to query. If a node is an element, its children will be queried.
+ * @param options - Options for querying the document.
+ * @returns All matching elements.
+ */
+    function findAll (query, elems, options) {
+      const { adapter, xmlMode = false } = options
+      const result = []
+      /** Stack of the arrays we are looking at. */
+      const nodeStack = [elems]
+      /** Stack of the indices within the arrays. */
+      const indexStack = [0]
+      for (;;) {
+      // First, check if the current array has any more elements to look at.
+        if (indexStack[0] >= nodeStack[0].length) {
+        // If we have no more arrays to look at, we are done.
+          if (nodeStack.length === 1) {
+            return result
+          }
+          nodeStack.shift()
+          indexStack.shift()
+          // Loop back to the start to continue with the next array.
+          continue
+        }
+        const elem = nodeStack[0][indexStack[0]++]
+        if (!adapter.isTag(elem)) {
+          continue
+        }
+        if (query(elem)) {
+          result.push(elem)
+        }
+        if (xmlMode || adapter.getName(elem) !== 'template') {
+        /*
+             * Add the children to the stack. We are depth-first, so this is
+             * the next array we look at.
+             */
+          const children = adapter.getChildren(elem)
+          if (children.length > 0) {
+            nodeStack.unshift(children)
+            indexStack.unshift(0)
+          }
+        }
+      }
+    }
+    /**
+ * Find the first element matching the query. If not in XML mode, the query will ignore
+ * the contents of `<template>` elements.
+ *
+ * @param query - Function that returns true if the element matches the query.
+ * @param elems - Nodes to query. If a node is an element, its children will be queried.
+ * @param options - Options for querying the document.
+ * @returns The first matching element, or null if there was no match.
+ */
+    function findOne (query, elems, options) {
+      const { adapter, xmlMode = false } = options
+      /** Stack of the arrays we are looking at. */
+      const nodeStack = [elems]
+      /** Stack of the indices within the arrays. */
+      const indexStack = [0]
+      for (;;) {
+      // First, check if the current array has any more elements to look at.
+        if (indexStack[0] >= nodeStack[0].length) {
+        // If we have no more arrays to look at, we are done.
+          if (nodeStack.length === 1) {
+            return null
+          }
+          nodeStack.shift()
+          indexStack.shift()
+          // Loop back to the start to continue with the next array.
+          continue
+        }
+        const elem = nodeStack[0][indexStack[0]++]
+        if (!adapter.isTag(elem)) {
+          continue
+        }
+        if (query(elem)) {
+          return elem
+        }
+        if (xmlMode || adapter.getName(elem) !== 'template') {
+        /*
+             * Add the children to the stack. We are depth-first, so this is
+             * the next array we look at.
+             */
+          const children = adapter.getChildren(elem)
+          if (children.length > 0) {
+            nodeStack.unshift(children)
+            indexStack.unshift(0)
+          }
+        }
+      }
+    }
+    function getNextSiblings (elem, adapter) {
+      const siblings = adapter.getSiblings(elem)
+      if (siblings.length <= 1) {
+        return []
+      }
+      const elemIndex = siblings.indexOf(elem)
+      if (elemIndex < 0 || elemIndex === siblings.length - 1) {
+        return []
+      }
+      return siblings.slice(elemIndex + 1).filter(adapter.isTag)
+    }
+    function getElementParent (node, adapter) {
+      const parent = adapter.getParent(node)
+      return parent != null && adapter.isTag(parent) ? parent : null
+    }
+  }, {}],
+  227: [function (require, module, exports) {
+    'use strict'
+    Object.defineProperty(exports, '__esModule', { value: true })
+    exports.isTraversal = isTraversal
+    exports.sortRules = sortRules
+    exports.getQuality = getQuality
+    exports.includesScopePseudo = includesScopePseudo
+    const css_what_1 = require('css-what')
+    function isTraversal (token) {
+      return token.type === '_flexibleDescendant' || (0, css_what_1.isTraversal)(token)
+    }
+    /**
+ * Sort the parts of the passed selector, as there is potential for
+ * optimization (some types of selectors are faster than others).
+ *
+ * @param arr Selector to sort
+ */
+    function sortRules (arr) {
+      const ratings = arr.map(getQuality)
+      for (let i = 1; i < arr.length; i++) {
+        const procNew = ratings[i]
+        if (procNew < 0) {
+          continue
+        }
+        // Use insertion sort to move the token to the correct position.
+        for (let j = i; j > 0 && procNew < ratings[j - 1]; j--) {
+          const token = arr[j]
+          arr[j] = arr[j - 1]
+          arr[j - 1] = token
+          ratings[j] = ratings[j - 1]
+          ratings[j - 1] = procNew
+        }
+      }
+    }
+    function getAttributeQuality (token) {
+      switch (token.action) {
+        case css_what_1.AttributeAction.Exists: {
+          return 10
+        }
+        case css_what_1.AttributeAction.Equals: {
+        // Prefer ID selectors (eg. #ID)
+          return token.name === 'id' ? 9 : 8
+        }
+        case css_what_1.AttributeAction.Not: {
+          return 7
+        }
+        case css_what_1.AttributeAction.Start: {
+          return 6
+        }
+        case css_what_1.AttributeAction.End: {
+          return 6
+        }
+        case css_what_1.AttributeAction.Any: {
+          return 5
+        }
+        case css_what_1.AttributeAction.Hyphen: {
+          return 4
+        }
+        case css_what_1.AttributeAction.Element: {
+          return 3
+        }
+      }
+    }
+    /**
+ * Determine the quality of the passed token. The higher the number, the
+ * faster the token is to execute.
+ *
+ * @param token Token to get the quality of.
+ * @returns The token's quality.
+ */
+    function getQuality (token) {
+      switch (token.type) {
+        case css_what_1.SelectorType.Universal: {
+          return 50
+        }
+        case css_what_1.SelectorType.Tag: {
+          return 30
+        }
+        case css_what_1.SelectorType.Attribute: {
+          return Math.floor(getAttributeQuality(token) /
+                // `ignoreCase` adds some overhead, half the result if applicable.
+                (token.ignoreCase ? 2 : 1))
+        }
+        case css_what_1.SelectorType.Pseudo: {
+          return !token.data
+            ? 3
+            : token.name === 'has' ||
+                    token.name === 'contains' ||
+                    token.name === 'icontains'
+              ? // Expensive in any case — run as late as possible.
+              0
+              : Array.isArray(token.data)
+                ? // Eg. `:is`, `:not`
+                Math.max(
+                // If we have traversals, try to avoid executing this selector
+                  0, Math.min(...token.data.map((d) => Math.min(...d.map(getQuality)))))
+                : 2
+        }
+        default: {
+          return -1
+        }
+      }
+    }
+    function includesScopePseudo (t) {
+      return (t.type === css_what_1.SelectorType.Pseudo &&
+        (t.name === 'scope' ||
+            (Array.isArray(t.data) &&
+                t.data.some((data) => data.some(includesScopePseudo)))))
+    }
+  }, { 'css-what': 234 }],
+  228: [function (require, module, exports) {
+    'use strict'
+    const __createBinding = (this && this.__createBinding) || (Object.create
+      ? function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k
+        let desc = Object.getOwnPropertyDescriptor(m, k)
+        if (!desc || ('get' in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+          desc = { enumerable: true, get: function () { return m[k] } }
+        }
+        Object.defineProperty(o, k2, desc)
+      }
+      : function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k
+        o[k2] = m[k]
+      })
+    const __setModuleDefault = (this && this.__setModuleDefault) || (Object.create
+      ? function (o, v) {
+        Object.defineProperty(o, 'default', { enumerable: true, value: v })
+      }
+      : function (o, v) {
+        o.default = v
+      })
+    const __importStar = (this && this.__importStar) || (function () {
+      let ownKeys = function (o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+          const ar = []
+          for (const k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k
+          return ar
+        }
+        return ownKeys(o)
+      }
+      return function (mod) {
+        if (mod && mod.__esModule) return mod
+        const result = {}
+        if (mod != null) for (let k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== 'default') __createBinding(result, mod, k[i])
+        __setModuleDefault(result, mod)
+        return result
+      }
+    })()
+    Object.defineProperty(exports, '__esModule', { value: true })
+    exports.pseudos = exports.filters = exports.aliases = exports.selectOne = exports.selectAll = void 0
+    exports.compile = compile
+    exports._compileUnsafe = _compileUnsafe
+    exports._compileToken = _compileToken
+    exports.prepareContext = prepareContext
+    exports.is = is
+    const boolbase = __importStar(require('boolbase'))
+    const css_what_1 = require('css-what')
+    const DomUtils = __importStar(require('domutils'))
+    const compile_js_1 = require('./compile.js')
+    const querying_js_1 = require('./helpers/querying.js')
+    const defaultEquals = (a, b) => a === b
+    const defaultOptions = {
+      adapter: DomUtils,
+      equals: defaultEquals
+    }
+    function convertOptionFormats (options) {
+    /*
+     * We force one format of options to the other one.
+     */
+      // @ts-expect-error Default options may have incompatible `Node` / `ElementNode`.
+      const opts = options ?? defaultOptions
+      // @ts-expect-error Same as above.
+      opts.adapter ?? (opts.adapter = DomUtils)
+      // @ts-expect-error `equals` does not exist on `Options`
+      opts.equals ?? (opts.equals = opts.adapter?.equals ?? defaultEquals)
+      return opts
+    }
+    /**
+ * Compiles a selector to an executable function.
+ *
+ * The returned function checks if each passed node is an element. Use
+ * `_compileUnsafe` to skip this check.
+ *
+ * @param selector Selector to compile.
+ * @param options Compilation options.
+ * @param context Optional context for the selector.
+ */
+    function compile (selector, options, context) {
+      const opts = convertOptionFormats(options)
+      const next = _compileUnsafe(selector, opts, context)
+      return next === boolbase.falseFunc
+        ? boolbase.falseFunc
+        : (elem) => opts.adapter.isTag(elem) && next(elem)
+    }
+    /**
+ * Like `compile`, but does not add a check if elements are tags.
+ */
+    function _compileUnsafe (selector, options, context) {
+      return _compileToken(typeof selector === 'string' ? (0, css_what_1.parse)(selector) : selector, options, context)
+    }
+    /**
+ * @deprecated Use `_compileUnsafe` instead.
+ */
+    function _compileToken (selector, options, context) {
+      return (0, compile_js_1.compileToken)(selector, convertOptionFormats(options), context)
+    }
+    function getSelectorFunc (searchFunc) {
+      return function select (query, elements, options) {
+        const opts = convertOptionFormats(options)
+        if (typeof query !== 'function') {
+          query = _compileUnsafe(query, opts, elements)
+        }
+        const filteredElements = prepareContext(elements, opts.adapter, query.shouldTestNextSiblings)
+        return searchFunc(query, filteredElements, opts)
+      }
+    }
+    function prepareContext (elems, adapter, shouldTestNextSiblings = false) {
+    /*
+     * Add siblings if the query requires them.
+     * See https://github.com/fb55/css-select/pull/43#issuecomment-225414692
+     */
+      if (shouldTestNextSiblings) {
+        elems = appendNextSiblings(elems, adapter)
+      }
+      return Array.isArray(elems)
+        ? adapter.removeSubsets(elems)
+        : adapter.getChildren(elems)
+    }
+    function appendNextSiblings (elem, adapter) {
+    // Order matters because jQuery seems to check the children before the siblings
+      const elems = Array.isArray(elem) ? elem.slice(0) : [elem]
+      const elemsLength = elems.length
+      for (let i = 0; i < elemsLength; i++) {
+        const nextSiblings = (0, querying_js_1.getNextSiblings)(elems[i], adapter)
+        elems.push(...nextSiblings)
+      }
+      return elems
+    }
+    /**
+ * @template Node The generic Node type for the DOM adapter being used.
+ * @template ElementNode The Node type for elements for the DOM adapter being used.
+ * @param elems Elements to query. If it is an element, its children will be queried.
+ * @param query can be either a CSS selector string or a compiled query function.
+ * @param [options] options for querying the document.
+ * @see compile for supported selector queries.
+ * @returns All matching elements.
+ *
+ */
+    exports.selectAll = getSelectorFunc((query, elems, options) => query === boolbase.falseFunc || !elems || elems.length === 0
+      ? []
+      : (0, querying_js_1.findAll)(query, elems, options))
+    /**
+ * @template Node The generic Node type for the DOM adapter being used.
+ * @template ElementNode The Node type for elements for the DOM adapter being used.
+ * @param elems Elements to query. If it is an element, its children will be queried.
+ * @param query can be either a CSS selector string or a compiled query function.
+ * @param [options] options for querying the document.
+ * @see compile for supported selector queries.
+ * @returns the first match, or null if there was no match.
+ */
+    exports.selectOne = getSelectorFunc((query, elems, options) => query === boolbase.falseFunc || !elems || elems.length === 0
+      ? null
+      : (0, querying_js_1.findOne)(query, elems, options))
+    /**
+ * Tests whether or not an element is matched by query.
+ *
+ * @template Node The generic Node type for the DOM adapter being used.
+ * @template ElementNode The Node type for elements for the DOM adapter being used.
+ * @param elem The element to test if it matches the query.
+ * @param query can be either a CSS selector string or a compiled query function.
+ * @param [options] options for querying the document.
+ * @see compile for supported selector queries.
+ * @returns
+ */
+    function is (elem, query, options) {
+      return (typeof query === 'function' ? query : compile(query, options))(elem)
+    }
+    /**
+ * Alias for selectAll(query, elems, options).
+ * @see [compile] for supported selector queries.
+ */
+    exports.default = exports.selectAll
+    // Export filters, pseudos and aliases to allow users to supply their own.
+    /** @deprecated Use the `pseudos` option instead. */
+    const index_js_1 = require('./pseudo-selectors/index.js')
+    Object.defineProperty(exports, 'aliases', { enumerable: true, get: function () { return index_js_1.aliases } })
+    Object.defineProperty(exports, 'filters', { enumerable: true, get: function () { return index_js_1.filters } })
+    Object.defineProperty(exports, 'pseudos', { enumerable: true, get: function () { return index_js_1.pseudos } })
+  }, { './compile.js': 223, './helpers/querying.js': 226, './pseudo-selectors/index.js': 231, boolbase: 33, 'css-what': 234, domutils: 34 }],
+  229: [function (require, module, exports) {
+    'use strict'
+    Object.defineProperty(exports, '__esModule', { value: true })
+    exports.aliases = void 0
+    /**
+ * Only text controls can be made read-only, since for other controls (such
+ * as checkboxes and buttons) there is no useful distinction between being
+ * read-only and being disabled.
+ *
+ * @see {@link https://html.spec.whatwg.org/multipage/input.html#attr-input-readonly}
+ */
+    const textControl = 'input:is([type=text i],[type=search i],[type=url i],[type=tel i],[type=email i],[type=password i],[type=date i],[type=month i],[type=week i],[type=time i],[type=datetime-local i],[type=number i])'
+    /**
+ * Aliases are pseudos that are expressed as selectors.
+ */
+    exports.aliases = {
+    // Links
+      'any-link': ':is(a, area, link)[href]',
+      link: ':any-link:not(:visited)',
+      // Forms
+      // https://html.spec.whatwg.org/multipage/scripting.html#disabled-elements
+      disabled: `:is(
+        :is(button, input, select, textarea, optgroup, option)[disabled],
+        optgroup[disabled] > option,
+        fieldset[disabled]:not(fieldset[disabled] legend:first-of-type *)
+    )`,
+      enabled: ':not(:disabled)',
+      checked: ':is(:is(input[type=radio], input[type=checkbox])[checked], :selected)',
+      required: ':is(input, select, textarea)[required]',
+      optional: ':is(input, select, textarea):not([required])',
+      'read-only': `[readonly]:is(textarea, ${textControl})`,
+      'read-write': `:not([readonly]):is(textarea, ${textControl})`,
+      // JQuery extensions
+      /**
+     * `:selected` matches option elements that have the `selected` attribute,
+     * or are the first option element in a select element that does not have
+     * the `multiple` attribute and does not have any option elements with the
+     * `selected` attribute.
+     *
+     * @see https://html.spec.whatwg.org/multipage/form-elements.html#concept-option-selectedness
+     */
+      selected: 'option:is([selected], select:not([multiple]):not(:has(> option[selected])) > :first-of-type)',
+      checkbox: '[type=checkbox]',
+      file: '[type=file]',
+      password: '[type=password]',
+      radio: '[type=radio]',
+      reset: '[type=reset]',
+      image: '[type=image]',
+      submit: '[type=submit]',
+      parent: ':not(:empty)',
+      header: ':is(h1, h2, h3, h4, h5, h6)',
+      button: ':is(button, input[type=button])',
+      input: ':is(input, textarea, select, button)',
+      text: "input:is(:not([type!='']), [type=text])"
+    }
+  }, {}],
+  230: [function (require, module, exports) {
+    'use strict'
+    const __createBinding = (this && this.__createBinding) || (Object.create
+      ? function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k
+        let desc = Object.getOwnPropertyDescriptor(m, k)
+        if (!desc || ('get' in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+          desc = { enumerable: true, get: function () { return m[k] } }
+        }
+        Object.defineProperty(o, k2, desc)
+      }
+      : function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k
+        o[k2] = m[k]
+      })
+    const __setModuleDefault = (this && this.__setModuleDefault) || (Object.create
+      ? function (o, v) {
+        Object.defineProperty(o, 'default', { enumerable: true, value: v })
+      }
+      : function (o, v) {
+        o.default = v
+      })
+    const __importStar = (this && this.__importStar) || (function () {
+      let ownKeys = function (o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+          const ar = []
+          for (const k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k
+          return ar
+        }
+        return ownKeys(o)
+      }
+      return function (mod) {
+        if (mod && mod.__esModule) return mod
+        const result = {}
+        if (mod != null) for (let k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== 'default') __createBinding(result, mod, k[i])
+        __setModuleDefault(result, mod)
+        return result
+      }
+    })()
+    const __importDefault = (this && this.__importDefault) || function (mod) {
+      return (mod && mod.__esModule) ? mod : { default: mod }
+    }
+    Object.defineProperty(exports, '__esModule', { value: true })
+    exports.filters = void 0
+    const boolbase = __importStar(require('boolbase'))
+    const nth_check_1 = __importDefault(require('nth-check'))
+    const cache_js_1 = require('../helpers/cache.js')
+    const querying_js_1 = require('../helpers/querying.js')
+    exports.filters = {
+      contains (next, text, options) {
+        const { getText } = options.adapter
+        return (0, cache_js_1.cacheParentResults)(next, options, (elem) => getText(elem).includes(text))
+      },
+      icontains (next, text, options) {
+        const itext = text.toLowerCase()
+        const { getText } = options.adapter
+        return (0, cache_js_1.cacheParentResults)(next, options, (elem) => getText(elem).toLowerCase().includes(itext))
+      },
+      // Location specific methods
+      'nth-child' (next, rule, { adapter, equals }) {
+        const func = (0, nth_check_1.default)(rule)
+        if (func === boolbase.falseFunc) {
+          return boolbase.falseFunc
+        }
+        if (func === boolbase.trueFunc) {
+          return (elem) => (0, querying_js_1.getElementParent)(elem, adapter) !== null && next(elem)
+        }
+        return function nthChild (elem) {
+          const siblings = adapter.getSiblings(elem)
+          let pos = 0
+          for (let i = 0; i < siblings.length; i++) {
+            if (equals(elem, siblings[i])) {
+              break
+            }
+            if (adapter.isTag(siblings[i])) {
+              pos++
+            }
+          }
+          return func(pos) && next(elem)
+        }
+      },
+      'nth-last-child' (next, rule, { adapter, equals }) {
+        const func = (0, nth_check_1.default)(rule)
+        if (func === boolbase.falseFunc) {
+          return boolbase.falseFunc
+        }
+        if (func === boolbase.trueFunc) {
+          return (elem) => (0, querying_js_1.getElementParent)(elem, adapter) !== null && next(elem)
+        }
+        return function nthLastChild (elem) {
+          const siblings = adapter.getSiblings(elem)
+          let pos = 0
+          for (let i = siblings.length - 1; i >= 0; i--) {
+            if (equals(elem, siblings[i])) {
+              break
+            }
+            if (adapter.isTag(siblings[i])) {
+              pos++
+            }
+          }
+          return func(pos) && next(elem)
+        }
+      },
+      'nth-of-type' (next, rule, { adapter, equals }) {
+        const func = (0, nth_check_1.default)(rule)
+        if (func === boolbase.falseFunc) {
+          return boolbase.falseFunc
+        }
+        if (func === boolbase.trueFunc) {
+          return (elem) => (0, querying_js_1.getElementParent)(elem, adapter) !== null && next(elem)
+        }
+        return function nthOfType (elem) {
+          const siblings = adapter.getSiblings(elem)
+          let pos = 0
+          for (let i = 0; i < siblings.length; i++) {
+            const currentSibling = siblings[i]
+            if (equals(elem, currentSibling)) {
+              break
+            }
+            if (adapter.isTag(currentSibling) &&
+                    adapter.getName(currentSibling) === adapter.getName(elem)) {
+              pos++
+            }
+          }
+          return func(pos) && next(elem)
+        }
+      },
+      'nth-last-of-type' (next, rule, { adapter, equals }) {
+        const func = (0, nth_check_1.default)(rule)
+        if (func === boolbase.falseFunc) {
+          return boolbase.falseFunc
+        }
+        if (func === boolbase.trueFunc) {
+          return (elem) => (0, querying_js_1.getElementParent)(elem, adapter) !== null && next(elem)
+        }
+        return function nthLastOfType (elem) {
+          const siblings = adapter.getSiblings(elem)
+          let pos = 0
+          for (let i = siblings.length - 1; i >= 0; i--) {
+            const currentSibling = siblings[i]
+            if (equals(elem, currentSibling)) {
+              break
+            }
+            if (adapter.isTag(currentSibling) &&
+                    adapter.getName(currentSibling) === adapter.getName(elem)) {
+              pos++
+            }
+          }
+          return func(pos) && next(elem)
+        }
+      },
+      // TODO determine the actual root element
+      root (next, _rule, { adapter }) {
+        return (elem) => (0, querying_js_1.getElementParent)(elem, adapter) === null && next(elem)
+      },
+      scope (next, rule, options, context) {
+        const { equals } = options
+        if (!context || context.length === 0) {
+        // Equivalent to :root
+          return exports.filters.root(next, rule, options)
+        }
+        if (context.length === 1) {
+        // NOTE: can't be unpacked, as :has uses this for side-effects
+          return (elem) => equals(context[0], elem) && next(elem)
+        }
+        return (elem) => context.includes(elem) && next(elem)
+      },
+      hover: dynamicStatePseudo('isHovered'),
+      visited: dynamicStatePseudo('isVisited'),
+      active: dynamicStatePseudo('isActive')
+    }
+    /**
+ * Dynamic state pseudos. These depend on optional Adapter methods.
+ *
+ * @param name The name of the adapter method to call.
+ * @returns Pseudo for the `filters` object.
+ */
+    function dynamicStatePseudo (name) {
+      return function dynamicPseudo (next, _rule, { adapter }) {
+        const func = adapter[name]
+        if (typeof func !== 'function') {
+          return boolbase.falseFunc
+        }
+        return function active (elem) {
+          return func(elem) && next(elem)
+        }
+      }
+    }
+  }, { '../helpers/cache.js': 225, '../helpers/querying.js': 226, boolbase: 33, 'nth-check': 239 }],
+  231: [function (require, module, exports) {
+    'use strict'
+    /*
+ * Pseudo selectors
+ *
+ * Pseudo selectors are available in three forms:
+ *
+ * 1. Filters are called when the selector is compiled and return a function
+ *  that has to return either false, or the results of `next()`.
+ * 2. Pseudos are called on execution. They have to return a boolean.
+ * 3. Subselects work like filters, but have an embedded selector that will be run separately.
+ *
+ * Filters are great if you want to do some pre-processing, or change the call order
+ * of `next()` and your code.
+ * Pseudos should be used to implement simple checks.
+ */
+    Object.defineProperty(exports, '__esModule', { value: true })
+    exports.aliases = exports.pseudos = exports.filters = void 0
+    exports.compilePseudoSelector = compilePseudoSelector
+    const css_what_1 = require('css-what')
+    const aliases_js_1 = require('./aliases.js')
+    Object.defineProperty(exports, 'aliases', { enumerable: true, get: function () { return aliases_js_1.aliases } })
+    const filters_js_1 = require('./filters.js')
+    Object.defineProperty(exports, 'filters', { enumerable: true, get: function () { return filters_js_1.filters } })
+    const pseudos_js_1 = require('./pseudos.js')
+    Object.defineProperty(exports, 'pseudos', { enumerable: true, get: function () { return pseudos_js_1.pseudos } })
+    const subselects_js_1 = require('./subselects.js')
+    function compilePseudoSelector (next, selector, options, context, compileToken) {
+      const { name, data } = selector
+      if (Array.isArray(data)) {
+        if (!(name in subselects_js_1.subselects)) {
+          throw new Error(`Unknown pseudo-class :${name}(${data})`)
+        }
+        return subselects_js_1.subselects[name](next, data, options, context, compileToken)
+      }
+      const userPseudo = options.pseudos?.[name]
+      const stringPseudo = typeof userPseudo === 'string' ? userPseudo : aliases_js_1.aliases[name]
+      if (typeof stringPseudo === 'string') {
+        if (data != null) {
+          throw new Error(`Pseudo ${name} doesn't have any arguments`)
+        }
+        // The alias has to be parsed here, to make sure options are respected.
+        const alias = (0, css_what_1.parse)(stringPseudo)
+        return subselects_js_1.subselects.is(next, alias, options, context, compileToken)
+      }
+      if (typeof userPseudo === 'function') {
+        (0, pseudos_js_1.verifyPseudoArgs)(userPseudo, name, data, 1)
+        return (elem) => userPseudo(elem, data) && next(elem)
+      }
+      if (name in filters_js_1.filters) {
+        return filters_js_1.filters[name](next, data, options, context)
+      }
+      if (name in pseudos_js_1.pseudos) {
+        const pseudo = pseudos_js_1.pseudos[name];
+        (0, pseudos_js_1.verifyPseudoArgs)(pseudo, name, data, 2)
+        return (elem) => pseudo(elem, options, data) && next(elem)
+      }
+      throw new Error(`Unknown pseudo-class :${name}`)
+    }
+  }, { './aliases.js': 229, './filters.js': 230, './pseudos.js': 232, './subselects.js': 233, 'css-what': 234 }],
+  232: [function (require, module, exports) {
+    'use strict'
+    Object.defineProperty(exports, '__esModule', { value: true })
+    exports.pseudos = void 0
+    exports.verifyPseudoArgs = verifyPseudoArgs
+    /**
+ * CSS limits the characters considered as whitespace to space, tab & line
+ * feed. We add carriage returns as htmlparser2 doesn't normalize them to
+ * line feeds.
+ *
+ * @see {@link https://www.w3.org/TR/css-text-3/#white-space}
+ */
+    const isDocumentWhiteSpace = /^[ \t\r\n]*$/
+    // While filters are precompiled, pseudos get called when they are needed
+    exports.pseudos = {
+      empty (elem, { adapter }) {
+        const children = adapter.getChildren(elem)
+        return (
+        // First, make sure the tag does not have any element children.
+          children.every((elem) => !adapter.isTag(elem)) &&
+            // Then, check that the text content is only whitespace.
+            children.every((elem) =>
+            // FIXME: `getText` call is potentially expensive.
+              isDocumentWhiteSpace.test(adapter.getText(elem))))
+      },
+      'first-child' (elem, { adapter, equals }) {
+        if (adapter.prevElementSibling) {
+          return adapter.prevElementSibling(elem) == null
+        }
+        const firstChild = adapter
+          .getSiblings(elem)
+          .find((elem) => adapter.isTag(elem))
+        return firstChild != null && equals(elem, firstChild)
+      },
+      'last-child' (elem, { adapter, equals }) {
+        const siblings = adapter.getSiblings(elem)
+        for (let i = siblings.length - 1; i >= 0; i--) {
+          if (equals(elem, siblings[i])) {
+            return true
+          }
+          if (adapter.isTag(siblings[i])) {
+            break
+          }
+        }
+        return false
+      },
+      'first-of-type' (elem, { adapter, equals }) {
+        const siblings = adapter.getSiblings(elem)
+        const elemName = adapter.getName(elem)
+        for (let i = 0; i < siblings.length; i++) {
+          const currentSibling = siblings[i]
+          if (equals(elem, currentSibling)) {
+            return true
+          }
+          if (adapter.isTag(currentSibling) &&
+                adapter.getName(currentSibling) === elemName) {
+            break
+          }
+        }
+        return false
+      },
+      'last-of-type' (elem, { adapter, equals }) {
+        const siblings = adapter.getSiblings(elem)
+        const elemName = adapter.getName(elem)
+        for (let i = siblings.length - 1; i >= 0; i--) {
+          const currentSibling = siblings[i]
+          if (equals(elem, currentSibling)) {
+            return true
+          }
+          if (adapter.isTag(currentSibling) &&
+                adapter.getName(currentSibling) === elemName) {
+            break
+          }
+        }
+        return false
+      },
+      'only-of-type' (elem, { adapter, equals }) {
+        const elemName = adapter.getName(elem)
+        return adapter
+          .getSiblings(elem)
+          .every((sibling) => equals(elem, sibling) ||
+            !adapter.isTag(sibling) ||
+            adapter.getName(sibling) !== elemName)
+      },
+      'only-child' (elem, { adapter, equals }) {
+        return adapter
+          .getSiblings(elem)
+          .every((sibling) => equals(elem, sibling) || !adapter.isTag(sibling))
+      }
+    }
+    function verifyPseudoArgs (func, name, subselect, argIndex) {
+      if (subselect === null) {
+        if (func.length > argIndex) {
+          throw new Error(`Pseudo-class :${name} requires an argument`)
+        }
+      } else if (func.length === argIndex) {
+        throw new Error(`Pseudo-class :${name} doesn't have any arguments`)
+      }
+    }
+  }, {}],
+  233: [function (require, module, exports) {
+    'use strict'
+    const __createBinding = (this && this.__createBinding) || (Object.create
+      ? function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k
+        let desc = Object.getOwnPropertyDescriptor(m, k)
+        if (!desc || ('get' in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+          desc = { enumerable: true, get: function () { return m[k] } }
+        }
+        Object.defineProperty(o, k2, desc)
+      }
+      : function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k
+        o[k2] = m[k]
+      })
+    const __setModuleDefault = (this && this.__setModuleDefault) || (Object.create
+      ? function (o, v) {
+        Object.defineProperty(o, 'default', { enumerable: true, value: v })
+      }
+      : function (o, v) {
+        o.default = v
+      })
+    const __importStar = (this && this.__importStar) || (function () {
+      let ownKeys = function (o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+          const ar = []
+          for (const k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k
+          return ar
+        }
+        return ownKeys(o)
+      }
+      return function (mod) {
+        if (mod && mod.__esModule) return mod
+        const result = {}
+        if (mod != null) for (let k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== 'default') __createBinding(result, mod, k[i])
+        __setModuleDefault(result, mod)
+        return result
+      }
+    })()
+    Object.defineProperty(exports, '__esModule', { value: true })
+    exports.subselects = exports.PLACEHOLDER_ELEMENT = void 0
+    const boolbase = __importStar(require('boolbase'))
+    const cache_js_1 = require('../helpers/cache.js')
+    const querying_js_1 = require('../helpers/querying.js')
+    const selectors_js_1 = require('../helpers/selectors.js')
+    /** Used as a placeholder for :has. Will be replaced with the actual element. */
+    exports.PLACEHOLDER_ELEMENT = {}
+    /**
+ * Check if the selector has any properties that rely on the current element.
+ * If not, we can cache the result of the selector.
+ *
+ * We can't cache selectors that start with a traversal (e.g. `>`, `+`, `~`),
+ * or include a `:scope`.
+ *
+ * @param selector - The selector to check.
+ * @returns Whether the selector has any properties that rely on the current element.
+ */
+    function hasDependsOnCurrentElement (selector) {
+      return selector.some((sel) => sel.length > 0 &&
+        ((0, selectors_js_1.isTraversal)(sel[0]) || sel.some(selectors_js_1.includesScopePseudo)))
+    }
+    function copyOptions (options) {
+    // Not copied: context, rootFunc
+      return {
+        xmlMode: !!options.xmlMode,
+        lowerCaseAttributeNames: !!options.lowerCaseAttributeNames,
+        lowerCaseTags: !!options.lowerCaseTags,
+        quirksMode: !!options.quirksMode,
+        cacheResults: !!options.cacheResults,
+        pseudos: options.pseudos,
+        adapter: options.adapter,
+        equals: options.equals
+      }
+    }
+    const is = (next, token, options, context, compileToken) => {
+      const func = compileToken(token, copyOptions(options), context)
+      return func === boolbase.trueFunc
+        ? next
+        : func === boolbase.falseFunc
+          ? boolbase.falseFunc
+          : (elem) => func(elem) && next(elem)
+    }
+    /*
+ * :not, :has, :is, :matches and :where have to compile selectors
+ * doing this in src/pseudos.ts would lead to circular dependencies,
+ * so we add them here
+ */
+    exports.subselects = {
+      is,
+      /**
+     * `:matches` and `:where` are aliases for `:is`.
+     */
+      matches: is,
+      where: is,
+      not (next, token, options, context, compileToken) {
+        const func = compileToken(token, copyOptions(options), context)
+        return func === boolbase.falseFunc
+          ? next
+          : func === boolbase.trueFunc
+            ? boolbase.falseFunc
+            : (elem) => !func(elem) && next(elem)
+      },
+      has (next, subselect, options, _context, compileToken) {
+        const { adapter } = options
+        const opts = copyOptions(options)
+        opts.relativeSelector = true
+        const context = subselect.some((s) => s.some(selectors_js_1.isTraversal))
+          ? // Used as a placeholder. Will be replaced with the actual element.
+            [exports.PLACEHOLDER_ELEMENT]
+          : undefined
+        const skipCache = hasDependsOnCurrentElement(subselect)
+        const compiled = compileToken(subselect, opts, context)
+        if (compiled === boolbase.falseFunc) {
+          return boolbase.falseFunc
+        }
+        // If `compiled` is `trueFunc`, we can skip this.
+        if (context && compiled !== boolbase.trueFunc) {
+          return skipCache
+            ? (elem) => {
+                if (!next(elem)) {
+                  return false
+                }
+                context[0] = elem
+                const childs = adapter.getChildren(elem)
+                return ((0, querying_js_1.findOne)(compiled, compiled.shouldTestNextSiblings
+                  ? [
+                      ...childs,
+                      ...(0, querying_js_1.getNextSiblings)(elem, adapter)
+                    ]
+                  : childs, options) !== null)
+              }
+            : (0, cache_js_1.cacheParentResults)(next, options, (elem) => {
+                context[0] = elem
+                return ((0, querying_js_1.findOne)(compiled, adapter.getChildren(elem), options) !== null)
+              })
+        }
+        const hasOne = (elem) => (0, querying_js_1.findOne)(compiled, adapter.getChildren(elem), options) !== null
+        return skipCache
+          ? (elem) => next(elem) && hasOne(elem)
+          : (0, cache_js_1.cacheParentResults)(next, options, hasOne)
+      }
+    }
+  }, { '../helpers/cache.js': 225, '../helpers/querying.js': 226, '../helpers/selectors.js': 227, boolbase: 33 }],
+  234: [function (require, module, exports) {
+    'use strict'
+    const __createBinding = (this && this.__createBinding) || (Object.create
+      ? function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k
+        let desc = Object.getOwnPropertyDescriptor(m, k)
+        if (!desc || ('get' in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+          desc = { enumerable: true, get: function () { return m[k] } }
+        }
+        Object.defineProperty(o, k2, desc)
+      }
+      : function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k
+        o[k2] = m[k]
+      })
+    const __exportStar = (this && this.__exportStar) || function (m, exports) {
+      for (const p in m) if (p !== 'default' && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p)
+    }
+    Object.defineProperty(exports, '__esModule', { value: true })
+    exports.stringify = exports.parse = exports.isTraversal = void 0
+    __exportStar(require('./types.js'), exports)
+    const parse_js_1 = require('./parse.js')
+    Object.defineProperty(exports, 'isTraversal', { enumerable: true, get: function () { return parse_js_1.isTraversal } })
+    Object.defineProperty(exports, 'parse', { enumerable: true, get: function () { return parse_js_1.parse } })
+    const stringify_js_1 = require('./stringify.js')
+    Object.defineProperty(exports, 'stringify', { enumerable: true, get: function () { return stringify_js_1.stringify } })
+  }, { './parse.js': 235, './stringify.js': 236, './types.js': 237 }],
+  235: [function (require, module, exports) {
+    'use strict'
+    Object.defineProperty(exports, '__esModule', { value: true })
+    exports.isTraversal = isTraversal
+    exports.parse = parse
+    const types_js_1 = require('./types.js')
+    const reName = /^[^#\\]?(?:\\(?:[\da-f]{1,6}\s?|.)|[\w\u00B0-\uFFFF-])+/
+    const reEscape = /\\([\da-f]{1,6}\s?|(\s)|.)/gi
+    let CharCode;
+    (function (CharCode) {
+      CharCode[CharCode.LeftParenthesis = 40] = 'LeftParenthesis'
+      CharCode[CharCode.RightParenthesis = 41] = 'RightParenthesis'
+      CharCode[CharCode.LeftSquareBracket = 91] = 'LeftSquareBracket'
+      CharCode[CharCode.RightSquareBracket = 93] = 'RightSquareBracket'
+      CharCode[CharCode.Comma = 44] = 'Comma'
+      CharCode[CharCode.Period = 46] = 'Period'
+      CharCode[CharCode.Colon = 58] = 'Colon'
+      CharCode[CharCode.SingleQuote = 39] = 'SingleQuote'
+      CharCode[CharCode.DoubleQuote = 34] = 'DoubleQuote'
+      CharCode[CharCode.Plus = 43] = 'Plus'
+      CharCode[CharCode.Tilde = 126] = 'Tilde'
+      CharCode[CharCode.QuestionMark = 63] = 'QuestionMark'
+      CharCode[CharCode.ExclamationMark = 33] = 'ExclamationMark'
+      CharCode[CharCode.Slash = 47] = 'Slash'
+      CharCode[CharCode.Equal = 61] = 'Equal'
+      CharCode[CharCode.Dollar = 36] = 'Dollar'
+      CharCode[CharCode.Pipe = 124] = 'Pipe'
+      CharCode[CharCode.Circumflex = 94] = 'Circumflex'
+      CharCode[CharCode.Asterisk = 42] = 'Asterisk'
+      CharCode[CharCode.GreaterThan = 62] = 'GreaterThan'
+      CharCode[CharCode.LessThan = 60] = 'LessThan'
+      CharCode[CharCode.Hash = 35] = 'Hash'
+      CharCode[CharCode.LowerI = 105] = 'LowerI'
+      CharCode[CharCode.LowerS = 115] = 'LowerS'
+      CharCode[CharCode.BackSlash = 92] = 'BackSlash'
+      // Whitespace
+      CharCode[CharCode.Space = 32] = 'Space'
+      CharCode[CharCode.Tab = 9] = 'Tab'
+      CharCode[CharCode.NewLine = 10] = 'NewLine'
+      CharCode[CharCode.FormFeed = 12] = 'FormFeed'
+      CharCode[CharCode.CarriageReturn = 13] = 'CarriageReturn'
+    })(CharCode || (CharCode = {}))
+    const actionTypes = new Map([
+      [CharCode.Tilde, types_js_1.AttributeAction.Element],
+      [CharCode.Circumflex, types_js_1.AttributeAction.Start],
+      [CharCode.Dollar, types_js_1.AttributeAction.End],
+      [CharCode.Asterisk, types_js_1.AttributeAction.Any],
+      [CharCode.ExclamationMark, types_js_1.AttributeAction.Not],
+      [CharCode.Pipe, types_js_1.AttributeAction.Hyphen]
+    ])
+    // Pseudos, whose data property is parsed as well.
+    const unpackPseudos = new Set([
+      'has',
+      'not',
+      'matches',
+      'is',
+      'where',
+      'host',
+      'host-context'
+    ])
+    /**
+ * Pseudo elements defined in CSS Level 1 and CSS Level 2 can be written with
+ * a single colon; eg. :before will turn into ::before.
+ *
+ * @see {@link https://www.w3.org/TR/2018/WD-selectors-4-20181121/#pseudo-element-syntax}
+ */
+    const pseudosToPseudoElements = new Set([
+      'before',
+      'after',
+      'first-line',
+      'first-letter'
+    ])
+    /**
+ * Checks whether a specific selector is a traversal.
+ * This is useful eg. in swapping the order of elements that
+ * are not traversals.
+ *
+ * @param selector Selector to check.
+ */
+    function isTraversal (selector) {
+      switch (selector.type) {
+        case types_js_1.SelectorType.Adjacent:
+        case types_js_1.SelectorType.Child:
+        case types_js_1.SelectorType.Descendant:
+        case types_js_1.SelectorType.Parent:
+        case types_js_1.SelectorType.Sibling:
+        case types_js_1.SelectorType.ColumnCombinator: {
+          return true
+        }
+        default: {
+          return false
+        }
+      }
+    }
+    const stripQuotesFromPseudos = new Set(['contains', 'icontains'])
+    // Unescape function taken from https://github.com/jquery/sizzle/blob/master/src/sizzle.js#L152
+    function funescape (_, escaped, escapedWhitespace) {
+      const high = Number.parseInt(escaped, 16) - 65536
+      // NaN means non-codepoint
+      return high !== high || escapedWhitespace
+        ? escaped
+        : high < 0
+          ? // BMP codepoint
+          String.fromCharCode(high + 65536)
+          : // Supplemental Plane codepoint (surrogate pair)
+          String.fromCharCode((high >> 10) | 55296, (high & 1023) | 56320)
+    }
+    function unescapeCSS (cssString) {
+      return cssString.replace(reEscape, funescape)
+    }
+    function isQuote (c) {
+      return c === CharCode.SingleQuote || c === CharCode.DoubleQuote
+    }
+    function isWhitespace (c) {
+      return (c === CharCode.Space ||
+        c === CharCode.Tab ||
+        c === CharCode.NewLine ||
+        c === CharCode.FormFeed ||
+        c === CharCode.CarriageReturn)
+    }
+    /**
+ * Parses `selector`.
+ *
+ * @param selector Selector to parse.
+ * @returns Returns a two-dimensional array.
+ * The first dimension represents selectors separated by commas (eg. `sub1, sub2`),
+ * the second contains the relevant tokens for that selector.
+ */
+    function parse (selector) {
+      const subselects = []
+      const endIndex = parseSelector(subselects, `${selector}`, 0)
+      if (endIndex < selector.length) {
+        throw new Error(`Unmatched selector: ${selector.slice(endIndex)}`)
+      }
+      return subselects
+    }
+    function parseSelector (subselects, selector, selectorIndex) {
+      let tokens = []
+      function getName (offset) {
+        const match = selector.slice(selectorIndex + offset).match(reName)
+        if (!match) {
+          throw new Error(`Expected name, found ${selector.slice(selectorIndex)}`)
+        }
+        const [name] = match
+        selectorIndex += offset + name.length
+        return unescapeCSS(name)
+      }
+      function stripWhitespace (offset) {
+        selectorIndex += offset
+        while (selectorIndex < selector.length &&
+            isWhitespace(selector.charCodeAt(selectorIndex))) {
+          selectorIndex++
+        }
+      }
+      function readValueWithParenthesis () {
+        selectorIndex += 1
+        const start = selectorIndex
+        for (let counter = 1; selectorIndex < selector.length; selectorIndex++) {
+          switch (selector.charCodeAt(selectorIndex)) {
+            case CharCode.BackSlash: {
+            // Skip next character
+              selectorIndex += 1
+              break
+            }
+            case CharCode.LeftParenthesis: {
+              counter += 1
+              break
+            }
+            case CharCode.RightParenthesis: {
+              counter -= 1
+              if (counter === 0) {
+                return unescapeCSS(selector.slice(start, selectorIndex++))
+              }
+              break
+            }
+          }
+        }
+        throw new Error('Parenthesis not matched')
+      }
+      function ensureNotTraversal () {
+        if (tokens.length > 0 && isTraversal(tokens[tokens.length - 1])) {
+          throw new Error('Did not expect successive traversals.')
+        }
+      }
+      function addTraversal (type) {
+        if (tokens.length > 0 &&
+            tokens[tokens.length - 1].type === types_js_1.SelectorType.Descendant) {
+          tokens[tokens.length - 1].type = type
+          return
+        }
+        ensureNotTraversal()
+        tokens.push({ type })
+      }
+      function addSpecialAttribute (name, action) {
+        tokens.push({
+          type: types_js_1.SelectorType.Attribute,
+          name,
+          action,
+          value: getName(1),
+          namespace: null,
+          ignoreCase: 'quirks'
+        })
+      }
+      /**
+     * We have finished parsing the current part of the selector.
+     *
+     * Remove descendant tokens at the end if they exist,
+     * and return the last index, so that parsing can be
+     * picked up from here.
+     */
+      function finalizeSubselector () {
+        if (tokens.length > 0 &&
+            tokens[tokens.length - 1].type === types_js_1.SelectorType.Descendant) {
+          tokens.pop()
+        }
+        if (tokens.length === 0) {
+          throw new Error('Empty sub-selector')
+        }
+        subselects.push(tokens)
+      }
+      stripWhitespace(0)
+      if (selector.length === selectorIndex) {
+        return selectorIndex
+      }
+      loop: while (selectorIndex < selector.length) {
+        const firstChar = selector.charCodeAt(selectorIndex)
+        switch (firstChar) {
+        // Whitespace
+          case CharCode.Space:
+          case CharCode.Tab:
+          case CharCode.NewLine:
+          case CharCode.FormFeed:
+          case CharCode.CarriageReturn: {
+            if (tokens.length === 0 ||
+                    tokens[0].type !== types_js_1.SelectorType.Descendant) {
+              ensureNotTraversal()
+              tokens.push({ type: types_js_1.SelectorType.Descendant })
+            }
+            stripWhitespace(1)
+            break
+          }
+          // Traversals
+          case CharCode.GreaterThan: {
+            addTraversal(types_js_1.SelectorType.Child)
+            stripWhitespace(1)
+            break
+          }
+          case CharCode.LessThan: {
+            addTraversal(types_js_1.SelectorType.Parent)
+            stripWhitespace(1)
+            break
+          }
+          case CharCode.Tilde: {
+            addTraversal(types_js_1.SelectorType.Sibling)
+            stripWhitespace(1)
+            break
+          }
+          case CharCode.Plus: {
+            addTraversal(types_js_1.SelectorType.Adjacent)
+            stripWhitespace(1)
+            break
+          }
+          // Special attribute selectors: .class, #id
+          case CharCode.Period: {
+            addSpecialAttribute('class', types_js_1.AttributeAction.Element)
+            break
+          }
+          case CharCode.Hash: {
+            addSpecialAttribute('id', types_js_1.AttributeAction.Equals)
+            break
+          }
+          case CharCode.LeftSquareBracket: {
+            stripWhitespace(1)
+            // Determine attribute name and namespace
+            let name
+            let namespace = null
+            if (selector.charCodeAt(selectorIndex) === CharCode.Pipe) {
+            // Equivalent to no namespace
+              name = getName(1)
+            } else if (selector.startsWith('*|', selectorIndex)) {
+              namespace = '*'
+              name = getName(2)
+            } else {
+              name = getName(0)
+              if (selector.charCodeAt(selectorIndex) === CharCode.Pipe &&
+                        selector.charCodeAt(selectorIndex + 1) !==
+                            CharCode.Equal) {
+                namespace = name
+                name = getName(1)
+              }
+            }
+            stripWhitespace(0)
+            // Determine comparison operation
+            let action = types_js_1.AttributeAction.Exists
+            const possibleAction = actionTypes.get(selector.charCodeAt(selectorIndex))
+            if (possibleAction) {
+              action = possibleAction
+              if (selector.charCodeAt(selectorIndex + 1) !==
+                        CharCode.Equal) {
+                throw new Error('Expected `=`')
+              }
+              stripWhitespace(2)
+            } else if (selector.charCodeAt(selectorIndex) === CharCode.Equal) {
+              action = types_js_1.AttributeAction.Equals
+              stripWhitespace(1)
+            }
+            // Determine value
+            let value = ''
+            let ignoreCase = null
+            if (action !== 'exists') {
+              if (isQuote(selector.charCodeAt(selectorIndex))) {
+                const quote = selector.charCodeAt(selectorIndex)
+                selectorIndex += 1
+                const sectionStart = selectorIndex
+                while (selectorIndex < selector.length &&
+                            selector.charCodeAt(selectorIndex) !== quote) {
+                  selectorIndex +=
+                                // Skip next character if it is escaped
+                                selector.charCodeAt(selectorIndex) ===
+                                    CharCode.BackSlash
+                                  ? 2
+                                  : 1
+                }
+                if (selector.charCodeAt(selectorIndex) !== quote) {
+                  throw new Error("Attribute value didn't end")
+                }
+                value = unescapeCSS(selector.slice(sectionStart, selectorIndex))
+                selectorIndex += 1
+              } else {
+                const valueStart = selectorIndex
+                while (selectorIndex < selector.length &&
+                            !isWhitespace(selector.charCodeAt(selectorIndex)) &&
+                            selector.charCodeAt(selectorIndex) !==
+                                CharCode.RightSquareBracket) {
+                  selectorIndex +=
+                                // Skip next character if it is escaped
+                                selector.charCodeAt(selectorIndex) ===
+                                    CharCode.BackSlash
+                                  ? 2
+                                  : 1
+                }
+                value = unescapeCSS(selector.slice(valueStart, selectorIndex))
+              }
+              stripWhitespace(0)
+              // See if we have a force ignore flag
+              switch (selector.charCodeAt(selectorIndex) | 0x20) {
+              // If the forceIgnore flag is set (either `i` or `s`), use that value
+                case CharCode.LowerI: {
+                  ignoreCase = true
+                  stripWhitespace(1)
+                  break
+                }
+                case CharCode.LowerS: {
+                  ignoreCase = false
+                  stripWhitespace(1)
+                  break
+                }
+              }
+            }
+            if (selector.charCodeAt(selectorIndex) !==
+                    CharCode.RightSquareBracket) {
+              throw new Error("Attribute selector didn't terminate")
+            }
+            selectorIndex += 1
+            const attributeSelector = {
+              type: types_js_1.SelectorType.Attribute,
+              name,
+              action,
+              value,
+              namespace,
+              ignoreCase
+            }
+            tokens.push(attributeSelector)
+            break
+          }
+          case CharCode.Colon: {
+            if (selector.charCodeAt(selectorIndex + 1) === CharCode.Colon) {
+              tokens.push({
+                type: types_js_1.SelectorType.PseudoElement,
+                name: getName(2).toLowerCase(),
+                data: selector.charCodeAt(selectorIndex) ===
+                            CharCode.LeftParenthesis
+                  ? readValueWithParenthesis()
+                  : null
+              })
+              break
+            }
+            const name = getName(1).toLowerCase()
+            if (pseudosToPseudoElements.has(name)) {
+              tokens.push({
+                type: types_js_1.SelectorType.PseudoElement,
+                name,
+                data: null
+              })
+              break
+            }
+            let data = null
+            if (selector.charCodeAt(selectorIndex) ===
+                    CharCode.LeftParenthesis) {
+              if (unpackPseudos.has(name)) {
+                if (isQuote(selector.charCodeAt(selectorIndex + 1))) {
+                  throw new Error(`Pseudo-selector ${name} cannot be quoted`)
+                }
+                data = []
+                selectorIndex = parseSelector(data, selector, selectorIndex + 1)
+                if (selector.charCodeAt(selectorIndex) !==
+                            CharCode.RightParenthesis) {
+                  throw new Error(`Missing closing parenthesis in :${name} (${selector})`)
+                }
+                selectorIndex += 1
+              } else {
+                data = readValueWithParenthesis()
+                if (stripQuotesFromPseudos.has(name)) {
+                  const quot = data.charCodeAt(0)
+                  if (quot === data.charCodeAt(data.length - 1) &&
+                                isQuote(quot)) {
+                    data = data.slice(1, -1)
+                  }
+                }
+                data = unescapeCSS(data)
+              }
+            }
+            tokens.push({ type: types_js_1.SelectorType.Pseudo, name, data })
+            break
+          }
+          case CharCode.Comma: {
+            finalizeSubselector()
+            tokens = []
+            stripWhitespace(1)
+            break
+          }
+          default: {
+            if (selector.startsWith('/*', selectorIndex)) {
+              const endIndex = selector.indexOf('*/', selectorIndex + 2)
+              if (endIndex < 0) {
+                throw new Error('Comment was not terminated')
+              }
+              selectorIndex = endIndex + 2
+              // Remove leading whitespace
+              if (tokens.length === 0) {
+                stripWhitespace(0)
+              }
+              break
+            }
+            let namespace = null
+            let name
+            if (firstChar === CharCode.Asterisk) {
+              selectorIndex += 1
+              name = '*'
+            } else if (firstChar === CharCode.Pipe) {
+              name = ''
+              if (selector.charCodeAt(selectorIndex + 1) === CharCode.Pipe) {
+                addTraversal(types_js_1.SelectorType.ColumnCombinator)
+                stripWhitespace(2)
+                break
+              }
+            } else if (reName.test(selector.slice(selectorIndex))) {
+              name = getName(0)
+            } else {
+              break loop
+            }
+            if (selector.charCodeAt(selectorIndex) === CharCode.Pipe &&
+                    selector.charCodeAt(selectorIndex + 1) !== CharCode.Pipe) {
+              namespace = name
+              if (selector.charCodeAt(selectorIndex + 1) ===
+                        CharCode.Asterisk) {
+                name = '*'
+                selectorIndex += 2
+              } else {
+                name = getName(1)
+              }
+            }
+            tokens.push(name === '*'
+              ? { type: types_js_1.SelectorType.Universal, namespace }
+              : { type: types_js_1.SelectorType.Tag, name, namespace })
+          }
+        }
+      }
+      finalizeSubselector()
+      return selectorIndex
+    }
+  }, { './types.js': 237 }],
+  236: [function (require, module, exports) {
+    'use strict'
+    Object.defineProperty(exports, '__esModule', { value: true })
+    exports.stringify = stringify
+    const types_js_1 = require('./types.js')
+    const attribValueChars = ['\\', '"']
+    const pseudoValueChars = [...attribValueChars, '(', ')']
+    const charsToEscapeInAttributeValue = new Set(attribValueChars.map((c) => c.charCodeAt(0)))
+    const charsToEscapeInPseudoValue = new Set(pseudoValueChars.map((c) => c.charCodeAt(0)))
+    const charsToEscapeInName = new Set([
+      ...pseudoValueChars,
+      '~',
+      '^',
+      '$',
+      '*',
+      '+',
+      '!',
+      '|',
+      ':',
+      '[',
+      ']',
+      ' ',
+      '.',
+      '%'
+    ].map((c) => c.charCodeAt(0)))
+    /**
+ * Turns `selector` back into a string.
+ *
+ * @param selector Selector to stringify.
+ */
+    function stringify (selector) {
+      return selector
+        .map((token) => token
+          .map((token, index, array) => stringifyToken(token, index, array))
+          .join(''))
+        .join(', ')
+    }
+    function stringifyToken (token, index, array) {
+      switch (token.type) {
+      // Simple types
+        case types_js_1.SelectorType.Child: {
+          return index === 0 ? '> ' : ' > '
+        }
+        case types_js_1.SelectorType.Parent: {
+          return index === 0 ? '< ' : ' < '
+        }
+        case types_js_1.SelectorType.Sibling: {
+          return index === 0 ? '~ ' : ' ~ '
+        }
+        case types_js_1.SelectorType.Adjacent: {
+          return index === 0 ? '+ ' : ' + '
+        }
+        case types_js_1.SelectorType.Descendant: {
+          return ' '
+        }
+        case types_js_1.SelectorType.ColumnCombinator: {
+          return index === 0 ? '|| ' : ' || '
+        }
+        case types_js_1.SelectorType.Universal: {
+        // Return an empty string if the selector isn't needed.
+          return token.namespace === '*' &&
+                index + 1 < array.length &&
+                'name' in array[index + 1]
+            ? ''
+            : `${getNamespace(token.namespace)}*`
+        }
+        case types_js_1.SelectorType.Tag: {
+          return getNamespacedName(token)
+        }
+        case types_js_1.SelectorType.PseudoElement: {
+          return `::${escapeName(token.name, charsToEscapeInName)}${token.data === null
+                ? ''
+                : `(${escapeName(token.data, charsToEscapeInPseudoValue)})`}`
+        }
+        case types_js_1.SelectorType.Pseudo: {
+          return `:${escapeName(token.name, charsToEscapeInName)}${token.data === null
+                ? ''
+                : `(${typeof token.data === 'string'
+                    ? escapeName(token.data, charsToEscapeInPseudoValue)
+                    : stringify(token.data)})`}`
+        }
+        case types_js_1.SelectorType.Attribute: {
+          if (token.name === 'id' &&
+                token.action === types_js_1.AttributeAction.Equals &&
+                token.ignoreCase === 'quirks' &&
+                !token.namespace) {
+            return `#${escapeName(token.value, charsToEscapeInName)}`
+          }
+          if (token.name === 'class' &&
+                token.action === types_js_1.AttributeAction.Element &&
+                token.ignoreCase === 'quirks' &&
+                !token.namespace) {
+            return `.${escapeName(token.value, charsToEscapeInName)}`
+          }
+          const name = getNamespacedName(token)
+          if (token.action === types_js_1.AttributeAction.Exists) {
+            return `[${name}]`
+          }
+          return `[${name}${getActionValue(token.action)}="${escapeName(token.value, charsToEscapeInAttributeValue)}"${token.ignoreCase === null ? '' : token.ignoreCase ? ' i' : ' s'}]`
+        }
+      }
+    }
+    function getActionValue (action) {
+      switch (action) {
+        case types_js_1.AttributeAction.Equals: {
+          return ''
+        }
+        case types_js_1.AttributeAction.Element: {
+          return '~'
+        }
+        case types_js_1.AttributeAction.Start: {
+          return '^'
+        }
+        case types_js_1.AttributeAction.End: {
+          return '$'
+        }
+        case types_js_1.AttributeAction.Any: {
+          return '*'
+        }
+        case types_js_1.AttributeAction.Not: {
+          return '!'
+        }
+        case types_js_1.AttributeAction.Hyphen: {
+          return '|'
+        }
+        default: {
+          throw new Error("Shouldn't be here")
+        }
+      }
+    }
+    function getNamespacedName (token) {
+      return `${getNamespace(token.namespace)}${escapeName(token.name, charsToEscapeInName)}`
+    }
+    function getNamespace (namespace) {
+      return namespace === null
+        ? ''
+        : `${namespace === '*'
+            ? '*'
+            : escapeName(namespace, charsToEscapeInName)}|`
+    }
+    function escapeName (name, charsToEscape) {
+      let lastIndex = 0
+      let escapedName = ''
+      for (let index = 0; index < name.length; index++) {
+        if (charsToEscape.has(name.charCodeAt(index))) {
+          escapedName += `${name.slice(lastIndex, index)}\\${name.charAt(index)}`
+          lastIndex = index + 1
+        }
+      }
+      return escapedName.length > 0 ? escapedName + name.slice(lastIndex) : name
+    }
+  }, { './types.js': 237 }],
+  237: [function (require, module, exports) {
+    'use strict'
+    Object.defineProperty(exports, '__esModule', { value: true })
+    exports.AttributeAction = exports.IgnoreCaseMode = exports.SelectorType = void 0
+    let SelectorType;
+    (function (SelectorType) {
+      SelectorType.Attribute = 'attribute'
+      SelectorType.Pseudo = 'pseudo'
+      SelectorType.PseudoElement = 'pseudo-element'
+      SelectorType.Tag = 'tag'
+      SelectorType.Universal = 'universal'
+      // Traversals
+      SelectorType.Adjacent = 'adjacent'
+      SelectorType.Child = 'child'
+      SelectorType.Descendant = 'descendant'
+      SelectorType.Parent = 'parent'
+      SelectorType.Sibling = 'sibling'
+      SelectorType.ColumnCombinator = 'column-combinator'
+    })(SelectorType || (exports.SelectorType = SelectorType = {}))
+    /**
+ * Modes for ignore case.
+ *
+ * This could be updated to an enum, and the object is
+ * the current stand-in that will allow code to be updated
+ * without big changes.
+ */
+    exports.IgnoreCaseMode = {
+      Unknown: null,
+      QuirksMode: 'quirks',
+      IgnoreCase: true,
+      CaseSensitive: false
+    }
+    let AttributeAction;
+    (function (AttributeAction) {
+      AttributeAction.Any = 'any'
+      AttributeAction.Element = 'element'
+      AttributeAction.End = 'end'
+      AttributeAction.Equals = 'equals'
+      AttributeAction.Exists = 'exists'
+      AttributeAction.Hyphen = 'hyphen'
+      AttributeAction.Not = 'not'
+      AttributeAction.Start = 'start'
+    })(AttributeAction || (exports.AttributeAction = AttributeAction = {}))
+  }, {}],
+  238: [function (require, module, exports) {
+    'use strict'
+    const __importDefault = (this && this.__importDefault) || function (mod) {
+      return (mod && mod.__esModule) ? mod : { default: mod }
+    }
+    Object.defineProperty(exports, '__esModule', { value: true })
+    exports.generate = exports.compile = void 0
+    const boolbase_1 = __importDefault(require('boolbase'))
+    /**
+ * Returns a function that checks if an elements index matches the given rule
+ * highly optimized to return the fastest solution.
+ *
+ * @param parsed A tuple [a, b], as returned by `parse`.
+ * @returns A highly optimized function that returns whether an index matches the nth-check.
+ * @example
+ *
+ * ```js
+ * const check = nthCheck.compile([2, 3]);
+ *
+ * check(0); // `false`
+ * check(1); // `false`
+ * check(2); // `true`
+ * check(3); // `false`
+ * check(4); // `true`
+ * check(5); // `false`
+ * check(6); // `true`
+ * ```
+ */
+    function compile (parsed) {
+      const a = parsed[0]
+      // Subtract 1 from `b`, to convert from one- to zero-indexed.
+      const b = parsed[1] - 1
+      /*
+     * When `b <= 0`, `a * n` won't be lead to any matches for `a < 0`.
+     * Besides, the specification states that no elements are
+     * matched when `a` and `b` are 0.
+     *
+     * `b < 0` here as we subtracted 1 from `b` above.
+     */
+      if (b < 0 && a <= 0) { return boolbase_1.default.falseFunc }
+      // When `a` is in the range -1..1, it matches any element (so only `b` is checked).
+      if (a === -1) { return function (index) { return index <= b } }
+      if (a === 0) { return function (index) { return index === b } }
+      // When `b <= 0` and `a === 1`, they match any element.
+      if (a === 1) { return b < 0 ? boolbase_1.default.trueFunc : function (index) { return index >= b } }
+      /*
+     * Otherwise, modulo can be used to check if there is a match.
+     *
+     * Modulo doesn't care about the sign, so let's use `a`s absolute value.
+     */
+      const absA = Math.abs(a)
+      // Get `b mod a`, + a if this is negative.
+      const bMod = ((b % absA) + absA) % absA
+      return a > 1
+        ? function (index) { return index >= b && index % absA === bMod }
+        : function (index) { return index <= b && index % absA === bMod }
+    }
+    exports.compile = compile
+    /**
+ * Returns a function that produces a monotonously increasing sequence of indices.
+ *
+ * If the sequence has an end, the returned function will return `null` after
+ * the last index in the sequence.
+ *
+ * @param parsed A tuple [a, b], as returned by `parse`.
+ * @returns A function that produces a sequence of indices.
+ * @example <caption>Always increasing (2n+3)</caption>
+ *
+ * ```js
+ * const gen = nthCheck.generate([2, 3])
+ *
+ * gen() // `1`
+ * gen() // `3`
+ * gen() // `5`
+ * gen() // `8`
+ * gen() // `11`
+ * ```
+ *
+ * @example <caption>With end value (-2n+10)</caption>
+ *
+ * ```js
+ *
+ * const gen = nthCheck.generate([-2, 5]);
+ *
+ * gen() // 0
+ * gen() // 2
+ * gen() // 4
+ * gen() // null
+ * ```
+ */
+    function generate (parsed) {
+      const a = parsed[0]
+      // Subtract 1 from `b`, to convert from one- to zero-indexed.
+      let b = parsed[1] - 1
+      let n = 0
+      // Make sure to always return an increasing sequence
+      if (a < 0) {
+        const aPos_1 = -a
+        // Get `b mod a`
+        const minValue_1 = ((b % aPos_1) + aPos_1) % aPos_1
+        return function () {
+          const val = minValue_1 + aPos_1 * n++
+          return val > b ? null : val
+        }
+      }
+      if (a === 0) {
+        return b < 0
+          ? // There are no result — always return `null`
+          function () { return null }
+          : // Return `b` exactly once
+          function () { return (n++ === 0 ? b : null) }
+      }
+      if (b < 0) {
+        b += a * Math.ceil(-b / a)
+      }
+      return function () { return a * n++ + b }
+    }
+    exports.generate = generate
+  }, { boolbase: 33 }],
+  239: [function (require, module, exports) {
+    'use strict'
+    Object.defineProperty(exports, '__esModule', { value: true })
+    exports.sequence = exports.generate = exports.compile = exports.parse = void 0
+    const parse_js_1 = require('./parse.js')
+    Object.defineProperty(exports, 'parse', { enumerable: true, get: function () { return parse_js_1.parse } })
+    const compile_js_1 = require('./compile.js')
+    Object.defineProperty(exports, 'compile', { enumerable: true, get: function () { return compile_js_1.compile } })
+    Object.defineProperty(exports, 'generate', { enumerable: true, get: function () { return compile_js_1.generate } })
+    /**
+ * Parses and compiles a formula to a highly optimized function.
+ * Combination of {@link parse} and {@link compile}.
+ *
+ * If the formula doesn't match any elements,
+ * it returns [`boolbase`](https://github.com/fb55/boolbase)'s `falseFunc`.
+ * Otherwise, a function accepting an _index_ is returned, which returns
+ * whether or not the passed _index_ matches the formula.
+ *
+ * Note: The nth-rule starts counting at `1`, the returned function at `0`.
+ *
+ * @param formula The formula to compile.
+ * @example
+ * const check = nthCheck("2n+3");
+ *
+ * check(0); // `false`
+ * check(1); // `false`
+ * check(2); // `true`
+ * check(3); // `false`
+ * check(4); // `true`
+ * check(5); // `false`
+ * check(6); // `true`
+ */
+    function nthCheck (formula) {
+      return (0, compile_js_1.compile)((0, parse_js_1.parse)(formula))
+    }
+    exports.default = nthCheck
+    /**
+ * Parses and compiles a formula to a generator that produces a sequence of indices.
+ * Combination of {@link parse} and {@link generate}.
+ *
+ * @param formula The formula to compile.
+ * @returns A function that produces a sequence of indices.
+ * @example <caption>Always increasing</caption>
+ *
+ * ```js
+ * const gen = nthCheck.sequence('2n+3')
+ *
+ * gen() // `1`
+ * gen() // `3`
+ * gen() // `5`
+ * gen() // `8`
+ * gen() // `11`
+ * ```
+ *
+ * @example <caption>With end value</caption>
+ *
+ * ```js
+ *
+ * const gen = nthCheck.sequence('-2n+5');
+ *
+ * gen() // 0
+ * gen() // 2
+ * gen() // 4
+ * gen() // null
+ * ```
+ */
+    function sequence (formula) {
+      return (0, compile_js_1.generate)((0, parse_js_1.parse)(formula))
+    }
+    exports.sequence = sequence
+  }, { './compile.js': 238, './parse.js': 240 }],
+  240: [function (require, module, exports) {
+    'use strict'
+    // Following http://www.w3.org/TR/css3-selectors/#nth-child-pseudo
+    Object.defineProperty(exports, '__esModule', { value: true })
+    exports.parse = void 0
+    // Whitespace as per https://www.w3.org/TR/selectors-3/#lex is " \t\r\n\f"
+    const whitespace = new Set([9, 10, 12, 13, 32])
+    const ZERO = '0'.charCodeAt(0)
+    const NINE = '9'.charCodeAt(0)
+    /**
+ * Parses an expression.
+ *
+ * @throws An `Error` if parsing fails.
+ * @returns An array containing the integer step size and the integer offset of the nth rule.
+ * @example nthCheck.parse("2n+3"); // returns [2, 3]
+ */
+    function parse (formula) {
+      formula = formula.trim().toLowerCase()
+      if (formula === 'even') {
+        return [2, 0]
+      } else if (formula === 'odd') {
+        return [2, 1]
+      }
+      // Parse [ ['-'|'+']? INTEGER? {N} [ S* ['-'|'+'] S* INTEGER ]?
+      let idx = 0
+      let a = 0
+      let sign = readSign()
+      let number = readNumber()
+      if (idx < formula.length && formula.charAt(idx) === 'n') {
+        idx++
+        a = sign * (number !== null && number !== void 0 ? number : 1)
+        skipWhitespace()
+        if (idx < formula.length) {
+          sign = readSign()
+          skipWhitespace()
+          number = readNumber()
+        } else {
+          sign = number = 0
+        }
+      }
+      // Throw if there is anything else
+      if (number === null || idx < formula.length) {
+        throw new Error("n-th rule couldn't be parsed ('".concat(formula, "')"))
+      }
+      return [a, sign * number]
+      function readSign () {
+        if (formula.charAt(idx) === '-') {
+          idx++
+          return -1
+        }
+        if (formula.charAt(idx) === '+') {
+          idx++
+        }
+        return 1
+      }
+      function readNumber () {
+        const start = idx
+        let value = 0
+        while (idx < formula.length &&
+            formula.charCodeAt(idx) >= ZERO &&
+            formula.charCodeAt(idx) <= NINE) {
+          value = value * 10 + (formula.charCodeAt(idx) - ZERO)
+          idx++
+        }
+        // Return `null` if we didn't read anything.
+        return idx === start ? null : value
+      }
+      function skipWhitespace () {
+        while (idx < formula.length &&
+            whitespace.has(formula.charCodeAt(idx))) {
+          idx++
+        }
+      }
+    }
+    exports.parse = parse
+  }, {}],
+  241: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -8783,7 +11544,7 @@
     const callWithParams = (fn, params = [], minimum = 2) => fn(...params.slice(0, fn.length || minimum))
     const _default = exports.default = callWithParams
   }, {}],
-  219: [function (require, module, exports) {
+  242: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -8817,8 +11578,8 @@
       })
     }
     const _default = exports.default = relevancyFilter
-  }, { 'core-js/modules/esnext.iterator.constructor.js': 178, 'core-js/modules/esnext.iterator.filter.js': 180, 'core-js/modules/esnext.iterator.map.js': 183 }],
-  220: [function (require, module, exports) {
+  }, { 'core-js/modules/esnext.iterator.constructor.js': 182, 'core-js/modules/esnext.iterator.filter.js': 184, 'core-js/modules/esnext.iterator.map.js': 187 }],
+  243: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -8850,8 +11611,8 @@
       useClone: true
     })(object)
     const _default = exports.default = cloneObject
-  }, { './mergeObjectsBase': 225 }],
-  221: [function (require, module, exports) {
+  }, { './mergeObjectsBase': 248 }],
+  244: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -8868,8 +11629,8 @@
  */
     const isCloneable = value => typeof value === 'object' && value !== null && !(0, _isInstanceObject.default)(value)
     const _default = exports.default = isCloneable
-  }, { './isInstanceObject': 223 }],
-  222: [function (require, module, exports) {
+  }, { './isInstanceObject': 246 }],
+  245: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -8970,8 +11731,8 @@
  */
     const isEqual = (first, second) => compare(first, second, new WeakMap())
     const _default = exports.default = isEqual
-  }, { 'core-js/modules/es.regexp.flags.js': 177, 'core-js/modules/esnext.iterator.constructor.js': 178, 'core-js/modules/esnext.iterator.every.js': 179, 'core-js/modules/esnext.iterator.some.js': 185, 'core-js/modules/esnext.map.delete-all.js': 186, 'core-js/modules/esnext.map.every.js': 187, 'core-js/modules/esnext.map.filter.js': 188, 'core-js/modules/esnext.map.find-key.js': 189, 'core-js/modules/esnext.map.find.js': 190, 'core-js/modules/esnext.map.includes.js': 191, 'core-js/modules/esnext.map.key-of.js': 192, 'core-js/modules/esnext.map.map-keys.js': 193, 'core-js/modules/esnext.map.map-values.js': 194, 'core-js/modules/esnext.map.merge.js': 195, 'core-js/modules/esnext.map.reduce.js': 196, 'core-js/modules/esnext.map.some.js': 197, 'core-js/modules/esnext.map.update.js': 198, 'core-js/modules/esnext.set.add-all.js': 199, 'core-js/modules/esnext.set.delete-all.js': 200, 'core-js/modules/esnext.set.difference.js': 201, 'core-js/modules/esnext.set.every.js': 202, 'core-js/modules/esnext.set.filter.js': 203, 'core-js/modules/esnext.set.find.js': 204, 'core-js/modules/esnext.set.intersection.js': 205, 'core-js/modules/esnext.set.is-disjoint-from.js': 206, 'core-js/modules/esnext.set.is-subset-of.js': 207, 'core-js/modules/esnext.set.is-superset-of.js': 208, 'core-js/modules/esnext.set.join.js': 209, 'core-js/modules/esnext.set.map.js': 210, 'core-js/modules/esnext.set.reduce.js': 211, 'core-js/modules/esnext.set.some.js': 212, 'core-js/modules/esnext.set.symmetric-difference.js': 213, 'core-js/modules/esnext.set.union.js': 214, 'core-js/modules/esnext.weak-map.delete-all.js': 215, 'core-js/modules/esnext.weak-set.add-all.js': 216, 'core-js/modules/esnext.weak-set.delete-all.js': 217 }],
-  223: [function (require, module, exports) {
+  }, { 'core-js/modules/es.regexp.flags.js': 181, 'core-js/modules/esnext.iterator.constructor.js': 182, 'core-js/modules/esnext.iterator.every.js': 183, 'core-js/modules/esnext.iterator.some.js': 189, 'core-js/modules/esnext.map.delete-all.js': 190, 'core-js/modules/esnext.map.every.js': 191, 'core-js/modules/esnext.map.filter.js': 192, 'core-js/modules/esnext.map.find-key.js': 193, 'core-js/modules/esnext.map.find.js': 194, 'core-js/modules/esnext.map.includes.js': 195, 'core-js/modules/esnext.map.key-of.js': 196, 'core-js/modules/esnext.map.map-keys.js': 197, 'core-js/modules/esnext.map.map-values.js': 198, 'core-js/modules/esnext.map.merge.js': 199, 'core-js/modules/esnext.map.reduce.js': 200, 'core-js/modules/esnext.map.some.js': 201, 'core-js/modules/esnext.map.update.js': 202, 'core-js/modules/esnext.set.add-all.js': 203, 'core-js/modules/esnext.set.delete-all.js': 204, 'core-js/modules/esnext.set.difference.js': 205, 'core-js/modules/esnext.set.every.js': 206, 'core-js/modules/esnext.set.filter.js': 207, 'core-js/modules/esnext.set.find.js': 208, 'core-js/modules/esnext.set.intersection.js': 209, 'core-js/modules/esnext.set.is-disjoint-from.js': 210, 'core-js/modules/esnext.set.is-subset-of.js': 211, 'core-js/modules/esnext.set.is-superset-of.js': 212, 'core-js/modules/esnext.set.join.js': 213, 'core-js/modules/esnext.set.map.js': 214, 'core-js/modules/esnext.set.reduce.js': 215, 'core-js/modules/esnext.set.some.js': 216, 'core-js/modules/esnext.set.symmetric-difference.js': 217, 'core-js/modules/esnext.set.union.js': 218, 'core-js/modules/esnext.weak-map.delete-all.js': 219, 'core-js/modules/esnext.weak-set.add-all.js': 220, 'core-js/modules/esnext.weak-set.delete-all.js': 221 }],
+  246: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -8998,8 +11759,8 @@
       return object.constructor.name !== 'Array' && (0, _objectKeys.default)(object, true).length > (0, _objectKeys.default)(object).length
     }
     const _default = exports.default = isInstanceObject
-  }, { './isObject': 224, './objectKeys': 226, 'core-js/modules/es.array.includes.js': 168 }],
-  224: [function (require, module, exports) {
+  }, { './isObject': 247, './objectKeys': 249, 'core-js/modules/es.array.includes.js': 172 }],
+  247: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -9015,7 +11776,7 @@
     const isObject = object => typeof object === 'object' && object !== null
     const _default = exports.default = isObject
   }, {}],
-  225: [function (require, module, exports) {
+  248: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -9107,8 +11868,8 @@
       }, firstObject || {})
     }
     const _default = exports.default = mergeObjectsBase
-  }, { '../functions/relevancyFilter': 219, './isCloneable': 221, './reduceObject': 227, './setValue': 228, 'core-js/modules/esnext.iterator.constructor.js': 178, 'core-js/modules/esnext.iterator.find.js': 181, 'core-js/modules/esnext.iterator.map.js': 183, 'core-js/modules/esnext.iterator.reduce.js': 184 }],
-  226: [function (require, module, exports) {
+  }, { '../functions/relevancyFilter': 242, './isCloneable': 244, './reduceObject': 250, './setValue': 251, 'core-js/modules/esnext.iterator.constructor.js': 182, 'core-js/modules/esnext.iterator.find.js': 185, 'core-js/modules/esnext.iterator.map.js': 187, 'core-js/modules/esnext.iterator.reduce.js': 188 }],
+  249: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -9148,8 +11909,8 @@
       return keys
     }
     const _default = exports.default = objectKeys
-  }, { './isObject': 224 }],
-  227: [function (require, module, exports) {
+  }, { './isObject': 247 }],
+  250: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -9175,8 +11936,8 @@
  */
     const reduceObject = (obj, fn, initialValue = obj[(0, _objectKeys.default)(obj)[0]] || obj[0]) => Array.isArray(obj) ? obj.reduce(fn, initialValue) : (0, _objectKeys.default)(obj, true).reduce((newObj, curr) => (0, _callWithParams.default)(fn, [newObj, obj[curr], curr, obj], 2), initialValue)
     const _default = exports.default = reduceObject
-  }, { '../functions/callWithParams': 218, './objectKeys': 226, 'core-js/modules/esnext.iterator.constructor.js': 178, 'core-js/modules/esnext.iterator.reduce.js': 184 }],
-  228: [function (require, module, exports) {
+  }, { '../functions/callWithParams': 241, './objectKeys': 249, 'core-js/modules/esnext.iterator.constructor.js': 182, 'core-js/modules/esnext.iterator.reduce.js': 188 }],
+  251: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -9199,4 +11960,4 @@
     }
     const _default = exports.default = setValue
   }, {}]
-}, {}, [12])
+}, {}, [14])

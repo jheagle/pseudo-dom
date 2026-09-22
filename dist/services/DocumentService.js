@@ -19,5 +19,28 @@ class DocumentService extends NodeService_1.NodeService {
   get nodeType () {
     return NodeService_1.NodeService.DOCUMENT_NODE
   }
+
+  /**
+   * The first element, in tree order, whose id matches the given value, or null when there is none.
+   * @param {string} id
+   * @returns {PseudoElement|null}
+   */
+  getElementById (id) {
+    const search = node => {
+      for (const child of Array.from(node.childNodes)) {
+        if (child.nodeType === NodeService_1.NodeService.ELEMENT_NODE) {
+          if (child.id === id) {
+            return child
+          }
+          const found = search(child)
+          if (found) {
+            return found
+          }
+        }
+      }
+      return null
+    }
+    return search(this)
+  }
 }
 exports.DocumentService = DocumentService

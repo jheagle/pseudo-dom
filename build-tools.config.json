@@ -1,6 +1,10 @@
 {
   "browser": {
-    "name": "pseudo-dom"
+    "name": "pseudo-dom",
+    "ignore": [
+      "domutils",
+      "domhandler"
+    ]
   },
   "readme": {
     "from": "dist/**/!(*.min).js"

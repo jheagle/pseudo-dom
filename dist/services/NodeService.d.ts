@@ -6,6 +6,7 @@ import EventTargetService from './EventTargetService';
 import { PseudoElement } from '../interfaces/PseudoElement';
 import { PseudoDocument } from '../interfaces/PseudoDocument';
 import { PseudoDocumentFragment } from '../interfaces/PseudoDocumentFragment';
+import { HTMLCollectionService } from './HTMLCollectionService';
 /**
  * Simulate the behaviour of the Node Class when there is no DOM available.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -139,6 +140,31 @@ export declare class NodeService extends EventTargetService implements PseudoNod
      * @returns {PseudoNode}
      */
     private toChildNode;
+    /**
+     * Every element below this node with the given tag name (or every element when tagName is *), live.
+     * @param {string} tagName
+     * @returns {PseudoHTMLCollection}
+     */
+    getElementsByTagName(tagName: string): HTMLCollectionService;
+    /**
+     * Every element below this node which has all of the given (space separated) classes, live.
+     * @param {string} className
+     * @returns {PseudoHTMLCollection}
+     */
+    getElementsByClassName(className: string): HTMLCollectionService;
+    /**
+     * The first element below this node which matches the CSS selector, in tree order, or null when there is none.
+     * @param {string} selectors A CSS selector
+     * @returns {PseudoElement|null}
+     */
+    querySelector(selectors: string): PseudoElement | null;
+    /**
+     * Every element below this node which matches the CSS selector, in tree order. A plain array (not a live
+     * collection): like the DOM's querySelectorAll, it is a snapshot taken when it is called.
+     * @param {string} selectors A CSS selector
+     * @returns {Array<PseudoElement>}
+     */
+    querySelectorAll(selectors: string): Array<PseudoElement>;
     /**
      * Called each time a node has been inserted as a child of this node, so that nodes which need to react to children
      * (for example elements applying default events) can do so.
