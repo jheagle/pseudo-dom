@@ -35,6 +35,29 @@ describe('innerHTML (getter, serializing)', () => {
     expect(div.outerHTML).toBe('<div title="a &quot;quoted&quot; &amp; tricky"></div>')
   })
 
+  // Real bug found testing against battleship (a downstream consumer): unlike a real DOM, pseudo-dom's setAttribute
+  // does not coerce what it is given to a string - a caller can pass a number, boolean, etc. (setAttribute's own
+  // type says string, but that is not enforced at runtime in plain JS) and it is stored as-is. Serializing it then
+  // crashed with 'x'.replace is not a function instead of just stringifying it.
+  test('does not throw when an attribute value is not actually a string, and stringifies it', () => {
+    const div = el('div')
+    // setAttribute's own type says string, but nothing stops a caller (in plain JS) from passing something else,
+    // and pseudo-dom's setAttribute (unlike a real DOM) does not itself coerce it
+    div.setAttribute('count', 5)
+    div.setAttribute('active', true)
+    expect(() => div.outerHTML).not.toThrow()
+    expect(div.outerHTML).toBe('<div count="5" active="true"></div>')
+  })
+
+  test('does not throw when a text node\'s value is not actually a string', () => {
+    const div = el('div')
+    const text = new TextService('')
+    text.nodeValue = 5
+    div.appendChild(text)
+    expect(() => div.innerHTML).not.toThrow()
+    expect(div.innerHTML).toBe('5')
+  })
+
   test('serializes void elements without a closing tag or children', () => {
     const div = el('div')
     div.appendChild(el('br'))
