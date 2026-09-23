@@ -18,7 +18,7 @@
     "watch:test": "gulp watchTest"
   },
   "dependencies": {
-    "collect-your-stuff": "^2.1.1",
+    "collect-your-stuff": "^2.1.2",
     "core-js": "^3.50.0",
     "css-select": "^6.0.0",
     "si-funciona": "^2.6.1"
