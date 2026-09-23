@@ -59,6 +59,13 @@ reflected properties (`ariaLabel`, `ariaExpanded`, `ariaValueNow`, ...) are real
 matching `aria-*` attribute (`ariaLabel` <-> `aria-label`; the mapping isn't camelCase-to-kebab-case, so
 `ariaColCount` <-> `aria-colcount`, not `aria-col-count`).
 
+`getAttributeNode` / `setAttributeNode` / `removeAttributeNode` give and take real `Attr` nodes (backed by
+`AttrService`) instead of plain strings - `setAttributeNode` returns whatever `Attr` previously held that name (or
+`null` when it's new), and `removeAttributeNode` throws when the element has no attribute matching the one given, like
+the DOM's. Every `*NS` method (`getAttributeNS`, `hasAttributeNS`, `setAttributeNS`, `removeAttributeNS`,
+`getAttributeNodeNS`, `setAttributeNodeNS`) behaves exactly like its non-NS counterpart, ignoring the namespace
+argument entirely - there's no real namespace parsing here, matching `getElementsByTagNameNS`.
+
 **`style`** is a real, live `CSSStyleDeclaration`:
 
 - Named property access (`el.style.backgroundColor = 'red'`) alongside `getPropertyValue` / `setProperty` /
@@ -169,9 +176,6 @@ it) - useful for watching pseudo-dom-driven code run, or checking a final result
 - There are text and comment nodes (`PseudoText`, `PseudoComment`); `textContent` works like the DOM's (the text of
   everything below, and setting it replaces the children with a text node)
 
-## Not implemented yet
-
-- The `Attr`-node / namespaced attribute methods (`getAttributeNode`, `getAttributeNS`, ...)
 ## Modules
 
 <dl>
