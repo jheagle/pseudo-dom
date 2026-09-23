@@ -10,6 +10,9 @@ import { ElementService as PseudoElement } from './services/ElementService';
 import { HTMLElementService as PseudoHTMLElement } from './services/HTMLElementService';
 import PseudoHTMLDocument from './classes/PseudoHTMLDocument';
 import generateDocument from './factories/generateDocument';
+import installGlobal from './factories/installGlobal';
+import logElement from './factories/logElement';
+import { prettyPrint } from './factories/serializeHTML';
 import createEvent from './factories/createEvent';
 import eventDefaults from './factories/eventDefaults';
 import { UIEventService as PseudoUIEvent } from './services/UIEventService';
@@ -29,6 +32,9 @@ import { TextService as PseudoText, CommentService as PseudoComment } from './se
  */
 declare const pseudoDom: {
     generateDocument: (root: Window | any, context?: object) => Window | PseudoEventTarget;
+    installGlobal: (target?: any) => any;
+    logElement: (node: any, label?: string) => void;
+    prettyPrint: (node: any, indent?: string) => string;
     createEvent: (type: string, init?: {
         [option: string]: any;
     }, { browser, trusted }?: import("./factories/createEvent").CreateEventOptions) => PseudoEvent;
@@ -59,5 +65,5 @@ declare const pseudoDom: {
     PseudoHTMLElement: typeof PseudoHTMLElement;
     PseudoHTMLDocument: typeof PseudoHTMLDocument;
 };
-export { generateDocument, createEvent, eventDefaults, simulate, PseudoEvent, PseudoUIEvent, PseudoMouseEvent, PseudoPointerEvent, PseudoKeyboardEvent, PseudoFocusEvent, PseudoInputEvent, PseudoCustomEvent, PseudoEventTarget, PseudoNode, PseudoText, PseudoComment, PseudoElement, PseudoHTMLElement, PseudoHTMLDocument };
+export { generateDocument, installGlobal, logElement, prettyPrint, createEvent, eventDefaults, simulate, PseudoEvent, PseudoUIEvent, PseudoMouseEvent, PseudoPointerEvent, PseudoKeyboardEvent, PseudoFocusEvent, PseudoInputEvent, PseudoCustomEvent, PseudoEventTarget, PseudoNode, PseudoText, PseudoComment, PseudoElement, PseudoHTMLElement, PseudoHTMLDocument };
 export default pseudoDom;

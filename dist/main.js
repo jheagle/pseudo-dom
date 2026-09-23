@@ -15,7 +15,7 @@ const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
 Object.defineProperty(exports, '__esModule', {
   value: true
 })
-exports.PseudoHTMLDocument = exports.PseudoHTMLElement = exports.PseudoElement = exports.PseudoComment = exports.PseudoText = exports.PseudoNode = exports.PseudoEventTarget = exports.PseudoCustomEvent = exports.PseudoInputEvent = exports.PseudoFocusEvent = exports.PseudoKeyboardEvent = exports.PseudoPointerEvent = exports.PseudoMouseEvent = exports.PseudoUIEvent = exports.PseudoEvent = exports.simulate = exports.eventDefaults = exports.createEvent = exports.generateDocument = void 0
+exports.PseudoHTMLDocument = exports.PseudoHTMLElement = exports.PseudoElement = exports.PseudoComment = exports.PseudoText = exports.PseudoNode = exports.PseudoEventTarget = exports.PseudoCustomEvent = exports.PseudoInputEvent = exports.PseudoFocusEvent = exports.PseudoKeyboardEvent = exports.PseudoPointerEvent = exports.PseudoMouseEvent = exports.PseudoUIEvent = exports.PseudoEvent = exports.simulate = exports.eventDefaults = exports.createEvent = exports.prettyPrint = exports.logElement = exports.installGlobal = exports.generateDocument = void 0
 const EventService_1 = require('./services/EventService')
 Object.defineProperty(exports, 'PseudoEvent', {
   enumerable: true,
@@ -50,6 +50,17 @@ const PseudoHTMLDocument_1 = __importDefault(require('./classes/PseudoHTMLDocume
 exports.PseudoHTMLDocument = PseudoHTMLDocument_1.default
 const generateDocument_1 = __importDefault(require('./factories/generateDocument'))
 exports.generateDocument = generateDocument_1.default
+const installGlobal_1 = __importDefault(require('./factories/installGlobal'))
+exports.installGlobal = installGlobal_1.default
+const logElement_1 = __importDefault(require('./factories/logElement'))
+exports.logElement = logElement_1.default
+const serializeHTML_1 = require('./factories/serializeHTML')
+Object.defineProperty(exports, 'prettyPrint', {
+  enumerable: true,
+  get: function () {
+    return serializeHTML_1.prettyPrint
+  }
+})
 const createEvent_1 = __importDefault(require('./factories/createEvent'))
 exports.createEvent = createEvent_1.default
 const eventDefaults_1 = __importDefault(require('./factories/eventDefaults'))
@@ -126,6 +137,9 @@ Object.defineProperty(exports, 'PseudoComment', {
  */
 const pseudoDom = {
   generateDocument: generateDocument_1.default,
+  installGlobal: installGlobal_1.default,
+  logElement: logElement_1.default,
+  prettyPrint: serializeHTML_1.prettyPrint,
   createEvent: createEvent_1.default,
   eventDefaults: eventDefaults_1.default,
   simulate: simulate_1.default,

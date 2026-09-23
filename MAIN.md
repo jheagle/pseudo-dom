@@ -19,6 +19,8 @@ change before 1.0.
 - **Document** - `createElement`, `createTextNode`, and `generateDocument()` to get a `window`-like object with
   `document` already on it
 - **Cloning & comparison** - `cloneNode`, `isEqualNode`, `compareDocumentPosition`, `contains`
+- **Running headlessly** - `installGlobal()` makes code written against real DOM globals (`document.createElement`,
+  ...) run unmodified in Node; `logElement()` prints a readable, indented view of an element to the console
 
 Everything below goes into more detail, section by section.
 
@@ -130,6 +132,26 @@ through a custom adapter) are on `NodeService`, so `Document`, `DocumentFragment
 `DocumentFragmentService` is the plain `DocumentFragment`. `PseudoHTMLDocument` - what `generateDocument()` actually
 creates - only adds the `html` / `head` / `body` structure on top of `DocumentService`. `PseudoNodeList` backs
 `childNodes`.
+
+## Running headlessly
+
+Code written against a real DOM's globals (`document.createElement`, `new Node()`, ...) can run unmodified in Node,
+without an `if (typeof document === 'undefined')` check at every call site:
+
+```js
+if (typeof document === 'undefined') {
+  require('pseudo-dom').installGlobal(globalThis)
+}
+```
+
+`installGlobal(target = globalThis)` fills in `document` / `Node` / `Element` / `HTMLElement` on `target`, using
+[browser-or-node](https://www.npmjs.com/package/browser-or-node) to check whether a real DOM (a real browser, or a
+jsdom-based test environment) is already there first - it's always safe to call, everywhere: it does nothing when
+one is.
+
+There's no real rendering to look at, so `logElement(node, [label])` prints a readable, indented view of a node's
+markup to the console (`prettyPrint(node, [indent])`, from the same module, returns the string instead of printing
+it) - useful for watching pseudo-dom-driven code run, or checking a final result, from a terminal.
 
 ## Cloning, comparison & connection
 

@@ -22,7 +22,7 @@ require('core-js/modules/esnext.set.union.js')
 Object.defineProperty(exports, '__esModule', {
   value: true
 })
-exports.serializeOuter = exports.serializeChildren = void 0
+exports.prettyPrint = exports.serializeOuter = exports.serializeChildren = void 0
 /**
  * @file Serializes pseudo-dom nodes back into an HTML string, for innerHTML / outerHTML.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -112,3 +112,45 @@ exports.serializeChildren = serializeChildren
  */
 const serializeOuter = element => serializeNode(element)
 exports.serializeOuter = serializeOuter
+/**
+ * One node, indented for readability (see prettyPrint) - unlike serializeNode, every non-empty node is its own
+ * line, so the structure of a whole tree is easy to read at a glance.
+ * @param {*} node
+ * @param {number} depth
+ * @param {string} indent
+ * @returns {string}
+ */
+const prettyPrintNode = (node, depth, indent) => {
+  const pad = indent.repeat(depth)
+  if (node.nodeType === NodeService_1.NodeService.TEXT_NODE) {
+    const text = escapeText((node.nodeValue || '').trim())
+    return text ? `${pad}${text}` : ''
+  }
+  if (node.nodeType === NodeService_1.NodeService.COMMENT_NODE) {
+    return `${pad}<!--${node.nodeValue || ''}-->`
+  }
+  if (node.nodeType !== NodeService_1.NodeService.ELEMENT_NODE) {
+    return ''
+  }
+  const tagName = node.tagName
+  const attributes = serializeAttributes(node)
+  if (VOID_ELEMENTS.has(tagName)) {
+    return `${pad}<${tagName}${attributes}>`
+  }
+  const children = Array.from(node.childNodes).map(child => prettyPrintNode(child, depth + 1, indent)).filter(line => line !== '')
+  if (children.length === 0) {
+    return `${pad}<${tagName}${attributes}></${tagName}>`
+  }
+  return `${pad}<${tagName}${attributes}>\n${children.join('\n')}\n${pad}</${tagName}>`
+}
+/**
+ * A node's markup, indented one level per level of nesting - a real DOM's outerHTML / innerHTML has no line breaks
+ * at all, which does not read well for a whole tree (a board full of cells, say). Useful for watching pseudo-dom-
+ * driven code run headlessly, printed to a terminal - see also logElement, which does the printing too.
+ * @memberOf module:factories
+ * @param {*} node
+ * @param {string} [indent='  '] The indentation used per level of nesting
+ * @returns {string}
+ */
+const prettyPrint = (node, indent = '  ') => prettyPrintNode(node, 0, indent)
+exports.prettyPrint = prettyPrint

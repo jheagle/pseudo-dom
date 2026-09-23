@@ -107,4 +107,49 @@ const serializeChildren = (node: any): string => Array.from(node.childNodes).map
  */
 const serializeOuter = (element: any): string => serializeNode(element)
 
-export { serializeChildren, serializeOuter }
+/**
+ * One node, indented for readability (see prettyPrint) - unlike serializeNode, every non-empty node is its own
+ * line, so the structure of a whole tree is easy to read at a glance.
+ * @param {*} node
+ * @param {number} depth
+ * @param {string} indent
+ * @returns {string}
+ */
+const prettyPrintNode = (node: any, depth: number, indent: string): string => {
+  const pad: string = indent.repeat(depth)
+  if (node.nodeType === NodeService.TEXT_NODE) {
+    const text: string = escapeText((node.nodeValue || '').trim())
+    return text ? `${pad}${text}` : ''
+  }
+  if (node.nodeType === NodeService.COMMENT_NODE) {
+    return `${pad}<!--${node.nodeValue || ''}-->`
+  }
+  if (node.nodeType !== NodeService.ELEMENT_NODE) {
+    return ''
+  }
+  const tagName: string = node.tagName
+  const attributes: string = serializeAttributes(node)
+  if (VOID_ELEMENTS.has(tagName)) {
+    return `${pad}<${tagName}${attributes}>`
+  }
+  const children: Array<string> = Array.from(node.childNodes)
+    .map((child: any): string => prettyPrintNode(child, depth + 1, indent))
+    .filter((line: string): boolean => line !== '')
+  if (children.length === 0) {
+    return `${pad}<${tagName}${attributes}></${tagName}>`
+  }
+  return `${pad}<${tagName}${attributes}>\n${children.join('\n')}\n${pad}</${tagName}>`
+}
+
+/**
+ * A node's markup, indented one level per level of nesting - a real DOM's outerHTML / innerHTML has no line breaks
+ * at all, which does not read well for a whole tree (a board full of cells, say). Useful for watching pseudo-dom-
+ * driven code run headlessly, printed to a terminal - see also logElement, which does the printing too.
+ * @memberOf module:factories
+ * @param {*} node
+ * @param {string} [indent='  '] The indentation used per level of nesting
+ * @returns {string}
+ */
+const prettyPrint = (node: any, indent: string = '  '): string => prettyPrintNode(node, 0, indent)
+
+export { serializeChildren, serializeOuter, prettyPrint }

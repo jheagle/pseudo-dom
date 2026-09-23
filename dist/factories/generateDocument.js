@@ -60,6 +60,11 @@ const generateDocument = (root, context = {}) => {
   if (typeof newWindow.document === 'undefined') {
     newWindow.document = document
   }
-  return context ? Object.assign(context, newWindow) : Object.assign(root, newWindow)
+  // When there was no real document, newWindow is root itself (see above), so every assignment above already
+  // mutated it directly. If context is also that same object (root and context given as one and the same, as
+  // installGlobal does) merging is already done - doing it again would be Object.assign(target, target), which
+  // throws on any getter-only own property target already has (globalThis.crypto, in Node).
+  const mergeInto = context || root
+  return newWindow === mergeInto ? newWindow : Object.assign(mergeInto, newWindow)
 }
 exports.default = generateDocument

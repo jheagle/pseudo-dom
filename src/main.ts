@@ -11,6 +11,9 @@ import { ElementService as PseudoElement } from './services/ElementService'
 import { HTMLElementService as PseudoHTMLElement } from './services/HTMLElementService'
 import PseudoHTMLDocument from './classes/PseudoHTMLDocument'
 import generateDocument from './factories/generateDocument'
+import installGlobal from './factories/installGlobal'
+import logElement from './factories/logElement'
+import { prettyPrint } from './factories/serializeHTML'
 import createEvent from './factories/createEvent'
 import eventDefaults from './factories/eventDefaults'
 import { UIEventService as PseudoUIEvent } from './services/UIEventService'
@@ -31,6 +34,9 @@ import { TextService as PseudoText, CommentService as PseudoComment } from './se
  */
 const pseudoDom = {
   generateDocument,
+  installGlobal,
+  logElement,
+  prettyPrint,
   createEvent,
   eventDefaults,
   simulate,
@@ -53,6 +59,9 @@ const pseudoDom = {
 
 export {
   generateDocument,
+  installGlobal,
+  logElement,
+  prettyPrint,
   createEvent,
   eventDefaults,
   simulate,
