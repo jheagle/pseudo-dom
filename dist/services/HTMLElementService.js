@@ -16,6 +16,7 @@ const createEvent_1 = __importDefault(require('../factories/createEvent'))
 const activeElement_1 = require('../functions/activeElement')
 const createStyleDeclaration_1 = __importDefault(require('../factories/createStyleDeclaration'))
 const createDataset_1 = __importDefault(require('../factories/createDataset'))
+const parseHTML_1 = __importDefault(require('../factories/parseHTML'))
 /**
  * Simulate the behaviour of the HTMLElement Class when there is no DOM available.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -111,6 +112,72 @@ class HTMLElementService extends ElementService_1.ElementService {
    */
   equalsShallow (other) {
     return super.equalsShallow(other) && this.style.cssText === other.style.cssText
+  }
+
+  /**
+   * Parses html with this class building each new element (matches HTML: parsed elements behave like plain
+   * HTMLElements, not whatever specialized class happens to be setting innerHTML / outerHTML).
+   * @param {string} html
+   * @returns {Array<*>}
+   */
+  parse (html) {
+    return (0, parseHTML_1.default)(html, this.ownerDocument, HTMLElementService)
+  }
+
+  /**
+   * Replace this element's children by parsing html. innerHTML's setter is here rather than on ElementService (which
+   * only has the getter) because building the new elements needs a concrete element class - see parse().
+   * @param {string} html
+   * @returns {undefined}
+   */
+  set innerHTML (html) {
+    this.replaceChildren(...this.parse(html))
+  }
+
+  get innerHTML () {
+    return super.innerHTML
+  }
+
+  /**
+   * Replace this element itself, in its parent, by parsing html. Does nothing when it has no parent, like
+   * replaceWith. outerHTML's setter is here rather than on ElementService for the same reason as innerHTML's.
+   * @param {string} html
+   * @returns {undefined}
+   */
+  set outerHTML (html) {
+    this.replaceWith(...this.parse(html))
+  }
+
+  get outerHTML () {
+    return super.outerHTML
+  }
+
+  /**
+   * Parse html and insert the resulting nodes at the given position, like insertAdjacentElement /
+   * insertAdjacentText.
+   * @param {string} position beforebegin, afterbegin, beforeend or afterend
+   * @param {string} html The markup to parse
+   * @returns {undefined}
+   * @throws {Error} When the position is not one of the four above
+   */
+  insertAdjacentHTML (position, html) {
+    const nodes = this.parse(html)
+    switch (position) {
+      case 'beforebegin':
+        this.before(...nodes)
+        return
+      case 'afterbegin':
+        this.prepend(...nodes)
+        return
+      case 'beforeend':
+        this.append(...nodes)
+        return
+      case 'afterend':
+        this.after(...nodes)
+        return
+      default:
+        throw new Error(`insertAdjacentHTML: "${position}" is not one of beforebegin, afterbegin, beforeend, afterend.`)
+    }
   }
 
   /**

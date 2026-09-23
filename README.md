@@ -49,8 +49,15 @@ Elements can be walked and changed like the DOM: \`children\` is a live \`HTMLCo
 children, \`childElementCount\`, \`firstElementChild\` / \`lastElementChild\` and \`nextElementSibling\` /
 \`previousElementSibling\` skip text and comment nodes. \`append\` / \`prepend\` / \`before\` / \`after\` / \`remove\` /
 \`replaceWith\` / \`replaceChildren\` accept nodes or strings (a string becomes a text node) and move a node already in
-a tree rather than duplicating it; \`insertAdjacentElement\` / \`insertAdjacentText\` insert at beforebegin / afterbegin
-/ beforeend / afterend (\`insertAdjacentHTML\` is not implemented, no HTML parsing yet).
+a tree rather than duplicating it; \`insertAdjacentElement\` / \`insertAdjacentText\` / \`insertAdjacentHTML\` insert at
+beforebegin / afterbegin / beforeend / afterend.
+
+\`innerHTML\` / \`outerHTML\` parse and serialize real HTML, via [htmlparser2](https://www.npmjs.com/package/htmlparser2)
+(a SAX-style tokenizer; pseudo-dom builds its own nodes from its events, the same way it builds a tree from
+\`css-select\`'s selector matches) - entities decode, void elements (\`br\`, \`img\`, ...) auto-close, and \`class\` /
+\`style\` attributes populate \`className\`/\`classList\` and \`style\` for real, not just a generic attribute. The
+setters (\`innerHTML =\`, \`outerHTML =\`) and \`insertAdjacentHTML\` are on \`HTMLElementService\` (they need to build
+real \`HTMLElement\`s); \`ElementService\` only has the getters (serializing is fine without them).
 
 Selector queries work like the DOM's: \`getElementsByTagName\` / \`getElementsByClassName\` (live, on any node) and
 \`querySelector\` / \`querySelectorAll\` (real CSS selectors, via [css-select](https://www.npmjs.com/package/css-select)
@@ -84,9 +91,9 @@ for real; \`scrollIntoView\` is a real callable no-op (there is no viewport to s
 \`requestFullscreen\` / \`requestPointerLock\` resolve, like a browser granting the request would.
 \`computedStyleMap()\` is a thin read-only view of the element's own inline style (there is no CSS cascade).
 
-Not implemented yet (these throw a "not implemented" error or are missing): \`innerHTML\` / \`outerHTML\` parsing, the
-\`aria*\` reflected properties, and the \`Attr\`-node / namespaced attribute methods (\`getAttributeNode\`,
-\`getAttributeNS\`, ...). The API will change before 1.0.
+Not implemented yet (these throw a "not implemented" error or are missing): the \`aria*\` reflected properties, and
+the \`Attr\`-node / namespaced attribute methods (\`getAttributeNode\`, \`getAttributeNS\`, ...). The API will change
+before 1.0.
 ## Modules
 
 <dl>
@@ -234,6 +241,19 @@ order in which an event travels down through them). A node which has no parent h
 </dd>
 <dt><a href="#setActiveElement">setActiveElement(root, element)</a></dt>
 <dd><p>Remember the element which has the focus in a tree.</p>
+</dd>
+<dt><a href="#escapeText">escapeText(text)</a> ⇒ <code>string</code></dt>
+<dd><p>Escape text so it is safe inside HTML text content.</p>
+</dd>
+<dt><a href="#escapeAttributeValue">escapeAttributeValue(value)</a> ⇒ <code>string</code></dt>
+<dd><p>Escape a value so it is safe inside a double-quoted HTML attribute.</p>
+</dd>
+<dt><a href="#serializeAttributes">serializeAttributes(element)</a> ⇒ <code>string</code></dt>
+<dd><p>Every attribute of the element, serialized (class instead of className, boolean attributes bare, the never-real
+mock properties left out, style added from the live CSSStyleDeclaration when it is not empty).</p>
+</dd>
+<dt><a href="#serializeNode">serializeNode(node)</a> ⇒ <code>string</code></dt>
+<dd><p>One node, serialized (its own markup only - see serializeChildren for its descendants too).</p>
 </dd>
 <dt><a href="#generateNodeList">generateNodeList([innerList])</a> ⇒ <code><a href="#PseudoNodeList">PseudoNodeList</a></code></dt>
 <dd><p>Create a PseudoNodeList, optionally starting from an existing chain of linkers.</p>
@@ -2327,9 +2347,13 @@ Simulate the behaviour of the HTMLElement Class when there is no DOM available.
     * [new HTMLElementService([elementOptions])](#new_HTMLElementService_new)
     * [.style](#HTMLElementService+style) ⇒ [<code>CSSStyleDeclarationService</code>](#CSSStyleDeclarationService)
     * [.dataset](#HTMLElementService+dataset) ⇒ <code>Object.&lt;string, string&gt;</code>
+    * [.innerHTML](#HTMLElementService+innerHTML) ⇒ <code>undefined</code>
+    * [.outerHTML](#HTMLElementService+outerHTML) ⇒ <code>undefined</code>
     * [.canFocus](#HTMLElementService+canFocus) ⇒ <code>boolean</code>
     * [.cloneShallow()](#HTMLElementService+cloneShallow) ⇒ [<code>NodeService</code>](#NodeService)
     * [.equalsShallow(other)](#HTMLElementService+equalsShallow) ⇒ <code>boolean</code>
+    * [.parse(html)](#HTMLElementService+parse) ⇒ <code>Array.&lt;\*&gt;</code>
+    * [.insertAdjacentHTML(position, html)](#HTMLElementService+insertAdjacentHTML) ⇒ <code>undefined</code>
     * [.click()](#HTMLElementService+click)
     * [.focus()](#HTMLElementService+focus)
     * [.blur()](#HTMLElementService+blur)
@@ -2361,6 +2385,30 @@ The element's data-* attributes, live, under their camelCase names (data-foo-bar
 directly by getAttribute / setAttribute, so it is never out of sync with the attributes themselves.
 
 **Kind**: instance property of [<code>HTMLElementService</code>](#HTMLElementService)  
+<a name="HTMLElementService+innerHTML"></a>
+
+### htmlElementService.innerHTML ⇒ <code>undefined</code>
+Replace this element's children by parsing html. innerHTML's setter is here rather than on ElementService (which
+only has the getter) because building the new elements needs a concrete element class - see parse().
+
+**Kind**: instance property of [<code>HTMLElementService</code>](#HTMLElementService)  
+
+| Param | Type |
+| --- | --- |
+| html | <code>string</code> | 
+
+<a name="HTMLElementService+outerHTML"></a>
+
+### htmlElementService.outerHTML ⇒ <code>undefined</code>
+Replace this element itself, in its parent, by parsing html. Does nothing when it has no parent, like
+replaceWith. outerHTML's setter is here rather than on ElementService for the same reason as innerHTML's.
+
+**Kind**: instance property of [<code>HTMLElementService</code>](#HTMLElementService)  
+
+| Param | Type |
+| --- | --- |
+| html | <code>string</code> | 
+
 <a name="HTMLElementService+canFocus"></a>
 
 ### htmlElementService.canFocus ⇒ <code>boolean</code>
@@ -2383,6 +2431,35 @@ Style is not attribute-backed like most properties, so isEqualNode needs to comp
 | Param | Type | Description |
 | --- | --- | --- |
 | other | [<code>NodeService</code>](#NodeService) | The node to compare with |
+
+<a name="HTMLElementService+parse"></a>
+
+### htmlElementService.parse(html) ⇒ <code>Array.&lt;\*&gt;</code>
+Parses html with this class building each new element (matches HTML: parsed elements behave like plain
+HTMLElements, not whatever specialized class happens to be setting innerHTML / outerHTML).
+
+**Kind**: instance method of [<code>HTMLElementService</code>](#HTMLElementService)  
+
+| Param | Type |
+| --- | --- |
+| html | <code>string</code> | 
+
+<a name="HTMLElementService+insertAdjacentHTML"></a>
+
+### htmlElementService.insertAdjacentHTML(position, html) ⇒ <code>undefined</code>
+Parse html and insert the resulting nodes at the given position, like insertAdjacentElement /
+insertAdjacentText.
+
+**Kind**: instance method of [<code>HTMLElementService</code>](#HTMLElementService)  
+**Throws**:
+
+- <code>Error</code> When the position is not one of the four above
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| position | <code>string</code> | beforebegin, afterbegin, beforeend or afterend |
+| html | <code>string</code> | The markup to parse |
 
 <a name="HTMLElementService+click"></a>
 
@@ -2773,6 +2850,8 @@ Simulate the behaviour of the Element Class when there is no DOM available.
     * [.isVisible](#ElementService+isVisible)
     * [.localName](#ElementService+localName) ⇒ <code>string</code>
     * [.prefix](#ElementService+prefix) ⇒ <code>string</code> \| <code>null</code>
+    * [.innerHTML](#ElementService+innerHTML) ⇒ <code>string</code>
+    * [.outerHTML](#ElementService+outerHTML) ⇒ <code>string</code>
     * [.children](#ElementService+children) ⇒ <code>PseudoHTMLCollection</code>
     * [.childElementCount](#ElementService+childElementCount) ⇒ <code>number</code>
     * [.firstElementChild](#ElementService+firstElementChild) ⇒ <code>PseudoElement</code> \| <code>null</code>
@@ -2861,6 +2940,19 @@ same as tagName.
 ### elementService.prefix ⇒ <code>string</code> \| <code>null</code>
 The element's namespace prefix, or null when it has none. There is no real namespace parsing here, so this is
 always null.
+
+**Kind**: instance property of [<code>ElementService</code>](#ElementService)  
+<a name="ElementService+innerHTML"></a>
+
+### elementService.innerHTML ⇒ <code>string</code>
+The HTML markup of this element's children. Only the getter is here (the setter, which needs to build new
+elements from parsed HTML, is on HTMLElementService - see its class comment).
+
+**Kind**: instance property of [<code>ElementService</code>](#ElementService)  
+<a name="ElementService+outerHTML"></a>
+
+### elementService.outerHTML ⇒ <code>string</code>
+The HTML markup of this element itself, including its children. Only the getter is here (see innerHTML).
 
 **Kind**: instance property of [<code>ElementService</code>](#ElementService)  
 <a name="ElementService+children"></a>
@@ -5309,6 +5401,51 @@ Remember the element which has the focus in a tree.
 | --- | --- | --- |
 | root | <code>Object</code> | The root node of the tree |
 | element | <code>Object</code> \| <code>null</code> | The element which now has the focus, or null when nothing has it |
+
+<a name="escapeText"></a>
+
+## escapeText(text) ⇒ <code>string</code>
+Escape text so it is safe inside HTML text content.
+
+**Kind**: global function  
+
+| Param | Type |
+| --- | --- |
+| text | <code>string</code> | 
+
+<a name="escapeAttributeValue"></a>
+
+## escapeAttributeValue(value) ⇒ <code>string</code>
+Escape a value so it is safe inside a double-quoted HTML attribute.
+
+**Kind**: global function  
+
+| Param | Type |
+| --- | --- |
+| value | <code>string</code> | 
+
+<a name="serializeAttributes"></a>
+
+## serializeAttributes(element) ⇒ <code>string</code>
+Every attribute of the element, serialized (class instead of className, boolean attributes bare, the never-real
+mock properties left out, style added from the live CSSStyleDeclaration when it is not empty).
+
+**Kind**: global function  
+
+| Param | Type |
+| --- | --- |
+| element | <code>\*</code> | 
+
+<a name="serializeNode"></a>
+
+## serializeNode(node) ⇒ <code>string</code>
+One node, serialized (its own markup only - see serializeChildren for its descendants too).
+
+**Kind**: global function  
+
+| Param | Type |
+| --- | --- |
+| node | <code>\*</code> | 
 
 <a name="generateNodeList"></a>
 

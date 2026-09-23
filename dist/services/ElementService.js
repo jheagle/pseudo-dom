@@ -44,6 +44,7 @@ const cloneObject_1 = __importDefault(require('si-funciona/dist/helpers/objects/
 const isEqual_1 = __importDefault(require('si-funciona/dist/helpers/objects/isEqual'))
 const query_1 = require('../factories/query')
 const ShadowRootService_1 = require('./ShadowRootService')
+const serializeHTML_1 = require('../factories/serializeHTML')
 const zeroRect = () => ({
   x: 0,
   y: 0,
@@ -103,9 +104,6 @@ class ElementService extends NodeService_1.NodeService {
       value: ''
     }, {
       name: 'id',
-      value: ''
-    }, {
-      name: 'innerHTML',
       value: ''
     },
     // Layout is not really computed (there is no rendering engine here): these start at 0, like an unrendered
@@ -239,6 +237,23 @@ class ElementService extends NodeService_1.NodeService {
    */
   get prefix () {
     return null
+  }
+
+  /**
+   * The HTML markup of this element's children. Only the getter is here (the setter, which needs to build new
+   * elements from parsed HTML, is on HTMLElementService - see its class comment).
+   * @returns {string}
+   */
+  get innerHTML () {
+    return (0, serializeHTML_1.serializeChildren)(this)
+  }
+
+  /**
+   * The HTML markup of this element itself, including its children. Only the getter is here (see innerHTML).
+   * @returns {string}
+   */
+  get outerHTML () {
+    return (0, serializeHTML_1.serializeOuter)(this)
   }
 
   get nodeType () {

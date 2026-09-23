@@ -21,6 +21,7 @@ import isEqual from 'si-funciona/dist/helpers/objects/isEqual'
 import { matches, closest } from '../factories/query'
 import { ShadowRootService } from './ShadowRootService'
 import { PseudoShadowRoot } from '../interfaces/PseudoShadowRoot'
+import { serializeChildren, serializeOuter } from '../factories/serializeHTML'
 
 type attribute = { name: string, value: any }
 type DOMRect = { x: number, y: number, width: number, height: number, top: number, right: number, bottom: number, left: number }
@@ -43,7 +44,6 @@ const zeroRect = (): DOMRect => ({ x: 0, y: 0, width: 0, height: 0, top: 0, righ
  */
 export class ElementService extends NodeService implements Partial<PseudoElement> {
   public id: string
-  public innerHTML: string
   public type: string
   public clientHeight: number
   public clientLeft: number
@@ -89,7 +89,6 @@ export class ElementService extends NodeService implements Partial<PseudoElement
     this.attributeList = attributes.concat([
       { name: 'className', value: '' },
       { name: 'id', value: '' },
-      { name: 'innerHTML', value: '' },
       // Layout is not really computed (there is no rendering engine here): these start at 0, like an unrendered
       // element's would, but can be set directly to whatever a test needs code under test to see.
       { name: 'clientHeight', value: 0 },
@@ -188,6 +187,23 @@ export class ElementService extends NodeService implements Partial<PseudoElement
    */
   get prefix (): string | null {
     return null
+  }
+
+  /**
+   * The HTML markup of this element's children. Only the getter is here (the setter, which needs to build new
+   * elements from parsed HTML, is on HTMLElementService - see its class comment).
+   * @returns {string}
+   */
+  get innerHTML (): string {
+    return serializeChildren(this)
+  }
+
+  /**
+   * The HTML markup of this element itself, including its children. Only the getter is here (see innerHTML).
+   * @returns {string}
+   */
+  get outerHTML (): string {
+    return serializeOuter(this)
   }
 
   get nodeType (): number {

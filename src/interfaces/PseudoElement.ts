@@ -739,10 +739,10 @@ export interface PseudoElement extends PseudoNode {
   insertAdjacentElement (position: string, element: PseudoElement): PseudoElement | null
 
   /**
-   * Parses the text as HTML or XML and inserts the resulting nodes into the tree in the position given. Not implemented
-   * yet (HTML parsing is out of scope for now).
+   * Parses the text as HTML and inserts the resulting nodes into the tree in the position given.
    * @param {string} position beforebegin, afterbegin, beforeend or afterend
    * @param {string} text The markup to parse
+   * @throws {Error} When the position is not one of the four above
    */
   insertAdjacentHTML (position: string, text: string): void
 

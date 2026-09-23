@@ -41,7 +41,6 @@ type DOMRect = {
  */
 export declare class ElementService extends NodeService implements Partial<PseudoElement> {
     id: string;
-    innerHTML: string;
     type: string;
     clientHeight: number;
     clientLeft: number;
@@ -113,6 +112,17 @@ export declare class ElementService extends NodeService implements Partial<Pseud
      * @returns {string|null}
      */
     get prefix(): string | null;
+    /**
+     * The HTML markup of this element's children. Only the getter is here (the setter, which needs to build new
+     * elements from parsed HTML, is on HTMLElementService - see its class comment).
+     * @returns {string}
+     */
+    get innerHTML(): string;
+    /**
+     * The HTML markup of this element itself, including its children. Only the getter is here (see innerHTML).
+     * @returns {string}
+     */
+    get outerHTML(): string;
     get nodeType(): number;
     get attributes(): PseudoNamedNodeMap;
     get classList(): PseudoDOMTokenList;
