@@ -6,6 +6,22 @@ require('core-js/modules/esnext.iterator.find.js')
 require('core-js/modules/esnext.iterator.for-each.js')
 require('core-js/modules/esnext.iterator.map.js')
 require('core-js/modules/esnext.iterator.some.js')
+require('core-js/modules/esnext.set.add-all.js')
+require('core-js/modules/esnext.set.delete-all.js')
+require('core-js/modules/esnext.set.difference.js')
+require('core-js/modules/esnext.set.every.js')
+require('core-js/modules/esnext.set.filter.js')
+require('core-js/modules/esnext.set.find.js')
+require('core-js/modules/esnext.set.intersection.js')
+require('core-js/modules/esnext.set.is-disjoint-from.js')
+require('core-js/modules/esnext.set.is-subset-of.js')
+require('core-js/modules/esnext.set.is-superset-of.js')
+require('core-js/modules/esnext.set.join.js')
+require('core-js/modules/esnext.set.map.js')
+require('core-js/modules/esnext.set.reduce.js')
+require('core-js/modules/esnext.set.some.js')
+require('core-js/modules/esnext.set.symmetric-difference.js')
+require('core-js/modules/esnext.set.union.js')
 const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
   return mod && mod.__esModule
     ? mod
@@ -27,6 +43,17 @@ const HTMLCollectionService_1 = require('./HTMLCollectionService')
 const cloneObject_1 = __importDefault(require('si-funciona/dist/helpers/objects/cloneObject'))
 const isEqual_1 = __importDefault(require('si-funciona/dist/helpers/objects/isEqual'))
 const query_1 = require('../factories/query')
+const ShadowRootService_1 = require('./ShadowRootService')
+const zeroRect = () => ({
+  x: 0,
+  y: 0,
+  width: 0,
+  height: 0,
+  top: 0,
+  right: 0,
+  bottom: 0,
+  left: 0
+})
 /**
  * Simulate the behaviour of the Element Class when there is no DOM available.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -58,6 +85,16 @@ class ElementService extends NodeService_1.NodeService {
     children = []
   } = {}) {
     super()
+    /** What getBoundingClientRect() returns - not really computed (there is no layout engine), set this directly. */
+    this.boundingClientRect = zeroRect()
+    /** What getClientRects() returns - set this directly. */
+    this.clientRects = []
+    /** What getAnimations() returns - set this directly. */
+    this.animations = []
+    /** What checkVisibility() returns - set this directly. */
+    this.isVisible = true
+    this.capturedPointers = new Set()
+    this.shadowRootInstance = null
     this.defaultEventApplied = false
     this.tokenList = new DOMTokenListService_1.DOMTokenListService()
     this.tag = tagName
@@ -70,6 +107,33 @@ class ElementService extends NodeService_1.NodeService {
     }, {
       name: 'innerHTML',
       value: ''
+    },
+    // Layout is not really computed (there is no rendering engine here): these start at 0, like an unrendered
+    // element's would, but can be set directly to whatever a test needs code under test to see.
+    {
+      name: 'clientHeight',
+      value: 0
+    }, {
+      name: 'clientLeft',
+      value: 0
+    }, {
+      name: 'clientTop',
+      value: 0
+    }, {
+      name: 'clientWidth',
+      value: 0
+    }, {
+      name: 'scrollHeight',
+      value: 0
+    }, {
+      name: 'scrollLeft',
+      value: 0
+    }, {
+      name: 'scrollTop',
+      value: 0
+    }, {
+      name: 'scrollWidth',
+      value: 0
     }])
     this.propertyAttributes = this.attributeList.map(({
       name
@@ -157,6 +221,24 @@ class ElementService extends NodeService_1.NodeService {
 
   get tagName () {
     return this.tag
+  }
+
+  /**
+   * The local part of the element's qualified name. There is no real namespace parsing here, so this is always the
+   * same as tagName.
+   * @returns {string}
+   */
+  get localName () {
+    return this.tag
+  }
+
+  /**
+   * The element's namespace prefix, or null when it has none. There is no real namespace parsing here, so this is
+   * always null.
+   * @returns {string|null}
+   */
+  get prefix () {
+    return null
   }
 
   get nodeType () {
@@ -421,6 +503,215 @@ class ElementService extends NodeService_1.NodeService {
     if (index >= 0) {
       this.attributeList.splice(index, 1)
     }
+  }
+
+  /**
+   * The name of every attribute on the element, in the order they were set.
+   * @returns {Array<string>}
+   */
+  getAttributeNames () {
+    return this.currentAttributes().map(({
+      name
+    }) => name)
+  }
+
+  /**
+   * Whether the element has any attributes at all.
+   * @returns {boolean}
+   */
+  hasAttributes () {
+    return this.attributeList.length > 0
+  }
+
+  /**
+   * Add the attribute (with an empty value) when it is not present, or remove it when it is - unless force says
+   * which of those to do instead. Returns whether the attribute is present after the call.
+   * @param {string} attributeName
+   * @param {boolean} [force]
+   * @returns {boolean}
+   */
+  toggleAttribute (attributeName, force) {
+    const present = this.hasAttribute(attributeName)
+    const shouldHave = typeof force === 'boolean' ? force : !present
+    if (shouldHave && !present) {
+      this.setAttribute(attributeName, '')
+    } else if (!shouldHave && present) {
+      this.removeAttribute(attributeName)
+    }
+    return shouldHave
+  }
+
+  /**
+   * The size of the element and its position, settable directly - there is no layout engine here to compute it.
+   * @returns {DOMRect}
+   */
+  getBoundingClientRect () {
+    return this.boundingClientRect
+  }
+
+  /**
+   * The bounding rectangles for each line of text in the element, settable directly - there is no layout engine
+   * here to compute it.
+   * @returns {Array<DOMRect>}
+   */
+  getClientRects () {
+    return this.clientRects
+  }
+
+  /**
+   * The Animation objects currently active on the element, settable directly - there is no animation engine here.
+   * @returns {Array<*>}
+   */
+  getAnimations () {
+    return this.animations
+  }
+
+  /**
+   * Whether the element is expected to be visible, settable directly - there is no rendering here to check it.
+   * @returns {boolean}
+   */
+  checkVisibility () {
+    return this.isVisible
+  }
+
+  /**
+   * A read-only view of the element's own inline style declarations (there is no CSS cascade here, so this is not a
+   * real computed style - just what the element's own style object holds).
+   * @returns {{get: function(string): (string|undefined)}}
+   */
+  computedStyleMap () {
+    const style = this.style
+    return {
+      get: property => {
+        const value = style ? style.getPropertyValue(property) : ''
+        return value === '' ? undefined : value
+      }
+    }
+  }
+
+  /**
+   * Whether this element currently has capture of the given pointer.
+   * @param {number} pointerId
+   * @returns {boolean}
+   */
+  hasPointerCapture (pointerId) {
+    return this.capturedPointers.has(pointerId)
+  }
+
+  /**
+   * Give this element capture of the given pointer.
+   * @param {number} pointerId
+   * @returns {undefined}
+   */
+  setPointerCapture (pointerId) {
+    this.capturedPointers.add(pointerId)
+  }
+
+  /**
+   * Release this element's capture of the given pointer, if it had it.
+   * @param {number} pointerId
+   * @returns {undefined}
+   */
+  releasePointerCapture (pointerId) {
+    this.capturedPointers.delete(pointerId)
+  }
+
+  /**
+   * Scroll to the given position (or, given an options object, the position(s) it has). There is no real scrollable
+   * viewport here: this just sets scrollLeft / scrollTop.
+   * @param {number|{left: number, top: number}} [x=0]
+   * @param {number} [y=0]
+   * @returns {undefined}
+   */
+  scroll (x = 0, y = 0) {
+    if (typeof x === 'number') {
+      this.scrollLeft = x
+      this.scrollTop = y
+      return
+    }
+    if (typeof x.left === 'number') {
+      this.scrollLeft = x.left
+    }
+    if (typeof x.top === 'number') {
+      this.scrollTop = x.top
+    }
+  }
+
+  /**
+   * Scroll to the given position. An alias for scroll.
+   * @param {number|{left: number, top: number}} [x=0]
+   * @param {number} [y=0]
+   * @returns {undefined}
+   */
+  scrollTo (x = 0, y = 0) {
+    this.scroll(x, y)
+  }
+
+  /**
+   * Scroll by the given amount, relative to the current position.
+   * @param {number|{left: number, top: number}} [x=0]
+   * @param {number} [y=0]
+   * @returns {undefined}
+   */
+  scrollBy (x = 0, y = 0) {
+    if (typeof x === 'number') {
+      this.scroll(this.scrollLeft + x, this.scrollTop + y)
+      return
+    }
+    this.scroll({
+      left: this.scrollLeft + (x.left || 0),
+      top: this.scrollTop + (x.top || 0)
+    })
+  }
+
+  /**
+   * Scroll an ancestor until this element is in view. There is no real viewport here for that to mean anything, so
+   * this does nothing (override it on an instance in a test which needs to observe the call).
+   * @returns {undefined}
+   */
+  scrollIntoView () {}
+  /**
+   * Asynchronously ask for the element to be shown fullscreen. There is no real fullscreen here, so this just
+   * resolves, like a browser granting the request would.
+   * @returns {Promise<void>}
+   */
+  requestFullscreen () {
+    return Promise.resolve()
+  }
+
+  /**
+   * Asynchronously ask for the pointer to be locked to this element. There is no real pointer lock here, so this
+   * just resolves, like a browser granting the request would.
+   * @returns {Promise<void>}
+   */
+  requestPointerLock () {
+    return Promise.resolve()
+  }
+
+  /**
+   * Attach a shadow tree to this element and return its ShadowRoot. Throws when it already hosts one.
+   * @param {{mode: string}} options
+   * @returns {PseudoShadowRoot}
+   * @throws {Error}
+   */
+  attachShadow (options) {
+    if (this.shadowRootInstance) {
+      throw new Error('Shadow root cannot be created on a host which already hosts a shadow tree.')
+    }
+    const root = new ShadowRootService_1.ShadowRootService()
+    root.host = this
+    root.mode = options.mode
+    this.shadowRootInstance = root
+    return root
+  }
+
+  /**
+   * This element's shadow root, when it has one attached in 'open' mode, or null (including when the mode is
+   * 'closed' - it still exists, but is not reachable this way, like the DOM's).
+   * @returns {PseudoShadowRoot|null}
+   */
+  get shadowRoot () {
+    return this.shadowRootInstance && this.shadowRootInstance.mode === 'open' ? this.shadowRootInstance : null
   }
 }
 exports.ElementService = ElementService

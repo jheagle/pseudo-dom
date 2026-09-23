@@ -19,8 +19,12 @@ import { PseudoHTMLCollection } from '../interfaces/PseudoHTMLCollection'
 import cloneObject from 'si-funciona/dist/helpers/objects/cloneObject'
 import isEqual from 'si-funciona/dist/helpers/objects/isEqual'
 import { matches, closest } from '../factories/query'
+import { ShadowRootService } from './ShadowRootService'
+import { PseudoShadowRoot } from '../interfaces/PseudoShadowRoot'
 
 type attribute = { name: string, value: any }
+type DOMRect = { x: number, y: number, width: number, height: number, top: number, right: number, bottom: number, left: number }
+const zeroRect = (): DOMRect => ({ x: 0, y: 0, width: 0, height: 0, top: 0, right: 0, bottom: 0, left: 0 })
 
 /**
  * Simulate the behaviour of the Element Class when there is no DOM available.
@@ -41,10 +45,28 @@ export class ElementService extends NodeService implements Partial<PseudoElement
   public id: string
   public innerHTML: string
   public type: string
+  public clientHeight: number
+  public clientLeft: number
+  public clientTop: number
+  public clientWidth: number
+  public scrollHeight: number
+  public scrollLeft: number
+  public scrollTop: number
+  public scrollWidth: number
+  /** What getBoundingClientRect() returns - not really computed (there is no layout engine), set this directly. */
+  public boundingClientRect: DOMRect = zeroRect()
+  /** What getClientRects() returns - set this directly. */
+  public clientRects: Array<DOMRect> = []
+  /** What getAnimations() returns - set this directly. */
+  public animations: Array<any> = []
+  /** What checkVisibility() returns - set this directly. */
+  public isVisible: boolean = true
   private readonly tag: string
   private readonly attributeList: Array<attribute>
   private readonly propertyAttributes: Array<string>
   private readonly tokenList: DOMTokenListService
+  private readonly capturedPointers: Set<number> = new Set()
+  private shadowRootInstance: ShadowRootService | null = null
   private defaultEventApplied: boolean = false
 
   /**
@@ -67,7 +89,17 @@ export class ElementService extends NodeService implements Partial<PseudoElement
     this.attributeList = attributes.concat([
       { name: 'className', value: '' },
       { name: 'id', value: '' },
-      { name: 'innerHTML', value: '' }
+      { name: 'innerHTML', value: '' },
+      // Layout is not really computed (there is no rendering engine here): these start at 0, like an unrendered
+      // element's would, but can be set directly to whatever a test needs code under test to see.
+      { name: 'clientHeight', value: 0 },
+      { name: 'clientLeft', value: 0 },
+      { name: 'clientTop', value: 0 },
+      { name: 'clientWidth', value: 0 },
+      { name: 'scrollHeight', value: 0 },
+      { name: 'scrollLeft', value: 0 },
+      { name: 'scrollTop', value: 0 },
+      { name: 'scrollWidth', value: 0 }
     ])
     this.propertyAttributes = this.attributeList.map(({ name }) => name)
     this.attributeList.forEach(({ name, value }) => {
@@ -138,6 +170,24 @@ export class ElementService extends NodeService implements Partial<PseudoElement
 
   get tagName (): string {
     return this.tag
+  }
+
+  /**
+   * The local part of the element's qualified name. There is no real namespace parsing here, so this is always the
+   * same as tagName.
+   * @returns {string}
+   */
+  get localName (): string {
+    return this.tag
+  }
+
+  /**
+   * The element's namespace prefix, or null when it has none. There is no real namespace parsing here, so this is
+   * always null.
+   * @returns {string|null}
+   */
+  get prefix (): string | null {
+    return null
   }
 
   get nodeType (): number {
@@ -385,5 +435,213 @@ export class ElementService extends NodeService implements Partial<PseudoElement
     if (index >= 0) {
       this.attributeList.splice(index, 1)
     }
+  }
+
+  /**
+   * The name of every attribute on the element, in the order they were set.
+   * @returns {Array<string>}
+   */
+  getAttributeNames (): Array<string> {
+    return this.currentAttributes().map(({ name }) => name)
+  }
+
+  /**
+   * Whether the element has any attributes at all.
+   * @returns {boolean}
+   */
+  hasAttributes (): boolean {
+    return this.attributeList.length > 0
+  }
+
+  /**
+   * Add the attribute (with an empty value) when it is not present, or remove it when it is - unless force says
+   * which of those to do instead. Returns whether the attribute is present after the call.
+   * @param {string} attributeName
+   * @param {boolean} [force]
+   * @returns {boolean}
+   */
+  toggleAttribute (attributeName: string, force?: boolean): boolean {
+    const present: boolean = this.hasAttribute(attributeName)
+    const shouldHave: boolean = typeof force === 'boolean' ? force : !present
+    if (shouldHave && !present) {
+      this.setAttribute(attributeName, '')
+    } else if (!shouldHave && present) {
+      this.removeAttribute(attributeName)
+    }
+    return shouldHave
+  }
+
+  /**
+   * The size of the element and its position, settable directly - there is no layout engine here to compute it.
+   * @returns {DOMRect}
+   */
+  getBoundingClientRect (): DOMRect {
+    return this.boundingClientRect
+  }
+
+  /**
+   * The bounding rectangles for each line of text in the element, settable directly - there is no layout engine
+   * here to compute it.
+   * @returns {Array<DOMRect>}
+   */
+  getClientRects (): Array<DOMRect> {
+    return this.clientRects
+  }
+
+  /**
+   * The Animation objects currently active on the element, settable directly - there is no animation engine here.
+   * @returns {Array<*>}
+   */
+  getAnimations (): Array<any> {
+    return this.animations
+  }
+
+  /**
+   * Whether the element is expected to be visible, settable directly - there is no rendering here to check it.
+   * @returns {boolean}
+   */
+  checkVisibility (): boolean {
+    return this.isVisible
+  }
+
+  /**
+   * A read-only view of the element's own inline style declarations (there is no CSS cascade here, so this is not a
+   * real computed style - just what the element's own style object holds).
+   * @returns {{get: function(string): (string|undefined)}}
+   */
+  computedStyleMap (): { get: (property: string) => string | undefined } {
+    const style: any = (this as any).style
+    return {
+      get: (property: string): string | undefined => {
+        const value: string = style ? style.getPropertyValue(property) : ''
+        return value === '' ? undefined : value
+      }
+    }
+  }
+
+  /**
+   * Whether this element currently has capture of the given pointer.
+   * @param {number} pointerId
+   * @returns {boolean}
+   */
+  hasPointerCapture (pointerId: number): boolean {
+    return this.capturedPointers.has(pointerId)
+  }
+
+  /**
+   * Give this element capture of the given pointer.
+   * @param {number} pointerId
+   * @returns {undefined}
+   */
+  setPointerCapture (pointerId: number): void {
+    this.capturedPointers.add(pointerId)
+  }
+
+  /**
+   * Release this element's capture of the given pointer, if it had it.
+   * @param {number} pointerId
+   * @returns {undefined}
+   */
+  releasePointerCapture (pointerId: number): void {
+    this.capturedPointers.delete(pointerId)
+  }
+
+  /**
+   * Scroll to the given position (or, given an options object, the position(s) it has). There is no real scrollable
+   * viewport here: this just sets scrollLeft / scrollTop.
+   * @param {number|{left: number, top: number}} [x=0]
+   * @param {number} [y=0]
+   * @returns {undefined}
+   */
+  scroll (x: number | { left?: number, top?: number } = 0, y: number = 0): void {
+    if (typeof x === 'number') {
+      this.scrollLeft = x
+      this.scrollTop = y
+      return
+    }
+    if (typeof x.left === 'number') {
+      this.scrollLeft = x.left
+    }
+    if (typeof x.top === 'number') {
+      this.scrollTop = x.top
+    }
+  }
+
+  /**
+   * Scroll to the given position. An alias for scroll.
+   * @param {number|{left: number, top: number}} [x=0]
+   * @param {number} [y=0]
+   * @returns {undefined}
+   */
+  scrollTo (x: number | { left?: number, top?: number } = 0, y: number = 0): void {
+    this.scroll(x, y)
+  }
+
+  /**
+   * Scroll by the given amount, relative to the current position.
+   * @param {number|{left: number, top: number}} [x=0]
+   * @param {number} [y=0]
+   * @returns {undefined}
+   */
+  scrollBy (x: number | { left?: number, top?: number } = 0, y: number = 0): void {
+    if (typeof x === 'number') {
+      this.scroll(this.scrollLeft + x, this.scrollTop + y)
+      return
+    }
+    this.scroll({
+      left: this.scrollLeft + (x.left || 0),
+      top: this.scrollTop + (x.top || 0)
+    })
+  }
+
+  /**
+   * Scroll an ancestor until this element is in view. There is no real viewport here for that to mean anything, so
+   * this does nothing (override it on an instance in a test which needs to observe the call).
+   * @returns {undefined}
+   */
+  scrollIntoView (): void {}
+
+  /**
+   * Asynchronously ask for the element to be shown fullscreen. There is no real fullscreen here, so this just
+   * resolves, like a browser granting the request would.
+   * @returns {Promise<void>}
+   */
+  requestFullscreen (): Promise<void> {
+    return Promise.resolve()
+  }
+
+  /**
+   * Asynchronously ask for the pointer to be locked to this element. There is no real pointer lock here, so this
+   * just resolves, like a browser granting the request would.
+   * @returns {Promise<void>}
+   */
+  requestPointerLock (): Promise<void> {
+    return Promise.resolve()
+  }
+
+  /**
+   * Attach a shadow tree to this element and return its ShadowRoot. Throws when it already hosts one.
+   * @param {{mode: string}} options
+   * @returns {PseudoShadowRoot}
+   * @throws {Error}
+   */
+  attachShadow (options: { mode: string }): PseudoShadowRoot {
+    if (this.shadowRootInstance) {
+      throw new Error('Shadow root cannot be created on a host which already hosts a shadow tree.')
+    }
+    const root: ShadowRootService = new ShadowRootService()
+    ;(root as any).host = this
+    ;(root as any).mode = options.mode
+    this.shadowRootInstance = root
+    return root
+  }
+
+  /**
+   * This element's shadow root, when it has one attached in 'open' mode, or null (including when the mode is
+   * 'closed' - it still exists, but is not reachable this way, like the DOM's).
+   * @returns {PseudoShadowRoot|null}
+   */
+  get shadowRoot (): PseudoShadowRoot | null {
+    return this.shadowRootInstance && this.shadowRootInstance.mode === 'open' ? this.shadowRootInstance : null
   }
 }

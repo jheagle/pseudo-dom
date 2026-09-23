@@ -227,7 +227,7 @@
       }
     }
     exports.default = PseudoHTMLDocument
-  }, { '../services/DocumentService': 23, 'core-js/modules/esnext.iterator.constructor.js': 187, 'core-js/modules/esnext.iterator.find.js': 190 }],
+  }, { '../services/DocumentService': 23, 'core-js/modules/esnext.iterator.constructor.js': 188, 'core-js/modules/esnext.iterator.find.js': 191 }],
   3: [function (require, module, exports) {
     'use strict'
 
@@ -300,7 +300,7 @@
       }
     }
     exports.PseudoNodeList = PseudoNodeList
-  }, { 'collect-your-stuff/dist/collections/linked-tree-list/LinkedTreeList': 46, 'core-js/modules/esnext.iterator.constructor.js': 187, 'core-js/modules/esnext.iterator.map.js': 192 }],
+  }, { 'collect-your-stuff/dist/collections/linked-tree-list/LinkedTreeList': 47, 'core-js/modules/esnext.iterator.constructor.js': 188, 'core-js/modules/esnext.iterator.map.js': 193 }],
   4: [function (require, module, exports) {
     'use strict'
 
@@ -380,7 +380,7 @@
       }
     })
     exports.default = createDataset
-  }, { './createStyleDeclaration': 6, 'core-js/modules/esnext.iterator.constructor.js': 187, 'core-js/modules/esnext.iterator.map.js': 192 }],
+  }, { './createStyleDeclaration': 6, 'core-js/modules/esnext.iterator.constructor.js': 188, 'core-js/modules/esnext.iterator.map.js': 193 }],
   5: [function (require, module, exports) {
     'use strict'
 
@@ -438,7 +438,7 @@
     }
     exports.createEvent = createEvent
     exports.default = exports.createEvent
-  }, { '../services/CustomEventService': 20, '../services/EventService': 25, '../services/FocusEventService': 27, '../services/InputEventService': 30, '../services/KeyboardEventService': 31, '../services/MouseEventService': 32, '../services/PointerEventService': 35, '../services/UIEventService': 36, './eventDefaults': 8 }],
+  }, { '../services/CustomEventService': 20, '../services/EventService': 25, '../services/FocusEventService': 27, '../services/InputEventService': 30, '../services/KeyboardEventService': 31, '../services/MouseEventService': 32, '../services/PointerEventService': 35, '../services/UIEventService': 37, './eventDefaults': 8 }],
   6: [function (require, module, exports) {
     'use strict'
 
@@ -593,7 +593,7 @@
       }
     }
     exports.default = exports.cssSelectAdapter
-  }, { '../services/NodeService': 34, 'core-js/modules/esnext.iterator.constructor.js': 187, 'core-js/modules/esnext.iterator.filter.js': 189, 'core-js/modules/esnext.iterator.for-each.js': 191, 'core-js/modules/esnext.iterator.some.js': 194 }],
+  }, { '../services/NodeService': 34, 'core-js/modules/esnext.iterator.constructor.js': 188, 'core-js/modules/esnext.iterator.filter.js': 190, 'core-js/modules/esnext.iterator.for-each.js': 192, 'core-js/modules/esnext.iterator.some.js': 195 }],
   8: [function (require, module, exports) {
     'use strict'
 
@@ -850,7 +850,7 @@
       return null
     }
     exports.closest = closest
-  }, { './cssSelectAdapter': 7, 'css-select': 233 }],
+  }, { './cssSelectAdapter': 7, 'css-select': 234 }],
   12: [function (require, module, exports) {
     'use strict'
 
@@ -885,7 +885,7 @@
       }
     }
     exports.setActiveElement = setActiveElement
-  }, { 'core-js/modules/esnext.weak-map.delete-all.js': 224 }],
+  }, { 'core-js/modules/esnext.weak-map.delete-all.js': 225 }],
   13: [function (require, module, exports) {
     'use strict'
 
@@ -975,7 +975,7 @@
       return (0, getParentNodes_1.default)(node).filter(parent => (parent[attr] || false) === value)
     }
     exports.default = getParentNodesFromAttribute
-  }, { './getParentNodes': 14, 'core-js/modules/esnext.iterator.constructor.js': 187, 'core-js/modules/esnext.iterator.filter.js': 189 }],
+  }, { './getParentNodes': 14, 'core-js/modules/esnext.iterator.constructor.js': 188, 'core-js/modules/esnext.iterator.filter.js': 190 }],
   16: [function (require, module, exports) {
     'use strict'
 
@@ -1175,7 +1175,7 @@
       // @ts-ignore
       window.pseudoDom = pseudoDom
     }
-  }, { './classes/PseudoHTMLDocument': 2, './factories/createEvent': 5, './factories/eventDefaults': 8, './factories/generateDocument': 9, './services/CustomEventService': 20, './services/ElementService': 24, './services/EventService': 25, './services/EventTargetService': 26, './services/FocusEventService': 27, './services/HTMLElementService': 29, './services/InputEventService': 30, './services/KeyboardEventService': 31, './services/MouseEventService': 32, './services/NodeService': 34, './services/PointerEventService': 35, './services/UIEventService': 36, './simulate': 37 }],
+  }, { './classes/PseudoHTMLDocument': 2, './factories/createEvent': 5, './factories/eventDefaults': 8, './factories/generateDocument': 9, './services/CustomEventService': 20, './services/ElementService': 24, './services/EventService': 25, './services/EventTargetService': 26, './services/FocusEventService': 27, './services/HTMLElementService': 29, './services/InputEventService': 30, './services/KeyboardEventService': 31, './services/MouseEventService': 32, './services/NodeService': 34, './services/PointerEventService': 35, './services/UIEventService': 37, './simulate': 38 }],
   18: [function (require, module, exports) {
     'use strict'
 
@@ -1416,7 +1416,7 @@
     }
     exports.CSSStyleDeclarationService = CSSStyleDeclarationService
     exports.default = CSSStyleDeclarationService
-  }, { 'core-js/modules/esnext.iterator.constructor.js': 187, 'core-js/modules/esnext.iterator.for-each.js': 191, 'core-js/modules/esnext.iterator.map.js': 192, 'core-js/modules/esnext.map.delete-all.js': 195, 'core-js/modules/esnext.map.every.js': 196, 'core-js/modules/esnext.map.filter.js': 197, 'core-js/modules/esnext.map.find-key.js': 198, 'core-js/modules/esnext.map.find.js': 199, 'core-js/modules/esnext.map.includes.js': 200, 'core-js/modules/esnext.map.key-of.js': 201, 'core-js/modules/esnext.map.map-keys.js': 202, 'core-js/modules/esnext.map.map-values.js': 203, 'core-js/modules/esnext.map.merge.js': 204, 'core-js/modules/esnext.map.reduce.js': 205, 'core-js/modules/esnext.map.some.js': 206, 'core-js/modules/esnext.map.update.js': 207 }],
+  }, { 'core-js/modules/esnext.iterator.constructor.js': 188, 'core-js/modules/esnext.iterator.for-each.js': 192, 'core-js/modules/esnext.iterator.map.js': 193, 'core-js/modules/esnext.map.delete-all.js': 196, 'core-js/modules/esnext.map.every.js': 197, 'core-js/modules/esnext.map.filter.js': 198, 'core-js/modules/esnext.map.find-key.js': 199, 'core-js/modules/esnext.map.find.js': 200, 'core-js/modules/esnext.map.includes.js': 201, 'core-js/modules/esnext.map.key-of.js': 202, 'core-js/modules/esnext.map.map-keys.js': 203, 'core-js/modules/esnext.map.map-values.js': 204, 'core-js/modules/esnext.map.merge.js': 205, 'core-js/modules/esnext.map.reduce.js': 206, 'core-js/modules/esnext.map.some.js': 207, 'core-js/modules/esnext.map.update.js': 208 }],
   20: [function (require, module, exports) {
     'use strict'
 
@@ -1572,7 +1572,7 @@
       }
     }
     exports.DOMTokenListService = DOMTokenListService
-  }, { 'core-js/modules/esnext.iterator.constructor.js': 187, 'core-js/modules/esnext.iterator.filter.js': 189, 'core-js/modules/esnext.iterator.for-each.js': 191, 'core-js/modules/esnext.iterator.map.js': 192 }],
+  }, { 'core-js/modules/esnext.iterator.constructor.js': 188, 'core-js/modules/esnext.iterator.filter.js': 190, 'core-js/modules/esnext.iterator.for-each.js': 192, 'core-js/modules/esnext.iterator.map.js': 193 }],
   22: [function (require, module, exports) {
     'use strict'
 
@@ -1723,6 +1723,22 @@
     require('core-js/modules/esnext.iterator.for-each.js')
     require('core-js/modules/esnext.iterator.map.js')
     require('core-js/modules/esnext.iterator.some.js')
+    require('core-js/modules/esnext.set.add-all.js')
+    require('core-js/modules/esnext.set.delete-all.js')
+    require('core-js/modules/esnext.set.difference.js')
+    require('core-js/modules/esnext.set.every.js')
+    require('core-js/modules/esnext.set.filter.js')
+    require('core-js/modules/esnext.set.find.js')
+    require('core-js/modules/esnext.set.intersection.js')
+    require('core-js/modules/esnext.set.is-disjoint-from.js')
+    require('core-js/modules/esnext.set.is-subset-of.js')
+    require('core-js/modules/esnext.set.is-superset-of.js')
+    require('core-js/modules/esnext.set.join.js')
+    require('core-js/modules/esnext.set.map.js')
+    require('core-js/modules/esnext.set.reduce.js')
+    require('core-js/modules/esnext.set.some.js')
+    require('core-js/modules/esnext.set.symmetric-difference.js')
+    require('core-js/modules/esnext.set.union.js')
     const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
       return mod && mod.__esModule
         ? mod
@@ -1744,6 +1760,17 @@
     const cloneObject_1 = __importDefault(require('si-funciona/dist/helpers/objects/cloneObject'))
     const isEqual_1 = __importDefault(require('si-funciona/dist/helpers/objects/isEqual'))
     const query_1 = require('../factories/query')
+    const ShadowRootService_1 = require('./ShadowRootService')
+    const zeroRect = () => ({
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0
+    })
     /**
  * Simulate the behaviour of the Element Class when there is no DOM available.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -1775,6 +1802,16 @@
         children = []
       } = {}) {
         super()
+        /** What getBoundingClientRect() returns - not really computed (there is no layout engine), set this directly. */
+        this.boundingClientRect = zeroRect()
+        /** What getClientRects() returns - set this directly. */
+        this.clientRects = []
+        /** What getAnimations() returns - set this directly. */
+        this.animations = []
+        /** What checkVisibility() returns - set this directly. */
+        this.isVisible = true
+        this.capturedPointers = new Set()
+        this.shadowRootInstance = null
         this.defaultEventApplied = false
         this.tokenList = new DOMTokenListService_1.DOMTokenListService()
         this.tag = tagName
@@ -1787,6 +1824,33 @@
         }, {
           name: 'innerHTML',
           value: ''
+        },
+        // Layout is not really computed (there is no rendering engine here): these start at 0, like an unrendered
+        // element's would, but can be set directly to whatever a test needs code under test to see.
+        {
+          name: 'clientHeight',
+          value: 0
+        }, {
+          name: 'clientLeft',
+          value: 0
+        }, {
+          name: 'clientTop',
+          value: 0
+        }, {
+          name: 'clientWidth',
+          value: 0
+        }, {
+          name: 'scrollHeight',
+          value: 0
+        }, {
+          name: 'scrollLeft',
+          value: 0
+        }, {
+          name: 'scrollTop',
+          value: 0
+        }, {
+          name: 'scrollWidth',
+          value: 0
         }])
         this.propertyAttributes = this.attributeList.map(({
           name
@@ -1874,6 +1938,24 @@
 
       get tagName () {
         return this.tag
+      }
+
+      /**
+   * The local part of the element's qualified name. There is no real namespace parsing here, so this is always the
+   * same as tagName.
+   * @returns {string}
+   */
+      get localName () {
+        return this.tag
+      }
+
+      /**
+   * The element's namespace prefix, or null when it has none. There is no real namespace parsing here, so this is
+   * always null.
+   * @returns {string|null}
+   */
+      get prefix () {
+        return null
       }
 
       get nodeType () {
@@ -2139,9 +2221,218 @@
           this.attributeList.splice(index, 1)
         }
       }
+
+      /**
+   * The name of every attribute on the element, in the order they were set.
+   * @returns {Array<string>}
+   */
+      getAttributeNames () {
+        return this.currentAttributes().map(({
+          name
+        }) => name)
+      }
+
+      /**
+   * Whether the element has any attributes at all.
+   * @returns {boolean}
+   */
+      hasAttributes () {
+        return this.attributeList.length > 0
+      }
+
+      /**
+   * Add the attribute (with an empty value) when it is not present, or remove it when it is - unless force says
+   * which of those to do instead. Returns whether the attribute is present after the call.
+   * @param {string} attributeName
+   * @param {boolean} [force]
+   * @returns {boolean}
+   */
+      toggleAttribute (attributeName, force) {
+        const present = this.hasAttribute(attributeName)
+        const shouldHave = typeof force === 'boolean' ? force : !present
+        if (shouldHave && !present) {
+          this.setAttribute(attributeName, '')
+        } else if (!shouldHave && present) {
+          this.removeAttribute(attributeName)
+        }
+        return shouldHave
+      }
+
+      /**
+   * The size of the element and its position, settable directly - there is no layout engine here to compute it.
+   * @returns {DOMRect}
+   */
+      getBoundingClientRect () {
+        return this.boundingClientRect
+      }
+
+      /**
+   * The bounding rectangles for each line of text in the element, settable directly - there is no layout engine
+   * here to compute it.
+   * @returns {Array<DOMRect>}
+   */
+      getClientRects () {
+        return this.clientRects
+      }
+
+      /**
+   * The Animation objects currently active on the element, settable directly - there is no animation engine here.
+   * @returns {Array<*>}
+   */
+      getAnimations () {
+        return this.animations
+      }
+
+      /**
+   * Whether the element is expected to be visible, settable directly - there is no rendering here to check it.
+   * @returns {boolean}
+   */
+      checkVisibility () {
+        return this.isVisible
+      }
+
+      /**
+   * A read-only view of the element's own inline style declarations (there is no CSS cascade here, so this is not a
+   * real computed style - just what the element's own style object holds).
+   * @returns {{get: function(string): (string|undefined)}}
+   */
+      computedStyleMap () {
+        const style = this.style
+        return {
+          get: property => {
+            const value = style ? style.getPropertyValue(property) : ''
+            return value === '' ? undefined : value
+          }
+        }
+      }
+
+      /**
+   * Whether this element currently has capture of the given pointer.
+   * @param {number} pointerId
+   * @returns {boolean}
+   */
+      hasPointerCapture (pointerId) {
+        return this.capturedPointers.has(pointerId)
+      }
+
+      /**
+   * Give this element capture of the given pointer.
+   * @param {number} pointerId
+   * @returns {undefined}
+   */
+      setPointerCapture (pointerId) {
+        this.capturedPointers.add(pointerId)
+      }
+
+      /**
+   * Release this element's capture of the given pointer, if it had it.
+   * @param {number} pointerId
+   * @returns {undefined}
+   */
+      releasePointerCapture (pointerId) {
+        this.capturedPointers.delete(pointerId)
+      }
+
+      /**
+   * Scroll to the given position (or, given an options object, the position(s) it has). There is no real scrollable
+   * viewport here: this just sets scrollLeft / scrollTop.
+   * @param {number|{left: number, top: number}} [x=0]
+   * @param {number} [y=0]
+   * @returns {undefined}
+   */
+      scroll (x = 0, y = 0) {
+        if (typeof x === 'number') {
+          this.scrollLeft = x
+          this.scrollTop = y
+          return
+        }
+        if (typeof x.left === 'number') {
+          this.scrollLeft = x.left
+        }
+        if (typeof x.top === 'number') {
+          this.scrollTop = x.top
+        }
+      }
+
+      /**
+   * Scroll to the given position. An alias for scroll.
+   * @param {number|{left: number, top: number}} [x=0]
+   * @param {number} [y=0]
+   * @returns {undefined}
+   */
+      scrollTo (x = 0, y = 0) {
+        this.scroll(x, y)
+      }
+
+      /**
+   * Scroll by the given amount, relative to the current position.
+   * @param {number|{left: number, top: number}} [x=0]
+   * @param {number} [y=0]
+   * @returns {undefined}
+   */
+      scrollBy (x = 0, y = 0) {
+        if (typeof x === 'number') {
+          this.scroll(this.scrollLeft + x, this.scrollTop + y)
+          return
+        }
+        this.scroll({
+          left: this.scrollLeft + (x.left || 0),
+          top: this.scrollTop + (x.top || 0)
+        })
+      }
+
+      /**
+   * Scroll an ancestor until this element is in view. There is no real viewport here for that to mean anything, so
+   * this does nothing (override it on an instance in a test which needs to observe the call).
+   * @returns {undefined}
+   */
+      scrollIntoView () {}
+      /**
+   * Asynchronously ask for the element to be shown fullscreen. There is no real fullscreen here, so this just
+   * resolves, like a browser granting the request would.
+   * @returns {Promise<void>}
+   */
+      requestFullscreen () {
+        return Promise.resolve()
+      }
+
+      /**
+   * Asynchronously ask for the pointer to be locked to this element. There is no real pointer lock here, so this
+   * just resolves, like a browser granting the request would.
+   * @returns {Promise<void>}
+   */
+      requestPointerLock () {
+        return Promise.resolve()
+      }
+
+      /**
+   * Attach a shadow tree to this element and return its ShadowRoot. Throws when it already hosts one.
+   * @param {{mode: string}} options
+   * @returns {PseudoShadowRoot}
+   * @throws {Error}
+   */
+      attachShadow (options) {
+        if (this.shadowRootInstance) {
+          throw new Error('Shadow root cannot be created on a host which already hosts a shadow tree.')
+        }
+        const root = new ShadowRootService_1.ShadowRootService()
+        root.host = this
+        root.mode = options.mode
+        this.shadowRootInstance = root
+        return root
+      }
+
+      /**
+   * This element's shadow root, when it has one attached in 'open' mode, or null (including when the mode is
+   * 'closed' - it still exists, but is not reachable this way, like the DOM's).
+   * @returns {PseudoShadowRoot|null}
+   */
+      get shadowRoot () {
+        return this.shadowRootInstance && this.shadowRootInstance.mode === 'open' ? this.shadowRootInstance : null
+      }
     }
     exports.ElementService = ElementService
-  }, { '../factories/createEvent': 5, '../factories/query': 11, '../functions/getParentNodesFromAttribute': 15, './AttrService': 18, './DOMTokenListService': 21, './HTMLCollectionService': 28, './NamedNodeMapService': 33, './NodeService': 34, 'core-js/modules/esnext.iterator.constructor.js': 187, 'core-js/modules/esnext.iterator.every.js': 188, 'core-js/modules/esnext.iterator.find.js': 190, 'core-js/modules/esnext.iterator.for-each.js': 191, 'core-js/modules/esnext.iterator.map.js': 192, 'core-js/modules/esnext.iterator.some.js': 194, 'si-funciona/dist/helpers/objects/cloneObject': 248, 'si-funciona/dist/helpers/objects/isEqual': 250 }],
+  }, { '../factories/createEvent': 5, '../factories/query': 11, '../functions/getParentNodesFromAttribute': 15, './AttrService': 18, './DOMTokenListService': 21, './HTMLCollectionService': 28, './NamedNodeMapService': 33, './NodeService': 34, './ShadowRootService': 36, 'core-js/modules/esnext.iterator.constructor.js': 188, 'core-js/modules/esnext.iterator.every.js': 189, 'core-js/modules/esnext.iterator.find.js': 191, 'core-js/modules/esnext.iterator.for-each.js': 192, 'core-js/modules/esnext.iterator.map.js': 193, 'core-js/modules/esnext.iterator.some.js': 195, 'core-js/modules/esnext.set.add-all.js': 209, 'core-js/modules/esnext.set.delete-all.js': 210, 'core-js/modules/esnext.set.difference.js': 211, 'core-js/modules/esnext.set.every.js': 212, 'core-js/modules/esnext.set.filter.js': 213, 'core-js/modules/esnext.set.find.js': 214, 'core-js/modules/esnext.set.intersection.js': 215, 'core-js/modules/esnext.set.is-disjoint-from.js': 216, 'core-js/modules/esnext.set.is-subset-of.js': 217, 'core-js/modules/esnext.set.is-superset-of.js': 218, 'core-js/modules/esnext.set.join.js': 219, 'core-js/modules/esnext.set.map.js': 220, 'core-js/modules/esnext.set.reduce.js': 221, 'core-js/modules/esnext.set.some.js': 222, 'core-js/modules/esnext.set.symmetric-difference.js': 223, 'core-js/modules/esnext.set.union.js': 224, 'si-funciona/dist/helpers/objects/cloneObject': 249, 'si-funciona/dist/helpers/objects/isEqual': 251 }],
   25: [function (require, module, exports) {
     'use strict'
 
@@ -2627,7 +2918,7 @@
       }
     }
     exports.default = EventTargetService
-  }, { '../classes/PseudoEventListener': 1, '../functions/getParentNodes': 14, './EventService': 25, 'collect-your-stuff/dist/collections/linked-list/LinkedList': 44, 'core-js/modules/esnext.iterator.constructor.js': 187, 'core-js/modules/esnext.iterator.filter.js': 189, 'core-js/modules/esnext.iterator.find.js': 190, 'core-js/modules/esnext.iterator.for-each.js': 191, 'core-js/modules/esnext.iterator.map.js': 192, 'core-js/modules/esnext.iterator.some.js': 194 }],
+  }, { '../classes/PseudoEventListener': 1, '../functions/getParentNodes': 14, './EventService': 25, 'collect-your-stuff/dist/collections/linked-list/LinkedList': 45, 'core-js/modules/esnext.iterator.constructor.js': 188, 'core-js/modules/esnext.iterator.filter.js': 190, 'core-js/modules/esnext.iterator.find.js': 191, 'core-js/modules/esnext.iterator.for-each.js': 192, 'core-js/modules/esnext.iterator.map.js': 193, 'core-js/modules/esnext.iterator.some.js': 195 }],
   27: [function (require, module, exports) {
     'use strict'
 
@@ -2664,7 +2955,7 @@
       }
     }
     exports.FocusEventService = FocusEventService
-  }, { './UIEventService': 36 }],
+  }, { './UIEventService': 37 }],
   28: [function (require, module, exports) {
     'use strict'
 
@@ -2758,7 +3049,7 @@
     }
     exports.HTMLCollectionService = HTMLCollectionService
     exports.default = HTMLCollectionService
-  }, { './NodeService': 34, 'core-js/modules/esnext.iterator.constructor.js': 187, 'core-js/modules/esnext.iterator.find.js': 190, 'core-js/modules/esnext.iterator.for-each.js': 191 }],
+  }, { './NodeService': 34, 'core-js/modules/esnext.iterator.constructor.js': 188, 'core-js/modules/esnext.iterator.find.js': 191, 'core-js/modules/esnext.iterator.for-each.js': 192 }],
   29: [function (require, module, exports) {
     'use strict'
 
@@ -3011,7 +3302,7 @@
       }
     }
     exports.InputEventService = InputEventService
-  }, { './UIEventService': 36 }],
+  }, { './UIEventService': 37 }],
   31: [function (require, module, exports) {
     'use strict'
 
@@ -3099,7 +3390,7 @@
       }
     }
     exports.KeyboardEventService = KeyboardEventService
-  }, { '../functions/modifierState': 16, './UIEventService': 36 }],
+  }, { '../functions/modifierState': 16, './UIEventService': 37 }],
   32: [function (require, module, exports) {
     'use strict'
 
@@ -3209,7 +3500,7 @@
       }
     }
     exports.MouseEventService = MouseEventService
-  }, { '../functions/modifierState': 16, './UIEventService': 36 }],
+  }, { '../functions/modifierState': 16, './UIEventService': 37 }],
   33: [function (require, module, exports) {
     'use strict'
 
@@ -3288,7 +3579,7 @@
       }
     }
     exports.NamedNodeMapService = NamedNodeMapService
-  }, { 'core-js/modules/esnext.iterator.constructor.js': 187, 'core-js/modules/esnext.iterator.find.js': 190 }],
+  }, { 'core-js/modules/esnext.iterator.constructor.js': 188, 'core-js/modules/esnext.iterator.find.js': 191 }],
   34: [function (require, module, exports) {
     'use strict'
 
@@ -3587,6 +3878,17 @@
       getElementsByClassName (className) {
         const names = className.trim().split(/\s+/).filter(Boolean)
         return new HTMLCollectionService_1.HTMLCollectionService(this, element => names.every(name => element.classList.contains(name)), true)
+      }
+
+      /**
+   * Every element below this node with the given tag name, live. There is no real namespace parsing here, so this
+   * ignores the namespace and behaves exactly like getElementsByTagName.
+   * @param {string} namespace Ignored
+   * @param {string} tagName
+   * @returns {PseudoHTMLCollection}
+   */
+      getElementsByTagNameNS (namespace, tagName) {
+        return this.getElementsByTagName(tagName)
       }
 
       /**
@@ -4011,7 +4313,7 @@
       }
     }
     exports.CommentService = CommentService
-  }, { '../factories/generateNodeList': 10, '../factories/query': 11, './EventTargetService': 26, './HTMLCollectionService': 28, 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker': 47, 'core-js/modules/esnext.iterator.constructor.js': 187, 'core-js/modules/esnext.iterator.every.js': 188, 'core-js/modules/esnext.iterator.filter.js': 189, 'core-js/modules/esnext.iterator.for-each.js': 191 }],
+  }, { '../factories/generateNodeList': 10, '../factories/query': 11, './EventTargetService': 26, './HTMLCollectionService': 28, 'collect-your-stuff/dist/collections/linked-tree-list/TreeLinker': 48, 'core-js/modules/esnext.iterator.constructor.js': 188, 'core-js/modules/esnext.iterator.every.js': 189, 'core-js/modules/esnext.iterator.filter.js': 190, 'core-js/modules/esnext.iterator.for-each.js': 192 }],
   35: [function (require, module, exports) {
     'use strict'
 
@@ -4087,6 +4389,32 @@
     Object.defineProperty(exports, '__esModule', {
       value: true
     })
+    exports.ShadowRootService = void 0
+    const DocumentFragmentService_1 = require('./DocumentFragmentService')
+    /**
+ * Simulate the behaviour of the ShadowRoot Class when there is no DOM available: a DocumentFragment attached to an
+ * element via attachShadow, which sets host and mode.
+ * @author Joshua Heagle <joshuaheagle@gmail.com>
+ * @class
+ * @augments DocumentFragmentService
+ */
+    class ShadowRootService extends DocumentFragmentService_1.DocumentFragmentService {
+      constructor () {
+        super(...arguments)
+        /** The element this shadow root is attached to. Set by attachShadow. */
+        this.host = null
+        /** 'open' (reachable via element.shadowRoot) or 'closed' (not). Set by attachShadow. */
+        this.mode = 'open'
+      }
+    }
+    exports.ShadowRootService = ShadowRootService
+  }, { './DocumentFragmentService': 22 }],
+  37: [function (require, module, exports) {
+    'use strict'
+
+    Object.defineProperty(exports, '__esModule', {
+      value: true
+    })
     exports.UIEventService = void 0
     /**
  * @file Substitute for the DOM UIEvent Class.
@@ -4125,7 +4453,7 @@
     }
     exports.UIEventService = UIEventService
   }, { './EventService': 25 }],
-  37: [function (require, module, exports) {
+  38: [function (require, module, exports) {
     'use strict'
 
     const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
@@ -4242,7 +4570,7 @@
       keyPress: exports.keyPress
     }
   }, { './factories/createEvent': 5, './functions/activeElement': 12 }],
-  38: [function (require, module, exports) {
+  39: [function (require, module, exports) {
     module.exports = {
       trueFunc: function trueFunc () {
         return true
@@ -4252,10 +4580,10 @@
       }
     }
   }, {}],
-  39: [function (require, module, exports) {
+  40: [function (require, module, exports) {
 
   }, {}],
-  40: [function (require, module, exports) {
+  41: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -4322,8 +4650,8 @@
       head: [],
       tail: null
     })
-  }, { 'core-js/modules/esnext.iterator.constructor.js': 187, 'core-js/modules/esnext.iterator.reduce.js': 193 }],
-  41: [function (require, module, exports) {
+  }, { 'core-js/modules/esnext.iterator.constructor.js': 188, 'core-js/modules/esnext.iterator.reduce.js': 194 }],
+  42: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -4547,8 +4875,8 @@
       const list = new classType(elementClass)
       return list.initialize(elementClass.fromArray(values).head)
     }
-  }, { '../../recipes/ArrayIterator': 48, './ArrayElement': 40 }],
-  42: [function (require, module, exports) {
+  }, { '../../recipes/ArrayIterator': 49, './ArrayElement': 41 }],
+  43: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -4622,8 +4950,8 @@
       head: null,
       tail: null
     })
-  }, { '../linked-list/Linker': 45, 'core-js/modules/esnext.iterator.constructor.js': 187, 'core-js/modules/esnext.iterator.reduce.js': 193 }],
-  43: [function (require, module, exports) {
+  }, { '../linked-list/Linker': 46, 'core-js/modules/esnext.iterator.constructor.js': 188, 'core-js/modules/esnext.iterator.reduce.js': 194 }],
+  44: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -4951,8 +5279,8 @@
     DoublyLinkedList.fromArray = (values = [], linkerClass = _DoubleLinker.DoubleLinker, classType = DoublyLinkedList) => {
       return _LinkedList.LinkedList.fromArray(values, linkerClass, classType)
     }
-  }, { '../../recipes/DoubleLinkerIterator': 49, '../linked-list/LinkedList': 44, './DoubleLinker': 42, 'core-js/modules/esnext.iterator.constructor.js': 187, 'core-js/modules/esnext.iterator.for-each.js': 191 }],
-  44: [function (require, module, exports) {
+  }, { '../../recipes/DoubleLinkerIterator': 50, '../linked-list/LinkedList': 45, './DoubleLinker': 43, 'core-js/modules/esnext.iterator.constructor.js': 188, 'core-js/modules/esnext.iterator.for-each.js': 192 }],
+  45: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -5249,8 +5577,8 @@
       const list = new classType(linkerClass)
       return list.initialize(linkerClass.fromArray(values).head)
     }
-  }, { '../../recipes/LinkerIterator': 50, '../arrayable/Arrayable': 41, './Linker': 45 }],
-  45: [function (require, module, exports) {
+  }, { '../../recipes/LinkerIterator': 51, '../arrayable/Arrayable': 42, './Linker': 46 }],
+  46: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -5335,8 +5663,8 @@
       head: null,
       tail: null
     })
-  }, { '../arrayable/ArrayElement': 40, 'core-js/modules/esnext.iterator.constructor.js': 187, 'core-js/modules/esnext.iterator.reduce.js': 193 }],
-  46: [function (require, module, exports) {
+  }, { '../arrayable/ArrayElement': 41, 'core-js/modules/esnext.iterator.constructor.js': 188, 'core-js/modules/esnext.iterator.reduce.js': 194 }],
+  47: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -5631,8 +5959,8 @@
       const list = new classType(linkerClass)
       return list.initialize(linkerClass.fromArray(values).head)
     }
-  }, { '../../recipes/TreeLinkerIterator': 51, '../doubly-linked-list/DoublyLinkedList': 43, './TreeLinker': 47, 'core-js/modules/esnext.iterator.constructor.js': 187, 'core-js/modules/esnext.iterator.for-each.js': 191 }],
-  47: [function (require, module, exports) {
+  }, { '../../recipes/TreeLinkerIterator': 52, '../doubly-linked-list/DoublyLinkedList': 44, './TreeLinker': 48, 'core-js/modules/esnext.iterator.constructor.js': 188, 'core-js/modules/esnext.iterator.for-each.js': 192 }],
+  48: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -5727,8 +6055,8 @@
  * @returns {{head: TreeLinker, tail: TreeLinker}}
  */
     TreeLinker.fromArray = (values = [], classType = TreeLinker) => _DoubleLinker.DoubleLinker.fromArray(values, classType)
-  }, { '../doubly-linked-list/DoubleLinker': 42, './LinkedTreeList': 46, 'core-js/modules/esnext.iterator.constructor.js': 187, 'core-js/modules/esnext.iterator.map.js': 192 }],
-  48: [function (require, module, exports) {
+  }, { '../doubly-linked-list/DoubleLinker': 43, './LinkedTreeList': 47, 'core-js/modules/esnext.iterator.constructor.js': 188, 'core-js/modules/esnext.iterator.map.js': 193 }],
+  49: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -5769,7 +6097,7 @@
     }
     exports.ArrayIterator = ArrayIterator
   }, {}],
-  49: [function (require, module, exports) {
+  50: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -5804,7 +6132,7 @@
     }
     exports.DoubleLinkerIterator = DoubleLinkerIterator
   }, {}],
-  50: [function (require, module, exports) {
+  51: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -5839,7 +6167,7 @@
     }
     exports.LinkerIterator = LinkerIterator
   }, {}],
-  51: [function (require, module, exports) {
+  52: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -5876,8 +6204,8 @@
       }
     }
     exports.TreeLinkerIterator = TreeLinkerIterator
-  }, { '../services/parseTreeNext': 52 }],
-  52: [function (require, module, exports) {
+  }, { '../services/parseTreeNext': 53 }],
+  53: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -5921,7 +6249,7 @@
     }
     exports.parseTreeNext = parseTreeNext
   }, {}],
-  53: [function (require, module, exports) {
+  54: [function (require, module, exports) {
     'use strict'
     const isCallable = require('../internals/is-callable')
     const tryToString = require('../internals/try-to-string')
@@ -5933,8 +6261,8 @@
       if (isCallable(argument)) return argument
       throw new $TypeError(tryToString(argument) + ' is not a function')
     }
-  }, { '../internals/is-callable': 105, '../internals/try-to-string': 169 }],
-  54: [function (require, module, exports) {
+  }, { '../internals/is-callable': 106, '../internals/try-to-string': 170 }],
+  55: [function (require, module, exports) {
     'use strict'
     const has = require('../internals/map-helpers').has
 
@@ -5943,8 +6271,8 @@
       has(it)
       return it
     }
-  }, { '../internals/map-helpers': 124 }],
-  55: [function (require, module, exports) {
+  }, { '../internals/map-helpers': 125 }],
+  56: [function (require, module, exports) {
     'use strict'
     const has = require('../internals/set-helpers').has
 
@@ -5953,8 +6281,8 @@
       has(it)
       return it
     }
-  }, { '../internals/set-helpers': 146 }],
-  56: [function (require, module, exports) {
+  }, { '../internals/set-helpers': 147 }],
+  57: [function (require, module, exports) {
     'use strict'
     const has = require('../internals/weak-map-helpers').has
 
@@ -5963,8 +6291,8 @@
       has(it)
       return it
     }
-  }, { '../internals/weak-map-helpers': 174 }],
-  57: [function (require, module, exports) {
+  }, { '../internals/weak-map-helpers': 175 }],
+  58: [function (require, module, exports) {
     'use strict'
     const has = require('../internals/weak-set-helpers').has
 
@@ -5973,8 +6301,8 @@
       has(it)
       return it
     }
-  }, { '../internals/weak-set-helpers': 175 }],
-  58: [function (require, module, exports) {
+  }, { '../internals/weak-set-helpers': 176 }],
+  59: [function (require, module, exports) {
     'use strict'
     const wellKnownSymbol = require('../internals/well-known-symbol')
     const create = require('../internals/object-create')
@@ -5996,8 +6324,8 @@
     module.exports = function (key) {
       ArrayPrototype[UNSCOPABLES][key] = true
     }
-  }, { '../internals/object-create': 127, '../internals/object-define-property': 129, '../internals/well-known-symbol': 176 }],
-  59: [function (require, module, exports) {
+  }, { '../internals/object-create': 128, '../internals/object-define-property': 130, '../internals/well-known-symbol': 177 }],
+  60: [function (require, module, exports) {
     'use strict'
     const isPrototypeOf = require('../internals/object-is-prototype-of')
 
@@ -6007,8 +6335,8 @@
       if (isPrototypeOf(Prototype, it)) return it
       throw new $TypeError('Incorrect invocation')
     }
-  }, { '../internals/object-is-prototype-of': 134 }],
-  60: [function (require, module, exports) {
+  }, { '../internals/object-is-prototype-of': 135 }],
+  61: [function (require, module, exports) {
     'use strict'
     const isObject = require('../internals/is-object')
 
@@ -6020,8 +6348,8 @@
       if (isObject(argument)) return argument
       throw new $TypeError($String(argument) + ' is not an object')
     }
-  }, { '../internals/is-object': 109 }],
-  61: [function (require, module, exports) {
+  }, { '../internals/is-object': 110 }],
+  62: [function (require, module, exports) {
     'use strict'
     const toIndexedObject = require('../internals/to-indexed-object')
     const toAbsoluteIndex = require('../internals/to-absolute-index')
@@ -6060,8 +6388,8 @@
       // https://tc39.es/ecma262/#sec-array.prototype.indexof
       indexOf: createMethod(false)
     }
-  }, { '../internals/length-of-array-like': 122, '../internals/to-absolute-index': 159, '../internals/to-indexed-object': 160 }],
-  62: [function (require, module, exports) {
+  }, { '../internals/length-of-array-like': 123, '../internals/to-absolute-index': 160, '../internals/to-indexed-object': 161 }],
+  63: [function (require, module, exports) {
     'use strict'
     const anObject = require('../internals/an-object')
     const iteratorClose = require('../internals/iterator-close')
@@ -6074,8 +6402,8 @@
         iteratorClose(iterator, 'throw', error)
       }
     }
-  }, { '../internals/an-object': 60, '../internals/iterator-close': 116 }],
-  63: [function (require, module, exports) {
+  }, { '../internals/an-object': 61, '../internals/iterator-close': 117 }],
+  64: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
 
@@ -6085,8 +6413,8 @@
     module.exports = function (it) {
       return stringSlice(toString(it), 8, -1)
     }
-  }, { '../internals/function-uncurry-this': 89 }],
-  64: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 90 }],
+  65: [function (require, module, exports) {
     'use strict'
     const TO_STRING_TAG_SUPPORT = require('../internals/to-string-tag-support')
     const isCallable = require('../internals/is-callable')
@@ -6117,8 +6445,8 @@
           // ES3 arguments fallback
             : (result = classofRaw(O)) === 'Object' && isCallable(O.callee) ? 'Arguments' : result
     }
-  }, { '../internals/classof-raw': 63, '../internals/is-callable': 105, '../internals/to-string-tag-support': 167, '../internals/well-known-symbol': 176 }],
-  65: [function (require, module, exports) {
+  }, { '../internals/classof-raw': 64, '../internals/is-callable': 106, '../internals/to-string-tag-support': 168, '../internals/well-known-symbol': 177 }],
+  66: [function (require, module, exports) {
     'use strict'
     const hasOwn = require('../internals/has-own-property')
     const ownKeys = require('../internals/own-keys')
@@ -6136,8 +6464,8 @@
         }
       }
     }
-  }, { '../internals/has-own-property': 97, '../internals/object-define-property': 129, '../internals/object-get-own-property-descriptor': 130, '../internals/own-keys': 139 }],
-  66: [function (require, module, exports) {
+  }, { '../internals/has-own-property': 98, '../internals/object-define-property': 130, '../internals/object-get-own-property-descriptor': 131, '../internals/own-keys': 140 }],
+  67: [function (require, module, exports) {
     'use strict'
     const fails = require('../internals/fails')
 
@@ -6147,8 +6475,8 @@
       // eslint-disable-next-line es/no-object-getprototypeof -- required for testing
       return Object.getPrototypeOf(new F()) !== F.prototype
     })
-  }, { '../internals/fails': 81 }],
-  67: [function (require, module, exports) {
+  }, { '../internals/fails': 82 }],
+  68: [function (require, module, exports) {
     'use strict'
     // `CreateIterResultObject` abstract operation
     // https://tc39.es/ecma262/#sec-createiterresultobject
@@ -6156,7 +6484,7 @@
       return { value, done }
     }
   }, {}],
-  68: [function (require, module, exports) {
+  69: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const definePropertyModule = require('../internals/object-define-property')
@@ -6170,8 +6498,8 @@
         object[key] = value
         return object
       }
-  }, { '../internals/create-property-descriptor': 69, '../internals/descriptors': 75, '../internals/object-define-property': 129 }],
-  69: [function (require, module, exports) {
+  }, { '../internals/create-property-descriptor': 70, '../internals/descriptors': 76, '../internals/object-define-property': 130 }],
+  70: [function (require, module, exports) {
     'use strict'
     module.exports = function (bitmap, value) {
       return {
@@ -6182,7 +6510,7 @@
       }
     }
   }, {}],
-  70: [function (require, module, exports) {
+  71: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const definePropertyModule = require('../internals/object-define-property')
@@ -6192,8 +6520,8 @@
       if (DESCRIPTORS) definePropertyModule.f(object, key, createPropertyDescriptor(0, value))
       else object[key] = value
     }
-  }, { '../internals/create-property-descriptor': 69, '../internals/descriptors': 75, '../internals/object-define-property': 129 }],
-  71: [function (require, module, exports) {
+  }, { '../internals/create-property-descriptor': 70, '../internals/descriptors': 76, '../internals/object-define-property': 130 }],
+  72: [function (require, module, exports) {
     'use strict'
     const makeBuiltIn = require('../internals/make-built-in')
     const defineProperty = require('../internals/object-define-property')
@@ -6203,8 +6531,8 @@
       if (descriptor.set) makeBuiltIn(descriptor.set, name, { setter: true })
       return defineProperty.f(target, name, descriptor)
     }
-  }, { '../internals/make-built-in': 123, '../internals/object-define-property': 129 }],
-  72: [function (require, module, exports) {
+  }, { '../internals/make-built-in': 124, '../internals/object-define-property': 130 }],
+  73: [function (require, module, exports) {
     'use strict'
     const isCallable = require('../internals/is-callable')
     const definePropertyModule = require('../internals/object-define-property')
@@ -6235,8 +6563,8 @@
         }
       } return O
     }
-  }, { '../internals/define-global-property': 74, '../internals/is-callable': 105, '../internals/make-built-in': 123, '../internals/object-define-property': 129 }],
-  73: [function (require, module, exports) {
+  }, { '../internals/define-global-property': 75, '../internals/is-callable': 106, '../internals/make-built-in': 124, '../internals/object-define-property': 130 }],
+  74: [function (require, module, exports) {
     'use strict'
     const defineBuiltIn = require('../internals/define-built-in')
 
@@ -6244,8 +6572,8 @@
       for (const key in src) defineBuiltIn(target, key, src[key], options)
       return target
     }
-  }, { '../internals/define-built-in': 72 }],
-  74: [function (require, module, exports) {
+  }, { '../internals/define-built-in': 73 }],
+  75: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
 
@@ -6259,8 +6587,8 @@
         globalThis[key] = value
       } return value
     }
-  }, { '../internals/global-this': 96 }],
-  75: [function (require, module, exports) {
+  }, { '../internals/global-this': 97 }],
+  76: [function (require, module, exports) {
     'use strict'
     const fails = require('../internals/fails')
 
@@ -6269,8 +6597,8 @@
       // eslint-disable-next-line es/no-object-defineproperty -- required for testing
       return Object.defineProperty({}, 1, { get: function () { return 7 } })[1] !== 7
     })
-  }, { '../internals/fails': 81 }],
-  76: [function (require, module, exports) {
+  }, { '../internals/fails': 82 }],
+  77: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
     const isObject = require('../internals/is-object')
@@ -6282,8 +6610,8 @@
     module.exports = function (it) {
       return EXISTS ? document.createElement(it) : {}
     }
-  }, { '../internals/global-this': 96, '../internals/is-object': 109 }],
-  77: [function (require, module, exports) {
+  }, { '../internals/global-this': 97, '../internals/is-object': 110 }],
+  78: [function (require, module, exports) {
     'use strict'
     // IE8- don't enum bug keys
     module.exports = [
@@ -6296,7 +6624,7 @@
       'valueOf'
     ]
   }, {}],
-  78: [function (require, module, exports) {
+  79: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
 
@@ -6304,8 +6632,8 @@
     const userAgent = navigator && navigator.userAgent
 
     module.exports = userAgent ? String(userAgent) : ''
-  }, { '../internals/global-this': 96 }],
-  79: [function (require, module, exports) {
+  }, { '../internals/global-this': 97 }],
+  80: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
     const userAgent = require('../internals/environment-user-agent')
@@ -6334,8 +6662,8 @@
     }
 
     module.exports = version
-  }, { '../internals/environment-user-agent': 78, '../internals/global-this': 96 }],
-  80: [function (require, module, exports) {
+  }, { '../internals/environment-user-agent': 79, '../internals/global-this': 97 }],
+  81: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
     const getOwnPropertyDescriptor = require('../internals/object-get-own-property-descriptor').f
@@ -6393,8 +6721,8 @@
         }
       }
     }
-  }, { '../internals/copy-constructor-properties': 65, '../internals/create-non-enumerable-property': 68, '../internals/define-built-in': 72, '../internals/define-global-property': 74, '../internals/global-this': 96, '../internals/is-forced': 106, '../internals/object-get-own-property-descriptor': 130 }],
-  81: [function (require, module, exports) {
+  }, { '../internals/copy-constructor-properties': 66, '../internals/create-non-enumerable-property': 69, '../internals/define-built-in': 73, '../internals/define-global-property': 75, '../internals/global-this': 97, '../internals/is-forced': 107, '../internals/object-get-own-property-descriptor': 131 }],
+  82: [function (require, module, exports) {
     'use strict'
     module.exports = function (exec) {
       try {
@@ -6404,7 +6732,7 @@
       }
     }
   }, {}],
-  82: [function (require, module, exports) {
+  83: [function (require, module, exports) {
     'use strict'
     const NATIVE_BIND = require('../internals/function-bind-native')
 
@@ -6418,8 +6746,8 @@
       : function () {
         return call.apply(apply, arguments)
       })
-  }, { '../internals/function-bind-native': 84 }],
-  83: [function (require, module, exports) {
+  }, { '../internals/function-bind-native': 85 }],
+  84: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this-clause')
     const aCallable = require('../internals/a-callable')
@@ -6434,8 +6762,8 @@
         return fn.apply(that, arguments)
       }
     }
-  }, { '../internals/a-callable': 53, '../internals/function-bind-native': 84, '../internals/function-uncurry-this-clause': 88 }],
-  84: [function (require, module, exports) {
+  }, { '../internals/a-callable': 54, '../internals/function-bind-native': 85, '../internals/function-uncurry-this-clause': 89 }],
+  85: [function (require, module, exports) {
     'use strict'
     const fails = require('../internals/fails')
 
@@ -6445,8 +6773,8 @@
       // eslint-disable-next-line no-prototype-builtins -- safe
       return typeof test !== 'function' || test.hasOwnProperty('prototype')
     })
-  }, { '../internals/fails': 81 }],
-  85: [function (require, module, exports) {
+  }, { '../internals/fails': 82 }],
+  86: [function (require, module, exports) {
     'use strict'
     const NATIVE_BIND = require('../internals/function-bind-native')
 
@@ -6457,8 +6785,8 @@
       : function () {
         return call.apply(call, arguments)
       }
-  }, { '../internals/function-bind-native': 84 }],
-  86: [function (require, module, exports) {
+  }, { '../internals/function-bind-native': 85 }],
+  87: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const hasOwn = require('../internals/has-own-property')
@@ -6477,8 +6805,8 @@
       PROPER,
       CONFIGURABLE
     }
-  }, { '../internals/descriptors': 75, '../internals/has-own-property': 97 }],
-  87: [function (require, module, exports) {
+  }, { '../internals/descriptors': 76, '../internals/has-own-property': 98 }],
+  88: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
     const aCallable = require('../internals/a-callable')
@@ -6489,8 +6817,8 @@
         return uncurryThis(aCallable(Object.getOwnPropertyDescriptor(object, key)[method]))
       } catch (error) { /* empty */ }
     }
-  }, { '../internals/a-callable': 53, '../internals/function-uncurry-this': 89 }],
-  88: [function (require, module, exports) {
+  }, { '../internals/a-callable': 54, '../internals/function-uncurry-this': 90 }],
+  89: [function (require, module, exports) {
     'use strict'
     const classofRaw = require('../internals/classof-raw')
     const uncurryThis = require('../internals/function-uncurry-this')
@@ -6501,8 +6829,8 @@
       //   https://github.com/zloirock/core-js/issues/1130
       if (classofRaw(fn) === 'Function') return uncurryThis(fn)
     }
-  }, { '../internals/classof-raw': 63, '../internals/function-uncurry-this': 89 }],
-  89: [function (require, module, exports) {
+  }, { '../internals/classof-raw': 64, '../internals/function-uncurry-this': 90 }],
+  90: [function (require, module, exports) {
     'use strict'
     const NATIVE_BIND = require('../internals/function-bind-native')
 
@@ -6518,8 +6846,8 @@
           return call.apply(fn, arguments)
         }
       }
-  }, { '../internals/function-bind-native': 84 }],
-  90: [function (require, module, exports) {
+  }, { '../internals/function-bind-native': 85 }],
+  91: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
     const isCallable = require('../internals/is-callable')
@@ -6531,8 +6859,8 @@
     module.exports = function (namespace, method) {
       return arguments.length < 2 ? aFunction(globalThis[namespace]) : globalThis[namespace] && globalThis[namespace][method]
     }
-  }, { '../internals/global-this': 96, '../internals/is-callable': 105 }],
-  91: [function (require, module, exports) {
+  }, { '../internals/global-this': 97, '../internals/is-callable': 106 }],
+  92: [function (require, module, exports) {
     'use strict'
     // `GetIteratorDirect(obj)` abstract operation
     // https://tc39.es/ecma262/#sec-getiteratordirect
@@ -6544,7 +6872,7 @@
       }
     }
   }, {}],
-  92: [function (require, module, exports) {
+  93: [function (require, module, exports) {
     'use strict'
     const call = require('../internals/function-call')
     const isCallable = require('../internals/is-callable')
@@ -6559,8 +6887,8 @@
       if (isCallable(iteratorMethod)) return anObject(call(iteratorMethod, argument))
       throw new $TypeError(tryToString(argument) + ' is not iterable')
     }
-  }, { '../internals/an-object': 60, '../internals/function-call': 85, '../internals/get-iterator-method-internal': 93, '../internals/is-callable': 105, '../internals/try-to-string': 169 }],
-  93: [function (require, module, exports) {
+  }, { '../internals/an-object': 61, '../internals/function-call': 86, '../internals/get-iterator-method-internal': 94, '../internals/is-callable': 106, '../internals/try-to-string': 170 }],
+  94: [function (require, module, exports) {
     'use strict'
     const classof = require('../internals/classof-raw')
     const isNullOrUndefined = require('../internals/is-null-or-undefined')
@@ -6577,8 +6905,8 @@
     (classof(it) === 'Arguments' ? ArrayPrototype[ITERATOR] : undefined)
       }
     }
-  }, { '../internals/classof-raw': 63, '../internals/get-method': 94, '../internals/is-null-or-undefined': 108, '../internals/well-known-symbol': 176 }],
-  94: [function (require, module, exports) {
+  }, { '../internals/classof-raw': 64, '../internals/get-method': 95, '../internals/is-null-or-undefined': 109, '../internals/well-known-symbol': 177 }],
+  95: [function (require, module, exports) {
     'use strict'
     const aCallable = require('../internals/a-callable')
     const isNullOrUndefined = require('../internals/is-null-or-undefined')
@@ -6589,8 +6917,8 @@
       const func = V[P]
       return isNullOrUndefined(func) ? undefined : aCallable(func)
     }
-  }, { '../internals/a-callable': 53, '../internals/is-null-or-undefined': 108 }],
-  95: [function (require, module, exports) {
+  }, { '../internals/a-callable': 54, '../internals/is-null-or-undefined': 109 }],
+  96: [function (require, module, exports) {
     'use strict'
     const aCallable = require('../internals/a-callable')
     const anObject = require('../internals/an-object')
@@ -6631,8 +6959,8 @@
       if (intSize < 0) throw new $RangeError(INVALID_SIZE)
       return new SetRecord(obj, intSize)
     }
-  }, { '../internals/a-callable': 53, '../internals/an-object': 60, '../internals/function-call': 85, '../internals/get-iterator-direct': 91, '../internals/to-integer-or-infinity': 161 }],
-  96: [function (require, module, exports) {
+  }, { '../internals/a-callable': 54, '../internals/an-object': 61, '../internals/function-call': 86, '../internals/get-iterator-direct': 92, '../internals/to-integer-or-infinity': 162 }],
+  97: [function (require, module, exports) {
     (function (global) {
       (function () {
         'use strict'
@@ -6654,7 +6982,7 @@
       }).call(this)
     }).call(this, typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : typeof window !== 'undefined' ? window : {})
   }, {}],
-  97: [function (require, module, exports) {
+  98: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
     const toObject = require('../internals/to-object')
@@ -6667,18 +6995,18 @@
     module.exports = Object.hasOwn || function hasOwn (it, key) {
       return hasOwnProperty(toObject(it), key)
     }
-  }, { '../internals/function-uncurry-this': 89, '../internals/to-object': 163 }],
-  98: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 90, '../internals/to-object': 164 }],
+  99: [function (require, module, exports) {
     'use strict'
     module.exports = {}
   }, {}],
-  99: [function (require, module, exports) {
+  100: [function (require, module, exports) {
     'use strict'
     const getBuiltIn = require('../internals/get-built-in')
 
     module.exports = getBuiltIn('document', 'documentElement')
-  }, { '../internals/get-built-in': 90 }],
-  100: [function (require, module, exports) {
+  }, { '../internals/get-built-in': 91 }],
+  101: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const fails = require('../internals/fails')
@@ -6691,8 +7019,8 @@
         get: function () { return 7 }
       }).a !== 7
     })
-  }, { '../internals/descriptors': 75, '../internals/document-create-element': 76, '../internals/fails': 81 }],
-  101: [function (require, module, exports) {
+  }, { '../internals/descriptors': 76, '../internals/document-create-element': 77, '../internals/fails': 82 }],
+  102: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
     const fails = require('../internals/fails')
@@ -6709,8 +7037,8 @@
     }) ? function (it) {
         return classof(it) === 'String' ? split(it, '') : $Object(it)
       } : $Object
-  }, { '../internals/classof-raw': 63, '../internals/fails': 81, '../internals/function-uncurry-this': 89 }],
-  102: [function (require, module, exports) {
+  }, { '../internals/classof-raw': 64, '../internals/fails': 82, '../internals/function-uncurry-this': 90 }],
+  103: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
     const isCallable = require('../internals/is-callable')
@@ -6726,8 +7054,8 @@
     }
 
     module.exports = store.inspectSource
-  }, { '../internals/function-uncurry-this': 89, '../internals/is-callable': 105, '../internals/shared-store': 156 }],
-  103: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 90, '../internals/is-callable': 106, '../internals/shared-store': 157 }],
+  104: [function (require, module, exports) {
     'use strict'
     const NATIVE_WEAK_MAP = require('../internals/weak-map-basic-detection')
     const globalThis = require('../internals/global-this')
@@ -6799,8 +7127,8 @@
       enforce,
       getterFor
     }
-  }, { '../internals/create-non-enumerable-property': 68, '../internals/global-this': 96, '../internals/has-own-property': 97, '../internals/hidden-keys': 98, '../internals/is-object': 109, '../internals/shared-key': 155, '../internals/shared-store': 156, '../internals/weak-map-basic-detection': 173 }],
-  104: [function (require, module, exports) {
+  }, { '../internals/create-non-enumerable-property': 69, '../internals/global-this': 97, '../internals/has-own-property': 98, '../internals/hidden-keys': 99, '../internals/is-object': 110, '../internals/shared-key': 156, '../internals/shared-store': 157, '../internals/weak-map-basic-detection': 174 }],
+  105: [function (require, module, exports) {
     'use strict'
     const wellKnownSymbol = require('../internals/well-known-symbol')
     const Iterators = require('../internals/iterators')
@@ -6812,8 +7140,8 @@
     module.exports = function (it) {
       return it !== undefined && (Iterators.Array === it || ArrayPrototype[ITERATOR] === it)
     }
-  }, { '../internals/iterators': 121, '../internals/well-known-symbol': 176 }],
-  105: [function (require, module, exports) {
+  }, { '../internals/iterators': 122, '../internals/well-known-symbol': 177 }],
+  106: [function (require, module, exports) {
     'use strict'
     // https://tc39.es/ecma262/#sec-IsHTMLDDA-internal-slot
     const documentAll = typeof document === 'object' && document.all
@@ -6829,7 +7157,7 @@
         return typeof argument === 'function'
       }
   }, {}],
-  106: [function (require, module, exports) {
+  107: [function (require, module, exports) {
     'use strict'
     const fails = require('../internals/fails')
     const isCallable = require('../internals/is-callable')
@@ -6856,8 +7184,8 @@
     var POLYFILL = isForced.POLYFILL = 'P'
 
     module.exports = isForced
-  }, { '../internals/fails': 81, '../internals/is-callable': 105 }],
-  107: [function (require, module, exports) {
+  }, { '../internals/fails': 82, '../internals/is-callable': 106 }],
+  108: [function (require, module, exports) {
     'use strict'
     const classof = require('../internals/classof-raw')
     const wellKnownSymbol = require('../internals/well-known-symbol')
@@ -6869,8 +7197,8 @@
     it['@@iterator'] !== undefined ||
     classof(it) === 'Arguments'
     }
-  }, { '../internals/classof-raw': 63, '../internals/well-known-symbol': 176 }],
-  108: [function (require, module, exports) {
+  }, { '../internals/classof-raw': 64, '../internals/well-known-symbol': 177 }],
+  109: [function (require, module, exports) {
     'use strict'
     // we can't use just `it == null` since of `document.all` special case
     // https://tc39.es/ecma262/#sec-IsHTMLDDA-internal-slot-aec
@@ -6878,19 +7206,19 @@
       return it === null || it === undefined
     }
   }, {}],
-  109: [function (require, module, exports) {
+  110: [function (require, module, exports) {
     'use strict'
     const isCallable = require('../internals/is-callable')
 
     module.exports = function (it) {
       return typeof it === 'object' ? it !== null : isCallable(it)
     }
-  }, { '../internals/is-callable': 105 }],
-  110: [function (require, module, exports) {
+  }, { '../internals/is-callable': 106 }],
+  111: [function (require, module, exports) {
     'use strict'
     module.exports = false
   }, {}],
-  111: [function (require, module, exports) {
+  112: [function (require, module, exports) {
     'use strict'
     const getBuiltIn = require('../internals/get-built-in')
     const isCallable = require('../internals/is-callable')
@@ -6907,8 +7235,8 @@
         const $Symbol = getBuiltIn('Symbol')
         return isCallable($Symbol) && isPrototypeOf($Symbol.prototype, $Object(it))
       }
-  }, { '../internals/get-built-in': 90, '../internals/is-callable': 105, '../internals/object-is-prototype-of': 134, '../internals/use-symbol-as-uid': 171 }],
-  112: [function (require, module, exports) {
+  }, { '../internals/get-built-in': 91, '../internals/is-callable': 106, '../internals/object-is-prototype-of': 135, '../internals/use-symbol-as-uid': 172 }],
+  113: [function (require, module, exports) {
     'use strict'
     const call = require('../internals/function-call')
 
@@ -6921,8 +7249,8 @@
         if (result !== undefined) return result
       }
     }
-  }, { '../internals/function-call': 85 }],
-  113: [function (require, module, exports) {
+  }, { '../internals/function-call': 86 }],
+  114: [function (require, module, exports) {
     'use strict'
     const bind = require('../internals/function-bind-context')
     const call = require('../internals/function-call')
@@ -6997,8 +7325,8 @@
         if (typeof result === 'object' && result && isPrototypeOf(ResultPrototype, result)) return result
       } return new Result(false)
     }
-  }, { '../internals/an-object': 60, '../internals/function-bind-context': 83, '../internals/function-call': 85, '../internals/get-iterator-internal': 92, '../internals/get-iterator-method-internal': 93, '../internals/is-array-iterator-method': 104, '../internals/iterator-close': 116, '../internals/length-of-array-like': 122, '../internals/object-is-prototype-of': 134, '../internals/try-to-string': 169 }],
-  114: [function (require, module, exports) {
+  }, { '../internals/an-object': 61, '../internals/function-bind-context': 84, '../internals/function-call': 86, '../internals/get-iterator-internal': 93, '../internals/get-iterator-method-internal': 94, '../internals/is-array-iterator-method': 105, '../internals/iterator-close': 117, '../internals/length-of-array-like': 123, '../internals/object-is-prototype-of': 135, '../internals/try-to-string': 170 }],
+  115: [function (require, module, exports) {
     'use strict'
     // release references held by exhausted / closed iterator helpers to allow GC of the source chain
     module.exports = function (state) {
@@ -7006,7 +7334,7 @@
     state.iterables = state.iters = state.openIters = state.padding = state.finishResults = state.buffer = null
     }
   }, {}],
-  115: [function (require, module, exports) {
+  116: [function (require, module, exports) {
     'use strict'
     const iteratorClose = require('../internals/iterator-close')
 
@@ -7023,8 +7351,8 @@
       if (kind === 'throw') throw value
       return value
     }
-  }, { '../internals/iterator-close': 116 }],
-  116: [function (require, module, exports) {
+  }, { '../internals/iterator-close': 117 }],
+  117: [function (require, module, exports) {
     'use strict'
     const call = require('../internals/function-call')
     const anObject = require('../internals/an-object')
@@ -7049,8 +7377,8 @@
       anObject(innerResult)
       return value
     }
-  }, { '../internals/an-object': 60, '../internals/function-call': 85, '../internals/get-method': 94 }],
-  117: [function (require, module, exports) {
+  }, { '../internals/an-object': 61, '../internals/function-call': 86, '../internals/get-method': 95 }],
+  118: [function (require, module, exports) {
     'use strict'
     const call = require('../internals/function-call')
     const create = require('../internals/object-create')
@@ -7150,8 +7478,8 @@
 
       return IteratorProxy
     }
-  }, { '../internals/create-iter-result-object': 67, '../internals/create-non-enumerable-property': 68, '../internals/define-built-ins': 73, '../internals/function-call': 85, '../internals/get-method': 94, '../internals/internal-state': 103, '../internals/iterator-cleanup-state': 114, '../internals/iterator-close': 116, '../internals/iterator-close-all': 115, '../internals/iterators-core': 120, '../internals/object-create': 127, '../internals/well-known-symbol': 176 }],
-  118: [function (require, module, exports) {
+  }, { '../internals/create-iter-result-object': 68, '../internals/create-non-enumerable-property': 69, '../internals/define-built-ins': 74, '../internals/function-call': 86, '../internals/get-method': 95, '../internals/internal-state': 104, '../internals/iterator-cleanup-state': 115, '../internals/iterator-close': 117, '../internals/iterator-close-all': 116, '../internals/iterators-core': 121, '../internals/object-create': 128, '../internals/well-known-symbol': 177 }],
+  119: [function (require, module, exports) {
     'use strict'
     // Should throw an error on invalid iterator
     // https://issues.chromium.org/issues/336839115
@@ -7167,7 +7495,7 @@
       }
     }
   }, {}],
-  119: [function (require, module, exports) {
+  120: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
 
@@ -7193,8 +7521,8 @@
 
       if (!CLOSED) return method
     }
-  }, { '../internals/global-this': 96 }],
-  120: [function (require, module, exports) {
+  }, { '../internals/global-this': 97 }],
+  121: [function (require, module, exports) {
     'use strict'
     const fails = require('../internals/fails')
     const isCallable = require('../internals/is-callable')
@@ -7244,12 +7572,12 @@
       IteratorPrototype,
       BUGGY_SAFARI_ITERATORS
     }
-  }, { '../internals/define-built-in': 72, '../internals/fails': 81, '../internals/is-callable': 105, '../internals/is-object': 109, '../internals/is-pure': 110, '../internals/object-create': 127, '../internals/object-get-prototype-of': 133, '../internals/well-known-symbol': 176 }],
-  121: [function (require, module, exports) {
+  }, { '../internals/define-built-in': 73, '../internals/fails': 82, '../internals/is-callable': 106, '../internals/is-object': 110, '../internals/is-pure': 111, '../internals/object-create': 128, '../internals/object-get-prototype-of': 134, '../internals/well-known-symbol': 177 }],
+  122: [function (require, module, exports) {
     'use strict'
     module.exports = Object.create ? Object.create(null) : {}
   }, {}],
-  122: [function (require, module, exports) {
+  123: [function (require, module, exports) {
     'use strict'
     const toLength = require('../internals/to-length')
 
@@ -7258,8 +7586,8 @@
     module.exports = function (obj) {
       return toLength(obj.length)
     }
-  }, { '../internals/to-length': 162 }],
-  123: [function (require, module, exports) {
+  }, { '../internals/to-length': 163 }],
+  124: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
     const fails = require('../internals/fails')
@@ -7315,8 +7643,8 @@
     Function.prototype.toString = makeBuiltIn(function toString () {
       return isCallable(this) && getInternalState(this).source || inspectSource(this)
     }, 'toString')
-  }, { '../internals/descriptors': 75, '../internals/fails': 81, '../internals/function-name': 86, '../internals/function-uncurry-this': 89, '../internals/has-own-property': 97, '../internals/inspect-source': 102, '../internals/internal-state': 103, '../internals/is-callable': 105 }],
-  124: [function (require, module, exports) {
+  }, { '../internals/descriptors': 76, '../internals/fails': 82, '../internals/function-name': 87, '../internals/function-uncurry-this': 90, '../internals/has-own-property': 98, '../internals/inspect-source': 103, '../internals/internal-state': 104, '../internals/is-callable': 106 }],
+  125: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
 
@@ -7332,8 +7660,8 @@
       remove: uncurryThis(MapPrototype.delete),
       proto: MapPrototype
     }
-  }, { '../internals/function-uncurry-this': 89 }],
-  125: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 90 }],
+  126: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
     const iterateSimple = require('../internals/iterate-simple')
@@ -7352,8 +7680,8 @@
         })
         : forEach(map, fn)
     }
-  }, { '../internals/function-uncurry-this': 89, '../internals/iterate-simple': 112, '../internals/map-helpers': 124 }],
-  126: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 90, '../internals/iterate-simple': 113, '../internals/map-helpers': 125 }],
+  127: [function (require, module, exports) {
     'use strict'
     const ceil = Math.ceil
     const floor = Math.floor
@@ -7366,7 +7694,7 @@
       return (n > 0 ? floor : ceil)(n)
     }
   }, {}],
-  127: [function (require, module, exports) {
+  128: [function (require, module, exports) {
     'use strict'
     /* global ActiveXObject -- old IE, WSH */
     const anObject = require('../internals/an-object')
@@ -7452,8 +7780,8 @@
       } else result = NullProtoObject()
       return Properties === undefined ? result : definePropertiesModule.f(result, Properties)
     }
-  }, { '../internals/an-object': 60, '../internals/document-create-element': 76, '../internals/enum-bug-keys': 77, '../internals/hidden-keys': 98, '../internals/html': 99, '../internals/object-define-properties': 128, '../internals/shared-key': 155 }],
-  128: [function (require, module, exports) {
+  }, { '../internals/an-object': 61, '../internals/document-create-element': 77, '../internals/enum-bug-keys': 78, '../internals/hidden-keys': 99, '../internals/html': 100, '../internals/object-define-properties': 129, '../internals/shared-key': 156 }],
+  129: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const V8_PROTOTYPE_DEFINE_BUG = require('../internals/v8-prototype-define-bug')
@@ -7477,8 +7805,8 @@
         while (length > index) definePropertyModule.f(O, key = keys[index++], props[key])
         return O
       }
-  }, { '../internals/an-object': 60, '../internals/descriptors': 75, '../internals/object-define-property': 129, '../internals/object-keys': 136, '../internals/to-indexed-object': 160, '../internals/v8-prototype-define-bug': 172 }],
-  129: [function (require, module, exports) {
+  }, { '../internals/an-object': 61, '../internals/descriptors': 76, '../internals/object-define-property': 130, '../internals/object-keys': 137, '../internals/to-indexed-object': 161, '../internals/v8-prototype-define-bug': 173 }],
+  130: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const IE8_DOM_DEFINE = require('../internals/ie8-dom-define')
@@ -7527,8 +7855,8 @@
       if ('value' in Attributes) O[P] = Attributes.value
       return O
     }
-  }, { '../internals/an-object': 60, '../internals/descriptors': 75, '../internals/ie8-dom-define': 100, '../internals/to-property-key': 165, '../internals/v8-prototype-define-bug': 172 }],
-  130: [function (require, module, exports) {
+  }, { '../internals/an-object': 61, '../internals/descriptors': 76, '../internals/ie8-dom-define': 101, '../internals/to-property-key': 166, '../internals/v8-prototype-define-bug': 173 }],
+  131: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const call = require('../internals/function-call')
@@ -7554,8 +7882,8 @@
       }
       if (hasOwn(O, P)) return createPropertyDescriptor(!call(propertyIsEnumerableModule.f, O, P), O[P])
     }
-  }, { '../internals/create-property-descriptor': 69, '../internals/descriptors': 75, '../internals/function-call': 85, '../internals/has-own-property': 97, '../internals/ie8-dom-define': 100, '../internals/object-property-is-enumerable': 137, '../internals/to-indexed-object': 160, '../internals/to-property-key': 165 }],
-  131: [function (require, module, exports) {
+  }, { '../internals/create-property-descriptor': 70, '../internals/descriptors': 76, '../internals/function-call': 86, '../internals/has-own-property': 98, '../internals/ie8-dom-define': 101, '../internals/object-property-is-enumerable': 138, '../internals/to-indexed-object': 161, '../internals/to-property-key': 166 }],
+  132: [function (require, module, exports) {
     'use strict'
     const internalObjectKeys = require('../internals/object-keys-internal')
     const enumBugKeys = require('../internals/enum-bug-keys')
@@ -7568,13 +7896,13 @@
     exports.f = Object.getOwnPropertyNames || function getOwnPropertyNames (O) {
       return internalObjectKeys(O, hiddenKeys)
     }
-  }, { '../internals/enum-bug-keys': 77, '../internals/object-keys-internal': 135 }],
-  132: [function (require, module, exports) {
+  }, { '../internals/enum-bug-keys': 78, '../internals/object-keys-internal': 136 }],
+  133: [function (require, module, exports) {
     'use strict'
     // eslint-disable-next-line es/no-object-getownpropertysymbols -- safe
     exports.f = Object.getOwnPropertySymbols
   }, {}],
-  133: [function (require, module, exports) {
+  134: [function (require, module, exports) {
     'use strict'
     const hasOwn = require('../internals/has-own-property')
     const isCallable = require('../internals/is-callable')
@@ -7599,14 +7927,14 @@
           return constructor.prototype
         } return object instanceof $Object ? ObjectPrototype : null
       }
-  }, { '../internals/correct-prototype-getter': 66, '../internals/has-own-property': 97, '../internals/is-callable': 105, '../internals/shared-key': 155, '../internals/to-object': 163 }],
-  134: [function (require, module, exports) {
+  }, { '../internals/correct-prototype-getter': 67, '../internals/has-own-property': 98, '../internals/is-callable': 106, '../internals/shared-key': 156, '../internals/to-object': 164 }],
+  135: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
 
     module.exports = uncurryThis({}.isPrototypeOf)
-  }, { '../internals/function-uncurry-this': 89 }],
-  135: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 90 }],
+  136: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
     const hasOwn = require('../internals/has-own-property')
@@ -7630,8 +7958,8 @@
       }
       return result
     }
-  }, { '../internals/array-includes': 61, '../internals/function-uncurry-this': 89, '../internals/has-own-property': 97, '../internals/hidden-keys': 98, '../internals/to-indexed-object': 160 }],
-  136: [function (require, module, exports) {
+  }, { '../internals/array-includes': 62, '../internals/function-uncurry-this': 90, '../internals/has-own-property': 98, '../internals/hidden-keys': 99, '../internals/to-indexed-object': 161 }],
+  137: [function (require, module, exports) {
     'use strict'
     const internalObjectKeys = require('../internals/object-keys-internal')
     const enumBugKeys = require('../internals/enum-bug-keys')
@@ -7642,8 +7970,8 @@
     module.exports = Object.keys || function keys (O) {
       return internalObjectKeys(O, enumBugKeys)
     }
-  }, { '../internals/enum-bug-keys': 77, '../internals/object-keys-internal': 135 }],
-  137: [function (require, module, exports) {
+  }, { '../internals/enum-bug-keys': 78, '../internals/object-keys-internal': 136 }],
+  138: [function (require, module, exports) {
     'use strict'
     const $propertyIsEnumerable = {}.propertyIsEnumerable
     // eslint-disable-next-line es/no-object-getownpropertydescriptor -- safe
@@ -7661,7 +7989,7 @@
       }
       : $propertyIsEnumerable
   }, {}],
-  138: [function (require, module, exports) {
+  139: [function (require, module, exports) {
     'use strict'
     const call = require('../internals/function-call')
     const isCallable = require('../internals/is-callable')
@@ -7678,8 +8006,8 @@
       if (pref !== 'string' && isCallable(fn = input.toString) && !isObject(val = call(fn, input))) return val
       throw new $TypeError("Can't convert object to primitive value")
     }
-  }, { '../internals/function-call': 85, '../internals/is-callable': 105, '../internals/is-object': 109 }],
-  139: [function (require, module, exports) {
+  }, { '../internals/function-call': 86, '../internals/is-callable': 106, '../internals/is-object': 110 }],
+  140: [function (require, module, exports) {
     'use strict'
     const getBuiltIn = require('../internals/get-built-in')
     const uncurryThis = require('../internals/function-uncurry-this')
@@ -7695,8 +8023,8 @@
       const getOwnPropertySymbols = getOwnPropertySymbolsModule.f
       return getOwnPropertySymbols ? concat(keys, getOwnPropertySymbols(it)) : keys
     }
-  }, { '../internals/an-object': 60, '../internals/function-uncurry-this': 89, '../internals/get-built-in': 90, '../internals/object-get-own-property-names': 131, '../internals/object-get-own-property-symbols': 132 }],
-  140: [function (require, module, exports) {
+  }, { '../internals/an-object': 61, '../internals/function-uncurry-this': 90, '../internals/get-built-in': 91, '../internals/object-get-own-property-names': 132, '../internals/object-get-own-property-symbols': 133 }],
+  141: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
     const fails = require('../internals/fails')
@@ -7746,8 +8074,8 @@
     })
 
     module.exports = { correct: FLAGS_GETTER_IS_CORRECT }
-  }, { '../internals/fails': 81, '../internals/global-this': 96 }],
-  141: [function (require, module, exports) {
+  }, { '../internals/fails': 82, '../internals/global-this': 97 }],
+  142: [function (require, module, exports) {
     'use strict'
     const anObject = require('../internals/an-object')
 
@@ -7766,8 +8094,8 @@
       if (that.sticky) result += 'y'
       return result
     }
-  }, { '../internals/an-object': 60 }],
-  142: [function (require, module, exports) {
+  }, { '../internals/an-object': 61 }],
+  143: [function (require, module, exports) {
     'use strict'
     const isNullOrUndefined = require('../internals/is-null-or-undefined')
 
@@ -7779,8 +8107,8 @@
       if (isNullOrUndefined(it)) throw new $TypeError("Can't call method on " + it)
       return it
     }
-  }, { '../internals/is-null-or-undefined': 108 }],
-  143: [function (require, module, exports) {
+  }, { '../internals/is-null-or-undefined': 109 }],
+  144: [function (require, module, exports) {
     'use strict'
     // `SameValueZero` abstract operation
     // https://tc39.es/ecma262/#sec-samevaluezero
@@ -7789,7 +8117,7 @@
       return x === y || x !== x && y !== y
     }
   }, {}],
-  144: [function (require, module, exports) {
+  145: [function (require, module, exports) {
     'use strict'
     const SetHelpers = require('../internals/set-helpers')
     const iterate = require('../internals/set-iterate')
@@ -7804,8 +8132,8 @@
       })
       return result
     }
-  }, { '../internals/set-helpers': 146, '../internals/set-iterate': 151 }],
-  145: [function (require, module, exports) {
+  }, { '../internals/set-helpers': 147, '../internals/set-iterate': 152 }],
+  146: [function (require, module, exports) {
     'use strict'
     const aSet = require('../internals/a-set')
     const SetHelpers = require('../internals/set-helpers')
@@ -7835,8 +8163,8 @@
       }
       return result
     }
-  }, { '../internals/a-set': 55, '../internals/get-set-record': 95, '../internals/iterate-simple': 112, '../internals/set-clone': 144, '../internals/set-helpers': 146, '../internals/set-iterate': 151, '../internals/set-size': 152 }],
-  146: [function (require, module, exports) {
+  }, { '../internals/a-set': 56, '../internals/get-set-record': 96, '../internals/iterate-simple': 113, '../internals/set-clone': 145, '../internals/set-helpers': 147, '../internals/set-iterate': 152, '../internals/set-size': 153 }],
+  147: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
 
@@ -7851,8 +8179,8 @@
       remove: uncurryThis(SetPrototype.delete),
       proto: SetPrototype
     }
-  }, { '../internals/function-uncurry-this': 89 }],
-  147: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 90 }],
+  148: [function (require, module, exports) {
     'use strict'
     const aSet = require('../internals/a-set')
     const SetHelpers = require('../internals/set-helpers')
@@ -7884,8 +8212,8 @@
 
       return result
     }
-  }, { '../internals/a-set': 55, '../internals/get-set-record': 95, '../internals/iterate-simple': 112, '../internals/set-helpers': 146, '../internals/set-iterate': 151, '../internals/set-size': 152 }],
-  148: [function (require, module, exports) {
+  }, { '../internals/a-set': 56, '../internals/get-set-record': 96, '../internals/iterate-simple': 113, '../internals/set-helpers': 147, '../internals/set-iterate': 152, '../internals/set-size': 153 }],
+  149: [function (require, module, exports) {
     'use strict'
     const aSet = require('../internals/a-set')
     const has = require('../internals/set-helpers').has
@@ -7910,8 +8238,8 @@
         if (has(O, e)) return iteratorClose(iterator.iterator, 'normal', false)
       }) !== false
     }
-  }, { '../internals/a-set': 55, '../internals/get-set-record': 95, '../internals/iterate-simple': 112, '../internals/iterator-close': 116, '../internals/set-helpers': 146, '../internals/set-iterate': 151, '../internals/set-size': 152 }],
-  149: [function (require, module, exports) {
+  }, { '../internals/a-set': 56, '../internals/get-set-record': 96, '../internals/iterate-simple': 113, '../internals/iterator-close': 117, '../internals/set-helpers': 147, '../internals/set-iterate': 152, '../internals/set-size': 153 }],
+  150: [function (require, module, exports) {
     'use strict'
     const aSet = require('../internals/a-set')
     const size = require('../internals/set-size')
@@ -7928,8 +8256,8 @@
         if (!otherRec.includes(e)) return false
       }, true) !== false
     }
-  }, { '../internals/a-set': 55, '../internals/get-set-record': 95, '../internals/set-iterate': 151, '../internals/set-size': 152 }],
-  150: [function (require, module, exports) {
+  }, { '../internals/a-set': 56, '../internals/get-set-record': 96, '../internals/set-iterate': 152, '../internals/set-size': 153 }],
+  151: [function (require, module, exports) {
     'use strict'
     const aSet = require('../internals/a-set')
     const has = require('../internals/set-helpers').has
@@ -7949,8 +8277,8 @@
         if (!has(O, e)) return iteratorClose(iterator.iterator, 'normal', false)
       }) !== false
     }
-  }, { '../internals/a-set': 55, '../internals/get-set-record': 95, '../internals/iterate-simple': 112, '../internals/iterator-close': 116, '../internals/set-helpers': 146, '../internals/set-size': 152 }],
-  151: [function (require, module, exports) {
+  }, { '../internals/a-set': 56, '../internals/get-set-record': 96, '../internals/iterate-simple': 113, '../internals/iterator-close': 117, '../internals/set-helpers': 147, '../internals/set-size': 153 }],
+  152: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
     const iterateSimple = require('../internals/iterate-simple')
@@ -7965,8 +8293,8 @@
     module.exports = function (set, fn, interruptible) {
       return interruptible ? iterateSimple({ iterator: keys(set), next }, fn) : forEach(set, fn)
     }
-  }, { '../internals/function-uncurry-this': 89, '../internals/iterate-simple': 112, '../internals/set-helpers': 146 }],
-  152: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 90, '../internals/iterate-simple': 113, '../internals/set-helpers': 147 }],
+  153: [function (require, module, exports) {
     'use strict'
     const uncurryThisAccessor = require('../internals/function-uncurry-this-accessor')
     const SetHelpers = require('../internals/set-helpers')
@@ -7974,8 +8302,8 @@
     module.exports = uncurryThisAccessor(SetHelpers.proto, 'size', 'get') || function (set) {
       return set.size
     }
-  }, { '../internals/function-uncurry-this-accessor': 87, '../internals/set-helpers': 146 }],
-  153: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this-accessor': 88, '../internals/set-helpers': 147 }],
+  154: [function (require, module, exports) {
     'use strict'
     const aSet = require('../internals/a-set')
     const SetHelpers = require('../internals/set-helpers')
@@ -7999,8 +8327,8 @@
       })
       return result
     }
-  }, { '../internals/a-set': 55, '../internals/get-set-record': 95, '../internals/iterate-simple': 112, '../internals/set-clone': 144, '../internals/set-helpers': 146 }],
-  154: [function (require, module, exports) {
+  }, { '../internals/a-set': 56, '../internals/get-set-record': 96, '../internals/iterate-simple': 113, '../internals/set-clone': 145, '../internals/set-helpers': 147 }],
+  155: [function (require, module, exports) {
     'use strict'
     const aSet = require('../internals/a-set')
     const add = require('../internals/set-helpers').add
@@ -8019,8 +8347,8 @@
       })
       return result
     }
-  }, { '../internals/a-set': 55, '../internals/get-set-record': 95, '../internals/iterate-simple': 112, '../internals/set-clone': 144, '../internals/set-helpers': 146 }],
-  155: [function (require, module, exports) {
+  }, { '../internals/a-set': 56, '../internals/get-set-record': 96, '../internals/iterate-simple': 113, '../internals/set-clone': 145, '../internals/set-helpers': 147 }],
+  156: [function (require, module, exports) {
     'use strict'
     const shared = require('../internals/shared')
     const uid = require('../internals/uid')
@@ -8030,8 +8358,8 @@
     module.exports = function (key) {
       return keys[key] || (keys[key] = uid(key))
     }
-  }, { '../internals/shared': 157, '../internals/uid': 170 }],
-  156: [function (require, module, exports) {
+  }, { '../internals/shared': 158, '../internals/uid': 171 }],
+  157: [function (require, module, exports) {
     'use strict'
     const IS_PURE = require('../internals/is-pure')
     const globalThis = require('../internals/global-this')
@@ -8047,8 +8375,8 @@
       license: 'https://github.com/zloirock/core-js/blob/v3.50.0/LICENSE',
       source: 'https://github.com/zloirock/core-js'
     })
-  }, { '../internals/define-global-property': 74, '../internals/global-this': 96, '../internals/is-pure': 110 }],
-  157: [function (require, module, exports) {
+  }, { '../internals/define-global-property': 75, '../internals/global-this': 97, '../internals/is-pure': 111 }],
+  158: [function (require, module, exports) {
     'use strict'
     const store = require('../internals/shared-store')
     // eslint-disable-next-line es/no-object-create -- safe
@@ -8057,8 +8385,8 @@
     module.exports = function (key, value) {
       return store[key] || (store[key] = value || create(null))
     }
-  }, { '../internals/shared-store': 156 }],
-  158: [function (require, module, exports) {
+  }, { '../internals/shared-store': 157 }],
+  159: [function (require, module, exports) {
     'use strict'
     /* eslint-disable es/no-symbol -- required for testing */
     const V8_VERSION = require('../internals/environment-v8-version')
@@ -8078,8 +8406,8 @@
     // Chrome 38-40 symbols are not inherited from DOM collections prototypes to instances
     !Symbol.sham && V8_VERSION && V8_VERSION < 41
     })
-  }, { '../internals/environment-v8-version': 79, '../internals/fails': 81, '../internals/global-this': 96 }],
-  159: [function (require, module, exports) {
+  }, { '../internals/environment-v8-version': 80, '../internals/fails': 82, '../internals/global-this': 97 }],
+  160: [function (require, module, exports) {
     'use strict'
     const toIntegerOrInfinity = require('../internals/to-integer-or-infinity')
 
@@ -8093,8 +8421,8 @@
       const integer = toIntegerOrInfinity(index)
       return integer < 0 ? max(integer + length, 0) : min(integer, length)
     }
-  }, { '../internals/to-integer-or-infinity': 161 }],
-  160: [function (require, module, exports) {
+  }, { '../internals/to-integer-or-infinity': 162 }],
+  161: [function (require, module, exports) {
     'use strict'
     // toObject with fallback for non-array-like ES3 strings
     const IndexedObject = require('../internals/indexed-object')
@@ -8103,8 +8431,8 @@
     module.exports = function (it) {
       return IndexedObject(requireObjectCoercible(it))
     }
-  }, { '../internals/indexed-object': 101, '../internals/require-object-coercible': 142 }],
-  161: [function (require, module, exports) {
+  }, { '../internals/indexed-object': 102, '../internals/require-object-coercible': 143 }],
+  162: [function (require, module, exports) {
     'use strict'
     const trunc = require('../internals/math-trunc')
 
@@ -8115,8 +8443,8 @@
       // eslint-disable-next-line no-self-compare -- NaN check
       return number !== number || number === 0 ? 0 : trunc(number)
     }
-  }, { '../internals/math-trunc': 126 }],
-  162: [function (require, module, exports) {
+  }, { '../internals/math-trunc': 127 }],
+  163: [function (require, module, exports) {
     'use strict'
     const toIntegerOrInfinity = require('../internals/to-integer-or-infinity')
 
@@ -8128,8 +8456,8 @@
       const len = toIntegerOrInfinity(argument)
       return len > 0 ? min(len, 0x1FFFFFFFFFFFFF) : 0 // 2 ** 53 - 1 == 9007199254740991
     }
-  }, { '../internals/to-integer-or-infinity': 161 }],
-  163: [function (require, module, exports) {
+  }, { '../internals/to-integer-or-infinity': 162 }],
+  164: [function (require, module, exports) {
     'use strict'
     const requireObjectCoercible = require('../internals/require-object-coercible')
 
@@ -8140,8 +8468,8 @@
     module.exports = function (argument) {
       return $Object(requireObjectCoercible(argument))
     }
-  }, { '../internals/require-object-coercible': 142 }],
-  164: [function (require, module, exports) {
+  }, { '../internals/require-object-coercible': 143 }],
+  165: [function (require, module, exports) {
     'use strict'
     const call = require('../internals/function-call')
     const isObject = require('../internals/is-object')
@@ -8168,8 +8496,8 @@
       if (pref === undefined) pref = 'number'
       return ordinaryToPrimitive(input, pref)
     }
-  }, { '../internals/function-call': 85, '../internals/get-method': 94, '../internals/is-object': 109, '../internals/is-symbol': 111, '../internals/ordinary-to-primitive': 138, '../internals/well-known-symbol': 176 }],
-  165: [function (require, module, exports) {
+  }, { '../internals/function-call': 86, '../internals/get-method': 95, '../internals/is-object': 110, '../internals/is-symbol': 112, '../internals/ordinary-to-primitive': 139, '../internals/well-known-symbol': 177 }],
+  166: [function (require, module, exports) {
     'use strict'
     const toPrimitive = require('../internals/to-primitive')
     const isSymbol = require('../internals/is-symbol')
@@ -8180,8 +8508,8 @@
       const key = toPrimitive(argument, 'string')
       return isSymbol(key) ? key : key + ''
     }
-  }, { '../internals/is-symbol': 111, '../internals/to-primitive': 164 }],
-  166: [function (require, module, exports) {
+  }, { '../internals/is-symbol': 112, '../internals/to-primitive': 165 }],
+  167: [function (require, module, exports) {
     'use strict'
     const getBuiltIn = require('../internals/get-built-in')
     const isCallable = require('../internals/is-callable')
@@ -8202,8 +8530,8 @@
       if (isSetLike(it)) return it
       return isIterable(it) ? new Set(it) : it
     }
-  }, { '../internals/get-built-in': 90, '../internals/is-callable': 105, '../internals/is-iterable': 107, '../internals/is-object': 109 }],
-  167: [function (require, module, exports) {
+  }, { '../internals/get-built-in': 91, '../internals/is-callable': 106, '../internals/is-iterable': 108, '../internals/is-object': 110 }],
+  168: [function (require, module, exports) {
     'use strict'
     const wellKnownSymbol = require('../internals/well-known-symbol')
 
@@ -8213,8 +8541,8 @@
     test[TO_STRING_TAG] = 'z'
 
     module.exports = String(test) === '[object z]'
-  }, { '../internals/well-known-symbol': 176 }],
-  168: [function (require, module, exports) {
+  }, { '../internals/well-known-symbol': 177 }],
+  169: [function (require, module, exports) {
     'use strict'
     const classof = require('../internals/classof')
 
@@ -8224,8 +8552,8 @@
       if (classof(argument) === 'Symbol') throw new TypeError('Cannot convert a Symbol value to a string')
       return $String(argument)
     }
-  }, { '../internals/classof': 64 }],
-  169: [function (require, module, exports) {
+  }, { '../internals/classof': 65 }],
+  170: [function (require, module, exports) {
     'use strict'
     const $String = String
 
@@ -8237,7 +8565,7 @@
       }
     }
   }, {}],
-  170: [function (require, module, exports) {
+  171: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
 
@@ -8248,8 +8576,8 @@
     module.exports = function (key) {
       return 'Symbol(' + (key === undefined ? '' : key) + ')_' + toString(++id + postfix, 36)
     }
-  }, { '../internals/function-uncurry-this': 89 }],
-  171: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 90 }],
+  172: [function (require, module, exports) {
     'use strict'
     /* eslint-disable es/no-symbol -- required for testing */
     const NATIVE_SYMBOL = require('../internals/symbol-constructor-detection')
@@ -8257,8 +8585,8 @@
     module.exports = NATIVE_SYMBOL &&
   !Symbol.sham &&
   typeof Symbol.iterator === 'symbol'
-  }, { '../internals/symbol-constructor-detection': 158 }],
-  172: [function (require, module, exports) {
+  }, { '../internals/symbol-constructor-detection': 159 }],
+  173: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const fails = require('../internals/fails')
@@ -8272,8 +8600,8 @@
         writable: false
       }).prototype !== 42
     })
-  }, { '../internals/descriptors': 75, '../internals/fails': 81 }],
-  173: [function (require, module, exports) {
+  }, { '../internals/descriptors': 76, '../internals/fails': 82 }],
+  174: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
     const isCallable = require('../internals/is-callable')
@@ -8281,8 +8609,8 @@
     const WeakMap = globalThis.WeakMap
 
     module.exports = isCallable(WeakMap) && /native code/.test(String(WeakMap))
-  }, { '../internals/global-this': 96, '../internals/is-callable': 105 }],
-  174: [function (require, module, exports) {
+  }, { '../internals/global-this': 97, '../internals/is-callable': 106 }],
+  175: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
 
@@ -8297,8 +8625,8 @@
       has: uncurryThis(WeakMapPrototype.has),
       remove: uncurryThis(WeakMapPrototype.delete)
     }
-  }, { '../internals/function-uncurry-this': 89 }],
-  175: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 90 }],
+  176: [function (require, module, exports) {
     'use strict'
     const uncurryThis = require('../internals/function-uncurry-this')
 
@@ -8312,8 +8640,8 @@
       has: uncurryThis(WeakSetPrototype.has),
       remove: uncurryThis(WeakSetPrototype.delete)
     }
-  }, { '../internals/function-uncurry-this': 89 }],
-  176: [function (require, module, exports) {
+  }, { '../internals/function-uncurry-this': 90 }],
+  177: [function (require, module, exports) {
     'use strict'
     const globalThis = require('../internals/global-this')
     const shared = require('../internals/shared')
@@ -8333,8 +8661,8 @@
           : createWellKnownSymbol('Symbol.' + name)
       } return WellKnownSymbolsStore[name]
     }
-  }, { '../internals/global-this': 96, '../internals/has-own-property': 97, '../internals/shared': 157, '../internals/symbol-constructor-detection': 158, '../internals/uid': 170, '../internals/use-symbol-as-uid': 171 }],
-  177: [function (require, module, exports) {
+  }, { '../internals/global-this': 97, '../internals/has-own-property': 98, '../internals/shared': 158, '../internals/symbol-constructor-detection': 159, '../internals/uid': 171, '../internals/use-symbol-as-uid': 172 }],
+  178: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const $includes = require('../internals/array-includes').includes
@@ -8363,8 +8691,8 @@
 
     // https://tc39.es/ecma262/#sec-array.prototype-@@unscopables
     addToUnscopables('includes')
-  }, { '../internals/add-to-unscopables': 58, '../internals/array-includes': 61, '../internals/export': 80, '../internals/fails': 81 }],
-  178: [function (require, module, exports) {
+  }, { '../internals/add-to-unscopables': 59, '../internals/array-includes': 62, '../internals/export': 81, '../internals/fails': 82 }],
+  179: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const globalThis = require('../internals/global-this')
@@ -8430,8 +8758,8 @@
     $({ global: true, constructor: true, forced: FORCED }, {
       Iterator: IteratorConstructor
     })
-  }, { '../internals/an-instance': 59, '../internals/an-object': 60, '../internals/create-property': 70, '../internals/define-built-in-accessor': 71, '../internals/descriptors': 75, '../internals/export': 80, '../internals/fails': 81, '../internals/global-this': 96, '../internals/has-own-property': 97, '../internals/is-callable': 105, '../internals/is-pure': 110, '../internals/iterators-core': 120, '../internals/object-get-prototype-of': 133, '../internals/well-known-symbol': 176 }],
-  179: [function (require, module, exports) {
+  }, { '../internals/an-instance': 60, '../internals/an-object': 61, '../internals/create-property': 71, '../internals/define-built-in-accessor': 72, '../internals/descriptors': 76, '../internals/export': 81, '../internals/fails': 82, '../internals/global-this': 97, '../internals/has-own-property': 98, '../internals/is-callable': 106, '../internals/is-pure': 111, '../internals/iterators-core': 121, '../internals/object-get-prototype-of': 134, '../internals/well-known-symbol': 177 }],
+  180: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -8464,8 +8792,8 @@
         }, { IS_RECORD: true, INTERRUPTED: true }).stopped
       }
     })
-  }, { '../internals/a-callable': 53, '../internals/an-object': 60, '../internals/export': 80, '../internals/function-call': 85, '../internals/get-iterator-direct': 91, '../internals/iterate': 113, '../internals/iterator-close': 116, '../internals/iterator-helper-without-closing-on-early-error': 119 }],
-  180: [function (require, module, exports) {
+  }, { '../internals/a-callable': 54, '../internals/an-object': 61, '../internals/export': 81, '../internals/function-call': 86, '../internals/get-iterator-direct': 92, '../internals/iterate': 114, '../internals/iterator-close': 117, '../internals/iterator-helper-without-closing-on-early-error': 120 }],
+  181: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -8517,8 +8845,8 @@
         })
       }
     })
-  }, { '../internals/a-callable': 53, '../internals/an-object': 60, '../internals/call-with-safe-iteration-closing': 62, '../internals/export': 80, '../internals/function-call': 85, '../internals/get-iterator-direct': 91, '../internals/is-pure': 110, '../internals/iterator-close': 116, '../internals/iterator-create-proxy': 117, '../internals/iterator-helper-throws-on-invalid-iterator': 118, '../internals/iterator-helper-without-closing-on-early-error': 119 }],
-  181: [function (require, module, exports) {
+  }, { '../internals/a-callable': 54, '../internals/an-object': 61, '../internals/call-with-safe-iteration-closing': 63, '../internals/export': 81, '../internals/function-call': 86, '../internals/get-iterator-direct': 92, '../internals/is-pure': 111, '../internals/iterator-close': 117, '../internals/iterator-create-proxy': 118, '../internals/iterator-helper-throws-on-invalid-iterator': 119, '../internals/iterator-helper-without-closing-on-early-error': 120 }],
+  182: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -8551,8 +8879,8 @@
         }, { IS_RECORD: true, INTERRUPTED: true }).result
       }
     })
-  }, { '../internals/a-callable': 53, '../internals/an-object': 60, '../internals/export': 80, '../internals/function-call': 85, '../internals/get-iterator-direct': 91, '../internals/iterate': 113, '../internals/iterator-close': 116, '../internals/iterator-helper-without-closing-on-early-error': 119 }],
-  182: [function (require, module, exports) {
+  }, { '../internals/a-callable': 54, '../internals/an-object': 61, '../internals/export': 81, '../internals/function-call': 86, '../internals/get-iterator-direct': 92, '../internals/iterate': 114, '../internals/iterator-close': 117, '../internals/iterator-helper-without-closing-on-early-error': 120 }],
+  183: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -8585,8 +8913,8 @@
         }, { IS_RECORD: true })
       }
     })
-  }, { '../internals/a-callable': 53, '../internals/an-object': 60, '../internals/export': 80, '../internals/function-call': 85, '../internals/get-iterator-direct': 91, '../internals/iterate': 113, '../internals/iterator-close': 116, '../internals/iterator-helper-without-closing-on-early-error': 119 }],
-  183: [function (require, module, exports) {
+  }, { '../internals/a-callable': 54, '../internals/an-object': 61, '../internals/export': 81, '../internals/function-call': 86, '../internals/get-iterator-direct': 92, '../internals/iterate': 114, '../internals/iterator-close': 117, '../internals/iterator-helper-without-closing-on-early-error': 120 }],
+  184: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -8631,8 +8959,8 @@
         })
       }
     })
-  }, { '../internals/a-callable': 53, '../internals/an-object': 60, '../internals/call-with-safe-iteration-closing': 62, '../internals/export': 80, '../internals/function-call': 85, '../internals/get-iterator-direct': 91, '../internals/is-pure': 110, '../internals/iterator-close': 116, '../internals/iterator-create-proxy': 117, '../internals/iterator-helper-throws-on-invalid-iterator': 118, '../internals/iterator-helper-without-closing-on-early-error': 119 }],
-  184: [function (require, module, exports) {
+  }, { '../internals/a-callable': 54, '../internals/an-object': 61, '../internals/call-with-safe-iteration-closing': 63, '../internals/export': 81, '../internals/function-call': 86, '../internals/get-iterator-direct': 92, '../internals/is-pure': 111, '../internals/iterator-close': 117, '../internals/iterator-create-proxy': 118, '../internals/iterator-helper-throws-on-invalid-iterator': 119, '../internals/iterator-helper-without-closing-on-early-error': 120 }],
+  185: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const iterate = require('../internals/iterate')
@@ -8685,8 +9013,8 @@
         return accumulator
       }
     })
-  }, { '../internals/a-callable': 53, '../internals/an-object': 60, '../internals/export': 80, '../internals/fails': 81, '../internals/function-apply': 82, '../internals/get-iterator-direct': 91, '../internals/iterate': 113, '../internals/iterator-close': 116, '../internals/iterator-helper-without-closing-on-early-error': 119 }],
-  185: [function (require, module, exports) {
+  }, { '../internals/a-callable': 54, '../internals/an-object': 61, '../internals/export': 81, '../internals/fails': 82, '../internals/function-apply': 83, '../internals/get-iterator-direct': 92, '../internals/iterate': 114, '../internals/iterator-close': 117, '../internals/iterator-helper-without-closing-on-early-error': 120 }],
+  186: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -8719,8 +9047,8 @@
         }, { IS_RECORD: true, INTERRUPTED: true }).stopped
       }
     })
-  }, { '../internals/a-callable': 53, '../internals/an-object': 60, '../internals/export': 80, '../internals/function-call': 85, '../internals/get-iterator-direct': 91, '../internals/iterate': 113, '../internals/iterator-close': 116, '../internals/iterator-helper-without-closing-on-early-error': 119 }],
-  186: [function (require, module, exports) {
+  }, { '../internals/a-callable': 54, '../internals/an-object': 61, '../internals/export': 81, '../internals/function-call': 86, '../internals/get-iterator-direct': 92, '../internals/iterate': 114, '../internals/iterator-close': 117, '../internals/iterator-helper-without-closing-on-early-error': 120 }],
+  187: [function (require, module, exports) {
     'use strict'
     const DESCRIPTORS = require('../internals/descriptors')
     const defineBuiltInAccessor = require('../internals/define-built-in-accessor')
@@ -8737,48 +9065,48 @@
 
       regExpFlagsDetection.correct = true
     }
-  }, { '../internals/define-built-in-accessor': 71, '../internals/descriptors': 75, '../internals/regexp-flags': 141, '../internals/regexp-flags-detection': 140 }],
-  187: [function (require, module, exports) {
-    'use strict'
-    // TODO: Remove from `core-js@4`
-    require('../modules/es.iterator.constructor')
-  }, { '../modules/es.iterator.constructor': 178 }],
+  }, { '../internals/define-built-in-accessor': 72, '../internals/descriptors': 76, '../internals/regexp-flags': 142, '../internals/regexp-flags-detection': 141 }],
   188: [function (require, module, exports) {
     'use strict'
     // TODO: Remove from `core-js@4`
-    require('../modules/es.iterator.every')
-  }, { '../modules/es.iterator.every': 179 }],
+    require('../modules/es.iterator.constructor')
+  }, { '../modules/es.iterator.constructor': 179 }],
   189: [function (require, module, exports) {
     'use strict'
     // TODO: Remove from `core-js@4`
-    require('../modules/es.iterator.filter')
-  }, { '../modules/es.iterator.filter': 180 }],
+    require('../modules/es.iterator.every')
+  }, { '../modules/es.iterator.every': 180 }],
   190: [function (require, module, exports) {
     'use strict'
     // TODO: Remove from `core-js@4`
-    require('../modules/es.iterator.find')
-  }, { '../modules/es.iterator.find': 181 }],
+    require('../modules/es.iterator.filter')
+  }, { '../modules/es.iterator.filter': 181 }],
   191: [function (require, module, exports) {
     'use strict'
     // TODO: Remove from `core-js@4`
-    require('../modules/es.iterator.for-each')
-  }, { '../modules/es.iterator.for-each': 182 }],
+    require('../modules/es.iterator.find')
+  }, { '../modules/es.iterator.find': 182 }],
   192: [function (require, module, exports) {
     'use strict'
     // TODO: Remove from `core-js@4`
-    require('../modules/es.iterator.map')
-  }, { '../modules/es.iterator.map': 183 }],
+    require('../modules/es.iterator.for-each')
+  }, { '../modules/es.iterator.for-each': 183 }],
   193: [function (require, module, exports) {
     'use strict'
     // TODO: Remove from `core-js@4`
-    require('../modules/es.iterator.reduce')
-  }, { '../modules/es.iterator.reduce': 184 }],
+    require('../modules/es.iterator.map')
+  }, { '../modules/es.iterator.map': 184 }],
   194: [function (require, module, exports) {
     'use strict'
     // TODO: Remove from `core-js@4`
-    require('../modules/es.iterator.some')
-  }, { '../modules/es.iterator.some': 185 }],
+    require('../modules/es.iterator.reduce')
+  }, { '../modules/es.iterator.reduce': 185 }],
   195: [function (require, module, exports) {
+    'use strict'
+    // TODO: Remove from `core-js@4`
+    require('../modules/es.iterator.some')
+  }, { '../modules/es.iterator.some': 186 }],
+  196: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const aMap = require('../internals/a-map')
@@ -8797,8 +9125,8 @@
         } return !!allDeleted
       }
     })
-  }, { '../internals/a-map': 54, '../internals/export': 80, '../internals/map-helpers': 124 }],
-  196: [function (require, module, exports) {
+  }, { '../internals/a-map': 55, '../internals/export': 81, '../internals/map-helpers': 125 }],
+  197: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const bind = require('../internals/function-bind-context')
@@ -8816,8 +9144,8 @@
         }, true) !== false
       }
     })
-  }, { '../internals/a-map': 54, '../internals/export': 80, '../internals/function-bind-context': 83, '../internals/map-iterate': 125 }],
-  197: [function (require, module, exports) {
+  }, { '../internals/a-map': 55, '../internals/export': 81, '../internals/function-bind-context': 84, '../internals/map-iterate': 126 }],
+  198: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const bind = require('../internals/function-bind-context')
@@ -8841,8 +9169,8 @@
         return newMap
       }
     })
-  }, { '../internals/a-map': 54, '../internals/export': 80, '../internals/function-bind-context': 83, '../internals/map-helpers': 124, '../internals/map-iterate': 125 }],
-  198: [function (require, module, exports) {
+  }, { '../internals/a-map': 55, '../internals/export': 81, '../internals/function-bind-context': 84, '../internals/map-helpers': 125, '../internals/map-iterate': 126 }],
+  199: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const bind = require('../internals/function-bind-context')
@@ -8861,8 +9189,8 @@
         return result && result.key
       }
     })
-  }, { '../internals/a-map': 54, '../internals/export': 80, '../internals/function-bind-context': 83, '../internals/map-iterate': 125 }],
-  199: [function (require, module, exports) {
+  }, { '../internals/a-map': 55, '../internals/export': 81, '../internals/function-bind-context': 84, '../internals/map-iterate': 126 }],
+  200: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const bind = require('../internals/function-bind-context')
@@ -8881,8 +9209,8 @@
         return result && result.value
       }
     })
-  }, { '../internals/a-map': 54, '../internals/export': 80, '../internals/function-bind-context': 83, '../internals/map-iterate': 125 }],
-  200: [function (require, module, exports) {
+  }, { '../internals/a-map': 55, '../internals/export': 81, '../internals/function-bind-context': 84, '../internals/map-iterate': 126 }],
+  201: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const sameValueZero = require('../internals/same-value-zero')
@@ -8898,8 +9226,8 @@
         }, true) === true
       }
     })
-  }, { '../internals/a-map': 54, '../internals/export': 80, '../internals/map-iterate': 125, '../internals/same-value-zero': 143 }],
-  201: [function (require, module, exports) {
+  }, { '../internals/a-map': 55, '../internals/export': 81, '../internals/map-iterate': 126, '../internals/same-value-zero': 144 }],
+  202: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const aMap = require('../internals/a-map')
@@ -8915,8 +9243,8 @@
         return result && result.key
       }
     })
-  }, { '../internals/a-map': 54, '../internals/export': 80, '../internals/map-iterate': 125 }],
-  202: [function (require, module, exports) {
+  }, { '../internals/a-map': 55, '../internals/export': 81, '../internals/map-iterate': 126 }],
+  203: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const bind = require('../internals/function-bind-context')
@@ -8940,8 +9268,8 @@
         return newMap
       }
     })
-  }, { '../internals/a-map': 54, '../internals/export': 80, '../internals/function-bind-context': 83, '../internals/map-helpers': 124, '../internals/map-iterate': 125 }],
-  203: [function (require, module, exports) {
+  }, { '../internals/a-map': 55, '../internals/export': 81, '../internals/function-bind-context': 84, '../internals/map-helpers': 125, '../internals/map-iterate': 126 }],
+  204: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const bind = require('../internals/function-bind-context')
@@ -8965,8 +9293,8 @@
         return newMap
       }
     })
-  }, { '../internals/a-map': 54, '../internals/export': 80, '../internals/function-bind-context': 83, '../internals/map-helpers': 124, '../internals/map-iterate': 125 }],
-  204: [function (require, module, exports) {
+  }, { '../internals/a-map': 55, '../internals/export': 81, '../internals/function-bind-context': 84, '../internals/map-helpers': 125, '../internals/map-iterate': 126 }],
+  205: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const aMap = require('../internals/a-map')
@@ -8989,8 +9317,8 @@
         return map
       }
     })
-  }, { '../internals/a-map': 54, '../internals/export': 80, '../internals/iterate': 113, '../internals/map-helpers': 124 }],
-  205: [function (require, module, exports) {
+  }, { '../internals/a-map': 55, '../internals/export': 81, '../internals/iterate': 114, '../internals/map-helpers': 125 }],
+  206: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const aCallable = require('../internals/a-callable')
@@ -9019,8 +9347,8 @@
         return accumulator
       }
     })
-  }, { '../internals/a-callable': 53, '../internals/a-map': 54, '../internals/export': 80, '../internals/map-iterate': 125 }],
-  206: [function (require, module, exports) {
+  }, { '../internals/a-callable': 54, '../internals/a-map': 55, '../internals/export': 81, '../internals/map-iterate': 126 }],
+  207: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const bind = require('../internals/function-bind-context')
@@ -9038,8 +9366,8 @@
         }, true) === true
       }
     })
-  }, { '../internals/a-map': 54, '../internals/export': 80, '../internals/function-bind-context': 83, '../internals/map-iterate': 125 }],
-  207: [function (require, module, exports) {
+  }, { '../internals/a-map': 55, '../internals/export': 81, '../internals/function-bind-context': 84, '../internals/map-iterate': 126 }],
+  208: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const aCallable = require('../internals/a-callable')
@@ -9067,8 +9395,8 @@
         return map
       }
     })
-  }, { '../internals/a-callable': 53, '../internals/a-map': 54, '../internals/export': 80, '../internals/map-helpers': 124 }],
-  208: [function (require, module, exports) {
+  }, { '../internals/a-callable': 54, '../internals/a-map': 55, '../internals/export': 81, '../internals/map-helpers': 125 }],
+  209: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const aSet = require('../internals/a-set')
@@ -9084,8 +9412,8 @@
         } return set
       }
     })
-  }, { '../internals/a-set': 55, '../internals/export': 80, '../internals/set-helpers': 146 }],
-  209: [function (require, module, exports) {
+  }, { '../internals/a-set': 56, '../internals/export': 81, '../internals/set-helpers': 147 }],
+  210: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const aSet = require('../internals/a-set')
@@ -9104,8 +9432,8 @@
         } return !!allDeleted
       }
     })
-  }, { '../internals/a-set': 55, '../internals/export': 80, '../internals/set-helpers': 146 }],
-  210: [function (require, module, exports) {
+  }, { '../internals/a-set': 56, '../internals/export': 81, '../internals/set-helpers': 147 }],
+  211: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -9120,8 +9448,8 @@
         return call($difference, this, toSetLike(other))
       }
     })
-  }, { '../internals/export': 80, '../internals/function-call': 85, '../internals/set-difference': 145, '../internals/to-set-like': 166 }],
-  211: [function (require, module, exports) {
+  }, { '../internals/export': 81, '../internals/function-call': 86, '../internals/set-difference': 146, '../internals/to-set-like': 167 }],
+  212: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const bind = require('../internals/function-bind-context')
@@ -9139,8 +9467,8 @@
         }, true) !== false
       }
     })
-  }, { '../internals/a-set': 55, '../internals/export': 80, '../internals/function-bind-context': 83, '../internals/set-iterate': 151 }],
-  212: [function (require, module, exports) {
+  }, { '../internals/a-set': 56, '../internals/export': 81, '../internals/function-bind-context': 84, '../internals/set-iterate': 152 }],
+  213: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const bind = require('../internals/function-bind-context')
@@ -9164,8 +9492,8 @@
         return newSet
       }
     })
-  }, { '../internals/a-set': 55, '../internals/export': 80, '../internals/function-bind-context': 83, '../internals/set-helpers': 146, '../internals/set-iterate': 151 }],
-  213: [function (require, module, exports) {
+  }, { '../internals/a-set': 56, '../internals/export': 81, '../internals/function-bind-context': 84, '../internals/set-helpers': 147, '../internals/set-iterate': 152 }],
+  214: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const bind = require('../internals/function-bind-context')
@@ -9184,8 +9512,8 @@
         return result && result.value
       }
     })
-  }, { '../internals/a-set': 55, '../internals/export': 80, '../internals/function-bind-context': 83, '../internals/set-iterate': 151 }],
-  214: [function (require, module, exports) {
+  }, { '../internals/a-set': 56, '../internals/export': 81, '../internals/function-bind-context': 84, '../internals/set-iterate': 152 }],
+  215: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -9200,8 +9528,8 @@
         return call($intersection, this, toSetLike(other))
       }
     })
-  }, { '../internals/export': 80, '../internals/function-call': 85, '../internals/set-intersection': 147, '../internals/to-set-like': 166 }],
-  215: [function (require, module, exports) {
+  }, { '../internals/export': 81, '../internals/function-call': 86, '../internals/set-intersection': 148, '../internals/to-set-like': 167 }],
+  216: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -9216,8 +9544,8 @@
         return call($isDisjointFrom, this, toSetLike(other))
       }
     })
-  }, { '../internals/export': 80, '../internals/function-call': 85, '../internals/set-is-disjoint-from': 148, '../internals/to-set-like': 166 }],
-  216: [function (require, module, exports) {
+  }, { '../internals/export': 81, '../internals/function-call': 86, '../internals/set-is-disjoint-from': 149, '../internals/to-set-like': 167 }],
+  217: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -9232,8 +9560,8 @@
         return call($isSubsetOf, this, toSetLike(other))
       }
     })
-  }, { '../internals/export': 80, '../internals/function-call': 85, '../internals/set-is-subset-of': 149, '../internals/to-set-like': 166 }],
-  217: [function (require, module, exports) {
+  }, { '../internals/export': 81, '../internals/function-call': 86, '../internals/set-is-subset-of': 150, '../internals/to-set-like': 167 }],
+  218: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -9248,8 +9576,8 @@
         return call($isSupersetOf, this, toSetLike(other))
       }
     })
-  }, { '../internals/export': 80, '../internals/function-call': 85, '../internals/set-is-superset-of': 150, '../internals/to-set-like': 166 }],
-  218: [function (require, module, exports) {
+  }, { '../internals/export': 81, '../internals/function-call': 86, '../internals/set-is-superset-of': 151, '../internals/to-set-like': 167 }],
+  219: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const uncurryThis = require('../internals/function-uncurry-this')
@@ -9273,8 +9601,8 @@
         return arrayJoin(array, sep)
       }
     })
-  }, { '../internals/a-set': 55, '../internals/export': 80, '../internals/function-uncurry-this': 89, '../internals/set-iterate': 151, '../internals/to-string': 168 }],
-  219: [function (require, module, exports) {
+  }, { '../internals/a-set': 56, '../internals/export': 81, '../internals/function-uncurry-this': 90, '../internals/set-iterate': 152, '../internals/to-string': 169 }],
+  220: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const bind = require('../internals/function-bind-context')
@@ -9298,8 +9626,8 @@
         return newSet
       }
     })
-  }, { '../internals/a-set': 55, '../internals/export': 80, '../internals/function-bind-context': 83, '../internals/set-helpers': 146, '../internals/set-iterate': 151 }],
-  220: [function (require, module, exports) {
+  }, { '../internals/a-set': 56, '../internals/export': 81, '../internals/function-bind-context': 84, '../internals/set-helpers': 147, '../internals/set-iterate': 152 }],
+  221: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const aCallable = require('../internals/a-callable')
@@ -9328,8 +9656,8 @@
         return accumulator
       }
     })
-  }, { '../internals/a-callable': 53, '../internals/a-set': 55, '../internals/export': 80, '../internals/set-iterate': 151 }],
-  221: [function (require, module, exports) {
+  }, { '../internals/a-callable': 54, '../internals/a-set': 56, '../internals/export': 81, '../internals/set-iterate': 152 }],
+  222: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const bind = require('../internals/function-bind-context')
@@ -9347,8 +9675,8 @@
         }, true) === true
       }
     })
-  }, { '../internals/a-set': 55, '../internals/export': 80, '../internals/function-bind-context': 83, '../internals/set-iterate': 151 }],
-  222: [function (require, module, exports) {
+  }, { '../internals/a-set': 56, '../internals/export': 81, '../internals/function-bind-context': 84, '../internals/set-iterate': 152 }],
+  223: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -9363,8 +9691,8 @@
         return call($symmetricDifference, this, toSetLike(other))
       }
     })
-  }, { '../internals/export': 80, '../internals/function-call': 85, '../internals/set-symmetric-difference': 153, '../internals/to-set-like': 166 }],
-  223: [function (require, module, exports) {
+  }, { '../internals/export': 81, '../internals/function-call': 86, '../internals/set-symmetric-difference': 154, '../internals/to-set-like': 167 }],
+  224: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const call = require('../internals/function-call')
@@ -9379,8 +9707,8 @@
         return call($union, this, toSetLike(other))
       }
     })
-  }, { '../internals/export': 80, '../internals/function-call': 85, '../internals/set-union': 154, '../internals/to-set-like': 166 }],
-  224: [function (require, module, exports) {
+  }, { '../internals/export': 81, '../internals/function-call': 86, '../internals/set-union': 155, '../internals/to-set-like': 167 }],
+  225: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const aWeakMap = require('../internals/a-weak-map')
@@ -9399,8 +9727,8 @@
         } return !!allDeleted
       }
     })
-  }, { '../internals/a-weak-map': 56, '../internals/export': 80, '../internals/weak-map-helpers': 174 }],
-  225: [function (require, module, exports) {
+  }, { '../internals/a-weak-map': 57, '../internals/export': 81, '../internals/weak-map-helpers': 175 }],
+  226: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const aWeakSet = require('../internals/a-weak-set')
@@ -9416,8 +9744,8 @@
         } return set
       }
     })
-  }, { '../internals/a-weak-set': 57, '../internals/export': 80, '../internals/weak-set-helpers': 175 }],
-  226: [function (require, module, exports) {
+  }, { '../internals/a-weak-set': 58, '../internals/export': 81, '../internals/weak-set-helpers': 176 }],
+  227: [function (require, module, exports) {
     'use strict'
     const $ = require('../internals/export')
     const aWeakSet = require('../internals/a-weak-set')
@@ -9436,8 +9764,8 @@
         } return !!allDeleted
       }
     })
-  }, { '../internals/a-weak-set': 57, '../internals/export': 80, '../internals/weak-set-helpers': 175 }],
-  227: [function (require, module, exports) {
+  }, { '../internals/a-weak-set': 58, '../internals/export': 81, '../internals/weak-set-helpers': 176 }],
+  228: [function (require, module, exports) {
     'use strict'
     const __createBinding = (this && this.__createBinding) || (Object.create
       ? function (o, m, k, k2) {
@@ -9689,8 +10017,8 @@
         return (elem) => adapter.getAttributeValue(elem, name) !== value && next(elem)
       }
     }
-  }, { boolbase: 38 }],
-  228: [function (require, module, exports) {
+  }, { boolbase: 39 }],
+  229: [function (require, module, exports) {
     'use strict'
     const __createBinding = (this && this.__createBinding) || (Object.create
       ? function (o, m, k, k2) {
@@ -9818,8 +10146,8 @@
     function or (a, b) {
       return (elem) => a(elem) || b(elem)
     }
-  }, { './general.js': 229, './helpers/querying.js': 231, './helpers/selectors.js': 232, './pseudo-selectors/subselects.js': 238, boolbase: 38, 'css-what': 239 }],
-  229: [function (require, module, exports) {
+  }, { './general.js': 230, './helpers/querying.js': 232, './helpers/selectors.js': 233, './pseudo-selectors/subselects.js': 239, boolbase: 39, 'css-what': 240 }],
+  230: [function (require, module, exports) {
     'use strict'
     Object.defineProperty(exports, '__esModule', { value: true })
     exports.compileGeneralSelector = compileGeneralSelector
@@ -9975,8 +10303,8 @@
         }
       }
     }
-  }, { './attributes.js': 227, './helpers/querying.js': 231, './pseudo-selectors/index.js': 236, 'css-what': 239 }],
-  230: [function (require, module, exports) {
+  }, { './attributes.js': 228, './helpers/querying.js': 232, './pseudo-selectors/index.js': 237, 'css-what': 240 }],
+  231: [function (require, module, exports) {
     'use strict'
     Object.defineProperty(exports, '__esModule', { value: true })
     exports.cacheParentResults = cacheParentResults
@@ -10021,8 +10349,8 @@
         return resultCache.get(node) && addResultToCache(elem)
       }
     }
-  }, { './querying.js': 231 }],
-  231: [function (require, module, exports) {
+  }, { './querying.js': 232 }],
+  232: [function (require, module, exports) {
     'use strict'
     Object.defineProperty(exports, '__esModule', { value: true })
     exports.findAll = findAll
@@ -10140,7 +10468,7 @@
       return parent != null && adapter.isTag(parent) ? parent : null
     }
   }, {}],
-  232: [function (require, module, exports) {
+  233: [function (require, module, exports) {
     'use strict'
     Object.defineProperty(exports, '__esModule', { value: true })
     exports.isTraversal = isTraversal
@@ -10249,8 +10577,8 @@
             (Array.isArray(t.data) &&
                 t.data.some((data) => data.some(includesScopePseudo)))))
     }
-  }, { 'css-what': 239 }],
-  233: [function (require, module, exports) {
+  }, { 'css-what': 240 }],
+  234: [function (require, module, exports) {
     'use strict'
     const __createBinding = (this && this.__createBinding) || (Object.create
       ? function (o, m, k, k2) {
@@ -10429,8 +10757,8 @@
     Object.defineProperty(exports, 'aliases', { enumerable: true, get: function () { return index_js_1.aliases } })
     Object.defineProperty(exports, 'filters', { enumerable: true, get: function () { return index_js_1.filters } })
     Object.defineProperty(exports, 'pseudos', { enumerable: true, get: function () { return index_js_1.pseudos } })
-  }, { './compile.js': 228, './helpers/querying.js': 231, './pseudo-selectors/index.js': 236, boolbase: 38, 'css-what': 239, domutils: 39 }],
-  234: [function (require, module, exports) {
+  }, { './compile.js': 229, './helpers/querying.js': 232, './pseudo-selectors/index.js': 237, boolbase: 39, 'css-what': 240, domutils: 40 }],
+  235: [function (require, module, exports) {
     'use strict'
     Object.defineProperty(exports, '__esModule', { value: true })
     exports.aliases = void 0
@@ -10486,7 +10814,7 @@
       text: "input:is(:not([type!='']), [type=text])"
     }
   }, {}],
-  235: [function (require, module, exports) {
+  236: [function (require, module, exports) {
     'use strict'
     const __createBinding = (this && this.__createBinding) || (Object.create
       ? function (o, m, k, k2) {
@@ -10674,8 +11002,8 @@
         }
       }
     }
-  }, { '../helpers/cache.js': 230, '../helpers/querying.js': 231, boolbase: 38, 'nth-check': 244 }],
-  236: [function (require, module, exports) {
+  }, { '../helpers/cache.js': 231, '../helpers/querying.js': 232, boolbase: 39, 'nth-check': 245 }],
+  237: [function (require, module, exports) {
     'use strict'
     /*
  * Pseudo selectors
@@ -10734,8 +11062,8 @@
       }
       throw new Error(`Unknown pseudo-class :${name}`)
     }
-  }, { './aliases.js': 234, './filters.js': 235, './pseudos.js': 237, './subselects.js': 238, 'css-what': 239 }],
-  237: [function (require, module, exports) {
+  }, { './aliases.js': 235, './filters.js': 236, './pseudos.js': 238, './subselects.js': 239, 'css-what': 240 }],
+  238: [function (require, module, exports) {
     'use strict'
     Object.defineProperty(exports, '__esModule', { value: true })
     exports.pseudos = void 0
@@ -10835,7 +11163,7 @@
       }
     }
   }, {}],
-  238: [function (require, module, exports) {
+  239: [function (require, module, exports) {
     'use strict'
     const __createBinding = (this && this.__createBinding) || (Object.create
       ? function (o, m, k, k2) {
@@ -10977,8 +11305,8 @@
           : (0, cache_js_1.cacheParentResults)(next, options, hasOne)
       }
     }
-  }, { '../helpers/cache.js': 230, '../helpers/querying.js': 231, '../helpers/selectors.js': 232, boolbase: 38 }],
-  239: [function (require, module, exports) {
+  }, { '../helpers/cache.js': 231, '../helpers/querying.js': 232, '../helpers/selectors.js': 233, boolbase: 39 }],
+  240: [function (require, module, exports) {
     'use strict'
     const __createBinding = (this && this.__createBinding) || (Object.create
       ? function (o, m, k, k2) {
@@ -11004,8 +11332,8 @@
     Object.defineProperty(exports, 'parse', { enumerable: true, get: function () { return parse_js_1.parse } })
     const stringify_js_1 = require('./stringify.js')
     Object.defineProperty(exports, 'stringify', { enumerable: true, get: function () { return stringify_js_1.stringify } })
-  }, { './parse.js': 240, './stringify.js': 241, './types.js': 242 }],
-  240: [function (require, module, exports) {
+  }, { './parse.js': 241, './stringify.js': 242, './types.js': 243 }],
+  241: [function (require, module, exports) {
     'use strict'
     Object.defineProperty(exports, '__esModule', { value: true })
     exports.isTraversal = isTraversal
@@ -11486,8 +11814,8 @@
       finalizeSubselector()
       return selectorIndex
     }
-  }, { './types.js': 242 }],
-  241: [function (require, module, exports) {
+  }, { './types.js': 243 }],
+  242: [function (require, module, exports) {
     'use strict'
     Object.defineProperty(exports, '__esModule', { value: true })
     exports.stringify = stringify
@@ -11638,8 +11966,8 @@
       }
       return escapedName.length > 0 ? escapedName + name.slice(lastIndex) : name
     }
-  }, { './types.js': 242 }],
-  242: [function (require, module, exports) {
+  }, { './types.js': 243 }],
+  243: [function (require, module, exports) {
     'use strict'
     Object.defineProperty(exports, '__esModule', { value: true })
     exports.AttributeAction = exports.IgnoreCaseMode = exports.SelectorType = void 0
@@ -11683,7 +12011,7 @@
       AttributeAction.Start = 'start'
     })(AttributeAction || (exports.AttributeAction = AttributeAction = {}))
   }, {}],
-  243: [function (require, module, exports) {
+  244: [function (require, module, exports) {
     'use strict'
     const __importDefault = (this && this.__importDefault) || function (mod) {
       return (mod && mod.__esModule) ? mod : { default: mod }
@@ -11801,8 +12129,8 @@
       return function () { return a * n++ + b }
     }
     exports.generate = generate
-  }, { boolbase: 38 }],
-  244: [function (require, module, exports) {
+  }, { boolbase: 39 }],
+  245: [function (require, module, exports) {
     'use strict'
     Object.defineProperty(exports, '__esModule', { value: true })
     exports.sequence = exports.generate = exports.compile = exports.parse = void 0
@@ -11872,8 +12200,8 @@
       return (0, compile_js_1.generate)((0, parse_js_1.parse)(formula))
     }
     exports.sequence = sequence
-  }, { './compile.js': 243, './parse.js': 245 }],
-  245: [function (require, module, exports) {
+  }, { './compile.js': 244, './parse.js': 246 }],
+  246: [function (require, module, exports) {
     'use strict'
     // Following http://www.w3.org/TR/css3-selectors/#nth-child-pseudo
     Object.defineProperty(exports, '__esModule', { value: true })
@@ -11949,7 +12277,7 @@
     }
     exports.parse = parse
   }, {}],
-  246: [function (require, module, exports) {
+  247: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -11967,7 +12295,7 @@
     const callWithParams = (fn, params = [], minimum = 2) => fn(...params.slice(0, fn.length || minimum))
     const _default = exports.default = callWithParams
   }, {}],
-  247: [function (require, module, exports) {
+  248: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -12001,8 +12329,8 @@
       })
     }
     const _default = exports.default = relevancyFilter
-  }, { 'core-js/modules/esnext.iterator.constructor.js': 187, 'core-js/modules/esnext.iterator.filter.js': 189, 'core-js/modules/esnext.iterator.map.js': 192 }],
-  248: [function (require, module, exports) {
+  }, { 'core-js/modules/esnext.iterator.constructor.js': 188, 'core-js/modules/esnext.iterator.filter.js': 190, 'core-js/modules/esnext.iterator.map.js': 193 }],
+  249: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -12034,8 +12362,8 @@
       useClone: true
     })(object)
     const _default = exports.default = cloneObject
-  }, { './mergeObjectsBase': 253 }],
-  249: [function (require, module, exports) {
+  }, { './mergeObjectsBase': 254 }],
+  250: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -12052,8 +12380,8 @@
  */
     const isCloneable = value => typeof value === 'object' && value !== null && !(0, _isInstanceObject.default)(value)
     const _default = exports.default = isCloneable
-  }, { './isInstanceObject': 251 }],
-  250: [function (require, module, exports) {
+  }, { './isInstanceObject': 252 }],
+  251: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -12154,8 +12482,8 @@
  */
     const isEqual = (first, second) => compare(first, second, new WeakMap())
     const _default = exports.default = isEqual
-  }, { 'core-js/modules/es.regexp.flags.js': 186, 'core-js/modules/esnext.iterator.constructor.js': 187, 'core-js/modules/esnext.iterator.every.js': 188, 'core-js/modules/esnext.iterator.some.js': 194, 'core-js/modules/esnext.map.delete-all.js': 195, 'core-js/modules/esnext.map.every.js': 196, 'core-js/modules/esnext.map.filter.js': 197, 'core-js/modules/esnext.map.find-key.js': 198, 'core-js/modules/esnext.map.find.js': 199, 'core-js/modules/esnext.map.includes.js': 200, 'core-js/modules/esnext.map.key-of.js': 201, 'core-js/modules/esnext.map.map-keys.js': 202, 'core-js/modules/esnext.map.map-values.js': 203, 'core-js/modules/esnext.map.merge.js': 204, 'core-js/modules/esnext.map.reduce.js': 205, 'core-js/modules/esnext.map.some.js': 206, 'core-js/modules/esnext.map.update.js': 207, 'core-js/modules/esnext.set.add-all.js': 208, 'core-js/modules/esnext.set.delete-all.js': 209, 'core-js/modules/esnext.set.difference.js': 210, 'core-js/modules/esnext.set.every.js': 211, 'core-js/modules/esnext.set.filter.js': 212, 'core-js/modules/esnext.set.find.js': 213, 'core-js/modules/esnext.set.intersection.js': 214, 'core-js/modules/esnext.set.is-disjoint-from.js': 215, 'core-js/modules/esnext.set.is-subset-of.js': 216, 'core-js/modules/esnext.set.is-superset-of.js': 217, 'core-js/modules/esnext.set.join.js': 218, 'core-js/modules/esnext.set.map.js': 219, 'core-js/modules/esnext.set.reduce.js': 220, 'core-js/modules/esnext.set.some.js': 221, 'core-js/modules/esnext.set.symmetric-difference.js': 222, 'core-js/modules/esnext.set.union.js': 223, 'core-js/modules/esnext.weak-map.delete-all.js': 224, 'core-js/modules/esnext.weak-set.add-all.js': 225, 'core-js/modules/esnext.weak-set.delete-all.js': 226 }],
-  251: [function (require, module, exports) {
+  }, { 'core-js/modules/es.regexp.flags.js': 187, 'core-js/modules/esnext.iterator.constructor.js': 188, 'core-js/modules/esnext.iterator.every.js': 189, 'core-js/modules/esnext.iterator.some.js': 195, 'core-js/modules/esnext.map.delete-all.js': 196, 'core-js/modules/esnext.map.every.js': 197, 'core-js/modules/esnext.map.filter.js': 198, 'core-js/modules/esnext.map.find-key.js': 199, 'core-js/modules/esnext.map.find.js': 200, 'core-js/modules/esnext.map.includes.js': 201, 'core-js/modules/esnext.map.key-of.js': 202, 'core-js/modules/esnext.map.map-keys.js': 203, 'core-js/modules/esnext.map.map-values.js': 204, 'core-js/modules/esnext.map.merge.js': 205, 'core-js/modules/esnext.map.reduce.js': 206, 'core-js/modules/esnext.map.some.js': 207, 'core-js/modules/esnext.map.update.js': 208, 'core-js/modules/esnext.set.add-all.js': 209, 'core-js/modules/esnext.set.delete-all.js': 210, 'core-js/modules/esnext.set.difference.js': 211, 'core-js/modules/esnext.set.every.js': 212, 'core-js/modules/esnext.set.filter.js': 213, 'core-js/modules/esnext.set.find.js': 214, 'core-js/modules/esnext.set.intersection.js': 215, 'core-js/modules/esnext.set.is-disjoint-from.js': 216, 'core-js/modules/esnext.set.is-subset-of.js': 217, 'core-js/modules/esnext.set.is-superset-of.js': 218, 'core-js/modules/esnext.set.join.js': 219, 'core-js/modules/esnext.set.map.js': 220, 'core-js/modules/esnext.set.reduce.js': 221, 'core-js/modules/esnext.set.some.js': 222, 'core-js/modules/esnext.set.symmetric-difference.js': 223, 'core-js/modules/esnext.set.union.js': 224, 'core-js/modules/esnext.weak-map.delete-all.js': 225, 'core-js/modules/esnext.weak-set.add-all.js': 226, 'core-js/modules/esnext.weak-set.delete-all.js': 227 }],
+  252: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -12182,8 +12510,8 @@
       return object.constructor.name !== 'Array' && (0, _objectKeys.default)(object, true).length > (0, _objectKeys.default)(object).length
     }
     const _default = exports.default = isInstanceObject
-  }, { './isObject': 252, './objectKeys': 254, 'core-js/modules/es.array.includes.js': 177 }],
-  252: [function (require, module, exports) {
+  }, { './isObject': 253, './objectKeys': 255, 'core-js/modules/es.array.includes.js': 178 }],
+  253: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -12199,7 +12527,7 @@
     const isObject = object => typeof object === 'object' && object !== null
     const _default = exports.default = isObject
   }, {}],
-  253: [function (require, module, exports) {
+  254: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -12291,8 +12619,8 @@
       }, firstObject || {})
     }
     const _default = exports.default = mergeObjectsBase
-  }, { '../functions/relevancyFilter': 247, './isCloneable': 249, './reduceObject': 255, './setValue': 256, 'core-js/modules/esnext.iterator.constructor.js': 187, 'core-js/modules/esnext.iterator.find.js': 190, 'core-js/modules/esnext.iterator.map.js': 192, 'core-js/modules/esnext.iterator.reduce.js': 193 }],
-  254: [function (require, module, exports) {
+  }, { '../functions/relevancyFilter': 248, './isCloneable': 250, './reduceObject': 256, './setValue': 257, 'core-js/modules/esnext.iterator.constructor.js': 188, 'core-js/modules/esnext.iterator.find.js': 191, 'core-js/modules/esnext.iterator.map.js': 193, 'core-js/modules/esnext.iterator.reduce.js': 194 }],
+  255: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -12332,8 +12660,8 @@
       return keys
     }
     const _default = exports.default = objectKeys
-  }, { './isObject': 252 }],
-  255: [function (require, module, exports) {
+  }, { './isObject': 253 }],
+  256: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
@@ -12359,8 +12687,8 @@
  */
     const reduceObject = (obj, fn, initialValue = obj[(0, _objectKeys.default)(obj)[0]] || obj[0]) => Array.isArray(obj) ? obj.reduce(fn, initialValue) : (0, _objectKeys.default)(obj, true).reduce((newObj, curr) => (0, _callWithParams.default)(fn, [newObj, obj[curr], curr, obj], 2), initialValue)
     const _default = exports.default = reduceObject
-  }, { '../functions/callWithParams': 246, './objectKeys': 254, 'core-js/modules/esnext.iterator.constructor.js': 187, 'core-js/modules/esnext.iterator.reduce.js': 193 }],
-  256: [function (require, module, exports) {
+  }, { '../functions/callWithParams': 247, './objectKeys': 255, 'core-js/modules/esnext.iterator.constructor.js': 188, 'core-js/modules/esnext.iterator.reduce.js': 194 }],
+  257: [function (require, module, exports) {
     'use strict'
 
     Object.defineProperty(exports, '__esModule', {
