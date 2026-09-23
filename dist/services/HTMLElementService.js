@@ -14,6 +14,8 @@ exports.HTMLElementService = void 0
 const ElementService_1 = require('./ElementService')
 const createEvent_1 = __importDefault(require('../factories/createEvent'))
 const activeElement_1 = require('../functions/activeElement')
+const createStyleDeclaration_1 = __importDefault(require('../factories/createStyleDeclaration'))
+const createDataset_1 = __importDefault(require('../factories/createDataset'))
 /**
  * Simulate the behaviour of the HTMLElement Class when there is no DOM available.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -25,7 +27,8 @@ const activeElement_1 = require('../functions/activeElement')
  * @property {PseudoHTMLElement} offsetParent - A reference to the closest positioned parent element
  * @property {number} offsetTop - The position of the top side of the element based on the parent element
  * @property {number} offsetWidth - The width of the element as offset by the parent element
- * @property {Object} style - A container to define all applied inline-styles
+ * @property {CSSStyleDeclarationService} style - The element's inline styles, live and settable per property
+ * @property {Object.<string, string>} dataset - The element's data-* attributes, live, under their camelCase names
  * @property {string} title - The title attribute which affects the text visible on hover
  */
 class HTMLElementService extends ElementService_1.ElementService {
@@ -63,15 +66,51 @@ class HTMLElementService extends ElementService_1.ElementService {
         name: 'offsetWidth',
         value: 0
       }, {
-        name: 'style',
-        value: {}
-      }, {
         name: 'title',
         value: ''
       }],
       parent,
       children
     })
+    this.styleDeclaration = (0, createStyleDeclaration_1.default)()
+    this.datasetProxy = (0, createDataset_1.default)(this)
+  }
+
+  /**
+   * The element's inline styles: a live CSSStyleDeclaration-like object, so both style.setProperty('color', 'red')
+   * and style.color = 'red' work.
+   * @returns {CSSStyleDeclarationService}
+   */
+  get style () {
+    return this.styleDeclaration
+  }
+
+  /**
+   * The element's data-* attributes, live, under their camelCase names (data-foo-bar <-> dataset.fooBar). Backed
+   * directly by getAttribute / setAttribute, so it is never out of sync with the attributes themselves.
+   * @returns {Object.<string, string>}
+   */
+  get dataset () {
+    return this.datasetProxy
+  }
+
+  /**
+   * Style is not attribute-backed like most properties (see the constructor), so cloneNode needs its own copy of it.
+   * @returns {NodeService}
+   */
+  cloneShallow () {
+    const copy = super.cloneShallow()
+    copy.style.cssText = this.style.cssText
+    return copy
+  }
+
+  /**
+   * Style is not attribute-backed like most properties, so isEqualNode needs to compare it separately too.
+   * @param {NodeService} other The node to compare with
+   * @returns {boolean}
+   */
+  equalsShallow (other) {
+    return super.equalsShallow(other) && this.style.cssText === other.style.cssText
   }
 
   /**
