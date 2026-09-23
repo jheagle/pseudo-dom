@@ -20,33 +20,46 @@ const generateDocument = (root: Window | any, context: object = {}): Window | Ps
   const newWindow: Window | PseudoEventTarget | any = typeof root.document === 'undefined' ? root : new PseudoEventTarget()
 
   /**
-   * @type {Node|PseudoNode}
+   * The Node class itself (matching the DOM's window.Node), not an instance - the right-hand side of `instanceof`
+   * must be a constructor, so `x instanceof Node` needs this, not `new PseudoNode()`.
+   * @type {Function}
    */
-  const Node = root.Node || new PseudoNode()
+  const Node = root.Node || PseudoNode
   if (typeof newWindow.Node === 'undefined') {
     newWindow.Node = Node
   }
 
   /**
-   *
-   * @type {Element|PseudoElement}
+   * The Element class itself, for the same reason as Node.
+   * @type {Function}
    */
-  const Element = root.Element || new PseudoElement()
+  const Element = root.Element || PseudoElement
   if (typeof newWindow.Element === 'undefined') {
     newWindow.Element = Element
   }
 
   /**
-   * Create an instance of HTMLElement if not available
-   * @type {HTMLElement|PseudoHTMLElement}
+   * The HTMLElement class itself, for the same reason as Node.
+   * @type {Function}
    */
-  const HTMLElement = root.HTMLElement || new PseudoHTMLElement()
+  const HTMLElement = root.HTMLElement || PseudoHTMLElement
   if (typeof newWindow.HTMLElement === 'undefined') {
     newWindow.HTMLElement = HTMLElement
   }
 
   /**
-   * Define document when not available
+   * The HTMLDocument class itself, for the same reason as Node (so `document instanceof HTMLDocument`, a common
+   * real-DOM-detection check, works).
+   * @type {Function}
+   */
+  const HTMLDocument = root.HTMLDocument || PseudoHTMLDocument
+  if (typeof newWindow.HTMLDocument === 'undefined') {
+    newWindow.HTMLDocument = HTMLDocument
+  }
+
+  /**
+   * Define document when not available - a real instance, unlike the classes above (window.document IS an object,
+   * not a constructor).
    * @type {Document|PseudoHTMLDocument}
    */
   const document = root.document || new PseudoHTMLDocument()

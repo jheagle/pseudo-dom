@@ -144,10 +144,12 @@ if (typeof document === 'undefined') {
 }
 ```
 
-`installGlobal(target = globalThis)` fills in `document` / `Node` / `Element` / `HTMLElement` on `target`, using
+`installGlobal(target = globalThis)` fills in `document` / `Node` / `Element` / `HTMLElement` / `HTMLDocument` /
+`window` (a self-reference, like a real browser's) on `target`, using
 [browser-or-node](https://www.npmjs.com/package/browser-or-node) to check whether a real DOM (a real browser, or a
 jsdom-based test environment) is already there first - it's always safe to call, everywhere: it does nothing when
-one is.
+one is. `Node` / `Element` / `HTMLElement` / `HTMLDocument` are the classes themselves (not instances), so
+`x instanceof Element` works, matching the real DOM's.
 
 There's no real rendering to look at, so `logElement(node, [label])` prints a readable, indented view of a node's
 markup to the console (`prettyPrint(node, [indent])`, from the same module, returns the string instead of printing
