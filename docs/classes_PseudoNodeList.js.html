@@ -26,61 +26,77 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/**
+            <pre class="prettyprint source linenums"><code>'use strict'
+
+require('core-js/modules/esnext.iterator.constructor.js')
+require('core-js/modules/esnext.iterator.map.js')
+Object.defineProperty(exports, '__esModule', {
+  value: true
+})
+exports.PseudoNodeList = void 0
+/**
  * @file Substitute for the NodeList interface.
  * @author Joshua Heagle &lt;joshuaheagle@gmail.com>
  * @version 1.0.0
  */
-class PseudoNodeList {
-  #innerList = []
-  #initialized = false
-
-  initialize (innerList = []) {
-    if (this.#initialized) {
-      return this
-    }
-    this.#innerList = innerList
-    this.#initialized = true
-    return this
-  }
-
-  get length () {
-    return this.#innerList.length
-  }
-
-  get entries () {
-    return Array.from(this)
-  }
-
-  get keys () {
-    return Array.from(this.#innerList).keys
-  }
-
-  get values () {
-    return Array.from(this.#innerList).map(item => item.data).values
-  }
-
-  item (index) {
-    return this.#innerList.item(index)
-  }
-
-  forEach (callback) {
-    return Array.from(this.#innerList).map(item => item.data).forEach(callback)
-  }
-
+const LinkedTreeList_1 = require('collect-your-stuff/dist/collections/linked-tree-list/LinkedTreeList')
+/**
+ * A NodeList, like the DOM one, iterates over the nodes themselves (the data stored in each TreeLinker), rather than
+ * the linkers that hold them.
+ * @class
+ * @augments LinkedTreeList
+ */
+class PseudoNodeList extends LinkedTreeList_1.LinkedTreeList {
+  /**
+   * Iterate over the nodes in this list.
+   * @returns {Iterator}
+   */
   [Symbol.iterator] () {
-    let current = this.#innerList.first
+    // Walk the nodes of this list only (the linkers of a child list have no children of their own)
+    let current = this.first
     return {
       next: () => {
-        const result = { value: (current ? current.data : null), done: !current }
-        current = (current ? current.next : null)
+        if (current === null) {
+          return {
+            done: true,
+            value: undefined
+          }
+        }
+        const result = {
+          done: false,
+          value: current.data
+        }
+        current = current.next
         return result
       }
     }
   }
-}
 
-export default PseudoNodeList
+  /**
+   * Iterate over [index, node] pairs.
+   * @returns {Iterator}
+   */
+  entries () {
+    return Array.from(this).map((node, index) => [index, node])[Symbol.iterator]()
+  }
+
+  /**
+   * Iterate over the indexes.
+   * @returns {Iterator}
+   */
+  keys () {
+    return Array.from(this).map((node, index) => index)[Symbol.iterator]()
+  }
+
+  /**
+   * Iterate over the nodes.
+   * @returns {Iterator}
+   */
+  values () {
+    return Array.from(this)[Symbol.iterator]()
+  }
+}
+exports.PseudoNodeList = PseudoNodeList
 </code></pre>
         </article>
     </section>
@@ -91,13 +107,13 @@ export default PseudoNodeList
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-pseudoDom_objects.html">pseudoDom/objects</a></li></ul><h3>Classes</h3><ul><li><a href="PseudoElement.html">PseudoElement</a></li><li><a href="PseudoEvent.html">PseudoEvent</a></li><li><a href="PseudoEventListener.html">PseudoEventListener</a></li><li><a href="PseudoEventTarget.html">PseudoEventTarget</a></li><li><a href="PseudoHTMLDocument.html">PseudoHTMLDocument</a></li><li><a href="PseudoHTMLElement.html">PseudoHTMLElement</a></li><li><a href="PseudoNode.html">PseudoNode</a></li><li><a href="PseudoNodeAttached.html">PseudoNodeAttached</a></li></ul><h3>Global</h3><ul><li><a href="global.html#previousPseudoDom">previousPseudoDom</a></li><li><a href="global.html#root">root</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-pseudoDom_objects.html">pseudoDom/objects</a></li><li><a href="module-pseudoDom_simulate.html">pseudoDom/simulate</a></li></ul><h3>Classes</h3><ul><li><a href="AttrService.html">AttrService</a></li><li><a href="CSSStyleDeclarationService.html">CSSStyleDeclarationService</a></li><li><a href="CommentService.html">CommentService</a></li><li><a href="CustomEventService.html">CustomEventService</a></li><li><a href="DOMTokenListService.html">DOMTokenListService</a></li><li><a href="DocumentFragmentService.html">DocumentFragmentService</a></li><li><a href="DocumentService.html">DocumentService</a></li><li><a href="ElementService.html">ElementService</a></li><li><a href="EventService.html">EventService</a></li><li><a href="EventTargetService.html">EventTargetService</a></li><li><a href="FocusEventService.html">FocusEventService</a></li><li><a href="HTMLCollectionService.html">HTMLCollectionService</a></li><li><a href="HTMLElementService.html">HTMLElementService</a></li><li><a href="InputEventService.html">InputEventService</a></li><li><a href="KeyboardEventService.html">KeyboardEventService</a></li><li><a href="MouseEventService.html">MouseEventService</a></li><li><a href="NamedNodeMapService.html">NamedNodeMapService</a></li><li><a href="NodeService.html">NodeService</a></li><li><a href="PointerEventService.html">PointerEventService</a></li><li><a href="PseudoEventListener.html">PseudoEventListener</a></li><li><a href="PseudoHTMLDocument.html">PseudoHTMLDocument</a></li><li><a href="PseudoNodeList.html">PseudoNodeList</a></li><li><a href="ShadowRootService.html">ShadowRootService</a></li><li><a href="TextService.html">TextService</a></li><li><a href="UIEventService.html">UIEventService</a></li></ul><h3>Global</h3><ul><li><a href="global.html#camelToKebab">camelToKebab</a></li><li><a href="global.html#createEvent">createEvent</a></li><li><a href="global.html#dataAttributes">dataAttributes</a></li><li><a href="global.html#escapeAttributeValue">escapeAttributeValue</a></li><li><a href="global.html#escapeText">escapeText</a></li><li><a href="global.html#eventDefaults">eventDefaults</a></li><li><a href="global.html#focused">focused</a></li><li><a href="global.html#generateDocument">generateDocument</a></li><li><a href="global.html#generateNodeList">generateNodeList</a></li><li><a href="global.html#getActiveElement">getActiveElement</a></li><li><a href="global.html#getParentNodes">getParentNodes</a></li><li><a href="global.html#getParentNodesFromAttribute">getParentNodesFromAttribute</a></li><li><a href="global.html#kebabToCamel">kebabToCamel</a></li><li><a href="global.html#modifierKeys">modifierKeys</a></li><li><a href="global.html#modifierState">modifierState</a></li><li><a href="global.html#nearestElementSibling">nearestElementSibling</a></li><li><a href="global.html#serializeAttributes">serializeAttributes</a></li><li><a href="global.html#serializeNode">serializeNode</a></li><li><a href="global.html#setActiveElement">setActiveElement</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Thu Nov 16 2023 23:22:35 GMT-0500 (Eastern Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Wed Sep 23 2026 10:14:24 GMT-0400 (Eastern Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>

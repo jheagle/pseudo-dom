@@ -28,9 +28,11 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>PseudoHTMLDocument<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="PseudoHTMLDocument.html">PseudoHTMLDocument</a>}</span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>PseudoHTMLDocument<span class="signature">()</span><span class="type-signature"></span></h2>
         
-            <div class="class-description">Simulate the behaviour of the HTMLDocument Class when there is no DOM available.</div>
+            <div class="class-description">Simulate the behaviour of the HTMLDocument Class when there is no DOM available. Like the real HTMLDocument, this
+only adds the html/head/body structure on top of what Document already gives (createElement, createTextNode,
+createComment, createDocumentFragment, getElementById, textContent always null).</div>
         
     
 </header>
@@ -45,7 +47,7 @@
     
 
     
-    <h4 class="name" id="PseudoHTMLDocument"><span class="type-signature"></span>new PseudoHTMLDocument<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="PseudoHTMLDocument.html">PseudoHTMLDocument</a>}</span></h4>
+    <h4 class="name" id="PseudoHTMLDocument"><span class="type-signature"></span>new PseudoHTMLDocument<span class="signature">()</span><span class="type-signature"></span></h4>
     
 
     
@@ -100,7 +102,7 @@
             <td class="type">
             
                 
-<span class="param-type"><a href="PseudoHTMLElement.html">PseudoHTMLElement</a></span>
+<span class="param-type">PseudoHTMLElement</span>
 
 
             
@@ -123,7 +125,7 @@
             <td class="type">
             
                 
-<span class="param-type"><a href="PseudoHTMLElement.html">PseudoHTMLElement</a></span>
+<span class="param-type">PseudoHTMLElement</span>
 
 
             
@@ -134,29 +136,6 @@
             
 
             <td class="description last">A reference to the Body child element</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>createElement</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Generate a new PseudoHTMLElement with parent of document</td>
         </tr>
 
     
@@ -202,7 +181,344 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="classes_PseudoHTMLDocument.js.html">classes/PseudoHTMLDocument.js</a>, <a href="classes_PseudoHTMLDocument.js.html#line21">line 21</a>
+        <a href="classes_PseudoHTMLDocument.js.html">classes/PseudoHTMLDocument.js</a>, <a href="classes_PseudoHTMLDocument.js.html#line19">line 19</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+        <h3 class="subsection-title">Extends</h3>
+
+        
+
+
+    <ul>
+        <li><a href="DocumentService.html">DocumentService</a></li>
+    </ul>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="body"><span class="type-signature"></span>body<span class="type-signature"> :PseudoHTMLElement</span></h4>
+
+
+
+
+<div class="description">
+    Create document body element
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">PseudoHTMLElement</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="classes_PseudoHTMLDocument.js.html">classes/PseudoHTMLDocument.js</a>, <a href="classes_PseudoHTMLDocument.js.html#line38">line 38</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="head"><span class="type-signature"></span>head<span class="type-signature"> :PseudoHTMLElement</span></h4>
+
+
+
+
+<div class="description">
+    Create document head element
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">PseudoHTMLElement</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="classes_PseudoHTMLDocument.js.html">classes/PseudoHTMLDocument.js</a>, <a href="classes_PseudoHTMLDocument.js.html#line32">line 32</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="cloneNode"><span class="type-signature"></span>cloneNode<span class="signature">(deep<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="PseudoHTMLDocument.html">PseudoHTMLDocument</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Make a copy of this document. The copy has no parent or listeners, and a deep copy has copies of everything in
+the document (a shallow one is an empty document).
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>deep</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last">Copy everything in the document as well</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="classes_PseudoHTMLDocument.js.html">classes/PseudoHTMLDocument.js</a>, <a href="classes_PseudoHTMLDocument.js.html#line63">line 63</a>
     </li></ul></dd>
     
 
@@ -250,57 +566,31 @@
 
 
 
-    
-    </div>
-
-    
-        <h3 class="subsection-title">Extends</h3>
-
-        
-
-
-    <ul>
-        <li><a href="PseudoHTMLElement.html">PseudoHTMLElement</a></li>
-    </ul>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Members</h3>
-
         
             
-<h4 class="name" id="body"><span class="type-signature"></span>body<span class="type-signature"> :<a href="PseudoHTMLElement.html">PseudoHTMLElement</a></span></h4>
 
+    
+
+    
+    <h4 class="name" id="cloneShallow"><span class="type-signature"></span>cloneShallow<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="PseudoHTMLDocument.html">PseudoHTMLDocument</a>}</span></h4>
+    
+
+    
 
 
 
 <div class="description">
-    Create document body element
+    A copy of this document with none of its html/head/body (cloneNode, from the inherited cloneShallow hook, fills
+them back in, deep copies own document's, empty otherwise - see cloneNode).
 </div>
 
 
 
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type"><a href="PseudoHTMLElement.html">PseudoHTMLElement</a></span>
 
 
-        </li>
-    </ul>
+
+
+
 
 
 
@@ -335,7 +625,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="classes_PseudoHTMLDocument.js.html">classes/PseudoHTMLDocument.js</a>, <a href="classes_PseudoHTMLDocument.js.html#line41">line 41</a>
+        <a href="classes_PseudoHTMLDocument.js.html">classes/PseudoHTMLDocument.js</a>, <a href="classes_PseudoHTMLDocument.js.html#line47">line 47</a>
     </li></ul></dd>
     
 
@@ -351,168 +641,54 @@
 
 
 
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="PseudoHTMLDocument.html">PseudoHTMLDocument</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
         
             
-<h4 class="name" id="children"><span class="type-signature"></span>children<span class="type-signature"> :Array.&lt;<a href="PseudoHTMLElement.html">PseudoHTMLElement</a>></span></h4>
 
+    
+
+    
+    <h4 class="name" id="createComment"><span class="type-signature"></span>createComment<span class="signature">(data<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="CommentService.html">CommentService</a>}</span></h4>
+    
+
+    
 
 
 
 <div class="description">
-    Create document child element
+    Make a comment which belongs to this document.
 </div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">Array.&lt;<a href="PseudoHTMLElement.html">PseudoHTMLElement</a>></span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="classes_PseudoHTMLDocument.js.html">classes/PseudoHTMLDocument.js</a>, <a href="classes_PseudoHTMLDocument.js.html#line49">line 49</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="head"><span class="type-signature"></span>head<span class="type-signature"> :<a href="PseudoHTMLElement.html">PseudoHTMLElement</a></span></h4>
-
-
-
-
-<div class="description">
-    Create document head element
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type"><a href="PseudoHTMLElement.html">PseudoHTMLElement</a></span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="classes_PseudoHTMLDocument.js.html">classes/PseudoHTMLDocument.js</a>, <a href="classes_PseudoHTMLDocument.js.html#line35">line 35</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="addEventListener"><span class="type-signature"></span>addEventListener<span class="signature">(type, callback, useCapture<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
 
 
 
@@ -551,89 +727,13 @@
 
         <tr>
             
-                <td class="name"><code>type</code></td>
+                <td class="name"><code>data</code></td>
             
 
             <td class="type">
             
                 
 <span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-|
-
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>useCapture</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-|
-
-<span class="param-type">Object</span>
 
 
             
@@ -654,12 +754,12 @@
             
                 <td class="default">
                 
-                    false
+                    ''
                 
                 </td>
             
 
-            <td class="description last"></td>
+            <td class="description last">The comment</td>
         </tr>
 
     
@@ -682,7 +782,7 @@
     
     <dt class="tag-overrides">Overrides:</dt>
     <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="PseudoHTMLElement.html#addEventListener">PseudoHTMLElement#addEventListener</a>
+        <a href="DocumentService.html#createComment">DocumentService#createComment</a>
     </li></ul></dd>
     
 
@@ -705,148 +805,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="classes_PseudoEventTarget.js.html">classes/PseudoEventTarget.js</a>, <a href="classes_PseudoEventTarget.js.html#line128">line 128</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="appendChild"><span class="type-signature"></span>appendChild<span class="signature">(childElement)</span><span class="type-signature"> &rarr; {<a href="PseudoNode.html">PseudoNode</a>}</span></h4>
-    
-
-    
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>childElement</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="PseudoNode.html">PseudoNode</a></span>
-|
-
-<span class="param-type"><a href="PseudoElement.html">PseudoElement</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="PseudoHTMLElement.html#appendChild">PseudoHTMLElement#appendChild</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="classes_PseudoElement.js.html">classes/PseudoElement.js</a>, <a href="classes_PseudoElement.js.html#line83">line 83</a>
+        <a href="services_DocumentService.js.html">services/DocumentService.js</a>, <a href="services_DocumentService.js.html#line78">line 78</a>
     </li></ul></dd>
     
 
@@ -882,7 +841,7 @@
     </dt>
     <dd>
         
-<span class="param-type"><a href="PseudoNode.html">PseudoNode</a></span>
+<span class="param-type"><a href="CommentService.html">CommentService</a></span>
 
 
     </dd>
@@ -900,114 +859,7 @@
     
 
     
-    <h4 class="name" id="applyDefaultEvent"><span class="type-signature"></span>applyDefaultEvent<span class="signature">()</span><span class="type-signature"> &rarr; {function}</span></h4>
-    
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="PseudoHTMLElement.html#applyDefaultEvent">PseudoHTMLElement#applyDefaultEvent</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="classes_PseudoElement.js.html">classes/PseudoElement.js</a>, <a href="classes_PseudoElement.js.html#line57">line 57</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">function</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="createElement"><span class="type-signature"></span>createElement<span class="signature">(tagName)</span><span class="type-signature"> &rarr; {<a href="PseudoHTMLElement.html">PseudoHTMLElement</a>}</span></h4>
+    <h4 class="name" id="createDocumentFragment"><span class="type-signature"></span>createDocumentFragment<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="DocumentFragmentService.html">DocumentFragmentService</a>}</span></h4>
     
 
     
@@ -1015,7 +867,119 @@
 
 
 <div class="description">
-    Create and return a PseudoHTMLElement
+    Make an empty document fragment which belongs to this document, a container for nodes which can be built up and
+then inserted in one go.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="DocumentService.html#createDocumentFragment">DocumentService#createDocumentFragment</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="services_DocumentService.js.html">services/DocumentService.js</a>, <a href="services_DocumentService.js.html#line89">line 89</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="DocumentFragmentService.html">DocumentFragmentService</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="createElement"><span class="type-signature"></span>createElement<span class="signature">(tagName<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {PseudoElement}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Make an element of the given type which belongs to this document but is not added anywhere until it is appended.
 </div>
 
 
@@ -1038,6 +1002,8 @@
 
         <th>Type</th>
 
+        
+        <th>Attributes</th>
         
 
         
@@ -1066,16 +1032,26 @@
             </td>
 
             
-
-            
-                <td class="default">
+                <td class="attributes">
                 
-                    div
+                    &lt;optional><br>
+                
+
+                
+
                 
                 </td>
             
 
-            <td class="description last">Tag Name is a string representing the type of Dom element this represents</td>
+            
+                <td class="default">
+                
+                    'div'
+                
+                </td>
+            
+
+            <td class="description last">The type of element to create</td>
         </tr>
 
     
@@ -1095,6 +1071,11 @@
 
     
 
+    
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="DocumentService.html#createElement">DocumentService#createElement</a>
+    </li></ul></dd>
     
 
     
@@ -1116,7 +1097,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="classes_PseudoHTMLDocument.js.html">classes/PseudoHTMLDocument.js</a>, <a href="classes_PseudoHTMLDocument.js.html#line57">line 57</a>
+        <a href="services_DocumentService.js.html">services/DocumentService.js</a>, <a href="services_DocumentService.js.html#line53">line 53</a>
     </li></ul></dd>
     
 
@@ -1152,7 +1133,7 @@
     </dt>
     <dd>
         
-<span class="param-type"><a href="PseudoHTMLElement.html">PseudoHTMLElement</a></span>
+<span class="param-type">PseudoElement</span>
 
 
     </dd>
@@ -1170,12 +1151,196 @@
     
 
     
-    <h4 class="name" id="dispatchEvent"><span class="type-signature"></span>dispatchEvent<span class="signature">(event, target)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+    <h4 class="name" id="createTextNode"><span class="type-signature"></span>createTextNode<span class="signature">(data<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="TextService.html">TextService</a>}</span></h4>
     
 
     
 
 
+
+<div class="description">
+    Make a text node which belongs to this document.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    ''
+                
+                </td>
+            
+
+            <td class="description last">The text</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="DocumentService.html#createTextNode">DocumentService#createTextNode</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="services_DocumentService.js.html">services/DocumentService.js</a>, <a href="services_DocumentService.js.html#line67">line 67</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="TextService.html">TextService</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getElementById"><span class="type-signature"></span>getElementById<span class="signature">(id)</span><span class="type-signature"> &rarr; {PseudoElement|null}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    The first element, in tree order, whose id matches the given value, or null when there is none.
+</div>
 
 
 
@@ -1210,16 +1375,13 @@
 
         <tr>
             
-                <td class="name"><code>event</code></td>
+                <td class="name"><code>id</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Event</span>
-|
-
-<span class="param-type"><a href="PseudoEvent.html">PseudoEvent</a></span>
+<span class="param-type">string</span>
 
 
             
@@ -1233,1726 +1395,88 @@
         </tr>
 
     
+    </tbody>
+</table>
 
-        <tr>
-            
-                <td class="name"><code>target</code></td>
-            
 
-            <td class="type">
-            
-                
-<span class="param-type">EventTarget</span>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="DocumentService.html#getElementById">DocumentService#getElementById</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="services_DocumentService.js.html">services/DocumentService.js</a>, <a href="services_DocumentService.js.html#line44">line 44</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">PseudoElement</span>
 |
 
-<span class="param-type"><a href="PseudoEventTarget.html">PseudoEventTarget</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="PseudoHTMLElement.html#dispatchEvent">PseudoHTMLElement#dispatchEvent</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="classes_PseudoEventTarget.js.html">classes/PseudoEventTarget.js</a>, <a href="classes_PseudoEventTarget.js.html#line186">line 186</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">boolean</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="getAttribute"><span class="type-signature"></span>getAttribute<span class="signature">(attributeName)</span><span class="type-signature"> &rarr; {string|Object}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Retrieve the value of the specified attribute from the Element
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>attributeName</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">A string representing the name of the attribute to be retrieved</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="PseudoHTMLElement.html#getAttribute">PseudoHTMLElement#getAttribute</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="classes_PseudoElement.js.html">classes/PseudoElement.js</a>, <a href="classes_PseudoElement.js.html#line117">line 117</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">string</span>
-|
-
-<span class="param-type">Object</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="hasAttribute"><span class="type-signature"></span>hasAttribute<span class="signature">(attributeName)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Check if an attribute is assigned to this element.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>attributeName</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The attribute name to check</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="PseudoHTMLElement.html#hasAttribute">PseudoHTMLElement#hasAttribute</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="classes_PseudoElement.js.html">classes/PseudoElement.js</a>, <a href="classes_PseudoElement.js.html#line94">line 94</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">boolean</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="removeAttribute"><span class="type-signature"></span>removeAttribute<span class="signature">(attributeName)</span><span class="type-signature"> &rarr; {null}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Remove an assigned attribute from the Element
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>attributeName</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The string name of the attribute to be removed</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="PseudoHTMLElement.html#removeAttribute">PseudoHTMLElement#removeAttribute</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="classes_PseudoElement.js.html">classes/PseudoElement.js</a>, <a href="classes_PseudoElement.js.html#line127">line 127</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
 <span class="param-type">null</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="removeChild"><span class="type-signature"></span>removeChild<span class="signature">(childElement)</span><span class="type-signature"> &rarr; {<a href="PseudoNode.html">PseudoNode</a>}</span></h4>
-    
-
-    
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>childElement</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="PseudoNode.html">PseudoNode</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="PseudoHTMLElement.html#removeChild">PseudoHTMLElement#removeChild</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="classes_PseudoNode.js.html">classes/PseudoNode.js</a>, <a href="classes_PseudoNode.js.html#line141">line 141</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="PseudoNode.html">PseudoNode</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="removeEventListener"><span class="type-signature"></span>removeEventListener<span class="signature">(type, callback)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>type</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="PseudoHTMLElement.html#removeEventListener">PseudoHTMLElement#removeEventListener</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="classes_PseudoEventTarget.js.html">classes/PseudoEventTarget.js</a>, <a href="classes_PseudoEventTarget.js.html#line167">line 167</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="runDefaultEvent"><span class="type-signature"></span>runDefaultEvent<span class="signature">(event)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
-    
-
-    
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>event</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="PseudoEvent.html">PseudoEvent</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="PseudoHTMLElement.html#runDefaultEvent">PseudoHTMLElement#runDefaultEvent</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="classes_PseudoEventTarget.js.html">classes/PseudoEventTarget.js</a>, <a href="classes_PseudoEventTarget.js.html#line83">line 83</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">boolean</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="runEvents"><span class="type-signature"></span>runEvents<span class="signature">(event)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
-    
-
-    
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>event</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="PseudoEvent.html">PseudoEvent</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="PseudoHTMLElement.html#runEvents">PseudoHTMLElement#runEvents</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="classes_PseudoEventTarget.js.html">classes/PseudoEventTarget.js</a>, <a href="classes_PseudoEventTarget.js.html#line32">line 32</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">boolean</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="setAttribute"><span class="type-signature"></span>setAttribute<span class="signature">(attributeName, attributeValue)</span><span class="type-signature"> &rarr; {undefined}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Assign a new attribute or overwrite an assigned attribute with name and value.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>attributeName</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The name key of the attribute to append</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>attributeValue</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-|
-
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The value of the attribute to append</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="PseudoHTMLElement.html#setAttribute">PseudoHTMLElement#setAttribute</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="classes_PseudoElement.js.html">classes/PseudoElement.js</a>, <a href="classes_PseudoElement.js.html#line104">line 104</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">undefined</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="setDefaultEvent"><span class="type-signature"></span>setDefaultEvent<span class="signature">(type, callback)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>type</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="PseudoHTMLElement.html#setDefaultEvent">PseudoHTMLElement#setDefaultEvent</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="classes_PseudoEventTarget.js.html">classes/PseudoEventTarget.js</a>, <a href="classes_PseudoEventTarget.js.html#line70">line 70</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="startEvents"><span class="type-signature"></span>startEvents<span class="signature">(eventType)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
-    
-
-    
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>eventType</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="PseudoEvent.html">PseudoEvent</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="PseudoHTMLElement.html#startEvents">PseudoHTMLElement#startEvents</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="classes_PseudoEventTarget.js.html">classes/PseudoEventTarget.js</a>, <a href="classes_PseudoEventTarget.js.html#line95">line 95</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">boolean</span>
 
 
     </dd>
@@ -2980,13 +1504,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-pseudoDom_objects.html">pseudoDom/objects</a></li></ul><h3>Classes</h3><ul><li><a href="PseudoElement.html">PseudoElement</a></li><li><a href="PseudoEvent.html">PseudoEvent</a></li><li><a href="PseudoEventListener.html">PseudoEventListener</a></li><li><a href="PseudoEventTarget.html">PseudoEventTarget</a></li><li><a href="PseudoHTMLDocument.html">PseudoHTMLDocument</a></li><li><a href="PseudoHTMLElement.html">PseudoHTMLElement</a></li><li><a href="PseudoNode.html">PseudoNode</a></li><li><a href="PseudoNodeAttached.html">PseudoNodeAttached</a></li></ul><h3>Global</h3><ul><li><a href="global.html#previousPseudoDom">previousPseudoDom</a></li><li><a href="global.html#root">root</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-pseudoDom_objects.html">pseudoDom/objects</a></li><li><a href="module-pseudoDom_simulate.html">pseudoDom/simulate</a></li></ul><h3>Classes</h3><ul><li><a href="AttrService.html">AttrService</a></li><li><a href="CSSStyleDeclarationService.html">CSSStyleDeclarationService</a></li><li><a href="CommentService.html">CommentService</a></li><li><a href="CustomEventService.html">CustomEventService</a></li><li><a href="DOMTokenListService.html">DOMTokenListService</a></li><li><a href="DocumentFragmentService.html">DocumentFragmentService</a></li><li><a href="DocumentService.html">DocumentService</a></li><li><a href="ElementService.html">ElementService</a></li><li><a href="EventService.html">EventService</a></li><li><a href="EventTargetService.html">EventTargetService</a></li><li><a href="FocusEventService.html">FocusEventService</a></li><li><a href="HTMLCollectionService.html">HTMLCollectionService</a></li><li><a href="HTMLElementService.html">HTMLElementService</a></li><li><a href="InputEventService.html">InputEventService</a></li><li><a href="KeyboardEventService.html">KeyboardEventService</a></li><li><a href="MouseEventService.html">MouseEventService</a></li><li><a href="NamedNodeMapService.html">NamedNodeMapService</a></li><li><a href="NodeService.html">NodeService</a></li><li><a href="PointerEventService.html">PointerEventService</a></li><li><a href="PseudoEventListener.html">PseudoEventListener</a></li><li><a href="PseudoHTMLDocument.html">PseudoHTMLDocument</a></li><li><a href="PseudoNodeList.html">PseudoNodeList</a></li><li><a href="ShadowRootService.html">ShadowRootService</a></li><li><a href="TextService.html">TextService</a></li><li><a href="UIEventService.html">UIEventService</a></li></ul><h3>Global</h3><ul><li><a href="global.html#camelToKebab">camelToKebab</a></li><li><a href="global.html#createEvent">createEvent</a></li><li><a href="global.html#dataAttributes">dataAttributes</a></li><li><a href="global.html#escapeAttributeValue">escapeAttributeValue</a></li><li><a href="global.html#escapeText">escapeText</a></li><li><a href="global.html#eventDefaults">eventDefaults</a></li><li><a href="global.html#focused">focused</a></li><li><a href="global.html#generateDocument">generateDocument</a></li><li><a href="global.html#generateNodeList">generateNodeList</a></li><li><a href="global.html#getActiveElement">getActiveElement</a></li><li><a href="global.html#getParentNodes">getParentNodes</a></li><li><a href="global.html#getParentNodesFromAttribute">getParentNodesFromAttribute</a></li><li><a href="global.html#kebabToCamel">kebabToCamel</a></li><li><a href="global.html#modifierKeys">modifierKeys</a></li><li><a href="global.html#modifierState">modifierState</a></li><li><a href="global.html#nearestElementSibling">nearestElementSibling</a></li><li><a href="global.html#serializeAttributes">serializeAttributes</a></li><li><a href="global.html#serializeNode">serializeNode</a></li><li><a href="global.html#setActiveElement">setActiveElement</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Thu Nov 16 2023 23:22:35 GMT-0500 (Eastern Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Wed Sep 23 2026 10:14:24 GMT-0400 (Eastern Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>

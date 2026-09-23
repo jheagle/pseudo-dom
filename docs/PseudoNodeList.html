@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Module: pseudoDom/objects</title>
+    <title>JSDoc: Class: PseudoNodeList</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Module: pseudoDom/objects</h1>
+    <h1 class="page-title">Class: PseudoNodeList</h1>
 
     
 
@@ -28,8 +28,10 @@
 
 <header>
     
+        <h2><span class="attribs"><span class="type-signature"></span></span>PseudoNodeList<span class="signature">()</span><span class="type-signature"></span></h2>
         
-            
+            <div class="class-description">A NodeList, like the DOM one, iterates over the nodes themselves (the data stored in each TreeLinker), rather than
+the linkers that hold them.</div>
         
     
 </header>
@@ -38,11 +40,16 @@
     <div class="container-overview">
     
         
-            <div class="description">All methods exported from this module are encapsulated within pseudoDom.</div>
-        
 
-        
-            
+    
+    <h2>Constructor</h2>
+    
+
+    
+    <h4 class="name" id="PseudoNodeList"><span class="type-signature"></span>new PseudoNodeList<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
 
 
 
@@ -77,13 +84,6 @@
     
 
     
-    <dt class="tag-author">Author:</dt>
-    <dd class="tag-author">
-        <ul>
-            <li><a href="mailto:joshuaheagle@gmail.com">Joshua Heagle</a></li>
-        </ul>
-    </dd>
-    
 
     
 
@@ -94,7 +94,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="main.js.html">main.js</a>, <a href="main.js.html#line121">line 121</a>
+        <a href="classes_PseudoNodeList.js.html">classes/PseudoNodeList.js</a>, <a href="classes_PseudoNodeList.js.html#line21">line 21</a>
     </li></ul></dd>
     
 
@@ -124,11 +124,19 @@
 
 
 
-        
     
     </div>
 
     
+        <h3 class="subsection-title">Extends</h3>
+
+        
+
+
+    <ul>
+        <li>LinkedTreeList</li>
+    </ul>
+
 
     
 
@@ -142,6 +150,330 @@
 
     
 
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="entries"><span class="type-signature"></span>entries<span class="signature">()</span><span class="type-signature"> &rarr; {Iterator}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Iterate over [index, node] pairs.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="classes_PseudoNodeList.js.html">classes/PseudoNodeList.js</a>, <a href="classes_PseudoNodeList.js.html#line51">line 51</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Iterator</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="keys"><span class="type-signature"></span>keys<span class="signature">()</span><span class="type-signature"> &rarr; {Iterator}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Iterate over the indexes.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="classes_PseudoNodeList.js.html">classes/PseudoNodeList.js</a>, <a href="classes_PseudoNodeList.js.html#line59">line 59</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Iterator</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="values"><span class="type-signature"></span>values<span class="signature">()</span><span class="type-signature"> &rarr; {Iterator}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Iterate over the nodes.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="classes_PseudoNodeList.js.html">classes/PseudoNodeList.js</a>, <a href="classes_PseudoNodeList.js.html#line67">line 67</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Iterator</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
     
 
     

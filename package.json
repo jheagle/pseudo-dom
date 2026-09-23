@@ -9,7 +9,7 @@
   "scripts": {
     "build": "gulp build",
     "dev": "gulp",
-    "htmldocs": "jsdoc -R MAIN.md -r src/ -d docs",
+    "htmldocs": "node -e \"require('fs').rmSync('docs', { recursive: true, force: true })\" && jsdoc -R MAIN.md -r dist/ -d docs",
     "readme": "gulp readme",
     "test": "gulp testFull",
     "typecheck": "tsc --noEmit -p tsconfig.json",

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: classes/PseudoHTMLDocument.js</title>
+    <title>JSDoc: Source: factories/parseHTML.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: classes/PseudoHTMLDocument.js</h1>
+    <h1 class="page-title">Source: factories/parseHTML.js</h1>
 
     
 
@@ -28,78 +28,88 @@
         <article>
             <pre class="prettyprint source linenums"><code>'use strict'
 
-require('core-js/modules/esnext.iterator.constructor.js')
-require('core-js/modules/esnext.iterator.find.js')
 Object.defineProperty(exports, '__esModule', {
   value: true
 })
-const DocumentService_1 = require('../services/DocumentService')
 /**
- * Simulate the behaviour of the HTMLDocument Class when there is no DOM available. Like the real HTMLDocument, this
- * only adds the html/head/body structure on top of what Document already gives (createElement, createTextNode,
- * createComment, createDocumentFragment, getElementById, textContent always null).
+ * @file Parses an HTML string into pseudo-dom nodes, for innerHTML / outerHTML / insertAdjacentHTML. Built on
+ * htmlparser2's Parser (a SAX-style tokenizer) with a custom handler which builds pseudo-dom nodes directly -
+ * htmlparser2's own default DomHandler / domutils tree (which this never uses) is stubbed out of the browser bundle
+ * by the browser.ignore config, the same way css-select's unused default adapter already is.
+ *
+ * The class to build parsed elements with is given by the caller (rather than imported here) so this has no
+ * dependency on ElementService / HTMLElementService - importing either here, from a factory ElementService itself
+ * would need to call, would create an import cycle.
  * @author Joshua Heagle &lt;joshuaheagle@gmail.com>
- * @class
- * @augments DocumentService
- * @property {PseudoHTMLElement} head - A reference to the Head child element
- * @property {PseudoHTMLElement} body - A reference to the Body child element
+ * @version 1.0.0
  */
-class PseudoHTMLDocument extends DocumentService_1.DocumentService {
-  /**
-   * The root HTML element is acts as the parent to all HTML elements in the document.
-   * @constructor
-   */
-  constructor () {
-    super()
-    const html = this.createElement('html')
-    this.appendChild(html)
-    /**
-     * Create document head element
-     * @type {PseudoHTMLElement}
-     */
-    this.head = this.createElement('head')
-    html.appendChild(this.head)
-    /**
-     * Create document body element
-     * @type {PseudoHTMLElement}
-     */
-    this.body = this.createElement('body')
-    html.appendChild(this.body)
-  }
-
-  /**
-   * A copy of this document with none of its html/head/body (cloneNode, from the inherited cloneShallow hook, fills
-   * them back in, deep copies own document's, empty otherwise - see cloneNode).
-   * @returns {PseudoHTMLDocument}
-   */
-  cloneShallow () {
-    const copy = new this.constructor()
-    while (copy.firstChild) {
-      copy.removeChild(copy.firstChild)
+const htmlparser2_1 = require('htmlparser2')
+const NodeService_1 = require('../services/NodeService')
+/**
+ * Parse an HTML string into the nodes it describes (siblings at the top level, exactly like the DOM's own HTML
+ * parsing does for innerHTML / insertAdjacentHTML - there is no single root unless the markup itself has one).
+ * @memberOf module:factories
+ * @param {string} html
+ * @param {*} ownerDocument The document the new nodes belong to (matches what innerHTML etc. would set), or null
+ * @param {function(new: *, {tagName: string})} ElementClass The class to build each parsed element with
+ * @returns {Array&lt;*>}
+ */
+const parseHTML = (html, ownerDocument, ElementClass) => {
+  const roots = []
+  const stack = []
+  const appendNode = node => {
+    node.ownerDocumentStore = ownerDocument
+    if (stack.length) {
+      stack[stack.length - 1].appendChild(node)
+    } else {
+      roots.push(node)
     }
-    copy.head = null
-    copy.body = null
-    return copy
   }
-
-  /**
-   * Make a copy of this document. The copy has no parent or listeners, and a deep copy has copies of everything in
-   * the document (a shallow one is an empty document).
-   * @param {boolean} [deep=false] Copy everything in the document as well
-   * @returns {PseudoHTMLDocument}
-   */
-  cloneNode (deep = false) {
-    const copy = super.cloneNode(deep)
-    if (deep) {
-      const html = Array.from(copy.childNodes).find(child => child.tagName === 'html')
-      const inHtml = tagName => html ? Array.from(html.childNodes).find(child => child.tagName === tagName) || null : null
-      copy.head = inHtml('head')
-      copy.body = inHtml('body')
+  const parser = new htmlparser2_1.Parser({
+    onopentagname (name) {
+      const element = new ElementClass({
+        tagName: name
+      })
+      appendNode(element)
+      stack.push(element)
+    },
+    onattribute (name, value) {
+      if (!stack.length) {
+        return
+      }
+      const element = stack[stack.length - 1]
+      // pseudo-dom's className / classList and style are not kept in sync with a literal 'class' / 'style'
+      // attribute the way setAttribute usually is (there is no such special-casing here, unlike a real DOM) - route
+      // them to the real objects directly, the same way cssSelectAdapter does for reading 'class' when matching a
+      // CSS selector, so parsed markup's class="..." / style="..." actually populates className/classList and style.
+      if (name === 'class') {
+        element.className = value
+        return
+      }
+      if (name === 'style' &amp;&amp; element.style) {
+        element.style.cssText = value
+        return
+      }
+      element.setAttribute(name, value)
+    },
+    ontext (text) {
+      appendNode(new NodeService_1.TextService(text))
+    },
+    oncomment (data) {
+      appendNode(new NodeService_1.CommentService(data))
+    },
+    onclosetag () {
+      stack.pop()
     }
-    return copy
-  }
+  }, {
+    lowerCaseTags: true,
+    lowerCaseAttributeNames: true
+  })
+  parser.write(String(html || ''))
+  parser.end()
+  return roots
 }
-exports.default = PseudoHTMLDocument
+exports.default = parseHTML
 </code></pre>
         </article>
     </section>
