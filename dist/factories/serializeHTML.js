@@ -43,17 +43,21 @@ const ATTRIBUTE_NAME = {
 // Boolean HTML attributes: present (with no value) when true, absent entirely when false
 const BOOLEAN_ATTRIBUTES = new Set(['hidden'])
 /**
- * Escape text so it is safe inside HTML text content.
- * @param {string} text
+ * Escape text so it is safe inside HTML text content. Coerces to a string first - unlike a real DOM, pseudo-dom's
+ * setAttribute does not itself coerce (see the same note on escapeAttributeValue), and nodeValue is not guaranteed
+ * to be a string either.
+ * @param {*} text
  * @returns {string}
  */
-const escapeText = text => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+const escapeText = text => String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 /**
- * Escape a value so it is safe inside a double-quoted HTML attribute.
- * @param {string} value
+ * Escape a value so it is safe inside a double-quoted HTML attribute. Coerces to a string first: a real DOM's
+ * setAttribute always stores a string, however pseudo-dom's does not coerce what it is given, so a value set via
+ * setAttribute(name, 5) is stored (and read back by getAttribute) as the number 5, not the string '5'.
+ * @param {*} value
  * @returns {string}
  */
-const escapeAttributeValue = value => value.replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+const escapeAttributeValue = value => String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;')
 /**
  * Every attribute of the element, serialized (class instead of className, boolean attributes bare, the never-real
  * mock properties left out, style added from the live CSSStyleDeclaration when it is not empty).

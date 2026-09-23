@@ -319,10 +319,14 @@ order in which an event travels down through them). A node which has no parent h
 <dd><p>Remember the element which has the focus in a tree.</p>
 </dd>
 <dt><a href="#escapeText">escapeText(text)</a> ⇒ <code>string</code></dt>
-<dd><p>Escape text so it is safe inside HTML text content.</p>
+<dd><p>Escape text so it is safe inside HTML text content. Coerces to a string first - unlike a real DOM, pseudo-dom&#39;s
+setAttribute does not itself coerce (see the same note on escapeAttributeValue), and nodeValue is not guaranteed
+to be a string either.</p>
 </dd>
 <dt><a href="#escapeAttributeValue">escapeAttributeValue(value)</a> ⇒ <code>string</code></dt>
-<dd><p>Escape a value so it is safe inside a double-quoted HTML attribute.</p>
+<dd><p>Escape a value so it is safe inside a double-quoted HTML attribute. Coerces to a string first: a real DOM&#39;s
+setAttribute always stores a string, however pseudo-dom&#39;s does not coerce what it is given, so a value set via
+setAttribute(name, 5) is stored (and read back by getAttribute) as the number 5, not the string &#39;5&#39;.</p>
 </dd>
 <dt><a href="#serializeAttributes">serializeAttributes(element)</a> ⇒ <code>string</code></dt>
 <dd><p>Every attribute of the element, serialized (class instead of className, boolean attributes bare, the never-real
@@ -5485,24 +5489,28 @@ Remember the element which has the focus in a tree.
 <a name="escapeText"></a>
 
 ## escapeText(text) ⇒ <code>string</code>
-Escape text so it is safe inside HTML text content.
+Escape text so it is safe inside HTML text content. Coerces to a string first - unlike a real DOM, pseudo-dom's
+setAttribute does not itself coerce (see the same note on escapeAttributeValue), and nodeValue is not guaranteed
+to be a string either.
 
 **Kind**: global function  
 
 | Param | Type |
 | --- | --- |
-| text | <code>string</code> | 
+| text | <code>\*</code> | 
 
 <a name="escapeAttributeValue"></a>
 
 ## escapeAttributeValue(value) ⇒ <code>string</code>
-Escape a value so it is safe inside a double-quoted HTML attribute.
+Escape a value so it is safe inside a double-quoted HTML attribute. Coerces to a string first: a real DOM's
+setAttribute always stores a string, however pseudo-dom's does not coerce what it is given, so a value set via
+setAttribute(name, 5) is stored (and read back by getAttribute) as the number 5, not the string '5'.
 
 **Kind**: global function  
 
 | Param | Type |
 | --- | --- |
-| value | <code>string</code> | 
+| value | <code>\*</code> | 
 
 <a name="serializeAttributes"></a>
 

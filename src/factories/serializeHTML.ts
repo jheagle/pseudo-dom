@@ -26,21 +26,25 @@ const ATTRIBUTE_NAME: { [property: string]: string } = { className: 'class' }
 const BOOLEAN_ATTRIBUTES: Set<string> = new Set(['hidden'])
 
 /**
- * Escape text so it is safe inside HTML text content.
- * @param {string} text
+ * Escape text so it is safe inside HTML text content. Coerces to a string first - unlike a real DOM, pseudo-dom's
+ * setAttribute does not itself coerce (see the same note on escapeAttributeValue), and nodeValue is not guaranteed
+ * to be a string either.
+ * @param {*} text
  * @returns {string}
  */
-const escapeText = (text: string): string => text
+const escapeText = (text: any): string => String(text)
   .replace(/&/g, '&amp;')
   .replace(/</g, '&lt;')
   .replace(/>/g, '&gt;')
 
 /**
- * Escape a value so it is safe inside a double-quoted HTML attribute.
- * @param {string} value
+ * Escape a value so it is safe inside a double-quoted HTML attribute. Coerces to a string first: a real DOM's
+ * setAttribute always stores a string, however pseudo-dom's does not coerce what it is given, so a value set via
+ * setAttribute(name, 5) is stored (and read back by getAttribute) as the number 5, not the string '5'.
+ * @param {*} value
  * @returns {string}
  */
-const escapeAttributeValue = (value: string): string => value
+const escapeAttributeValue = (value: any): string => String(value)
   .replace(/&/g, '&amp;')
   .replace(/"/g, '&quot;')
 
