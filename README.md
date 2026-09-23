@@ -59,6 +59,13 @@ reflected properties (`ariaLabel`, `ariaExpanded`, `ariaValueNow`, ...) are real
 matching `aria-*` attribute (`ariaLabel` <-> `aria-label`; the mapping isn't camelCase-to-kebab-case, so
 `ariaColCount` <-> `aria-colcount`, not `aria-col-count`).
 
+`getAttributeNode` / `setAttributeNode` / `removeAttributeNode` give and take real `Attr` nodes (backed by
+`AttrService`) instead of plain strings - `setAttributeNode` returns whatever `Attr` previously held that name (or
+`null` when it's new), and `removeAttributeNode` throws when the element has no attribute matching the one given, like
+the DOM's. Every `*NS` method (`getAttributeNS`, `hasAttributeNS`, `setAttributeNS`, `removeAttributeNS`,
+`getAttributeNodeNS`, `setAttributeNodeNS`) behaves exactly like its non-NS counterpart, ignoring the namespace
+argument entirely - there's no real namespace parsing here, matching `getElementsByTagNameNS`.
+
 **`style`** is a real, live `CSSStyleDeclaration`:
 
 - Named property access (`el.style.backgroundColor = 'red'`) alongside `getPropertyValue` / `setProperty` /
@@ -169,9 +176,6 @@ it) - useful for watching pseudo-dom-driven code run, or checking a final result
 - There are text and comment nodes (`PseudoText`, `PseudoComment`); `textContent` works like the DOM's (the text of
   everything below, and setting it replaces the children with a text node)
 
-## Not implemented yet
-
-- The `Attr`-node / namespaced attribute methods (`getAttributeNode`, `getAttributeNS`, ...)
 ## Modules
 
 <dl>
@@ -2961,6 +2965,15 @@ Simulate the behaviour of the Element Class when there is no DOM available.
     * [.removeAttribute(attributeName)](#ElementService+removeAttribute) ⇒ <code>undefined</code>
     * [.getAttributeNames()](#ElementService+getAttributeNames) ⇒ <code>Array.&lt;string&gt;</code>
     * [.hasAttributes()](#ElementService+hasAttributes) ⇒ <code>boolean</code>
+    * [.getAttributeNode(attributeName)](#ElementService+getAttributeNode) ⇒ [<code>AttrService</code>](#AttrService) \| <code>null</code>
+    * [.getAttributeNodeNS(namespace, attributeName)](#ElementService+getAttributeNodeNS) ⇒ [<code>AttrService</code>](#AttrService) \| <code>null</code>
+    * [.getAttributeNS(namespace, attributeName)](#ElementService+getAttributeNS) ⇒ <code>string</code> \| <code>null</code>
+    * [.hasAttributeNS(namespace, attributeName)](#ElementService+hasAttributeNS) ⇒ <code>boolean</code>
+    * [.removeAttributeNode(attr)](#ElementService+removeAttributeNode) ⇒ [<code>AttrService</code>](#AttrService)
+    * [.removeAttributeNS(namespace, attributeName)](#ElementService+removeAttributeNS) ⇒ <code>undefined</code>
+    * [.setAttributeNode(attr)](#ElementService+setAttributeNode) ⇒ [<code>AttrService</code>](#AttrService) \| <code>null</code>
+    * [.setAttributeNodeNS(attr)](#ElementService+setAttributeNodeNS) ⇒ [<code>AttrService</code>](#AttrService) \| <code>null</code>
+    * [.setAttributeNS(namespace, attributeName, attributeValue)](#ElementService+setAttributeNS) ⇒ <code>undefined</code>
     * [.toggleAttribute(attributeName, [force])](#ElementService+toggleAttribute) ⇒ <code>boolean</code>
     * [.getBoundingClientRect()](#ElementService+getBoundingClientRect) ⇒ <code>DOMRect</code>
     * [.getClientRects()](#ElementService+getClientRects) ⇒ <code>Array.&lt;DOMRect&gt;</code>
@@ -3272,6 +3285,128 @@ The name of every attribute on the element, in the order they were set.
 Whether the element has any attributes at all.
 
 **Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+<a name="ElementService+getAttributeNode"></a>
+
+### elementService.getAttributeNode(attributeName) ⇒ [<code>AttrService</code>](#AttrService) \| <code>null</code>
+Retrieve the node representation of an attribute.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+**Returns**: [<code>AttrService</code>](#AttrService) \| <code>null</code> - An Attr for the attribute, or null when there is no such attribute  
+
+| Param | Type |
+| --- | --- |
+| attributeName | <code>string</code> | 
+
+<a name="ElementService+getAttributeNodeNS"></a>
+
+### elementService.getAttributeNodeNS(namespace, attributeName) ⇒ [<code>AttrService</code>](#AttrService) \| <code>null</code>
+Retrieve the node representation of an attribute. There is no real namespace parsing here, so this ignores
+the namespace and behaves exactly like getAttributeNode.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+**Returns**: [<code>AttrService</code>](#AttrService) \| <code>null</code> - An Attr for the attribute, or null when there is no such attribute  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| namespace | <code>string</code> | Ignored |
+| attributeName | <code>string</code> |  |
+
+<a name="ElementService+getAttributeNS"></a>
+
+### elementService.getAttributeNS(namespace, attributeName) ⇒ <code>string</code> \| <code>null</code>
+Retrieve the value of an attribute. There is no real namespace parsing here, so this ignores the namespace
+and behaves exactly like getAttribute.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+**Returns**: <code>string</code> \| <code>null</code> - The value, or null when there is no such attribute  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| namespace | <code>string</code> | Ignored |
+| attributeName | <code>string</code> |  |
+
+<a name="ElementService+hasAttributeNS"></a>
+
+### elementService.hasAttributeNS(namespace, attributeName) ⇒ <code>boolean</code>
+Check whether the element has an attribute by that name. There is no real namespace parsing here, so this
+ignores the namespace and behaves exactly like hasAttribute.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| namespace | <code>string</code> | Ignored |
+| attributeName | <code>string</code> |  |
+
+<a name="ElementService+removeAttributeNode"></a>
+
+### elementService.removeAttributeNode(attr) ⇒ [<code>AttrService</code>](#AttrService)
+Remove the node representation of an attribute from the element, and return it.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+**Returns**: [<code>AttrService</code>](#AttrService) - The removed Attr  
+**Throws**:
+
+- <code>Error</code> When the element has no attribute matching attr.name
+
+
+| Param | Type |
+| --- | --- |
+| attr | [<code>AttrService</code>](#AttrService) | 
+
+<a name="ElementService+removeAttributeNS"></a>
+
+### elementService.removeAttributeNS(namespace, attributeName) ⇒ <code>undefined</code>
+Remove an attribute from the element. There is no real namespace parsing here, so this ignores the namespace
+and behaves exactly like removeAttribute.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| namespace | <code>string</code> | Ignored |
+| attributeName | <code>string</code> |  |
+
+<a name="ElementService+setAttributeNode"></a>
+
+### elementService.setAttributeNode(attr) ⇒ [<code>AttrService</code>](#AttrService) \| <code>null</code>
+Set the node representation of an attribute, adding the attribute if it did not exist. Returns any previous
+Attr that had the same name, or null when there was none.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+**Returns**: [<code>AttrService</code>](#AttrService) \| <code>null</code> - The replaced Attr, or null when the attribute was new  
+
+| Param | Type |
+| --- | --- |
+| attr | [<code>AttrService</code>](#AttrService) | 
+
+<a name="ElementService+setAttributeNodeNS"></a>
+
+### elementService.setAttributeNodeNS(attr) ⇒ [<code>AttrService</code>](#AttrService) \| <code>null</code>
+Set the node representation of an attribute. There is no real namespace parsing here, so this behaves
+exactly like setAttributeNode (Attr.name already carries any prefix).
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+**Returns**: [<code>AttrService</code>](#AttrService) \| <code>null</code> - The replaced Attr, or null when the attribute was new  
+
+| Param | Type |
+| --- | --- |
+| attr | [<code>AttrService</code>](#AttrService) | 
+
+<a name="ElementService+setAttributeNS"></a>
+
+### elementService.setAttributeNS(namespace, attributeName, attributeValue) ⇒ <code>undefined</code>
+Set the value of an attribute, adding the attribute if it did not exist. There is no real namespace parsing
+here, so this ignores the namespace and behaves exactly like setAttribute.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| namespace | <code>string</code> | Ignored |
+| attributeName | <code>string</code> |  |
+| attributeValue | <code>string</code> |  |
+
 <a name="ElementService+toggleAttribute"></a>
 
 ### elementService.toggleAttribute(attributeName, [force]) ⇒ <code>boolean</code>

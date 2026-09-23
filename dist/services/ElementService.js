@@ -539,6 +539,108 @@ class ElementService extends NodeService_1.NodeService {
   }
 
   /**
+   * Retrieve the node representation of an attribute.
+   * @param {string} attributeName
+   * @returns {AttrService|null} An Attr for the attribute, or null when there is no such attribute
+   */
+  getAttributeNode (attributeName) {
+    return this.hasAttribute(attributeName) ? new AttrService_1.AttrService(attributeName, this.getAttribute(attributeName) || '', this) : null
+  }
+
+  /**
+   * Retrieve the node representation of an attribute. There is no real namespace parsing here, so this ignores
+   * the namespace and behaves exactly like getAttributeNode.
+   * @param {string} namespace Ignored
+   * @param {string} attributeName
+   * @returns {AttrService|null} An Attr for the attribute, or null when there is no such attribute
+   */
+  getAttributeNodeNS (namespace, attributeName) {
+    return this.getAttributeNode(attributeName)
+  }
+
+  /**
+   * Retrieve the value of an attribute. There is no real namespace parsing here, so this ignores the namespace
+   * and behaves exactly like getAttribute.
+   * @param {string} namespace Ignored
+   * @param {string} attributeName
+   * @returns {string|null} The value, or null when there is no such attribute
+   */
+  getAttributeNS (namespace, attributeName) {
+    return this.getAttribute(attributeName)
+  }
+
+  /**
+   * Check whether the element has an attribute by that name. There is no real namespace parsing here, so this
+   * ignores the namespace and behaves exactly like hasAttribute.
+   * @param {string} namespace Ignored
+   * @param {string} attributeName
+   * @returns {boolean}
+   */
+  hasAttributeNS (namespace, attributeName) {
+    return this.hasAttribute(attributeName)
+  }
+
+  /**
+   * Remove the node representation of an attribute from the element, and return it.
+   * @param {AttrService} attr
+   * @returns {AttrService} The removed Attr
+   * @throws {Error} When the element has no attribute matching attr.name
+   */
+  removeAttributeNode (attr) {
+    if (!this.hasAttribute(attr.name)) {
+      throw new Error(`Failed to execute 'removeAttributeNode': The node provided is owned by another element (no attribute named '${attr.name}')`)
+    }
+    const removed = this.getAttributeNode(attr.name)
+    this.removeAttribute(attr.name)
+    return removed
+  }
+
+  /**
+   * Remove an attribute from the element. There is no real namespace parsing here, so this ignores the namespace
+   * and behaves exactly like removeAttribute.
+   * @param {string} namespace Ignored
+   * @param {string} attributeName
+   * @returns {undefined}
+   */
+  removeAttributeNS (namespace, attributeName) {
+    this.removeAttribute(attributeName)
+  }
+
+  /**
+   * Set the node representation of an attribute, adding the attribute if it did not exist. Returns any previous
+   * Attr that had the same name, or null when there was none.
+   * @param {AttrService} attr
+   * @returns {AttrService|null} The replaced Attr, or null when the attribute was new
+   */
+  setAttributeNode (attr) {
+    const existing = this.getAttributeNode(attr.name)
+    this.setAttribute(attr.name, attr.value)
+    return existing
+  }
+
+  /**
+   * Set the node representation of an attribute. There is no real namespace parsing here, so this behaves
+   * exactly like setAttributeNode (Attr.name already carries any prefix).
+   * @param {AttrService} attr
+   * @returns {AttrService|null} The replaced Attr, or null when the attribute was new
+   */
+  setAttributeNodeNS (attr) {
+    return this.setAttributeNode(attr)
+  }
+
+  /**
+   * Set the value of an attribute, adding the attribute if it did not exist. There is no real namespace parsing
+   * here, so this ignores the namespace and behaves exactly like setAttribute.
+   * @param {string} namespace Ignored
+   * @param {string} attributeName
+   * @param {string} attributeValue
+   * @returns {undefined}
+   */
+  setAttributeNS (namespace, attributeName, attributeValue) {
+    this.setAttribute(attributeName, attributeValue)
+  }
+
+  /**
    * Add the attribute (with an empty value) when it is not present, or remove it when it is - unless force says
    * which of those to do instead. Returns whether the attribute is present after the call.
    * @param {string} attributeName

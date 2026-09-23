@@ -10,6 +10,7 @@ import { PseudoDOMTokenList } from './PseudoDOMTokenList';
 import { PseudoShadowRoot } from './PseudoShadowRoot';
 import { PseudoHTMLCollection } from './PseudoHTMLCollection';
 import { PseudoAnimation } from './PseudoAnimation';
+import { PseudoAttr } from './PseudoAttr';
 /**
  * Simulate the behaviour of the Element Class when there is no DOM available.
  * @author Joshua Heagle <joshuaheagle@gmail.com>
@@ -540,15 +541,23 @@ export interface PseudoElement extends PseudoNode {
     /**
      * Retrieves the node representation of the named attribute from the current node and returns it as an Attr.
      */
-    getAttributeNode(): string;
+    getAttributeNode(attributeName: string): PseudoAttr | null;
     /**
-     * Retrieves the node representation of the attribute with the specified name and namespace, from the current node and returns it as an Attr.
+     * Retrieves the node representation of the attribute with the specified name and namespace, from the current
+     * node and returns it as an Attr. There is no real namespace parsing here, so this ignores the namespace and
+     * behaves exactly like getAttributeNode.
+     * @param {string} namespace Ignored
+     * @param {string} attributeName
      */
-    getAttributeNodeNS(): string;
+    getAttributeNodeNS(namespace: string, attributeName: string): PseudoAttr | null;
     /**
-     * Retrieves the value of the attribute with the specified namespace and name from the current node and returns it as a string.
+     * Retrieves the value of the attribute with the specified namespace and name from the current node and returns
+     * it as a string. There is no real namespace parsing here, so this ignores the namespace and behaves exactly
+     * like getAttribute.
+     * @param {string} namespace Ignored
+     * @param {string} attributeName
      */
-    getAttributeNS(): string;
+    getAttributeNS(namespace: string, attributeName: string): string | null;
     /**
      * Returns the size of an element and its position relative to the viewport. Settable directly
      * (boundingClientRect) rather than really computed - there is no layout engine here.
@@ -596,9 +605,13 @@ export interface PseudoElement extends PseudoNode {
      */
     hasAttribute(attributeName: string): boolean;
     /**
-     * Returns a boolean value indicating if the element has the specified attribute, in the specified namespace, or not.
+     * Returns a boolean value indicating if the element has the specified attribute, in the specified namespace, or
+     * not. There is no real namespace parsing here, so this ignores the namespace and behaves exactly like
+     * hasAttribute.
+     * @param {string} namespace Ignored
+     * @param {string} attributeName
      */
-    hasAttributeNS(): string;
+    hasAttributeNS(namespace: string, attributeName: string): boolean;
     /**
      * Returns a boolean value indicating if the element has one or more HTML attributes present.
      * @returns {boolean}
@@ -667,13 +680,17 @@ export interface PseudoElement extends PseudoNode {
      */
     removeAttribute(attributeName: string): void;
     /**
-     * Removes the node representation of the named attribute from the current node.
+     * Removes the node representation of the named attribute from the current node, and returns it.
+     * @throws {Error} When the element has no attribute matching attr.name
      */
-    removeAttributeNode(): string;
+    removeAttributeNode(attr: PseudoAttr): PseudoAttr;
     /**
-     * Removes the attribute with the specified name and namespace, from the current node.
+     * Removes the attribute with the specified name and namespace, from the current node. There is no real
+     * namespace parsing here, so this ignores the namespace and behaves exactly like removeAttribute.
+     * @param {string} namespace Ignored
+     * @param {string} attributeName
      */
-    removeAttributeNS(): string;
+    removeAttributeNS(namespace: string, attributeName: string): void;
     /**
      * Replaces the existing children of a Node with a specified new set of children.
      */
@@ -737,17 +754,24 @@ export interface PseudoElement extends PseudoNode {
      */
     setAttribute(attributeName: string, attributeValue: string): void;
     /**
-     * Sets the node representation of the named attribute from the current node.
+     * Sets the node representation of the named attribute from the current node, returning any previous Attr with
+     * the same name (or null when there was none).
      */
-    setAttributeNode(): string;
+    setAttributeNode(attr: PseudoAttr): PseudoAttr | null;
     /**
      * Sets the node representation of the attribute with the specified name and namespace, from the current node.
+     * There is no real namespace parsing here, so this behaves exactly like setAttributeNode (Attr.name already
+     * carries any prefix).
      */
-    setAttributeNodeNS(): string;
+    setAttributeNodeNS(attr: PseudoAttr): PseudoAttr | null;
     /**
-     * Sets the value of the attribute with the specified name and namespace, from the current node.
+     * Sets the value of the attribute with the specified name and namespace, from the current node. There is no
+     * real namespace parsing here, so this ignores the namespace and behaves exactly like setAttribute.
+     * @param {string} namespace Ignored
+     * @param {string} attributeName
+     * @param {string} attributeValue
      */
-    setAttributeNS(): string;
+    setAttributeNS(namespace: string, attributeName: string, attributeValue: string): void;
     /**
      * Designates a specific element as the capture target of future pointer events.
      * @param {number} pointerId
