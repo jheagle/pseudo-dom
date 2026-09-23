@@ -54,7 +54,10 @@ else, document fragments insert their children instead of themselves, and a node
 
 **Attribute helpers** work like the DOM's: `getAttributeNames`, `hasAttributes`, `toggleAttribute(name, [force])`.
 `localName` matches `tagName` and `prefix` is always `null` (there's no real namespace parsing);
-`getElementsByTagNameNS` behaves exactly like `getElementsByTagName`, ignoring the namespace.
+`getElementsByTagNameNS` behaves exactly like `getElementsByTagName`, ignoring the namespace. All 37 `aria*`
+reflected properties (`ariaLabel`, `ariaExpanded`, `ariaValueNow`, ...) are real too - each just reads/writes its
+matching `aria-*` attribute (`ariaLabel` <-> `aria-label`; the mapping isn't camelCase-to-kebab-case, so
+`ariaColCount` <-> `aria-colcount`, not `aria-col-count`).
 
 **`style`** is a real, live `CSSStyleDeclaration`:
 
@@ -168,5 +171,4 @@ it) - useful for watching pseudo-dom-driven code run, or checking a final result
 
 ## Not implemented yet
 
-- The `aria*` reflected properties
 - The `Attr`-node / namespaced attribute methods (`getAttributeNode`, `getAttributeNS`, ...)

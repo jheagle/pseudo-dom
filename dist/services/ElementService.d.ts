@@ -367,5 +367,92 @@ export declare class ElementService extends NodeService implements Partial<Pseud
      * @returns {PseudoShadowRoot|null}
      */
     get shadowRoot(): PseudoShadowRoot | null;
+    /**
+     * Read one of the aria-* reflected properties (see the individual aria* getters/setters below).
+     * @param {string} attributeName A real aria-* attribute name (aria-label, ...)
+     * @returns {string}
+     */
+    private getAriaAttribute;
+    /**
+     * Write one of the aria-* reflected properties.
+     * @param {string} attributeName A real aria-* attribute name (aria-label, ...)
+     * @param {string} value
+     * @returns {undefined}
+     */
+    private setAriaAttribute;
+    get ariaAtomic(): string;
+    set ariaAtomic(value: string);
+    get ariaAutoComplete(): string;
+    set ariaAutoComplete(value: string);
+    get ariaBusy(): string;
+    set ariaBusy(value: string);
+    get ariaChecked(): string;
+    set ariaChecked(value: string);
+    get ariaColCount(): string;
+    set ariaColCount(value: string);
+    get ariaColIndex(): string;
+    set ariaColIndex(value: string);
+    get ariaColSpan(): string;
+    set ariaColSpan(value: string);
+    get ariaCurrent(): string;
+    set ariaCurrent(value: string);
+    get ariaDescription(): string;
+    set ariaDescription(value: string);
+    get ariaDisabled(): string;
+    set ariaDisabled(value: string);
+    get ariaExpanded(): string;
+    set ariaExpanded(value: string);
+    get ariaHasPopup(): string;
+    set ariaHasPopup(value: string);
+    get ariaHidden(): string;
+    set ariaHidden(value: string);
+    get ariaKeyShortcuts(): string;
+    set ariaKeyShortcuts(value: string);
+    get ariaLabel(): string;
+    set ariaLabel(value: string);
+    get ariaLevel(): string;
+    set ariaLevel(value: string);
+    get ariaLive(): string;
+    set ariaLive(value: string);
+    get ariaModal(): string;
+    set ariaModal(value: string);
+    get ariaMultiline(): string;
+    set ariaMultiline(value: string);
+    get ariaMultiSelectable(): string;
+    set ariaMultiSelectable(value: string);
+    get ariaOrientation(): string;
+    set ariaOrientation(value: string);
+    get ariaPlaceholder(): string;
+    set ariaPlaceholder(value: string);
+    get ariaPosInSet(): string;
+    set ariaPosInSet(value: string);
+    get ariaPressed(): string;
+    set ariaPressed(value: string);
+    get ariaReadOnly(): string;
+    set ariaReadOnly(value: string);
+    get ariaRequired(): string;
+    set ariaRequired(value: string);
+    get ariaRoleDescription(): string;
+    set ariaRoleDescription(value: string);
+    get ariaRowCount(): string;
+    set ariaRowCount(value: string);
+    get ariaRowIndex(): string;
+    set ariaRowIndex(value: string);
+    get ariaRowSpan(): string;
+    set ariaRowSpan(value: string);
+    get ariaSelected(): string;
+    set ariaSelected(value: string);
+    get ariaSetSize(): string;
+    set ariaSetSize(value: string);
+    get ariaSort(): string;
+    set ariaSort(value: string);
+    get ariaValueMax(): string;
+    set ariaValueMax(value: string);
+    get ariaValueMin(): string;
+    set ariaValueMin(value: string);
+    get ariaValueNow(): string;
+    set ariaValueNow(value: string);
+    get ariaValueText(): string;
+    set ariaValueText(value: string);
 }
 export {};
