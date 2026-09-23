@@ -1,10 +1,15 @@
-import { LinkedTreeList } from 'collect-your-stuff/dist/collections/linked-tree-list/LinkedTreeList'
-import generateNode from '../factories/generateNode'
+import { TextService } from '../services/NodeService'
+import { HTMLElementService } from '../services/HTMLElementService'
 import generateNodeList from '../factories/generateNodeList'
 import { PseudoNodeList } from './PseudoNodeList'
 
 const arrayData = ['one', 'two', 'three', 'four']
-const makeList = () => LinkedTreeList.fromArray(arrayData, generateNode(), PseudoNodeList)
+// The real production path: a PseudoNodeList is a node's childNodes, built up by appendChild
+const makeList = () => {
+  const parent = new HTMLElementService({ tagName: 'div' })
+  arrayData.forEach(value => parent.appendChild(new TextService(value)))
+  return parent.childNodes
+}
 
 describe('PseudoNodeList', () => {
   test('can store elements', () => {
@@ -26,8 +31,10 @@ describe('PseudoNodeList', () => {
 
   test('iterates over the nodes, not the linkers', () => {
     const [first] = makeList()
+    expect(first).toBeInstanceOf(TextService)
     expect(first.nodeValue).toBe('one')
-    expect(first.data).toBeUndefined()
+    // A linker (unlike a real node) has no nodeType of its own
+    expect(first.nodeType).toBe(3)
   })
 
   test('has keys, values and entries like a NodeList', () => {

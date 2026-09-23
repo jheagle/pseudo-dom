@@ -171,10 +171,17 @@ describe('getElementById', () => {
     expect(document.getElementById('missing')).toBeNull()
   })
 
-  test('is not available on plain elements or fragments', () => {
+  test('is not available on plain elements', () => {
     const { root } = makeTree()
-    const fragment = new DocumentFragmentService()
     expect(typeof root.getElementById).toBe('undefined')
-    expect(typeof fragment.getElementById).toBe('undefined')
+  })
+
+  test('also works on a DocumentFragment (the DOM\'s NonElementParentNode mixin)', () => {
+    const fragment = new DocumentFragmentService()
+    const item = new HTMLElementService({ tagName: 'span' })
+    item.id = 'frag-item'
+    fragment.appendChild(item)
+    expect(fragment.getElementById('frag-item')).toBe(item)
+    expect(fragment.getElementById('missing')).toBeNull()
   })
 })

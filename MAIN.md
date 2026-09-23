@@ -49,8 +49,14 @@ Selector queries work like the DOM's: \`getElementsByTagName\` / \`getElementsBy
 \`querySelector\` / \`querySelectorAll\` (real CSS selectors, via [css-select](https://www.npmjs.com/package/css-select)
 matched against pseudo-dom's own tree through a custom adapter - \`querySelectorAll\` is a plain array, a snapshot
 taken when it is called, like the DOM's) are on \`NodeService\` so \`Document\`, \`DocumentFragment\` and \`Element\`
-all have them; \`matches\` / \`closest\` are on \`ElementService\`; \`getElementById\` is on \`DocumentService\` only,
-matching the real DOM.
+all have them; \`matches\` / \`closest\` are on \`ElementService\`; \`getElementById\` is on both \`DocumentService\`
+and \`DocumentFragmentService\` (the DOM's \`NonElementParentNode\` mixin, so a \`ShadowRoot\` gets it too), matching
+the real DOM.
+
+\`DocumentService\` matches the real \`Document\` (it is not an \`Element\`, so it has no \`tagName\` / \`classList\` /
+\`matches\` / etc.): \`createElement\`, \`createTextNode\`, \`createComment\`, \`createDocumentFragment\`,
+\`getElementById\`, and \`textContent\` always \`null\`. \`PseudoHTMLDocument\` (what \`generateDocument\` actually
+creates) only adds the \`html\` / \`head\` / \`body\` structure on top.
 
 Not implemented yet (these throw a "not implemented" error or are missing): \`getElementsByTagNameNS\`, \`innerHTML\` /
 \`outerHTML\` parsing, and most of the rest of the Element and Document APIs. The API will change before 1.0.

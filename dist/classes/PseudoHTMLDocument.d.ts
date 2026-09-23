@@ -3,65 +3,39 @@
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @version 1.0.0
  */
-/**
- *
- * @type {PseudoHTMLElement}
- */
 import { HTMLElementService as PseudoHTMLElement } from '../services/HTMLElementService';
-import { TextService, CommentService } from '../services/NodeService';
-import { DocumentFragmentService } from '../services/DocumentFragmentService';
-import { PseudoNode } from '../interfaces/PseudoNode';
+import { DocumentService } from '../services/DocumentService';
+import { NodeService } from '../services/NodeService';
 /**
- * Simulate the behaviour of the HTMLDocument Class when there is no DOM available.
+ * Simulate the behaviour of the HTMLDocument Class when there is no DOM available. Like the real HTMLDocument, this
+ * only adds the html/head/body structure on top of what Document already gives (createElement, createTextNode,
+ * createComment, createDocumentFragment, getElementById, textContent always null).
  * @author Joshua Heagle <joshuaheagle@gmail.com>
  * @class
- * @augments PseudoHTMLElement
+ * @augments DocumentService
  * @property {PseudoHTMLElement} head - A reference to the Head child element
  * @property {PseudoHTMLElement} body - A reference to the Body child element
- * @property {function} createElement - Generate a new PseudoHTMLElement (which is not in the document until it is appended)
  */
-declare class PseudoHTMLDocument extends PseudoHTMLElement {
-    private head;
-    private body;
+declare class PseudoHTMLDocument extends DocumentService {
+    head: PseudoHTMLElement | null;
+    body: PseudoHTMLElement | null;
     /**
      * The root HTML element is acts as the parent to all HTML elements in the document.
      * @constructor
      */
     constructor();
-    get nodeName(): string;
-    get nodeType(): number;
-    get textContent(): string | null;
-    set textContent(text: string | null);
     /**
-     * Make an element of the given type which belongs to this document but is not added anywhere until it is appended.
-     * @param {string} tagName - Tag Name is a string representing the type of Dom element this represents
-     * @returns {PseudoHTMLElement}
+     * A copy of this document with none of its html/head/body (cloneNode, from the inherited cloneShallow hook, fills
+     * them back in, deep copies own document's, empty otherwise - see cloneNode).
+     * @returns {PseudoHTMLDocument}
      */
-    createElement(tagName?: string): PseudoHTMLElement;
+    protected cloneShallow(): NodeService;
     /**
-     * Make a text node which belongs to this document.
-     * @param {string} [data=''] The text
-     * @returns {TextService}
-     */
-    createTextNode(data?: string): TextService;
-    /**
-     * Make a comment which belongs to this document.
-     * @param {string} [data=''] The comment
-     * @returns {CommentService}
-     */
-    createComment(data?: string): CommentService;
-    /**
-     * Make an empty document fragment which belongs to this document, a container for nodes which can be built up and
-     * then inserted in one go.
-     * @returns {DocumentFragmentService}
-     */
-    createDocumentFragment(): DocumentFragmentService;
-    /**
-     * Make a copy of this document. The copy has no parent or listeners, and a deep copy has copies of everything in the
-     * document (a shallow one is an empty document).
+     * Make a copy of this document. The copy has no parent or listeners, and a deep copy has copies of everything in
+     * the document (a shallow one is an empty document).
      * @param {boolean} [deep=false] Copy everything in the document as well
-     * @returns {PseudoNode}
+     * @returns {PseudoHTMLDocument}
      */
-    cloneNode(deep?: boolean): PseudoNode;
+    cloneNode(deep?: boolean): PseudoHTMLDocument;
 }
 export default PseudoHTMLDocument;
