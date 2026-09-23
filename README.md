@@ -49,8 +49,14 @@ Selector queries work like the DOM's: \`getElementsByTagName\` / \`getElementsBy
 \`querySelector\` / \`querySelectorAll\` (real CSS selectors, via [css-select](https://www.npmjs.com/package/css-select)
 matched against pseudo-dom's own tree through a custom adapter - \`querySelectorAll\` is a plain array, a snapshot
 taken when it is called, like the DOM's) are on \`NodeService\` so \`Document\`, \`DocumentFragment\` and \`Element\`
-all have them; \`matches\` / \`closest\` are on \`ElementService\`; \`getElementById\` is on \`DocumentService\` only,
-matching the real DOM.
+all have them; \`matches\` / \`closest\` are on \`ElementService\`; \`getElementById\` is on both \`DocumentService\`
+and \`DocumentFragmentService\` (the DOM's \`NonElementParentNode\` mixin, so a \`ShadowRoot\` gets it too), matching
+the real DOM.
+
+\`DocumentService\` matches the real \`Document\` (it is not an \`Element\`, so it has no \`tagName\` / \`classList\` /
+\`matches\` / etc.): \`createElement\`, \`createTextNode\`, \`createComment\`, \`createDocumentFragment\`,
+\`getElementById\`, and \`textContent\` always \`null\`. \`PseudoHTMLDocument\` (what \`generateDocument\` actually
+creates) only adds the \`html\` / \`head\` / \`body\` structure on top.
 
 Not implemented yet (these throw a "not implemented" error or are missing): \`getElementsByTagNameNS\`, \`innerHTML\` /
 \`outerHTML\` parsing, and most of the rest of the Element and Document APIs. The API will change before 1.0.
@@ -134,16 +140,14 @@ not part of a tree, when it is inserted its children are moved into the tree ins
 <dt><a href="#AttrService">AttrService</a> ⇐ <code><a href="#NodeService">NodeService</a></code></dt>
 <dd><p>Simulate the behaviour of the Attr Class when there is no DOM available.</p>
 </dd>
-<dt><a href="#LinkedNode">LinkedNode</a> ⇐ <code><a href="#NodeService">NodeService</a></code></dt>
-<dd><p>A node which is stored in a TreeLinker (for example by a list built from an array of values). It finds its siblings
-from that linker, and its parent from the linker&#39;s parent when it has not been given one by appendChild.</p>
-</dd>
 <dt><a href="#PseudoNodeList">PseudoNodeList</a> ⇐ <code>LinkedTreeList</code></dt>
 <dd><p>A NodeList, like the DOM one, iterates over the nodes themselves (the data stored in each TreeLinker), rather than
 the linkers that hold them.</p>
 </dd>
-<dt><a href="#PseudoHTMLDocument">PseudoHTMLDocument</a> ⇐ <code>PseudoHTMLElement</code></dt>
-<dd><p>Simulate the behaviour of the HTMLDocument Class when there is no DOM available.</p>
+<dt><a href="#PseudoHTMLDocument">PseudoHTMLDocument</a> ⇐ <code><a href="#DocumentService">DocumentService</a></code></dt>
+<dd><p>Simulate the behaviour of the HTMLDocument Class when there is no DOM available. Like the real HTMLDocument, this
+only adds the html/head/body structure on top of what Document already gives (createElement, createTextNode,
+createComment, createDocumentFragment, getElementById, textContent always null).</p>
 </dd>
 <dt><a href="#PseudoEventListener">PseudoEventListener</a></dt>
 <dd><p>Handle events as they are stored and implemented.</p>
@@ -167,8 +171,6 @@ The values follow the UI Events, HTML, Pointer Events, Clipboard, Drag and Drop,
 <dt><a href="#focused">focused</a></dt>
 <dd><p>The element which has the focus, kept for each tree (the root node of the tree it is in), like document.activeElement.</p>
 </dd>
-<dt><a href="#HTMLElementService_1">HTMLElementService_1</a> : <code>PseudoHTMLElement</code></dt>
-<dd></dd>
 </dl>
 
 ## Functions
@@ -197,10 +199,6 @@ order in which an event travels down through them). A node which has no parent h
 </dd>
 <dt><a href="#generateNodeList">generateNodeList([innerList])</a> ⇒ <code><a href="#PseudoNodeList">PseudoNodeList</a></code></dt>
 <dd><p>Create a PseudoNodeList, optionally starting from an existing chain of linkers.</p>
-</dd>
-<dt><a href="#generateNode">generateNode()</a> ⇒ <code>function</code></dt>
-<dd><p>Create a TreeLinker class whose linkers each store a node (a LinkedNode) as their data, this can be used to build a
-tree (or list) of nodes from plain values.</p>
 </dd>
 <dt><a href="#generateDocument">generateDocument(root, context)</a> ⇒ <code>Window</code> | <code>PseudoEventTarget</code></dt>
 <dd><p>Construct the Pseudo Dom to provide access to Dom objects which are otherwise not available outside the browser
@@ -2493,6 +2491,10 @@ Simulate the behaviour of the Document Class when there is no DOM available.
 * [DocumentService](#DocumentService) ⇐ [<code>NodeService</code>](#NodeService)
     * [.acceptsChildren](#NodeService+acceptsChildren) ⇒ <code>boolean</code>
     * [.getElementById(id)](#DocumentService+getElementById) ⇒ <code>PseudoElement</code> \| <code>null</code>
+    * [.createElement([tagName])](#DocumentService+createElement) ⇒ <code>PseudoElement</code>
+    * [.createTextNode([data])](#DocumentService+createTextNode) ⇒ [<code>TextService</code>](#TextService)
+    * [.createComment([data])](#DocumentService+createComment) ⇒ [<code>CommentService</code>](#CommentService)
+    * [.createDocumentFragment()](#DocumentService+createDocumentFragment) ⇒ [<code>DocumentFragmentService</code>](#DocumentFragmentService)
     * [.appendChild(childNode)](#NodeService+appendChild) ⇒ <code>PseudoNode</code>
     * [.cloneShallow()](#NodeService+cloneShallow) ⇒ [<code>NodeService</code>](#NodeService)
     * [.equalsShallow(other)](#NodeService+equalsShallow) ⇒ <code>boolean</code>
@@ -2535,6 +2537,46 @@ The first element, in tree order, whose id matches the given value, or null when
 | --- | --- |
 | id | <code>string</code> | 
 
+<a name="DocumentService+createElement"></a>
+
+### documentService.createElement([tagName]) ⇒ <code>PseudoElement</code>
+Make an element of the given type which belongs to this document but is not added anywhere until it is appended.
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [tagName] | <code>string</code> | <code>&quot;&#x27;div&#x27;&quot;</code> | The type of element to create |
+
+<a name="DocumentService+createTextNode"></a>
+
+### documentService.createTextNode([data]) ⇒ [<code>TextService</code>](#TextService)
+Make a text node which belongs to this document.
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [data] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | The text |
+
+<a name="DocumentService+createComment"></a>
+
+### documentService.createComment([data]) ⇒ [<code>CommentService</code>](#CommentService)
+Make a comment which belongs to this document.
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [data] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | The comment |
+
+<a name="DocumentService+createDocumentFragment"></a>
+
+### documentService.createDocumentFragment() ⇒ [<code>DocumentFragmentService</code>](#DocumentFragmentService)
+Make an empty document fragment which belongs to this document, a container for nodes which can be built up and
+then inserted in one go.
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
 <a name="NodeService+appendChild"></a>
 
 ### documentService.appendChild(childNode) ⇒ <code>PseudoNode</code>
@@ -2840,6 +2882,7 @@ not part of a tree, when it is inserted its children are moved into the tree ins
 
 * [DocumentFragmentService](#DocumentFragmentService) ⇐ [<code>NodeService</code>](#NodeService)
     * [.acceptsChildren](#NodeService+acceptsChildren) ⇒ <code>boolean</code>
+    * [.getElementById(id)](#DocumentFragmentService+getElementById) ⇒ <code>PseudoElement</code> \| <code>null</code>
     * [.appendChild(childNode)](#NodeService+appendChild) ⇒ <code>PseudoNode</code>
     * [.cloneShallow()](#NodeService+cloneShallow) ⇒ [<code>NodeService</code>](#NodeService)
     * [.equalsShallow(other)](#NodeService+equalsShallow) ⇒ <code>boolean</code>
@@ -2871,6 +2914,18 @@ not part of a tree, when it is inserted its children are moved into the tree ins
 Whether this kind of node can have children (text, comments and attributes cannot).
 
 **Kind**: instance property of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
+<a name="DocumentFragmentService+getElementById"></a>
+
+### documentFragmentService.getElementById(id) ⇒ <code>PseudoElement</code> \| <code>null</code>
+The first element, in tree order, whose id matches the given value, or null when there is none (the DOM's
+NonElementParentNode mixin, which Document and DocumentFragment both implement).
+
+**Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
+
+| Param | Type |
+| --- | --- |
+| id | <code>string</code> | 
+
 <a name="NodeService+appendChild"></a>
 
 ### documentFragmentService.appendChild(childNode) ⇒ <code>PseudoNode</code>
@@ -3622,377 +3677,6 @@ Replace a child of this node with another node (which is moved if it is already 
 | newChild | <code>PseudoNode</code> | The node which takes the place |
 | oldChild | <code>PseudoNode</code> | The child of this node to replace |
 
-<a name="LinkedNode"></a>
-
-## LinkedNode ⇐ [<code>NodeService</code>](#NodeService)
-A node which is stored in a TreeLinker (for example by a list built from an array of values). It finds its siblings
-from that linker, and its parent from the linker's parent when it has not been given one by appendChild.
-
-**Kind**: global class  
-**Extends**: [<code>NodeService</code>](#NodeService)  
-**Author**: Joshua Heagle <joshuaheagle@gmail.com>  
-
-* [LinkedNode](#LinkedNode) ⇐ [<code>NodeService</code>](#NodeService)
-    * [new LinkedNode(linker, value)](#new_LinkedNode_new)
-    * [.acceptsChildren](#NodeService+acceptsChildren) ⇒ <code>boolean</code>
-    * [.appendChild(childNode)](#NodeService+appendChild) ⇒ <code>PseudoNode</code>
-    * [.cloneShallow()](#NodeService+cloneShallow) ⇒ [<code>NodeService</code>](#NodeService)
-    * [.equalsShallow(other)](#NodeService+equalsShallow) ⇒ <code>boolean</code>
-    * [.append(...nodes)](#NodeService+append)
-    * [.prepend(...nodes)](#NodeService+prepend)
-    * [.replaceChildren(...nodes)](#NodeService+replaceChildren)
-    * [.before(...nodes)](#NodeService+before)
-    * [.after(...nodes)](#NodeService+after)
-    * [.replaceWith(...nodes)](#NodeService+replaceWith)
-    * [.remove()](#NodeService+remove)
-    * [.toChildNode(value)](#NodeService+toChildNode) ⇒ <code>PseudoNode</code>
-    * [.getElementsByTagName(tagName)](#NodeService+getElementsByTagName) ⇒ <code>PseudoHTMLCollection</code>
-    * [.getElementsByClassName(className)](#NodeService+getElementsByClassName) ⇒ <code>PseudoHTMLCollection</code>
-    * [.querySelector(selectors)](#NodeService+querySelector) ⇒ <code>PseudoElement</code> \| <code>null</code>
-    * [.querySelectorAll(selectors)](#NodeService+querySelectorAll) ⇒ <code>Array.&lt;PseudoElement&gt;</code>
-    * [.childInserted(child)](#NodeService+childInserted)
-    * [.cloneNode([deep])](#NodeService+cloneNode) ⇒ <code>PseudoNode</code>
-    * [.compareDocumentPosition(otherNode)](#NodeService+compareDocumentPosition) ⇒ <code>number</code>
-    * [.contains(otherNode)](#NodeService+contains) ⇒ <code>boolean</code>
-    * [.insertBefore(newNode, [referenceNode])](#NodeService+insertBefore) ⇒ <code>PseudoNode</code>
-    * [.isEqualNode(otherNode)](#NodeService+isEqualNode) ⇒ <code>boolean</code>
-    * [.normalize()](#NodeService+normalize)
-    * [.removeChild(childElement)](#NodeService+removeChild) ⇒ <code>PseudoNode</code>
-    * [.replaceChild(newChild, oldChild)](#NodeService+replaceChild) ⇒ <code>PseudoNode</code>
-
-<a name="new_LinkedNode_new"></a>
-
-### new LinkedNode(linker, value)
-
-| Param | Type | Description |
-| --- | --- | --- |
-| linker | <code>TreeLinker</code> | The linker holding this node |
-| value | <code>string</code> \| <code>null</code> | The value of the node |
-
-<a name="NodeService+acceptsChildren"></a>
-
-### linkedNode.acceptsChildren ⇒ <code>boolean</code>
-Whether this kind of node can have children (text, comments and attributes cannot).
-
-**Kind**: instance property of [<code>LinkedNode</code>](#LinkedNode)  
-**Overrides**: [<code>acceptsChildren</code>](#NodeService+acceptsChildren)  
-<a name="NodeService+appendChild"></a>
-
-### linkedNode.appendChild(childNode) ⇒ <code>PseudoNode</code>
-Add a node as the last child of this node (a node which is already in a tree is moved).
-
-**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
-**Overrides**: [<code>appendChild</code>](#NodeService+appendChild)  
-**Returns**: <code>PseudoNode</code> - The added node  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| childNode | <code>PseudoNode</code> | The node to add |
-
-<a name="NodeService+cloneShallow"></a>
-
-### linkedNode.cloneShallow() ⇒ [<code>NodeService</code>](#NodeService)
-Make a copy of this node without its children, its parent or its listeners, which is what cloneNode starts from.
-Kinds of node which are made with arguments override this to give them.
-
-**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
-**Overrides**: [<code>cloneShallow</code>](#NodeService+cloneShallow)  
-<a name="NodeService+equalsShallow"></a>
-
-### linkedNode.equalsShallow(other) ⇒ <code>boolean</code>
-Whether another node of the same type is equal to this one apart from its children, which isEqualNode compares
-afterwards. Kinds of node with more to compare (an element has attributes) override this.
-
-**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
-**Overrides**: [<code>equalsShallow</code>](#NodeService+equalsShallow)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| other | [<code>NodeService</code>](#NodeService) | The node to compare with |
-
-<a name="NodeService+append"></a>
-
-### linkedNode.append(...nodes)
-Add nodes (strings become text nodes) as the last children of this node, in the order given.
-
-**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
-**Overrides**: [<code>append</code>](#NodeService+append)  
-**Throws**:
-
-- <code>Error</code> When this kind of node cannot have children
-
-
-| Param | Type | Description |
-| --- | --- | --- |
-| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
-
-<a name="NodeService+prepend"></a>
-
-### linkedNode.prepend(...nodes)
-Add nodes (strings become text nodes) as the first children of this node, in the order given.
-
-**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
-**Overrides**: [<code>prepend</code>](#NodeService+prepend)  
-**Throws**:
-
-- <code>Error</code> When this kind of node cannot have children
-
-
-| Param | Type | Description |
-| --- | --- | --- |
-| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
-
-<a name="NodeService+replaceChildren"></a>
-
-### linkedNode.replaceChildren(...nodes)
-Remove every child of this node and put the given nodes (strings become text nodes) in their place, in order.
-
-**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
-**Overrides**: [<code>replaceChildren</code>](#NodeService+replaceChildren)  
-**Throws**:
-
-- <code>Error</code> When this kind of node cannot have children
-
-
-| Param | Type | Description |
-| --- | --- | --- |
-| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
-
-<a name="NodeService+before"></a>
-
-### linkedNode.before(...nodes)
-Add nodes (strings become text nodes) as this node's previous siblings, in order. Does nothing when this node has
-no parent.
-
-**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
-**Overrides**: [<code>before</code>](#NodeService+before)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
-
-<a name="NodeService+after"></a>
-
-### linkedNode.after(...nodes)
-Add nodes (strings become text nodes) as this node's next siblings, in order. Does nothing when this node has no
-parent.
-
-**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
-**Overrides**: [<code>after</code>](#NodeService+after)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
-
-<a name="NodeService+replaceWith"></a>
-
-### linkedNode.replaceWith(...nodes)
-Put the given nodes (strings become text nodes) where this node is, in order, then remove this node. Does nothing
-when this node has no parent.
-
-**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
-**Overrides**: [<code>replaceWith</code>](#NodeService+replaceWith)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to put in this node's place |
-
-<a name="NodeService+remove"></a>
-
-### linkedNode.remove()
-Remove this node from its parent. Does nothing when it has no parent.
-
-**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
-**Overrides**: [<code>remove</code>](#NodeService+remove)  
-<a name="NodeService+toChildNode"></a>
-
-### linkedNode.toChildNode(value) ⇒ <code>PseudoNode</code>
-Turn a value given to append / prepend / before / after / replaceWith / replaceChildren into a node: a string
-becomes a text node belonging to this node's document, anything else is returned as it is.
-
-**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
-**Overrides**: [<code>toChildNode</code>](#NodeService+toChildNode)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| value | <code>PseudoNode</code> \| <code>string</code> | The value to add |
-
-<a name="NodeService+getElementsByTagName"></a>
-
-### linkedNode.getElementsByTagName(tagName) ⇒ <code>PseudoHTMLCollection</code>
-Every element below this node with the given tag name (or every element when tagName is *), live.
-
-**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
-**Overrides**: [<code>getElementsByTagName</code>](#NodeService+getElementsByTagName)  
-
-| Param | Type |
-| --- | --- |
-| tagName | <code>string</code> | 
-
-<a name="NodeService+getElementsByClassName"></a>
-
-### linkedNode.getElementsByClassName(className) ⇒ <code>PseudoHTMLCollection</code>
-Every element below this node which has all of the given (space separated) classes, live.
-
-**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
-**Overrides**: [<code>getElementsByClassName</code>](#NodeService+getElementsByClassName)  
-
-| Param | Type |
-| --- | --- |
-| className | <code>string</code> | 
-
-<a name="NodeService+querySelector"></a>
-
-### linkedNode.querySelector(selectors) ⇒ <code>PseudoElement</code> \| <code>null</code>
-The first element below this node which matches the CSS selector, in tree order, or null when there is none.
-
-**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
-**Overrides**: [<code>querySelector</code>](#NodeService+querySelector)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| selectors | <code>string</code> | A CSS selector |
-
-<a name="NodeService+querySelectorAll"></a>
-
-### linkedNode.querySelectorAll(selectors) ⇒ <code>Array.&lt;PseudoElement&gt;</code>
-Every element below this node which matches the CSS selector, in tree order. A plain array (not a live
-collection): like the DOM's querySelectorAll, it is a snapshot taken when it is called.
-
-**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
-**Overrides**: [<code>querySelectorAll</code>](#NodeService+querySelectorAll)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| selectors | <code>string</code> | A CSS selector |
-
-<a name="NodeService+childInserted"></a>
-
-### linkedNode.childInserted(child)
-Called each time a node has been inserted as a child of this node, so that nodes which need to react to children
-(for example elements applying default events) can do so.
-
-**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
-**Overrides**: [<code>childInserted</code>](#NodeService+childInserted)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| child | [<code>NodeService</code>](#NodeService) | The node which was inserted |
-
-<a name="NodeService+cloneNode"></a>
-
-### linkedNode.cloneNode([deep]) ⇒ <code>PseudoNode</code>
-Make a copy of this node (without its parent, and without its event listeners). With deep the children are copied
-too, all the way down.
-
-**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
-**Overrides**: [<code>cloneNode</code>](#NodeService+cloneNode)  
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| [deep] | <code>boolean</code> | <code>false</code> | Copy the children as well |
-
-<a name="NodeService+compareDocumentPosition"></a>
-
-### linkedNode.compareDocumentPosition(otherNode) ⇒ <code>number</code>
-Say where another node is in relation to this one, as the bits of NodeService.DOCUMENT_POSITION_*: 0 for this node
-itself, DISCONNECTED (with IMPLEMENTATION_SPECIFIC and a consistent PRECEDING or FOLLOWING) for a node in another tree,
-CONTAINS + PRECEDING when the other node is an ancestor, CONTAINED_BY + FOLLOWING when it is a descendant,
-otherwise PRECEDING or FOLLOWING by their order in the tree.
-
-**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
-**Overrides**: [<code>compareDocumentPosition</code>](#NodeService+compareDocumentPosition)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| otherNode | <code>PseudoNode</code> | The node to locate |
-
-<a name="NodeService+contains"></a>
-
-### linkedNode.contains(otherNode) ⇒ <code>boolean</code>
-Check whether a node is this node or one of its descendants.
-
-**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
-**Overrides**: [<code>contains</code>](#NodeService+contains)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| otherNode | <code>PseudoNode</code> \| <code>null</code> | The node to look for |
-
-<a name="NodeService+insertBefore"></a>
-
-### linkedNode.insertBefore(newNode, [referenceNode]) ⇒ <code>PseudoNode</code>
-Insert a node as a child of this node, before the given child (or at the end when there is none). A node which is
-already in a tree is moved, and the children of a document fragment are moved in order.
-
-**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
-**Overrides**: [<code>insertBefore</code>](#NodeService+insertBefore)  
-**Returns**: <code>PseudoNode</code> - The inserted node  
-**Throws**:
-
-- <code>Error</code> When the reference node is not a child of this node, or the new node is this node or contains it
-
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| newNode | <code>PseudoNode</code> |  | The node to insert |
-| [referenceNode] | <code>PseudoNode</code> \| <code>null</code> | <code></code> | The child of this node to insert before, or null to insert at the end |
-
-<a name="NodeService+isEqualNode"></a>
-
-### linkedNode.isEqualNode(otherNode) ⇒ <code>boolean</code>
-Whether another node is the same as this one, by what they hold: the same type, name and value (an element also
-needs the same attributes), and children which are equal in the same order.
-
-**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
-**Overrides**: [<code>isEqualNode</code>](#NodeService+isEqualNode)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| otherNode | <code>PseudoNode</code> \| <code>null</code> | The node to compare with |
-
-<a name="NodeService+normalize"></a>
-
-### linkedNode.normalize()
-Tidy the text below this node: neighbouring text nodes are joined into one and empty text nodes are removed.
-
-**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
-**Overrides**: [<code>normalize</code>](#NodeService+normalize)  
-<a name="NodeService+removeChild"></a>
-
-### linkedNode.removeChild(childElement) ⇒ <code>PseudoNode</code>
-Remove a child from this node, it no longer has a parent or siblings afterwards.
-
-**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
-**Overrides**: [<code>removeChild</code>](#NodeService+removeChild)  
-**Returns**: <code>PseudoNode</code> - The removed node  
-**Throws**:
-
-- <code>Error</code> When the node is not a child of this node
-
-
-| Param | Type | Description |
-| --- | --- | --- |
-| childElement | <code>PseudoNode</code> | The child node to remove |
-
-<a name="NodeService+replaceChild"></a>
-
-### linkedNode.replaceChild(newChild, oldChild) ⇒ <code>PseudoNode</code>
-Replace a child of this node with another node (which is moved if it is already in a tree).
-
-**Kind**: instance method of [<code>LinkedNode</code>](#LinkedNode)  
-**Overrides**: [<code>replaceChild</code>](#NodeService+replaceChild)  
-**Returns**: <code>PseudoNode</code> - The replaced node  
-**Throws**:
-
-- <code>Error</code> When the old node is not a child of this node
-
-
-| Param | Type | Description |
-| --- | --- | --- |
-| newChild | <code>PseudoNode</code> | The node which takes the place |
-| oldChild | <code>PseudoNode</code> | The child of this node to replace |
-
 <a name="PseudoNodeList"></a>
 
 ## PseudoNodeList ⇐ <code>LinkedTreeList</code>
@@ -4027,11 +3711,13 @@ Iterate over the nodes.
 **Kind**: instance method of [<code>PseudoNodeList</code>](#PseudoNodeList)  
 <a name="PseudoHTMLDocument"></a>
 
-## PseudoHTMLDocument ⇐ <code>PseudoHTMLElement</code>
-Simulate the behaviour of the HTMLDocument Class when there is no DOM available.
+## PseudoHTMLDocument ⇐ [<code>DocumentService</code>](#DocumentService)
+Simulate the behaviour of the HTMLDocument Class when there is no DOM available. Like the real HTMLDocument, this
+only adds the html/head/body structure on top of what Document already gives (createElement, createTextNode,
+createComment, createDocumentFragment, getElementById, textContent always null).
 
 **Kind**: global class  
-**Extends**: <code>PseudoHTMLElement</code>  
+**Extends**: [<code>DocumentService</code>](#DocumentService)  
 **Author**: Joshua Heagle <joshuaheagle@gmail.com>  
 **Properties**
 
@@ -4039,18 +3725,42 @@ Simulate the behaviour of the HTMLDocument Class when there is no DOM available.
 | --- | --- | --- |
 | head | <code>PseudoHTMLElement</code> | A reference to the Head child element |
 | body | <code>PseudoHTMLElement</code> | A reference to the Body child element |
-| createElement | <code>function</code> | Generate a new PseudoHTMLElement (which is not in the document until it is appended) |
 
 
-* [PseudoHTMLDocument](#PseudoHTMLDocument) ⇐ <code>PseudoHTMLElement</code>
+* [PseudoHTMLDocument](#PseudoHTMLDocument) ⇐ [<code>DocumentService</code>](#DocumentService)
     * [new PseudoHTMLDocument()](#new_PseudoHTMLDocument_new)
     * [.head](#PseudoHTMLDocument+head) : <code>PseudoHTMLElement</code>
     * [.body](#PseudoHTMLDocument+body) : <code>PseudoHTMLElement</code>
-    * [.createElement(tagName)](#PseudoHTMLDocument+createElement) ⇒ <code>PseudoHTMLElement</code>
-    * [.createTextNode([data])](#PseudoHTMLDocument+createTextNode) ⇒ [<code>TextService</code>](#TextService)
-    * [.createComment([data])](#PseudoHTMLDocument+createComment) ⇒ [<code>CommentService</code>](#CommentService)
-    * [.createDocumentFragment()](#PseudoHTMLDocument+createDocumentFragment) ⇒ [<code>DocumentFragmentService</code>](#DocumentFragmentService)
-    * [.cloneNode([deep])](#PseudoHTMLDocument+cloneNode) ⇒ <code>PseudoNode</code>
+    * [.acceptsChildren](#NodeService+acceptsChildren) ⇒ <code>boolean</code>
+    * [.cloneShallow()](#PseudoHTMLDocument+cloneShallow) ⇒ [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)
+    * [.cloneNode([deep])](#PseudoHTMLDocument+cloneNode) ⇒ [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)
+    * [.getElementById(id)](#DocumentService+getElementById) ⇒ <code>PseudoElement</code> \| <code>null</code>
+    * [.createElement([tagName])](#DocumentService+createElement) ⇒ <code>PseudoElement</code>
+    * [.createTextNode([data])](#DocumentService+createTextNode) ⇒ [<code>TextService</code>](#TextService)
+    * [.createComment([data])](#DocumentService+createComment) ⇒ [<code>CommentService</code>](#CommentService)
+    * [.createDocumentFragment()](#DocumentService+createDocumentFragment) ⇒ [<code>DocumentFragmentService</code>](#DocumentFragmentService)
+    * [.appendChild(childNode)](#NodeService+appendChild) ⇒ <code>PseudoNode</code>
+    * [.equalsShallow(other)](#NodeService+equalsShallow) ⇒ <code>boolean</code>
+    * [.append(...nodes)](#NodeService+append)
+    * [.prepend(...nodes)](#NodeService+prepend)
+    * [.replaceChildren(...nodes)](#NodeService+replaceChildren)
+    * [.before(...nodes)](#NodeService+before)
+    * [.after(...nodes)](#NodeService+after)
+    * [.replaceWith(...nodes)](#NodeService+replaceWith)
+    * [.remove()](#NodeService+remove)
+    * [.toChildNode(value)](#NodeService+toChildNode) ⇒ <code>PseudoNode</code>
+    * [.getElementsByTagName(tagName)](#NodeService+getElementsByTagName) ⇒ <code>PseudoHTMLCollection</code>
+    * [.getElementsByClassName(className)](#NodeService+getElementsByClassName) ⇒ <code>PseudoHTMLCollection</code>
+    * [.querySelector(selectors)](#NodeService+querySelector) ⇒ <code>PseudoElement</code> \| <code>null</code>
+    * [.querySelectorAll(selectors)](#NodeService+querySelectorAll) ⇒ <code>Array.&lt;PseudoElement&gt;</code>
+    * [.childInserted(child)](#NodeService+childInserted)
+    * [.compareDocumentPosition(otherNode)](#NodeService+compareDocumentPosition) ⇒ <code>number</code>
+    * [.contains(otherNode)](#NodeService+contains) ⇒ <code>boolean</code>
+    * [.insertBefore(newNode, [referenceNode])](#NodeService+insertBefore) ⇒ <code>PseudoNode</code>
+    * [.isEqualNode(otherNode)](#NodeService+isEqualNode) ⇒ <code>boolean</code>
+    * [.normalize()](#NodeService+normalize)
+    * [.removeChild(childElement)](#NodeService+removeChild) ⇒ <code>PseudoNode</code>
+    * [.replaceChild(newChild, oldChild)](#NodeService+replaceChild) ⇒ <code>PseudoNode</code>
 
 <a name="new_PseudoHTMLDocument_new"></a>
 
@@ -4069,57 +3779,385 @@ Create document head element
 Create document body element
 
 **Kind**: instance property of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
-<a name="PseudoHTMLDocument+createElement"></a>
+<a name="NodeService+acceptsChildren"></a>
 
-### pseudoHTMLDocument.createElement(tagName) ⇒ <code>PseudoHTMLElement</code>
-Make an element of the given type which belongs to this document but is not added anywhere until it is appended.
+### pseudoHTMLDocument.acceptsChildren ⇒ <code>boolean</code>
+Whether this kind of node can have children (text, comments and attributes cannot).
+
+**Kind**: instance property of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>acceptsChildren</code>](#NodeService+acceptsChildren)  
+<a name="PseudoHTMLDocument+cloneShallow"></a>
+
+### pseudoHTMLDocument.cloneShallow() ⇒ [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)
+A copy of this document with none of its html/head/body (cloneNode, from the inherited cloneShallow hook, fills
+them back in, deep copies own document's, empty otherwise - see cloneNode).
 
 **Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>cloneShallow</code>](#NodeService+cloneShallow)  
+<a name="PseudoHTMLDocument+cloneNode"></a>
+
+### pseudoHTMLDocument.cloneNode([deep]) ⇒ [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)
+Make a copy of this document. The copy has no parent or listeners, and a deep copy has copies of everything in
+the document (a shallow one is an empty document).
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>cloneNode</code>](#NodeService+cloneNode)  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| tagName | <code>string</code> | <code>&quot;div&quot;</code> | Tag Name is a string representing the type of Dom element this represents |
+| [deep] | <code>boolean</code> | <code>false</code> | Copy everything in the document as well |
 
-<a name="PseudoHTMLDocument+createTextNode"></a>
+<a name="DocumentService+getElementById"></a>
+
+### pseudoHTMLDocument.getElementById(id) ⇒ <code>PseudoElement</code> \| <code>null</code>
+The first element, in tree order, whose id matches the given value, or null when there is none.
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>getElementById</code>](#DocumentService+getElementById)  
+
+| Param | Type |
+| --- | --- |
+| id | <code>string</code> | 
+
+<a name="DocumentService+createElement"></a>
+
+### pseudoHTMLDocument.createElement([tagName]) ⇒ <code>PseudoElement</code>
+Make an element of the given type which belongs to this document but is not added anywhere until it is appended.
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>createElement</code>](#DocumentService+createElement)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [tagName] | <code>string</code> | <code>&quot;&#x27;div&#x27;&quot;</code> | The type of element to create |
+
+<a name="DocumentService+createTextNode"></a>
 
 ### pseudoHTMLDocument.createTextNode([data]) ⇒ [<code>TextService</code>](#TextService)
 Make a text node which belongs to this document.
 
 **Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>createTextNode</code>](#DocumentService+createTextNode)  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | [data] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | The text |
 
-<a name="PseudoHTMLDocument+createComment"></a>
+<a name="DocumentService+createComment"></a>
 
 ### pseudoHTMLDocument.createComment([data]) ⇒ [<code>CommentService</code>](#CommentService)
 Make a comment which belongs to this document.
 
 **Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>createComment</code>](#DocumentService+createComment)  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | [data] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | The comment |
 
-<a name="PseudoHTMLDocument+createDocumentFragment"></a>
+<a name="DocumentService+createDocumentFragment"></a>
 
 ### pseudoHTMLDocument.createDocumentFragment() ⇒ [<code>DocumentFragmentService</code>](#DocumentFragmentService)
 Make an empty document fragment which belongs to this document, a container for nodes which can be built up and
 then inserted in one go.
 
 **Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
-<a name="PseudoHTMLDocument+cloneNode"></a>
+**Overrides**: [<code>createDocumentFragment</code>](#DocumentService+createDocumentFragment)  
+<a name="NodeService+appendChild"></a>
 
-### pseudoHTMLDocument.cloneNode([deep]) ⇒ <code>PseudoNode</code>
-Make a copy of this document. The copy has no parent or listeners, and a deep copy has copies of everything in the
-document (a shallow one is an empty document).
+### pseudoHTMLDocument.appendChild(childNode) ⇒ <code>PseudoNode</code>
+Add a node as the last child of this node (a node which is already in a tree is moved).
 
 **Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>appendChild</code>](#NodeService+appendChild)  
+**Returns**: <code>PseudoNode</code> - The added node  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| childNode | <code>PseudoNode</code> | The node to add |
+
+<a name="NodeService+equalsShallow"></a>
+
+### pseudoHTMLDocument.equalsShallow(other) ⇒ <code>boolean</code>
+Whether another node of the same type is equal to this one apart from its children, which isEqualNode compares
+afterwards. Kinds of node with more to compare (an element has attributes) override this.
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>equalsShallow</code>](#NodeService+equalsShallow)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| other | [<code>NodeService</code>](#NodeService) | The node to compare with |
+
+<a name="NodeService+append"></a>
+
+### pseudoHTMLDocument.append(...nodes)
+Add nodes (strings become text nodes) as the last children of this node, in the order given.
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>append</code>](#NodeService+append)  
+**Throws**:
+
+- <code>Error</code> When this kind of node cannot have children
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+prepend"></a>
+
+### pseudoHTMLDocument.prepend(...nodes)
+Add nodes (strings become text nodes) as the first children of this node, in the order given.
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>prepend</code>](#NodeService+prepend)  
+**Throws**:
+
+- <code>Error</code> When this kind of node cannot have children
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+replaceChildren"></a>
+
+### pseudoHTMLDocument.replaceChildren(...nodes)
+Remove every child of this node and put the given nodes (strings become text nodes) in their place, in order.
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>replaceChildren</code>](#NodeService+replaceChildren)  
+**Throws**:
+
+- <code>Error</code> When this kind of node cannot have children
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+before"></a>
+
+### pseudoHTMLDocument.before(...nodes)
+Add nodes (strings become text nodes) as this node's previous siblings, in order. Does nothing when this node has
+no parent.
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>before</code>](#NodeService+before)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+after"></a>
+
+### pseudoHTMLDocument.after(...nodes)
+Add nodes (strings become text nodes) as this node's next siblings, in order. Does nothing when this node has no
+parent.
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>after</code>](#NodeService+after)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+replaceWith"></a>
+
+### pseudoHTMLDocument.replaceWith(...nodes)
+Put the given nodes (strings become text nodes) where this node is, in order, then remove this node. Does nothing
+when this node has no parent.
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>replaceWith</code>](#NodeService+replaceWith)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to put in this node's place |
+
+<a name="NodeService+remove"></a>
+
+### pseudoHTMLDocument.remove()
+Remove this node from its parent. Does nothing when it has no parent.
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>remove</code>](#NodeService+remove)  
+<a name="NodeService+toChildNode"></a>
+
+### pseudoHTMLDocument.toChildNode(value) ⇒ <code>PseudoNode</code>
+Turn a value given to append / prepend / before / after / replaceWith / replaceChildren into a node: a string
+becomes a text node belonging to this node's document, anything else is returned as it is.
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>toChildNode</code>](#NodeService+toChildNode)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| value | <code>PseudoNode</code> \| <code>string</code> | The value to add |
+
+<a name="NodeService+getElementsByTagName"></a>
+
+### pseudoHTMLDocument.getElementsByTagName(tagName) ⇒ <code>PseudoHTMLCollection</code>
+Every element below this node with the given tag name (or every element when tagName is *), live.
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>getElementsByTagName</code>](#NodeService+getElementsByTagName)  
+
+| Param | Type |
+| --- | --- |
+| tagName | <code>string</code> | 
+
+<a name="NodeService+getElementsByClassName"></a>
+
+### pseudoHTMLDocument.getElementsByClassName(className) ⇒ <code>PseudoHTMLCollection</code>
+Every element below this node which has all of the given (space separated) classes, live.
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>getElementsByClassName</code>](#NodeService+getElementsByClassName)  
+
+| Param | Type |
+| --- | --- |
+| className | <code>string</code> | 
+
+<a name="NodeService+querySelector"></a>
+
+### pseudoHTMLDocument.querySelector(selectors) ⇒ <code>PseudoElement</code> \| <code>null</code>
+The first element below this node which matches the CSS selector, in tree order, or null when there is none.
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>querySelector</code>](#NodeService+querySelector)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selectors | <code>string</code> | A CSS selector |
+
+<a name="NodeService+querySelectorAll"></a>
+
+### pseudoHTMLDocument.querySelectorAll(selectors) ⇒ <code>Array.&lt;PseudoElement&gt;</code>
+Every element below this node which matches the CSS selector, in tree order. A plain array (not a live
+collection): like the DOM's querySelectorAll, it is a snapshot taken when it is called.
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>querySelectorAll</code>](#NodeService+querySelectorAll)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selectors | <code>string</code> | A CSS selector |
+
+<a name="NodeService+childInserted"></a>
+
+### pseudoHTMLDocument.childInserted(child)
+Called each time a node has been inserted as a child of this node, so that nodes which need to react to children
+(for example elements applying default events) can do so.
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>childInserted</code>](#NodeService+childInserted)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| child | [<code>NodeService</code>](#NodeService) | The node which was inserted |
+
+<a name="NodeService+compareDocumentPosition"></a>
+
+### pseudoHTMLDocument.compareDocumentPosition(otherNode) ⇒ <code>number</code>
+Say where another node is in relation to this one, as the bits of NodeService.DOCUMENT_POSITION_*: 0 for this node
+itself, DISCONNECTED (with IMPLEMENTATION_SPECIFIC and a consistent PRECEDING or FOLLOWING) for a node in another tree,
+CONTAINS + PRECEDING when the other node is an ancestor, CONTAINED_BY + FOLLOWING when it is a descendant,
+otherwise PRECEDING or FOLLOWING by their order in the tree.
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>compareDocumentPosition</code>](#NodeService+compareDocumentPosition)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| otherNode | <code>PseudoNode</code> | The node to locate |
+
+<a name="NodeService+contains"></a>
+
+### pseudoHTMLDocument.contains(otherNode) ⇒ <code>boolean</code>
+Check whether a node is this node or one of its descendants.
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>contains</code>](#NodeService+contains)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| otherNode | <code>PseudoNode</code> \| <code>null</code> | The node to look for |
+
+<a name="NodeService+insertBefore"></a>
+
+### pseudoHTMLDocument.insertBefore(newNode, [referenceNode]) ⇒ <code>PseudoNode</code>
+Insert a node as a child of this node, before the given child (or at the end when there is none). A node which is
+already in a tree is moved, and the children of a document fragment are moved in order.
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>insertBefore</code>](#NodeService+insertBefore)  
+**Returns**: <code>PseudoNode</code> - The inserted node  
+**Throws**:
+
+- <code>Error</code> When the reference node is not a child of this node, or the new node is this node or contains it
+
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| [deep] | <code>boolean</code> | <code>false</code> | Copy everything in the document as well |
+| newNode | <code>PseudoNode</code> |  | The node to insert |
+| [referenceNode] | <code>PseudoNode</code> \| <code>null</code> | <code></code> | The child of this node to insert before, or null to insert at the end |
+
+<a name="NodeService+isEqualNode"></a>
+
+### pseudoHTMLDocument.isEqualNode(otherNode) ⇒ <code>boolean</code>
+Whether another node is the same as this one, by what they hold: the same type, name and value (an element also
+needs the same attributes), and children which are equal in the same order.
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>isEqualNode</code>](#NodeService+isEqualNode)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| otherNode | <code>PseudoNode</code> \| <code>null</code> | The node to compare with |
+
+<a name="NodeService+normalize"></a>
+
+### pseudoHTMLDocument.normalize()
+Tidy the text below this node: neighbouring text nodes are joined into one and empty text nodes are removed.
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>normalize</code>](#NodeService+normalize)  
+<a name="NodeService+removeChild"></a>
+
+### pseudoHTMLDocument.removeChild(childElement) ⇒ <code>PseudoNode</code>
+Remove a child from this node, it no longer has a parent or siblings afterwards.
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>removeChild</code>](#NodeService+removeChild)  
+**Returns**: <code>PseudoNode</code> - The removed node  
+**Throws**:
+
+- <code>Error</code> When the node is not a child of this node
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| childElement | <code>PseudoNode</code> | The child node to remove |
+
+<a name="NodeService+replaceChild"></a>
+
+### pseudoHTMLDocument.replaceChild(newChild, oldChild) ⇒ <code>PseudoNode</code>
+Replace a child of this node with another node (which is moved if it is already in a tree).
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>replaceChild</code>](#NodeService+replaceChild)  
+**Returns**: <code>PseudoNode</code> - The replaced node  
+**Throws**:
+
+- <code>Error</code> When the old node is not a child of this node
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| newChild | <code>PseudoNode</code> | The node which takes the place |
+| oldChild | <code>PseudoNode</code> | The child of this node to replace |
 
 <a name="PseudoEventListener"></a>
 
@@ -4264,10 +4302,6 @@ The values follow the UI Events, HTML, Pointer Events, Clipboard, Drag and Drop,
 The element which has the focus, kept for each tree (the root node of the tree it is in), like document.activeElement.
 
 **Kind**: global constant  
-<a name="HTMLElementService_1"></a>
-
-## HTMLElementService\_1 : <code>PseudoHTMLElement</code>
-**Kind**: global constant  
 <a name="modifierKeys"></a>
 
 ## modifierKeys([init]) ⇒ <code>ModifierKeys</code>
@@ -4352,14 +4386,6 @@ Create a PseudoNodeList, optionally starting from an existing chain of linkers.
 | --- | --- | --- |
 | [innerList] | <code>TreeLinker</code> \| <code>null</code> | <code></code> | 
 
-<a name="generateNode"></a>
-
-## generateNode() ⇒ <code>function</code>
-Create a TreeLinker class whose linkers each store a node (a LinkedNode) as their data, this can be used to build a
-tree (or list) of nodes from plain values.
-
-**Kind**: global function  
-**Returns**: <code>function</code> - The NodeFactory class (a TreeLinker) to use as the linker class  
 <a name="generateDocument"></a>
 
 ## generateDocument(root, context) ⇒ <code>Window</code> \| <code>PseudoEventTarget</code>
