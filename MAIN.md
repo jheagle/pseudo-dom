@@ -54,7 +54,10 @@ else, document fragments insert their children instead of themselves, and a node
 
 **Attribute helpers** work like the DOM's: `getAttributeNames`, `hasAttributes`, `toggleAttribute(name, [force])`.
 `localName` matches `tagName` and `prefix` is always `null` (there's no real namespace parsing);
-`getElementsByTagNameNS` behaves exactly like `getElementsByTagName`, ignoring the namespace.
+`getElementsByTagNameNS` behaves exactly like `getElementsByTagName`, ignoring the namespace. All 37 `aria*`
+reflected properties (`ariaLabel`, `ariaExpanded`, `ariaValueNow`, ...) are real too - each just reads/writes its
+matching `aria-*` attribute (`ariaLabel` <-> `aria-label`; the mapping isn't camelCase-to-kebab-case, so
+`ariaColCount` <-> `aria-colcount`, not `aria-col-count`).
 
 `getAttributeNode` / `setAttributeNode` / `removeAttributeNode` give and take real `Attr` nodes (backed by
 `AttrService`) instead of plain strings - `setAttributeNode` returns whatever `Attr` previously held that name (or
@@ -173,6 +176,3 @@ it) - useful for watching pseudo-dom-driven code run, or checking a final result
 - There are text and comment nodes (`PseudoText`, `PseudoComment`); `textContent` works like the DOM's (the text of
   everything below, and setting it replaces the children with a text node)
 
-## Not implemented yet
-
-- The `aria*` reflected properties

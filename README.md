@@ -54,7 +54,10 @@ else, document fragments insert their children instead of themselves, and a node
 
 **Attribute helpers** work like the DOM's: `getAttributeNames`, `hasAttributes`, `toggleAttribute(name, [force])`.
 `localName` matches `tagName` and `prefix` is always `null` (there's no real namespace parsing);
-`getElementsByTagNameNS` behaves exactly like `getElementsByTagName`, ignoring the namespace.
+`getElementsByTagNameNS` behaves exactly like `getElementsByTagName`, ignoring the namespace. All 37 `aria*`
+reflected properties (`ariaLabel`, `ariaExpanded`, `ariaValueNow`, ...) are real too - each just reads/writes its
+matching `aria-*` attribute (`ariaLabel` <-> `aria-label`; the mapping isn't camelCase-to-kebab-case, so
+`ariaColCount` <-> `aria-colcount`, not `aria-col-count`).
 
 **`style`** is a real, live `CSSStyleDeclaration`:
 
@@ -168,7 +171,6 @@ it) - useful for watching pseudo-dom-driven code run, or checking a final result
 
 ## Not implemented yet
 
-- The `aria*` reflected properties
 - The `Attr`-node / namespaced attribute methods (`getAttributeNode`, `getAttributeNS`, ...)
 ## Modules
 
@@ -2984,6 +2986,8 @@ Simulate the behaviour of the Element Class when there is no DOM available.
     * [.requestFullscreen()](#ElementService+requestFullscreen) ⇒ <code>Promise.&lt;void&gt;</code>
     * [.requestPointerLock()](#ElementService+requestPointerLock) ⇒ <code>Promise.&lt;void&gt;</code>
     * [.attachShadow(options)](#ElementService+attachShadow) ⇒ <code>PseudoShadowRoot</code>
+    * [.getAriaAttribute(attributeName)](#ElementService+getAriaAttribute) ⇒ <code>string</code>
+    * [.setAriaAttribute(attributeName, value)](#ElementService+setAriaAttribute) ⇒ <code>undefined</code>
 
 <a name="new_ElementService_new"></a>
 
@@ -3549,6 +3553,29 @@ Attach a shadow tree to this element and return its ShadowRoot. Throws when it a
 | Param | Type |
 | --- | --- |
 | options | <code>Object</code> | 
+
+<a name="ElementService+getAriaAttribute"></a>
+
+### elementService.getAriaAttribute(attributeName) ⇒ <code>string</code>
+Read one of the aria-* reflected properties (see the individual aria* getters/setters below).
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| attributeName | <code>string</code> | A real aria-* attribute name (aria-label, ...) |
+
+<a name="ElementService+setAriaAttribute"></a>
+
+### elementService.setAriaAttribute(attributeName, value) ⇒ <code>undefined</code>
+Write one of the aria-* reflected properties.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| attributeName | <code>string</code> | A real aria-* attribute name (aria-label, ...) |
+| value | <code>string</code> |  |
 
 <a name="DocumentService"></a>
 

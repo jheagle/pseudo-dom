@@ -764,4 +764,319 @@ export class ElementService extends NodeService implements Partial<PseudoElement
   get shadowRoot (): PseudoShadowRoot | null {
     return this.shadowRootInstance && this.shadowRootInstance.mode === 'open' ? this.shadowRootInstance : null
   }
+
+  /**
+   * Read one of the aria-* reflected properties (see the individual aria* getters/setters below).
+   * @param {string} attributeName A real aria-* attribute name (aria-label, ...)
+   * @returns {string}
+   */
+  private getAriaAttribute (attributeName: string): string {
+    return this.getAttribute(attributeName) || ''
+  }
+
+  /**
+   * Write one of the aria-* reflected properties.
+   * @param {string} attributeName A real aria-* attribute name (aria-label, ...)
+   * @param {string} value
+   * @returns {undefined}
+   */
+  private setAriaAttribute (attributeName: string, value: string): void {
+    this.setAttribute(attributeName, value)
+  }
+
+  get ariaAtomic (): string {
+    return this.getAriaAttribute('aria-atomic')
+  }
+
+  set ariaAtomic (value: string) {
+    this.setAriaAttribute('aria-atomic', value)
+  }
+
+  get ariaAutoComplete (): string {
+    return this.getAriaAttribute('aria-autocomplete')
+  }
+
+  set ariaAutoComplete (value: string) {
+    this.setAriaAttribute('aria-autocomplete', value)
+  }
+
+  get ariaBusy (): string {
+    return this.getAriaAttribute('aria-busy')
+  }
+
+  set ariaBusy (value: string) {
+    this.setAriaAttribute('aria-busy', value)
+  }
+
+  get ariaChecked (): string {
+    return this.getAriaAttribute('aria-checked')
+  }
+
+  set ariaChecked (value: string) {
+    this.setAriaAttribute('aria-checked', value)
+  }
+
+  get ariaColCount (): string {
+    return this.getAriaAttribute('aria-colcount')
+  }
+
+  set ariaColCount (value: string) {
+    this.setAriaAttribute('aria-colcount', value)
+  }
+
+  get ariaColIndex (): string {
+    return this.getAriaAttribute('aria-colindex')
+  }
+
+  set ariaColIndex (value: string) {
+    this.setAriaAttribute('aria-colindex', value)
+  }
+
+  get ariaColSpan (): string {
+    return this.getAriaAttribute('aria-colspan')
+  }
+
+  set ariaColSpan (value: string) {
+    this.setAriaAttribute('aria-colspan', value)
+  }
+
+  get ariaCurrent (): string {
+    return this.getAriaAttribute('aria-current')
+  }
+
+  set ariaCurrent (value: string) {
+    this.setAriaAttribute('aria-current', value)
+  }
+
+  get ariaDescription (): string {
+    return this.getAriaAttribute('aria-description')
+  }
+
+  set ariaDescription (value: string) {
+    this.setAriaAttribute('aria-description', value)
+  }
+
+  get ariaDisabled (): string {
+    return this.getAriaAttribute('aria-disabled')
+  }
+
+  set ariaDisabled (value: string) {
+    this.setAriaAttribute('aria-disabled', value)
+  }
+
+  get ariaExpanded (): string {
+    return this.getAriaAttribute('aria-expanded')
+  }
+
+  set ariaExpanded (value: string) {
+    this.setAriaAttribute('aria-expanded', value)
+  }
+
+  get ariaHasPopup (): string {
+    return this.getAriaAttribute('aria-haspopup')
+  }
+
+  set ariaHasPopup (value: string) {
+    this.setAriaAttribute('aria-haspopup', value)
+  }
+
+  get ariaHidden (): string {
+    return this.getAriaAttribute('aria-hidden')
+  }
+
+  set ariaHidden (value: string) {
+    this.setAriaAttribute('aria-hidden', value)
+  }
+
+  get ariaKeyShortcuts (): string {
+    return this.getAriaAttribute('aria-keyshortcuts')
+  }
+
+  set ariaKeyShortcuts (value: string) {
+    this.setAriaAttribute('aria-keyshortcuts', value)
+  }
+
+  get ariaLabel (): string {
+    return this.getAriaAttribute('aria-label')
+  }
+
+  set ariaLabel (value: string) {
+    this.setAriaAttribute('aria-label', value)
+  }
+
+  get ariaLevel (): string {
+    return this.getAriaAttribute('aria-level')
+  }
+
+  set ariaLevel (value: string) {
+    this.setAriaAttribute('aria-level', value)
+  }
+
+  get ariaLive (): string {
+    return this.getAriaAttribute('aria-live')
+  }
+
+  set ariaLive (value: string) {
+    this.setAriaAttribute('aria-live', value)
+  }
+
+  get ariaModal (): string {
+    return this.getAriaAttribute('aria-modal')
+  }
+
+  set ariaModal (value: string) {
+    this.setAriaAttribute('aria-modal', value)
+  }
+
+  get ariaMultiline (): string {
+    return this.getAriaAttribute('aria-multiline')
+  }
+
+  set ariaMultiline (value: string) {
+    this.setAriaAttribute('aria-multiline', value)
+  }
+
+  get ariaMultiSelectable (): string {
+    return this.getAriaAttribute('aria-multiselectable')
+  }
+
+  set ariaMultiSelectable (value: string) {
+    this.setAriaAttribute('aria-multiselectable', value)
+  }
+
+  get ariaOrientation (): string {
+    return this.getAriaAttribute('aria-orientation')
+  }
+
+  set ariaOrientation (value: string) {
+    this.setAriaAttribute('aria-orientation', value)
+  }
+
+  get ariaPlaceholder (): string {
+    return this.getAriaAttribute('aria-placeholder')
+  }
+
+  set ariaPlaceholder (value: string) {
+    this.setAriaAttribute('aria-placeholder', value)
+  }
+
+  get ariaPosInSet (): string {
+    return this.getAriaAttribute('aria-posinset')
+  }
+
+  set ariaPosInSet (value: string) {
+    this.setAriaAttribute('aria-posinset', value)
+  }
+
+  get ariaPressed (): string {
+    return this.getAriaAttribute('aria-pressed')
+  }
+
+  set ariaPressed (value: string) {
+    this.setAriaAttribute('aria-pressed', value)
+  }
+
+  get ariaReadOnly (): string {
+    return this.getAriaAttribute('aria-readonly')
+  }
+
+  set ariaReadOnly (value: string) {
+    this.setAriaAttribute('aria-readonly', value)
+  }
+
+  get ariaRequired (): string {
+    return this.getAriaAttribute('aria-required')
+  }
+
+  set ariaRequired (value: string) {
+    this.setAriaAttribute('aria-required', value)
+  }
+
+  get ariaRoleDescription (): string {
+    return this.getAriaAttribute('aria-roledescription')
+  }
+
+  set ariaRoleDescription (value: string) {
+    this.setAriaAttribute('aria-roledescription', value)
+  }
+
+  get ariaRowCount (): string {
+    return this.getAriaAttribute('aria-rowcount')
+  }
+
+  set ariaRowCount (value: string) {
+    this.setAriaAttribute('aria-rowcount', value)
+  }
+
+  get ariaRowIndex (): string {
+    return this.getAriaAttribute('aria-rowindex')
+  }
+
+  set ariaRowIndex (value: string) {
+    this.setAriaAttribute('aria-rowindex', value)
+  }
+
+  get ariaRowSpan (): string {
+    return this.getAriaAttribute('aria-rowspan')
+  }
+
+  set ariaRowSpan (value: string) {
+    this.setAriaAttribute('aria-rowspan', value)
+  }
+
+  get ariaSelected (): string {
+    return this.getAriaAttribute('aria-selected')
+  }
+
+  set ariaSelected (value: string) {
+    this.setAriaAttribute('aria-selected', value)
+  }
+
+  get ariaSetSize (): string {
+    return this.getAriaAttribute('aria-setsize')
+  }
+
+  set ariaSetSize (value: string) {
+    this.setAriaAttribute('aria-setsize', value)
+  }
+
+  get ariaSort (): string {
+    return this.getAriaAttribute('aria-sort')
+  }
+
+  set ariaSort (value: string) {
+    this.setAriaAttribute('aria-sort', value)
+  }
+
+  get ariaValueMax (): string {
+    return this.getAriaAttribute('aria-valuemax')
+  }
+
+  set ariaValueMax (value: string) {
+    this.setAriaAttribute('aria-valuemax', value)
+  }
+
+  get ariaValueMin (): string {
+    return this.getAriaAttribute('aria-valuemin')
+  }
+
+  set ariaValueMin (value: string) {
+    this.setAriaAttribute('aria-valuemin', value)
+  }
+
+  get ariaValueNow (): string {
+    return this.getAriaAttribute('aria-valuenow')
+  }
+
+  set ariaValueNow (value: string) {
+    this.setAriaAttribute('aria-valuenow', value)
+  }
+
+  get ariaValueText (): string {
+    return this.getAriaAttribute('aria-valuetext')
+  }
+
+  set ariaValueText (value: string) {
+    this.setAriaAttribute('aria-valuetext', value)
+  }
 }
