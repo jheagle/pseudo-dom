@@ -13,7 +13,9 @@ describe('getAttributeNames / hasAttributes', () => {
   test('a plain element already reports its property-backed attributes (id, className, ...)', () => {
     const div = new ElementService({ tagName: 'div' })
     expect(div.hasAttributes()).toBe(true)
-    expect(div.getAttributeNames()).toEqual(expect.arrayContaining(['id', 'className', 'innerHTML']))
+    expect(div.getAttributeNames()).toEqual(expect.arrayContaining(['id', 'className']))
+    // innerHTML is a computed getter, not a stored attribute (it never was reflected in outerHTML either)
+    expect(div.getAttributeNames()).not.toEqual(expect.arrayContaining(['innerHTML']))
   })
 
   test('a custom attribute appears in both once set', () => {

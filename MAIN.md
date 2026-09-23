@@ -49,8 +49,15 @@ Elements can be walked and changed like the DOM: \`children\` is a live \`HTMLCo
 children, \`childElementCount\`, \`firstElementChild\` / \`lastElementChild\` and \`nextElementSibling\` /
 \`previousElementSibling\` skip text and comment nodes. \`append\` / \`prepend\` / \`before\` / \`after\` / \`remove\` /
 \`replaceWith\` / \`replaceChildren\` accept nodes or strings (a string becomes a text node) and move a node already in
-a tree rather than duplicating it; \`insertAdjacentElement\` / \`insertAdjacentText\` insert at beforebegin / afterbegin
-/ beforeend / afterend (\`insertAdjacentHTML\` is not implemented, no HTML parsing yet).
+a tree rather than duplicating it; \`insertAdjacentElement\` / \`insertAdjacentText\` / \`insertAdjacentHTML\` insert at
+beforebegin / afterbegin / beforeend / afterend.
+
+\`innerHTML\` / \`outerHTML\` parse and serialize real HTML, via [htmlparser2](https://www.npmjs.com/package/htmlparser2)
+(a SAX-style tokenizer; pseudo-dom builds its own nodes from its events, the same way it builds a tree from
+\`css-select\`'s selector matches) - entities decode, void elements (\`br\`, \`img\`, ...) auto-close, and \`class\` /
+\`style\` attributes populate \`className\`/\`classList\` and \`style\` for real, not just a generic attribute. The
+setters (\`innerHTML =\`, \`outerHTML =\`) and \`insertAdjacentHTML\` are on \`HTMLElementService\` (they need to build
+real \`HTMLElement\`s); \`ElementService\` only has the getters (serializing is fine without them).
 
 Selector queries work like the DOM's: \`getElementsByTagName\` / \`getElementsByClassName\` (live, on any node) and
 \`querySelector\` / \`querySelectorAll\` (real CSS selectors, via [css-select](https://www.npmjs.com/package/css-select)
@@ -84,6 +91,6 @@ for real; \`scrollIntoView\` is a real callable no-op (there is no viewport to s
 \`requestFullscreen\` / \`requestPointerLock\` resolve, like a browser granting the request would.
 \`computedStyleMap()\` is a thin read-only view of the element's own inline style (there is no CSS cascade).
 
-Not implemented yet (these throw a "not implemented" error or are missing): \`innerHTML\` / \`outerHTML\` parsing, the
-\`aria*\` reflected properties, and the \`Attr\`-node / namespaced attribute methods (\`getAttributeNode\`,
-\`getAttributeNS\`, ...). The API will change before 1.0.
+Not implemented yet (these throw a "not implemented" error or are missing): the \`aria*\` reflected properties, and
+the \`Attr\`-node / namespaced attribute methods (\`getAttributeNode\`, \`getAttributeNS\`, ...). The API will change
+before 1.0.

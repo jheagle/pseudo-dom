@@ -135,7 +135,12 @@ describe('insertAdjacentText', () => {
 })
 
 describe('insertAdjacentHTML', () => {
-  test('is not implemented yet', () => {
-    expect(() => el('div').insertAdjacentHTML('beforeend', '<span></span>')).toThrow('not implemented')
+  test('parses the markup and inserts the resulting nodes at the position given', () => {
+    const parent = el('div')
+    parent.insertAdjacentHTML('beforeend', '<span id="s"></span>')
+    expect(parent.firstChild.tagName).toBe('span')
+    expect(parent.firstChild.id).toBe('s')
   })
+  // Full coverage (all four positions, attributes, text, comments, void elements, ...) is in
+  // src/services/HTMLParsingAndSerializing.test.js
 })

@@ -65,6 +65,38 @@ export declare class HTMLElementService extends ElementService implements Partia
      */
     protected equalsShallow(other: NodeService): boolean;
     /**
+     * Parses html with this class building each new element (matches HTML: parsed elements behave like plain
+     * HTMLElements, not whatever specialized class happens to be setting innerHTML / outerHTML).
+     * @param {string} html
+     * @returns {Array<*>}
+     */
+    private parse;
+    /**
+     * Replace this element's children by parsing html. innerHTML's setter is here rather than on ElementService (which
+     * only has the getter) because building the new elements needs a concrete element class - see parse().
+     * @param {string} html
+     * @returns {undefined}
+     */
+    set innerHTML(html: string);
+    get innerHTML(): string;
+    /**
+     * Replace this element itself, in its parent, by parsing html. Does nothing when it has no parent, like
+     * replaceWith. outerHTML's setter is here rather than on ElementService for the same reason as innerHTML's.
+     * @param {string} html
+     * @returns {undefined}
+     */
+    set outerHTML(html: string);
+    get outerHTML(): string;
+    /**
+     * Parse html and insert the resulting nodes at the given position, like insertAdjacentElement /
+     * insertAdjacentText.
+     * @param {string} position beforebegin, afterbegin, beforeend or afterend
+     * @param {string} html The markup to parse
+     * @returns {undefined}
+     * @throws {Error} When the position is not one of the four above
+     */
+    insertAdjacentHTML(position: string, html: string): void;
+    /**
      * Whether this element can have the focus: form controls and links which are not disabled, and anything with a tabindex.
      * @returns {boolean}
      */
