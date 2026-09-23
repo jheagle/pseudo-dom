@@ -44,319 +44,137 @@
 
     <section>
         <article><h1>Pseudo DOM</h1>
-<p>Mock the DOM for server side-side DOM state and in tests.</p></article>
+<p>Mock the DOM for server-side DOM state and in tests.</p>
+<h2>Status: early development (0.x)</h2>
+<p>Pseudo DOM recreates the browser DOM API (following the MDN documentation) so DOM-dependent code can run in Node -
+in tests, without a real or headless browser. It's written in TypeScript and ships type definitions. The API will
+change before 1.0.</p>
+<h2>At a glance</h2>
+<ul>
+<li><strong>Tree &amp; events</strong> - a real node tree with full event dispatch (capture → target → bubble) and standard event
+defaults for clicks, focus and more</li>
+<li><strong>Elements</strong> - attributes, <code>classList</code>, a real live <code>style</code> and <code>dataset</code>, <code>children</code>, and DOM-style mutation
+(<code>append</code>, <code>before</code>, <code>remove</code>, <code>replaceWith</code>, ...)</li>
+<li><strong>HTML parsing</strong> - <code>innerHTML</code> / <code>outerHTML</code> / <code>insertAdjacentHTML</code> parse and serialize real HTML</li>
+<li><strong>Queries</strong> - <code>querySelector</code> / <code>querySelectorAll</code> with real CSS selectors, <code>getElementById</code>, <code>matches</code>, <code>closest</code></li>
+<li><strong>Document</strong> - <code>createElement</code>, <code>createTextNode</code>, and <code>generateDocument()</code> to get a <code>window</code>-like object with
+<code>document</code> already on it</li>
+<li><strong>Cloning &amp; comparison</strong> - <code>cloneNode</code>, <code>isEqualNode</code>, <code>compareDocumentPosition</code>, <code>contains</code></li>
+</ul>
+<p>Everything below goes into more detail, section by section.</p>
+<h2>Tree, nodes &amp; events</h2>
+<p>A real tree: <code>parentNode</code>, <code>previousSibling</code> / <code>nextSibling</code>, <code>firstChild</code> / <code>lastChild</code>, <code>appendChild</code>,
+<code>insertBefore</code>, <code>removeChild</code>, <code>replaceChild</code>, <code>contains</code>, <code>getRootNode</code>. Nodes move when they're added somewhere
+else, document fragments insert their children instead of themselves, and a node can't be put inside itself.</p>
+<p><code>EventService</code> / <code>EventTargetService</code> dispatch an event through the tree the way the DOM does:</p>
+<ul>
+<li>Capture down from the root, hit the target, then bubble back up</li>
+<li><code>stopPropagation</code>, <code>stopImmediatePropagation</code>, <code>once</code>, <code>passive</code>, <code>preventDefault</code>, and the target's default action
+(clicking a submit button sends a <code>submit</code> event to its form)</li>
+<li><code>createEvent(type, init, { browser, trusted })</code> makes the kind of event that suits the type (a click is a
+<code>MouseEvent</code>, a keydown a <code>KeyboardEvent</code>, ...). Like a real constructor, it gives nothing (no bubbling, no
+cancelling, not trusted) unless asked - but <code>browser: true</code> applies <code>eventDefaults</code>, the table of how a browser
+creates each standard type (click bubbles and can be cancelled; focus doesn't bubble but focusin does; input
+bubbles but can't be cancelled; ...), and <code>trusted: true</code> makes <code>isTrusted</code> true, as for a real user action</li>
+<li>The event kinds: <code>PseudoUIEvent</code>, <code>PseudoMouseEvent</code>, <code>PseudoPointerEvent</code>, <code>PseudoKeyboardEvent</code>,
+<code>PseudoFocusEvent</code>, <code>PseudoInputEvent</code>, <code>PseudoCustomEvent</code></li>
+<li>Elements have <code>click()</code> (an untrusted click, like a script's) and <code>focus()</code> / <code>blur()</code> (blur/focusout/focus/focusin
+and the related targets, with a focused element tracked per tree)</li>
+<li><code>simulate.click(element)</code> / <code>simulate.keyPress(element, key)</code> send what a real user action sends - pointerdown,
+mousedown, the focus moving, pointerup, mouseup, click; keydown, keyup - all trusted</li>
+</ul>
+<h2>Elements</h2>
+<p><code>ElementService</code> / <code>HTMLElementService</code> cover <code>Element</code> and <code>HTMLElement</code>: attributes, <code>NamedNodeMap</code>, <code>classList</code>.
+<code>AttrService</code>, <code>DOMTokenListService</code> and <code>NamedNodeMapService</code> back them.</p>
+<p><strong>Attribute helpers</strong> work like the DOM's: <code>getAttributeNames</code>, <code>hasAttributes</code>, <code>toggleAttribute(name, [force])</code>.
+<code>localName</code> matches <code>tagName</code> and <code>prefix</code> is always <code>null</code> (there's no real namespace parsing);
+<code>getElementsByTagNameNS</code> behaves exactly like <code>getElementsByTagName</code>, ignoring the namespace.</p>
+<p><strong><code>style</code></strong> is a real, live <code>CSSStyleDeclaration</code>:</p>
+<ul>
+<li>Named property access (<code>el.style.backgroundColor = 'red'</code>) alongside <code>getPropertyValue</code> / <code>setProperty</code> /
+<code>removeProperty</code> / <code>getPropertyPriority</code> / <code>cssText</code></li>
+<li>An unset property reads as <code>''</code>, like the DOM's</li>
+</ul>
+<p><strong><code>dataset</code></strong> is a live <code>DOMStringMap</code>: reading/writing/deleting a camelCase name (<code>el.dataset.fooBar</code>)
+reads/writes/removes the matching <code>data-foo-bar</code> attribute directly, so it can never fall out of sync with the
+attributes themselves.</p>
+<p><em>(<code>style</code> and <code>dataset</code> are both on <code>HTMLElementService</code>, matching the DOM - they're not on the base <code>Element</code>.)</em></p>
+<p><strong>Traversal &amp; mutation</strong> work like the DOM's:</p>
+<ul>
+<li><code>children</code> is a live <code>HTMLCollection</code> of just the element children; <code>childElementCount</code>, <code>firstElementChild</code> /
+<code>lastElementChild</code> and <code>nextElementSibling</code> / <code>previousElementSibling</code> skip text and comment nodes</li>
+<li><code>append</code> / <code>prepend</code> / <code>before</code> / <code>after</code> / <code>remove</code> / <code>replaceWith</code> / <code>replaceChildren</code> accept nodes or strings (a
+string becomes a text node), and move a node already in a tree rather than duplicating it</li>
+<li><code>insertAdjacentElement</code> / <code>insertAdjacentText</code> / <code>insertAdjacentHTML</code> insert at beforebegin / afterbegin /
+beforeend / afterend</li>
+</ul>
+<p><strong><code>attachShadow({mode})</code></strong> attaches a real (<code>DocumentFragmentService</code>-based) <code>ShadowRoot</code>, with <code>host</code> and <code>mode</code>
+set. <code>element.shadowRoot</code> reaches it when the mode is <code>'open'</code>, like the DOM's (a <code>'closed'</code> one still exists, just
+not reachable this way); attaching a second one throws.</p>
+<h3>HTML parsing</h3>
+<p><code>innerHTML</code> / <code>outerHTML</code> / <code>insertAdjacentHTML</code> parse and serialize real HTML, via
+<a href="https://www.npmjs.com/package/htmlparser2">htmlparser2</a> (a SAX-style tokenizer - pseudo-dom builds its own nodes
+from its events, the same way it builds matches from <code>css-select</code>).</p>
+<ul>
+<li>Entities decode, and void elements (<code>br</code>, <code>img</code>, ...) auto-close</li>
+<li><code>class</code> / <code>style</code> attributes populate <code>className</code> / <code>classList</code> and <code>style</code> for real, not just a generic attribute</li>
+<li>The setters (<code>innerHTML =</code>, <code>outerHTML =</code>) and <code>insertAdjacentHTML</code> are on <code>HTMLElementService</code> (building new
+elements needs a concrete element class); <code>ElementService</code> only has the getters, since serializing doesn't</li>
+</ul>
+<h3>Layout (mocked, not computed)</h3>
+<p>There's no layout engine, so anything that would need one is <strong>settable directly</strong> rather than really computed - set
+the value a test needs, and the getter/method returns it:</p>
+<ul>
+<li><code>clientWidth</code> / <code>clientHeight</code> / <code>clientTop</code> / <code>clientLeft</code> / <code>scrollWidth</code> / <code>scrollHeight</code> (plain numbers,
+alongside the existing <code>offsetWidth</code> etc.)</li>
+<li><code>boundingClientRect</code> backs <code>getBoundingClientRect()</code>, <code>clientRects</code> backs <code>getClientRects()</code>, <code>animations</code> backs
+<code>getAnimations()</code>, <code>isVisible</code> backs <code>checkVisibility()</code></li>
+</ul>
+<p>A few things in this group are genuinely real, not mocked:</p>
+<ul>
+<li><code>scrollLeft</code> / <code>scrollTop</code> are plain settable numbers, and <code>scroll</code> / <code>scrollTo</code> / <code>scrollBy</code> (a number pair or an
+options object) update them for real; <code>scrollIntoView</code> is a callable no-op (there's no viewport to scroll within)</li>
+<li><code>hasPointerCapture</code> / <code>setPointerCapture</code> / <code>releasePointerCapture</code> genuinely track capture per pointer id</li>
+<li><code>requestFullscreen</code> / <code>requestPointerLock</code> resolve, like a browser granting the request would</li>
+<li><code>computedStyleMap()</code> is a thin read-only view of the element's own inline style (there's no CSS cascade)</li>
+</ul>
+<h2>Queries</h2>
+<p><code>getElementsByTagName</code> / <code>getElementsByClassName</code> (live, on any node) and <code>querySelector</code> / <code>querySelectorAll</code> (real
+CSS selectors, via <a href="https://www.npmjs.com/package/css-select">css-select</a> matched against pseudo-dom's own tree
+through a custom adapter) are on <code>NodeService</code>, so <code>Document</code>, <code>DocumentFragment</code> and <code>Element</code> all have them.
+<code>querySelectorAll</code> returns a plain array - a snapshot taken when it's called, like the DOM's.</p>
+<p><code>matches</code> / <code>closest</code> are on <code>ElementService</code>. <code>getElementById</code> is on both <code>DocumentService</code> and
+<code>DocumentFragmentService</code> (the DOM's <code>NonElementParentNode</code> mixin, so a <code>ShadowRoot</code> gets it too).</p>
+<h2>Document</h2>
+<p><code>DocumentService</code> matches the real <code>Document</code> - it's not an <code>Element</code>, so it has no <code>tagName</code> / <code>classList</code> /
+<code>matches</code> / etc:</p>
+<ul>
+<li><code>createElement</code>, <code>createTextNode</code>, <code>createComment</code>, <code>createDocumentFragment</code></li>
+<li><code>getElementById</code></li>
+<li><code>textContent</code> is always <code>null</code></li>
+</ul>
+<p><code>DocumentFragmentService</code> is the plain <code>DocumentFragment</code>. <code>PseudoHTMLDocument</code> - what <code>generateDocument()</code> actually
+creates - only adds the <code>html</code> / <code>head</code> / <code>body</code> structure on top of <code>DocumentService</code>. <code>PseudoNodeList</code> backs
+<code>childNodes</code>.</p>
+<h2>Cloning, comparison &amp; connection</h2>
+<ul>
+<li><code>cloneNode(deep)</code> copies an element with its attributes (objects such as <code>style</code> are copied too, not shared) and,
+when deep, everything below it - without the parent or the event listeners</li>
+<li><code>isEqualNode</code> compares two nodes by what they hold (tag, attributes in any order, text and children in order)</li>
+<li><code>compareDocumentPosition</code> says where another node is (<code>NodeService.DOCUMENT_POSITION_*</code>)</li>
+<li><code>isConnected</code> is true when the tree has a document at the top; <code>ownerDocument</code> says which one made the node</li>
+<li><code>normalize</code> joins neighbouring text nodes</li>
+<li>There are text and comment nodes (<code>PseudoText</code>, <code>PseudoComment</code>); <code>textContent</code> works like the DOM's (the text of
+everything below, and setting it replaces the children with a text node)</li>
+</ul>
+<h2>Not implemented yet</h2>
+<ul>
+<li>The <code>aria*</code> reflected properties</li>
+<li>The <code>Attr</code>-node / namespaced attribute methods (<code>getAttributeNode</code>, <code>getAttributeNS</code>, ...)</li>
+</ul></article>
     </section>
 
 
-
-
-
-
-
-
-
-<section>
-
-<header>
-    
-        <h2>classes.js</h2>
-        
-    
-</header>
-
-<article>
-    <div class="container-overview">
-    
-        
-            <div class="description">All of the Pseudo Dom classes for replicating DOM structure.</div>
-        
-
-        
-
-
-<dl class="details">
-
-    
-    <dt class="tag-version">Version:</dt>
-    <dd class="tag-version"><ul class="dummy"><li>1.0.0</li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-author">Author:</dt>
-    <dd class="tag-author">
-        <ul>
-            <li><a href="mailto:joshuaheagle@gmail.com">Joshua Heagle</a></li>
-        </ul>
-    </dd>
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="classes.js.html">classes.js</a>, <a href="classes.js.html#line1">line 1</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
-
-
-
-
-
-
-
-<section>
-
-<header>
-    
-        <h2>classes/PseudoElement.js</h2>
-        
-    
-</header>
-
-<article>
-    <div class="container-overview">
-    
-        
-            <div class="description">Substitute for the DOM Element Class.</div>
-        
-
-        
-
-
-<dl class="details">
-
-    
-    <dt class="tag-version">Version:</dt>
-    <dd class="tag-version"><ul class="dummy"><li>1.0.0</li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-author">Author:</dt>
-    <dd class="tag-author">
-        <ul>
-            <li><a href="mailto:joshuaheagle@gmail.com">Joshua Heagle</a></li>
-        </ul>
-    </dd>
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="classes_PseudoElement.js.html">classes/PseudoElement.js</a>, <a href="classes_PseudoElement.js.html#line1">line 1</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
-
-
-
-
-
-
-
-<section>
-
-<header>
-    
-        <h2>classes/PseudoEvent.js</h2>
-        
-    
-</header>
-
-<article>
-    <div class="container-overview">
-    
-        
-            <div class="description">Substitute for the DOM Event Class.</div>
-        
-
-        
-
-
-<dl class="details">
-
-    
-    <dt class="tag-version">Version:</dt>
-    <dd class="tag-version"><ul class="dummy"><li>1.0.0</li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-author">Author:</dt>
-    <dd class="tag-author">
-        <ul>
-            <li><a href="mailto:joshuaheagle@gmail.com">Joshua Heagle</a></li>
-        </ul>
-    </dd>
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="classes_PseudoEvent.js.html">classes/PseudoEvent.js</a>, <a href="classes_PseudoEvent.js.html#line1">line 1</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
 
 
 
@@ -422,419 +240,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="classes_PseudoEventListener.js.html">classes/PseudoEventListener.js</a>, <a href="classes_PseudoEventListener.js.html#line1">line 1</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
-
-
-
-
-
-
-
-<section>
-
-<header>
-    
-        <h2>classes/PseudoEventTarget.js</h2>
-        
-    
-</header>
-
-<article>
-    <div class="container-overview">
-    
-        
-            <div class="description">Substitute for the DOM EventTarget Class.</div>
-        
-
-        
-
-
-<dl class="details">
-
-    
-    <dt class="tag-version">Version:</dt>
-    <dd class="tag-version"><ul class="dummy"><li>1.0.0</li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-author">Author:</dt>
-    <dd class="tag-author">
-        <ul>
-            <li><a href="mailto:joshuaheagle@gmail.com">Joshua Heagle</a></li>
-        </ul>
-    </dd>
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="classes_PseudoEventTarget.js.html">classes/PseudoEventTarget.js</a>, <a href="classes_PseudoEventTarget.js.html#line1">line 1</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
-
-
-
-
-
-
-
-<section>
-
-<header>
-    
-        <h2>classes/PseudoHTMLDocument.js</h2>
-        
-    
-</header>
-
-<article>
-    <div class="container-overview">
-    
-        
-            <div class="description">Substitute for the DOM HTMLDocument Class.</div>
-        
-
-        
-
-
-<dl class="details">
-
-    
-    <dt class="tag-version">Version:</dt>
-    <dd class="tag-version"><ul class="dummy"><li>1.0.0</li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-author">Author:</dt>
-    <dd class="tag-author">
-        <ul>
-            <li><a href="mailto:joshuaheagle@gmail.com">Joshua Heagle</a></li>
-        </ul>
-    </dd>
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="classes_PseudoHTMLDocument.js.html">classes/PseudoHTMLDocument.js</a>, <a href="classes_PseudoHTMLDocument.js.html#line1">line 1</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
-
-
-
-
-
-
-
-<section>
-
-<header>
-    
-        <h2>classes/PseudoHTMLElement.js</h2>
-        
-    
-</header>
-
-<article>
-    <div class="container-overview">
-    
-        
-            <div class="description">Substitute for the DOM HTMLElement Class.</div>
-        
-
-        
-
-
-<dl class="details">
-
-    
-    <dt class="tag-version">Version:</dt>
-    <dd class="tag-version"><ul class="dummy"><li>1.0.0</li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-author">Author:</dt>
-    <dd class="tag-author">
-        <ul>
-            <li><a href="mailto:joshuaheagle@gmail.com">Joshua Heagle</a></li>
-        </ul>
-    </dd>
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="classes_PseudoHTMLElement.js.html">classes/PseudoHTMLElement.js</a>, <a href="classes_PseudoHTMLElement.js.html#line1">line 1</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
-
-
-
-
-
-
-
-<section>
-
-<header>
-    
-        <h2>classes/PseudoNode.js</h2>
-        
-    
-</header>
-
-<article>
-    <div class="container-overview">
-    
-        
-            <div class="description">Substitute for the DOM Node Class.</div>
-        
-
-        
-
-
-<dl class="details">
-
-    
-    <dt class="tag-version">Version:</dt>
-    <dd class="tag-version"><ul class="dummy"><li>1.0.0</li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-author">Author:</dt>
-    <dd class="tag-author">
-        <ul>
-            <li><a href="mailto:joshuaheagle@gmail.com">Joshua Heagle</a></li>
-        </ul>
-    </dd>
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="classes_PseudoNode.js.html">classes/PseudoNode.js</a>, <a href="classes_PseudoNode.js.html#line1">line 1</a>
+        <a href="classes_PseudoEventListener.js.html">classes/PseudoEventListener.js</a>, <a href="classes_PseudoEventListener.js.html#line6">line 6</a>
     </li></ul></dd>
     
 
@@ -937,7 +343,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="classes_PseudoNodeList.js.html">classes/PseudoNodeList.js</a>, <a href="classes_PseudoNodeList.js.html#line1">line 1</a>
+        <a href="classes_PseudoNodeList.js.html">classes/PseudoNodeList.js</a>, <a href="classes_PseudoNodeList.js.html#line9">line 9</a>
     </li></ul></dd>
     
 
@@ -986,7 +392,7 @@
 
 <header>
     
-        <h2>factories.js</h2>
+        <h2>factories/createDataset.js</h2>
         
     
 </header>
@@ -995,7 +401,10 @@
     <div class="container-overview">
     
         
-            <div class="description">All of the Pseudo Dom Helper functions for generating DOM objects.</div>
+            <div class="description">Wraps an element in a Proxy which behaves like the DOM's DOMStringMap (element.dataset): a live view of its
+data-* attributes, under their camelCase names, backed by the element's own getAttribute / setAttribute /
+hasAttribute / removeAttribute (nothing is stored separately, so it can never fall out of sync with the
+attributes).</div>
         
 
         
@@ -1040,7 +449,738 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="factories.js.html">factories.js</a>, <a href="factories.js.html#line1">line 1</a>
+        <a href="factories_createDataset.js.html">factories/createDataset.js</a>, <a href="factories_createDataset.js.html#line8">line 8</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>factories/createStyleDeclaration.js</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description">Wraps a CSSStyleDeclarationService in a Proxy so arbitrary camelCase CSS properties (element.style.
+backgroundColor) work like the DOM's, on top of its real methods (getPropertyValue, setProperty, cssText, ...).</div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+    <dt class="tag-version">Version:</dt>
+    <dd class="tag-version"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li><a href="mailto:joshuaheagle@gmail.com">Joshua Heagle</a></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="factories_createStyleDeclaration.js.html">factories/createStyleDeclaration.js</a>, <a href="factories_createStyleDeclaration.js.html#line7">line 7</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>factories/cssSelectAdapter.js</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description">The css-select Adapter which lets it query pseudo-dom's own tree, instead of the domutils-based tree it
+defaults to.</div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+    <dt class="tag-version">Version:</dt>
+    <dd class="tag-version"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li><a href="mailto:joshuaheagle@gmail.com">Joshua Heagle</a></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="factories_cssSelectAdapter.js.html">factories/cssSelectAdapter.js</a>, <a href="factories_cssSelectAdapter.js.html#line11">line 11</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>factories/eventDefaults.js</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description">The standard event types of the browser, and how the browser creates them.</div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+    <dt class="tag-version">Version:</dt>
+    <dd class="tag-version"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li><a href="mailto:joshuaheagle@gmail.com">Joshua Heagle</a></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="factories_eventDefaults.js.html">factories/eventDefaults.js</a>, <a href="factories_eventDefaults.js.html#line3">line 3</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>factories/parseHTML.js</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description">Parses an HTML string into pseudo-dom nodes, for innerHTML / outerHTML / insertAdjacentHTML. Built on
+htmlparser2's Parser (a SAX-style tokenizer) with a custom handler which builds pseudo-dom nodes directly -
+htmlparser2's own default DomHandler / domutils tree (which this never uses) is stubbed out of the browser bundle
+by the browser.ignore config, the same way css-select's unused default adapter already is.
+
+The class to build parsed elements with is given by the caller (rather than imported here) so this has no
+dependency on ElementService / HTMLElementService - importing either here, from a factory ElementService itself
+would need to call, would create an import cycle.</div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+    <dt class="tag-version">Version:</dt>
+    <dd class="tag-version"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li><a href="mailto:joshuaheagle@gmail.com">Joshua Heagle</a></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="factories_parseHTML.js.html">factories/parseHTML.js</a>, <a href="factories_parseHTML.js.html#line6">line 6</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>factories/query.js</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description">Selector queries (querySelector, querySelectorAll, matches, closest), built on css-select and the
+cssSelectAdapter which lets it query pseudo-dom's own tree.</div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+    <dt class="tag-version">Version:</dt>
+    <dd class="tag-version"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li><a href="mailto:joshuaheagle@gmail.com">Joshua Heagle</a></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="factories_query.js.html">factories/query.js</a>, <a href="factories_query.js.html#line7">line 7</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>factories/serializeHTML.js</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description">Serializes pseudo-dom nodes back into an HTML string, for innerHTML / outerHTML.</div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+    <dt class="tag-version">Version:</dt>
+    <dd class="tag-version"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li><a href="mailto:joshuaheagle@gmail.com">Joshua Heagle</a></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="factories_serializeHTML.js.html">factories/serializeHTML.js</a>, <a href="factories_serializeHTML.js.html#line26">line 26</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>interfaces/PseudoEvent.js</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description">Substitute for the DOM Event Class.</div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+    <dt class="tag-version">Version:</dt>
+    <dd class="tag-version"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li><a href="mailto:joshuaheagle@gmail.com">Joshua Heagle</a></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="interfaces_PseudoEvent.js.html">interfaces/PseudoEvent.js</a>, <a href="interfaces_PseudoEvent.js.html#line3">line 3</a>
     </li></ul></dd>
     
 
@@ -1143,7 +1283,1243 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="main.js.html">main.js</a>, <a href="main.js.html#line1">line 1</a>
+        <a href="main.js.html">main.js</a>, <a href="main.js.html#line3">line 3</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>services/CSSStyleDeclarationService.js</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description">Substitute for the DOM CSSStyleDeclaration Class (the object behind Element.style).</div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+    <dt class="tag-version">Version:</dt>
+    <dd class="tag-version"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li><a href="mailto:joshuaheagle@gmail.com">Joshua Heagle</a></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="services_CSSStyleDeclarationService.js.html">services/CSSStyleDeclarationService.js</a>, <a href="services_CSSStyleDeclarationService.js.html#line3">line 3</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>services/CustomEventService.js</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description">Substitute for the DOM CustomEvent Class.</div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+    <dt class="tag-version">Version:</dt>
+    <dd class="tag-version"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li><a href="mailto:joshuaheagle@gmail.com">Joshua Heagle</a></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="services_CustomEventService.js.html">services/CustomEventService.js</a>, <a href="services_CustomEventService.js.html#line7">line 7</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>services/EventService.js</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description">Substitute for the DOM Event Class.</div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+    <dt class="tag-version">Version:</dt>
+    <dd class="tag-version"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li><a href="mailto:joshuaheagle@gmail.com">Joshua Heagle</a></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="services_EventService.js.html">services/EventService.js</a>, <a href="services_EventService.js.html#line3">line 3</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>services/EventTargetService.js</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description">Substitute for the DOM EventTarget Class.</div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+    <dt class="tag-version">Version:</dt>
+    <dd class="tag-version"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li><a href="mailto:joshuaheagle@gmail.com">Joshua Heagle</a></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="services_EventTargetService.js.html">services/EventTargetService.js</a>, <a href="services_EventTargetService.js.html#line19">line 19</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>services/FocusEventService.js</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description">Substitute for the DOM FocusEvent Class.</div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+    <dt class="tag-version">Version:</dt>
+    <dd class="tag-version"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li><a href="mailto:joshuaheagle@gmail.com">Joshua Heagle</a></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="services_FocusEventService.js.html">services/FocusEventService.js</a>, <a href="services_FocusEventService.js.html#line7">line 7</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>services/HTMLCollectionService.js</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description">Substitute for the DOM HTMLCollection Class.</div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+    <dt class="tag-version">Version:</dt>
+    <dd class="tag-version"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li><a href="mailto:joshuaheagle@gmail.com">Joshua Heagle</a></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="services_HTMLCollectionService.js.html">services/HTMLCollectionService.js</a>, <a href="services_HTMLCollectionService.js.html#line10">line 10</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>services/InputEventService.js</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description">Substitute for the DOM InputEvent Class.</div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+    <dt class="tag-version">Version:</dt>
+    <dd class="tag-version"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li><a href="mailto:joshuaheagle@gmail.com">Joshua Heagle</a></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="services_InputEventService.js.html">services/InputEventService.js</a>, <a href="services_InputEventService.js.html#line7">line 7</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>services/KeyboardEventService.js</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description">Substitute for the DOM KeyboardEvent Class.</div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+    <dt class="tag-version">Version:</dt>
+    <dd class="tag-version"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li><a href="mailto:joshuaheagle@gmail.com">Joshua Heagle</a></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="services_KeyboardEventService.js.html">services/KeyboardEventService.js</a>, <a href="services_KeyboardEventService.js.html#line7">line 7</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>services/MouseEventService.js</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description">Substitute for the DOM MouseEvent Class.</div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+    <dt class="tag-version">Version:</dt>
+    <dd class="tag-version"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li><a href="mailto:joshuaheagle@gmail.com">Joshua Heagle</a></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="services_MouseEventService.js.html">services/MouseEventService.js</a>, <a href="services_MouseEventService.js.html#line7">line 7</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>services/NodeService.js</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description">Substitute for the DOM Node Class.</div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+    <dt class="tag-version">Version:</dt>
+    <dd class="tag-version"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li><a href="mailto:joshuaheagle@gmail.com">Joshua Heagle</a></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="services_NodeService.js.html">services/NodeService.js</a>, <a href="services_NodeService.js.html#line18">line 18</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>services/PointerEventService.js</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description">Substitute for the DOM PointerEvent Class.</div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+    <dt class="tag-version">Version:</dt>
+    <dd class="tag-version"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li><a href="mailto:joshuaheagle@gmail.com">Joshua Heagle</a></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="services_PointerEventService.js.html">services/PointerEventService.js</a>, <a href="services_PointerEventService.js.html#line7">line 7</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>services/UIEventService.js</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description">Substitute for the DOM UIEvent Class.</div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+    <dt class="tag-version">Version:</dt>
+    <dd class="tag-version"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li><a href="mailto:joshuaheagle@gmail.com">Joshua Heagle</a></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="services_UIEventService.js.html">services/UIEventService.js</a>, <a href="services_UIEventService.js.html#line7">line 7</a>
     </li></ul></dd>
     
 
@@ -1188,13 +2564,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-pseudoDom_objects.html">pseudoDom/objects</a></li></ul><h3>Classes</h3><ul><li><a href="PseudoElement.html">PseudoElement</a></li><li><a href="PseudoEvent.html">PseudoEvent</a></li><li><a href="PseudoEventListener.html">PseudoEventListener</a></li><li><a href="PseudoEventTarget.html">PseudoEventTarget</a></li><li><a href="PseudoHTMLDocument.html">PseudoHTMLDocument</a></li><li><a href="PseudoHTMLElement.html">PseudoHTMLElement</a></li><li><a href="PseudoNode.html">PseudoNode</a></li><li><a href="PseudoNodeAttached.html">PseudoNodeAttached</a></li></ul><h3>Global</h3><ul><li><a href="global.html#previousPseudoDom">previousPseudoDom</a></li><li><a href="global.html#root">root</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-pseudoDom_objects.html">pseudoDom/objects</a></li><li><a href="module-pseudoDom_simulate.html">pseudoDom/simulate</a></li></ul><h3>Classes</h3><ul><li><a href="AttrService.html">AttrService</a></li><li><a href="CSSStyleDeclarationService.html">CSSStyleDeclarationService</a></li><li><a href="CommentService.html">CommentService</a></li><li><a href="CustomEventService.html">CustomEventService</a></li><li><a href="DOMTokenListService.html">DOMTokenListService</a></li><li><a href="DocumentFragmentService.html">DocumentFragmentService</a></li><li><a href="DocumentService.html">DocumentService</a></li><li><a href="ElementService.html">ElementService</a></li><li><a href="EventService.html">EventService</a></li><li><a href="EventTargetService.html">EventTargetService</a></li><li><a href="FocusEventService.html">FocusEventService</a></li><li><a href="HTMLCollectionService.html">HTMLCollectionService</a></li><li><a href="HTMLElementService.html">HTMLElementService</a></li><li><a href="InputEventService.html">InputEventService</a></li><li><a href="KeyboardEventService.html">KeyboardEventService</a></li><li><a href="MouseEventService.html">MouseEventService</a></li><li><a href="NamedNodeMapService.html">NamedNodeMapService</a></li><li><a href="NodeService.html">NodeService</a></li><li><a href="PointerEventService.html">PointerEventService</a></li><li><a href="PseudoEventListener.html">PseudoEventListener</a></li><li><a href="PseudoHTMLDocument.html">PseudoHTMLDocument</a></li><li><a href="PseudoNodeList.html">PseudoNodeList</a></li><li><a href="ShadowRootService.html">ShadowRootService</a></li><li><a href="TextService.html">TextService</a></li><li><a href="UIEventService.html">UIEventService</a></li></ul><h3>Global</h3><ul><li><a href="global.html#camelToKebab">camelToKebab</a></li><li><a href="global.html#createEvent">createEvent</a></li><li><a href="global.html#dataAttributes">dataAttributes</a></li><li><a href="global.html#escapeAttributeValue">escapeAttributeValue</a></li><li><a href="global.html#escapeText">escapeText</a></li><li><a href="global.html#eventDefaults">eventDefaults</a></li><li><a href="global.html#focused">focused</a></li><li><a href="global.html#generateDocument">generateDocument</a></li><li><a href="global.html#generateNodeList">generateNodeList</a></li><li><a href="global.html#getActiveElement">getActiveElement</a></li><li><a href="global.html#getParentNodes">getParentNodes</a></li><li><a href="global.html#getParentNodesFromAttribute">getParentNodesFromAttribute</a></li><li><a href="global.html#kebabToCamel">kebabToCamel</a></li><li><a href="global.html#modifierKeys">modifierKeys</a></li><li><a href="global.html#modifierState">modifierState</a></li><li><a href="global.html#nearestElementSibling">nearestElementSibling</a></li><li><a href="global.html#serializeAttributes">serializeAttributes</a></li><li><a href="global.html#serializeNode">serializeNode</a></li><li><a href="global.html#setActiveElement">setActiveElement</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Thu Nov 16 2023 23:22:35 GMT-0500 (Eastern Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Wed Sep 23 2026 10:14:24 GMT-0400 (Eastern Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>

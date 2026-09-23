@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: classes/PseudoHTMLDocument.js</title>
+    <title>JSDoc: Source: services/HTMLCollectionService.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: classes/PseudoHTMLDocument.js</h1>
+    <h1 class="page-title">Source: services/HTMLCollectionService.js</h1>
 
     
 
@@ -30,76 +30,94 @@
 
 require('core-js/modules/esnext.iterator.constructor.js')
 require('core-js/modules/esnext.iterator.find.js')
+require('core-js/modules/esnext.iterator.for-each.js')
 Object.defineProperty(exports, '__esModule', {
   value: true
 })
-const DocumentService_1 = require('../services/DocumentService')
+exports.HTMLCollectionService = void 0
 /**
- * Simulate the behaviour of the HTMLDocument Class when there is no DOM available. Like the real HTMLDocument, this
- * only adds the html/head/body structure on top of what Document already gives (createElement, createTextNode,
- * createComment, createDocumentFragment, getElementById, textContent always null).
+ * @file Substitute for the DOM HTMLCollection Class.
+ * @author Joshua Heagle &lt;joshuaheagle@gmail.com>
+ * @version 1.0.0
+ */
+const NodeService_1 = require('./NodeService')
+/**
+ * Simulate the behaviour of the HTMLCollection Class when there is no DOM available: a live view of some of a node's
+ * element descendants, recomputed each time it is used rather than kept in sync as they change.
  * @author Joshua Heagle &lt;joshuaheagle@gmail.com>
  * @class
- * @augments DocumentService
- * @property {PseudoHTMLElement} head - A reference to the Head child element
- * @property {PseudoHTMLElement} body - A reference to the Body child element
  */
-class PseudoHTMLDocument extends DocumentService_1.DocumentService {
+class HTMLCollectionService {
   /**
-   * The root HTML element is acts as the parent to all HTML elements in the document.
+   * @param {NodeService} owner The node this is a live view of a part of
+   * @param {function(*): boolean} [predicate] Only elements which pass this are included (every element by default)
+   * @param {boolean} [deep=false] Include every matching descendant (true, like getElementsByTagName), not just the
+   * direct element children (false, like Element.children)
    * @constructor
    */
-  constructor () {
-    super()
-    const html = this.createElement('html')
-    this.appendChild(html)
-    /**
-     * Create document head element
-     * @type {PseudoHTMLElement}
-     */
-    this.head = this.createElement('head')
-    html.appendChild(this.head)
-    /**
-     * Create document body element
-     * @type {PseudoHTMLElement}
-     */
-    this.body = this.createElement('body')
-    html.appendChild(this.body)
+  constructor (owner, predicate = () => true, deep = false) {
+    this.owner = owner
+    this.predicate = predicate
+    this.deep = deep
   }
 
   /**
-   * A copy of this document with none of its html/head/body (cloneNode, from the inherited cloneShallow hook, fills
-   * them back in, deep copies own document's, empty otherwise - see cloneNode).
-   * @returns {PseudoHTMLDocument}
+   * The current elements the collection holds, in tree order.
+   * @returns {Array&lt;PseudoNode>}
    */
-  cloneShallow () {
-    const copy = new this.constructor()
-    while (copy.firstChild) {
-      copy.removeChild(copy.firstChild)
+  elements () {
+    const results = []
+    const visit = node => {
+      Array.from(node.childNodes).forEach(child => {
+        if (child.nodeType === NodeService_1.NodeService.ELEMENT_NODE &amp;&amp; this.predicate(child)) {
+          results.push(child)
+        }
+        if (this.deep &amp;&amp; child.nodeType === NodeService_1.NodeService.ELEMENT_NODE) {
+          visit(child)
+        }
+      })
     }
-    copy.head = null
-    copy.body = null
-    return copy
+    visit(this.owner)
+    return results
   }
 
   /**
-   * Make a copy of this document. The copy has no parent or listeners, and a deep copy has copies of everything in
-   * the document (a shallow one is an empty document).
-   * @param {boolean} [deep=false] Copy everything in the document as well
-   * @returns {PseudoHTMLDocument}
+   * How many elements are in the collection right now.
+   * @returns {number}
    */
-  cloneNode (deep = false) {
-    const copy = super.cloneNode(deep)
-    if (deep) {
-      const html = Array.from(copy.childNodes).find(child => child.tagName === 'html')
-      const inHtml = tagName => html ? Array.from(html.childNodes).find(child => child.tagName === tagName) || null : null
-      copy.head = inHtml('head')
-      copy.body = inHtml('body')
-    }
-    return copy
+  get length () {
+    return this.elements().length
+  }
+
+  /**
+   * The element at the given index, or null when there is none.
+   * @param {number} index
+   * @returns {*}
+   */
+  item (index) {
+    return this.elements()[index] || null
+  }
+
+  /**
+   * The element whose id, or (failing that) whose name attribute, is the given value, or null when there is none.
+   * @param {string} name
+   * @returns {*}
+   */
+  namedItem (name) {
+    const elements = this.elements()
+    return elements.find(element => element.id === name) || elements.find(element => element.getAttribute('name') === name) || null
+  }
+
+  /**
+   * Iterate over the current elements.
+   * @returns {Iterator}
+   */
+  [Symbol.iterator] () {
+    return this.elements()[Symbol.iterator]()
   }
 }
-exports.default = PseudoHTMLDocument
+exports.HTMLCollectionService = HTMLCollectionService
+exports.default = HTMLCollectionService
 </code></pre>
         </article>
     </section>

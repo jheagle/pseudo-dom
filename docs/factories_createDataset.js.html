@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: classes/PseudoHTMLDocument.js</title>
+    <title>JSDoc: Source: factories/createDataset.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: classes/PseudoHTMLDocument.js</h1>
+    <h1 class="page-title">Source: factories/createDataset.js</h1>
 
     
 
@@ -29,77 +29,81 @@
             <pre class="prettyprint source linenums"><code>'use strict'
 
 require('core-js/modules/esnext.iterator.constructor.js')
-require('core-js/modules/esnext.iterator.find.js')
+require('core-js/modules/esnext.iterator.map.js')
 Object.defineProperty(exports, '__esModule', {
   value: true
 })
-const DocumentService_1 = require('../services/DocumentService')
 /**
- * Simulate the behaviour of the HTMLDocument Class when there is no DOM available. Like the real HTMLDocument, this
- * only adds the html/head/body structure on top of what Document already gives (createElement, createTextNode,
- * createComment, createDocumentFragment, getElementById, textContent always null).
+ * @file Wraps an element in a Proxy which behaves like the DOM's DOMStringMap (element.dataset): a live view of its
+ * data-* attributes, under their camelCase names, backed by the element's own getAttribute / setAttribute /
+ * hasAttribute / removeAttribute (nothing is stored separately, so it can never fall out of sync with the
+ * attributes).
  * @author Joshua Heagle &lt;joshuaheagle@gmail.com>
- * @class
- * @augments DocumentService
- * @property {PseudoHTMLElement} head - A reference to the Head child element
- * @property {PseudoHTMLElement} body - A reference to the Body child element
+ * @version 1.0.0
  */
-class PseudoHTMLDocument extends DocumentService_1.DocumentService {
-  /**
-   * The root HTML element is acts as the parent to all HTML elements in the document.
-   * @constructor
-   */
-  constructor () {
-    super()
-    const html = this.createElement('html')
-    this.appendChild(html)
-    /**
-     * Create document head element
-     * @type {PseudoHTMLElement}
-     */
-    this.head = this.createElement('head')
-    html.appendChild(this.head)
-    /**
-     * Create document body element
-     * @type {PseudoHTMLElement}
-     */
-    this.body = this.createElement('body')
-    html.appendChild(this.body)
-  }
-
-  /**
-   * A copy of this document with none of its html/head/body (cloneNode, from the inherited cloneShallow hook, fills
-   * them back in, deep copies own document's, empty otherwise - see cloneNode).
-   * @returns {PseudoHTMLDocument}
-   */
-  cloneShallow () {
-    const copy = new this.constructor()
-    while (copy.firstChild) {
-      copy.removeChild(copy.firstChild)
+const createStyleDeclaration_1 = require('./createStyleDeclaration')
+const DATA_PREFIX = 'data-'
+const attributeName = property => `${DATA_PREFIX}${(0, createStyleDeclaration_1.camelToKebab)(property)}`
+/**
+ * Every data-* attribute name currently on the element, as [attributeName, camelCaseName] pairs.
+ * @param {*} element
+ * @returns {Array&lt;Array&lt;string>>}
+ */
+const dataAttributes = element => {
+  const names = []
+  for (let index = 0; index &lt; element.attributes.length; index++) {
+    const name = element.attributes.item(index).name
+    if (name.indexOf(DATA_PREFIX) === 0 &amp;&amp; name.length > DATA_PREFIX.length) {
+      names.push([name, (0, createStyleDeclaration_1.kebabToCamel)(name.slice(DATA_PREFIX.length))])
     }
-    copy.head = null
-    copy.body = null
-    return copy
   }
-
-  /**
-   * Make a copy of this document. The copy has no parent or listeners, and a deep copy has copies of everything in
-   * the document (a shallow one is an empty document).
-   * @param {boolean} [deep=false] Copy everything in the document as well
-   * @returns {PseudoHTMLDocument}
-   */
-  cloneNode (deep = false) {
-    const copy = super.cloneNode(deep)
-    if (deep) {
-      const html = Array.from(copy.childNodes).find(child => child.tagName === 'html')
-      const inHtml = tagName => html ? Array.from(html.childNodes).find(child => child.tagName === tagName) || null : null
-      copy.head = inHtml('head')
-      copy.body = inHtml('body')
-    }
-    return copy
-  }
+  return names
 }
-exports.default = PseudoHTMLDocument
+/**
+ * A live DOMStringMap-like object for an element's data-* attributes.
+ * @memberOf module:factories
+ * @param {*} element The element whose data-* attributes this reflects
+ * @returns {Object.&lt;string, string>}
+ */
+const createDataset = element => new Proxy({}, {
+  get (_target, property) {
+    if (typeof property !== 'string') {
+      return undefined
+    }
+    const value = element.getAttribute(attributeName(property))
+    return value === null ? undefined : value
+  },
+  set (_target, property, value) {
+    if (typeof property !== 'string') {
+      return false
+    }
+    element.setAttribute(attributeName(property), String(value))
+    return true
+  },
+  deleteProperty (_target, property) {
+    if (typeof property === 'string') {
+      element.removeAttribute(attributeName(property))
+    }
+    return true
+  },
+  has (_target, property) {
+    return typeof property === 'string' &amp;&amp; element.hasAttribute(attributeName(property))
+  },
+  ownKeys () {
+    return dataAttributes(element).map(([, camelCaseName]) => camelCaseName)
+  },
+  getOwnPropertyDescriptor (_target, property) {
+    if (typeof property !== 'string' || !element.hasAttribute(attributeName(property))) {
+      return undefined
+    }
+    return {
+      enumerable: true,
+      configurable: true,
+      value: element.getAttribute(attributeName(property))
+    }
+  }
+})
+exports.default = createDataset
 </code></pre>
         </article>
     </section>

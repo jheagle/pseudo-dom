@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: services/CSSStyleDeclarationService.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: services/CSSStyleDeclarationService.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict'
+
+/**
+ * @file Substitute for the DOM CSSStyleDeclaration Class (the object behind Element.style).
+ * @author Joshua Heagle &lt;joshuaheagle@gmail.com>
+ * @version 1.0.0
+ */
+require('core-js/modules/esnext.iterator.constructor.js')
+require('core-js/modules/esnext.iterator.for-each.js')
+require('core-js/modules/esnext.iterator.map.js')
+require('core-js/modules/esnext.map.delete-all.js')
+require('core-js/modules/esnext.map.every.js')
+require('core-js/modules/esnext.map.filter.js')
+require('core-js/modules/esnext.map.find.js')
+require('core-js/modules/esnext.map.find-key.js')
+require('core-js/modules/esnext.map.includes.js')
+require('core-js/modules/esnext.map.key-of.js')
+require('core-js/modules/esnext.map.map-keys.js')
+require('core-js/modules/esnext.map.map-values.js')
+require('core-js/modules/esnext.map.merge.js')
+require('core-js/modules/esnext.map.reduce.js')
+require('core-js/modules/esnext.map.some.js')
+require('core-js/modules/esnext.map.update.js')
+Object.defineProperty(exports, '__esModule', {
+  value: true
+})
+exports.CSSStyleDeclarationService = void 0
+/**
+ * Simulate the behaviour of the CSSStyleDeclaration Class when there is no DOM available: an ordered map of CSS
+ * property/value pairs, parsed from and serialized back to a cssText string. Values are stored and returned as
+ * given, with no unit conversion, shorthand expansion or validation - this is a data structure, not a real CSS
+ * engine. Named property access (declaration.backgroundColor, camelCase) is added on top of this by
+ * createStyleDeclaration, which wraps an instance of this class in a Proxy.
+ * @author Joshua Heagle &lt;joshuaheagle@gmail.com>
+ * @class
+ */
+class CSSStyleDeclarationService {
+  /**
+   * @param {string} [cssText=''] Initial declarations, as CSS text ("color: red; font-size: 12px;")
+   * @constructor
+   */
+  constructor (cssText = '') {
+    this.properties = new Map()
+    this.cssText = cssText
+  }
+
+  /**
+   * How many properties are currently set.
+   * @returns {number}
+   */
+  get length () {
+    return this.properties.size
+  }
+
+  /**
+   * The name of the property at the given index, in the order it was set, or '' when there is none (matches the
+   * DOM's CSSStyleDeclaration, which is array-like).
+   * @param {number} index
+   * @returns {string}
+   */
+  item (index) {
+    return Array.from(this.properties.keys())[index] || ''
+  }
+
+  /**
+   * The value of the given property, or '' when it is not set.
+   * @param {string} property A CSS property name (kebab-case, e.g. "background-color")
+   * @returns {string}
+   */
+  getPropertyValue (property) {
+    const entry = this.properties.get(property)
+    return entry ? entry.value : ''
+  }
+
+  /**
+   * "important" when the property was set with !important, otherwise ''.
+   * @param {string} property A CSS property name (kebab-case)
+   * @returns {string}
+   */
+  getPropertyPriority (property) {
+    const entry = this.properties.get(property)
+    return entry ? entry.priority : ''
+  }
+
+  /**
+   * Set a property's value (and optionally its priority). An empty, null or undefined value removes the property
+   * instead, like the DOM.
+   * @param {string} property A CSS property name (kebab-case)
+   * @param {string} value The value, or '' to remove the property
+   * @param {string} [priority=''] "important" to mark it !important
+   * @returns {undefined}
+   */
+  setProperty (property, value, priority = '') {
+    if (value === '' || value === null || typeof value === 'undefined') {
+      this.removeProperty(property)
+      return
+    }
+    this.properties.set(property, {
+      value: String(value),
+      priority
+    })
+  }
+
+  /**
+   * Remove a property, returning the value it had (or '' when it was not set).
+   * @param {string} property A CSS property name (kebab-case)
+   * @returns {string}
+   */
+  removeProperty (property) {
+    const value = this.getPropertyValue(property)
+    this.properties.delete(property)
+    return value
+  }
+
+  /**
+   * All the declarations as one CSS text string.
+   * @returns {string}
+   */
+  get cssText () {
+    return Array.from(this.properties.entries()).map(([property, {
+      value,
+      priority
+    }]) => `${property}: ${value}${priority ? ` !${priority}` : ''};`).join(' ')
+  }
+
+  /**
+   * Replace every declaration by parsing a CSS text string ("color: red; font-size: 12px !important;").
+   * @param {string} cssText
+   * @returns {undefined}
+   */
+  set cssText (cssText) {
+    this.properties.clear()
+    String(cssText || '').split(';').forEach(declaration => {
+      const colon = declaration.indexOf(':')
+      if (colon &lt; 0) {
+        return
+      }
+      const property = declaration.slice(0, colon).trim()
+      let value = declaration.slice(colon + 1).trim()
+      let priority = ''
+      const important = value.match(/!\s*important\s*$/i)
+      if (important &amp;&amp; typeof important.index === 'number') {
+        priority = 'important'
+        value = value.slice(0, important.index).trim()
+      }
+      if (property &amp;&amp; value) {
+        this.properties.set(property, {
+          value,
+          priority
+        })
+      }
+    })
+  }
+}
+exports.CSSStyleDeclarationService = CSSStyleDeclarationService
+exports.default = CSSStyleDeclarationService
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-pseudoDom_objects.html">pseudoDom/objects</a></li><li><a href="module-pseudoDom_simulate.html">pseudoDom/simulate</a></li></ul><h3>Classes</h3><ul><li><a href="AttrService.html">AttrService</a></li><li><a href="CSSStyleDeclarationService.html">CSSStyleDeclarationService</a></li><li><a href="CommentService.html">CommentService</a></li><li><a href="CustomEventService.html">CustomEventService</a></li><li><a href="DOMTokenListService.html">DOMTokenListService</a></li><li><a href="DocumentFragmentService.html">DocumentFragmentService</a></li><li><a href="DocumentService.html">DocumentService</a></li><li><a href="ElementService.html">ElementService</a></li><li><a href="EventService.html">EventService</a></li><li><a href="EventTargetService.html">EventTargetService</a></li><li><a href="FocusEventService.html">FocusEventService</a></li><li><a href="HTMLCollectionService.html">HTMLCollectionService</a></li><li><a href="HTMLElementService.html">HTMLElementService</a></li><li><a href="InputEventService.html">InputEventService</a></li><li><a href="KeyboardEventService.html">KeyboardEventService</a></li><li><a href="MouseEventService.html">MouseEventService</a></li><li><a href="NamedNodeMapService.html">NamedNodeMapService</a></li><li><a href="NodeService.html">NodeService</a></li><li><a href="PointerEventService.html">PointerEventService</a></li><li><a href="PseudoEventListener.html">PseudoEventListener</a></li><li><a href="PseudoHTMLDocument.html">PseudoHTMLDocument</a></li><li><a href="PseudoNodeList.html">PseudoNodeList</a></li><li><a href="ShadowRootService.html">ShadowRootService</a></li><li><a href="TextService.html">TextService</a></li><li><a href="UIEventService.html">UIEventService</a></li></ul><h3>Global</h3><ul><li><a href="global.html#camelToKebab">camelToKebab</a></li><li><a href="global.html#createEvent">createEvent</a></li><li><a href="global.html#dataAttributes">dataAttributes</a></li><li><a href="global.html#escapeAttributeValue">escapeAttributeValue</a></li><li><a href="global.html#escapeText">escapeText</a></li><li><a href="global.html#eventDefaults">eventDefaults</a></li><li><a href="global.html#focused">focused</a></li><li><a href="global.html#generateDocument">generateDocument</a></li><li><a href="global.html#generateNodeList">generateNodeList</a></li><li><a href="global.html#getActiveElement">getActiveElement</a></li><li><a href="global.html#getParentNodes">getParentNodes</a></li><li><a href="global.html#getParentNodesFromAttribute">getParentNodesFromAttribute</a></li><li><a href="global.html#kebabToCamel">kebabToCamel</a></li><li><a href="global.html#modifierKeys">modifierKeys</a></li><li><a href="global.html#modifierState">modifierState</a></li><li><a href="global.html#nearestElementSibling">nearestElementSibling</a></li><li><a href="global.html#serializeAttributes">serializeAttributes</a></li><li><a href="global.html#serializeNode">serializeNode</a></li><li><a href="global.html#setActiveElement">setActiveElement</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Wed Sep 23 2026 10:14:24 GMT-0400 (Eastern Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

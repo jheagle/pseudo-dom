@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: classes/PseudoHTMLDocument.js</title>
+    <title>JSDoc: Source: factories/cssSelectAdapter.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: classes/PseudoHTMLDocument.js</h1>
+    <h1 class="page-title">Source: factories/cssSelectAdapter.js</h1>
 
     
 
@@ -29,77 +29,90 @@
             <pre class="prettyprint source linenums"><code>'use strict'
 
 require('core-js/modules/esnext.iterator.constructor.js')
-require('core-js/modules/esnext.iterator.find.js')
+require('core-js/modules/esnext.iterator.filter.js')
+require('core-js/modules/esnext.iterator.for-each.js')
+require('core-js/modules/esnext.iterator.some.js')
 Object.defineProperty(exports, '__esModule', {
   value: true
 })
-const DocumentService_1 = require('../services/DocumentService')
+exports.cssSelectAdapter = void 0
 /**
- * Simulate the behaviour of the HTMLDocument Class when there is no DOM available. Like the real HTMLDocument, this
- * only adds the html/head/body structure on top of what Document already gives (createElement, createTextNode,
- * createComment, createDocumentFragment, getElementById, textContent always null).
+ * @file The css-select Adapter which lets it query pseudo-dom's own tree, instead of the domutils-based tree it
+ * defaults to.
  * @author Joshua Heagle &lt;joshuaheagle@gmail.com>
- * @class
- * @augments DocumentService
- * @property {PseudoHTMLElement} head - A reference to the Head child element
- * @property {PseudoHTMLElement} body - A reference to the Body child element
+ * @version 1.0.0
  */
-class PseudoHTMLDocument extends DocumentService_1.DocumentService {
-  /**
-   * The root HTML element is acts as the parent to all HTML elements in the document.
-   * @constructor
-   */
-  constructor () {
-    super()
-    const html = this.createElement('html')
-    this.appendChild(html)
-    /**
-     * Create document head element
-     * @type {PseudoHTMLElement}
-     */
-    this.head = this.createElement('head')
-    html.appendChild(this.head)
-    /**
-     * Create document body element
-     * @type {PseudoHTMLElement}
-     */
-    this.body = this.createElement('body')
-    html.appendChild(this.body)
+const NodeService_1 = require('../services/NodeService')
+/**
+ * Walk up from a node (not including it) to find the nearest element, in the given direction.
+ * @param {*} node The node to start from
+ * @param {'nextSibling'|'previousSibling'} direction Which sibling reference to follow
+ * @returns {*|null}
+ */
+const nearestElementSibling = (node, direction) => {
+  let current = node ? node[direction] : null
+  while (current &amp;&amp; current.nodeType !== NodeService_1.NodeService.ELEMENT_NODE) {
+    current = current[direction]
   }
-
-  /**
-   * A copy of this document with none of its html/head/body (cloneNode, from the inherited cloneShallow hook, fills
-   * them back in, deep copies own document's, empty otherwise - see cloneNode).
-   * @returns {PseudoHTMLDocument}
-   */
-  cloneShallow () {
-    const copy = new this.constructor()
-    while (copy.firstChild) {
-      copy.removeChild(copy.firstChild)
+  return current || null
+}
+/**
+ * Maps pseudo-dom's own Node / Element API onto the Adapter interface css-select needs to query a tree which is not
+ * domutils' own (css-select's own Adapter&lt;Node, ElementNode> type). Every method here is one pseudo-dom already has
+ * under a different name; nothing here reimplements DOM behaviour.
+ * @memberOf module:factories
+ * @type {Object}
+ */
+exports.cssSelectAdapter = {
+  isTag: node => !!node &amp;&amp; node.nodeType === NodeService_1.NodeService.ELEMENT_NODE,
+  existsOne: (test, elems) => elems.some(elem => exports.cssSelectAdapter.isTag(elem) &amp;&amp; (test(elem) || exports.cssSelectAdapter.existsOne(test, exports.cssSelectAdapter.getChildren(elem)))),
+  // pseudo-dom's className / classList are kept in sync with each other, but not with a literal 'class' attribute
+  // (there is no such special-cased attribute here, unlike a real DOM) - so the 'class' css-select needs for class
+  // selectors is read from className instead.
+  getAttributeValue: (elem, name) => {
+    const value = name === 'class' ? elem.className : elem.getAttribute(name)
+    return value === null || value === undefined ? undefined : value
+  },
+  getChildren: node => Array.from(node.childNodes),
+  getName: elem => elem.tagName,
+  getParent: node => node.parentNode,
+  // Unlike jQuery's siblings(), this is expected to include the node itself
+  getSiblings: node => node.parentNode ? Array.from(node.parentNode.childNodes) : [node],
+  prevElementSibling: node => nearestElementSibling(node, 'previousSibling'),
+  getText: node => node.textContent || '',
+  hasAttrib: (elem, name) => elem.hasAttribute(name),
+  removeSubsets: nodes => nodes.filter((node, index) => !nodes.some((other, otherIndex) => otherIndex !== index &amp;&amp; typeof other.contains === 'function' &amp;&amp; other !== node &amp;&amp; other.contains(node))),
+  findAll: (test, nodes) => {
+    const found = []
+    const visit = list => list.forEach(node => {
+      if (!exports.cssSelectAdapter.isTag(node)) {
+        return
+      }
+      if (test(node)) {
+        found.push(node)
+      }
+      visit(exports.cssSelectAdapter.getChildren(node))
+    })
+    visit(nodes)
+    return found
+  },
+  findOne: (test, nodes) => {
+    for (const node of nodes) {
+      if (!exports.cssSelectAdapter.isTag(node)) {
+        continue
+      }
+      if (test(node)) {
+        return node
+      }
+      const inChildren = exports.cssSelectAdapter.findOne(test, exports.cssSelectAdapter.getChildren(node))
+      if (inChildren) {
+        return inChildren
+      }
     }
-    copy.head = null
-    copy.body = null
-    return copy
-  }
-
-  /**
-   * Make a copy of this document. The copy has no parent or listeners, and a deep copy has copies of everything in
-   * the document (a shallow one is an empty document).
-   * @param {boolean} [deep=false] Copy everything in the document as well
-   * @returns {PseudoHTMLDocument}
-   */
-  cloneNode (deep = false) {
-    const copy = super.cloneNode(deep)
-    if (deep) {
-      const html = Array.from(copy.childNodes).find(child => child.tagName === 'html')
-      const inHtml = tagName => html ? Array.from(html.childNodes).find(child => child.tagName === tagName) || null : null
-      copy.head = inHtml('head')
-      copy.body = inHtml('body')
-    }
-    return copy
+    return null
   }
 }
-exports.default = PseudoHTMLDocument
+exports.default = exports.cssSelectAdapter
 </code></pre>
         </article>
     </section>

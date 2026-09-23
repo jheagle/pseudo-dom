@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: classes/PseudoHTMLDocument.js</title>
+    <title>JSDoc: Source: services/DOMTokenListService.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: classes/PseudoHTMLDocument.js</h1>
+    <h1 class="page-title">Source: services/DOMTokenListService.js</h1>
 
     
 
@@ -29,77 +29,120 @@
             <pre class="prettyprint source linenums"><code>'use strict'
 
 require('core-js/modules/esnext.iterator.constructor.js')
-require('core-js/modules/esnext.iterator.find.js')
+require('core-js/modules/esnext.iterator.filter.js')
+require('core-js/modules/esnext.iterator.for-each.js')
+require('core-js/modules/esnext.iterator.map.js')
 Object.defineProperty(exports, '__esModule', {
   value: true
 })
-const DocumentService_1 = require('../services/DocumentService')
+exports.DOMTokenListService = void 0
 /**
- * Simulate the behaviour of the HTMLDocument Class when there is no DOM available. Like the real HTMLDocument, this
- * only adds the html/head/body structure on top of what Document already gives (createElement, createTextNode,
- * createComment, createDocumentFragment, getElementById, textContent always null).
+ * Simulate the behaviour of the DOMTokenList Class when there is no DOM available.
  * @author Joshua Heagle &lt;joshuaheagle@gmail.com>
  * @class
- * @augments DocumentService
- * @property {PseudoHTMLElement} head - A reference to the Head child element
- * @property {PseudoHTMLElement} body - A reference to the Body child element
  */
-class PseudoHTMLDocument extends DocumentService_1.DocumentService {
+class DOMTokenListService {
   /**
-   * The root HTML element is acts as the parent to all HTML elements in the document.
+   * @param {string} [value=''] The space separated tokens to start with
+   * @param {function(string): void} [onChange] Called with the new value whenever the tokens change
    * @constructor
    */
-  constructor () {
-    super()
-    const html = this.createElement('html')
-    this.appendChild(html)
-    /**
-     * Create document head element
-     * @type {PseudoHTMLElement}
-     */
-    this.head = this.createElement('head')
-    html.appendChild(this.head)
-    /**
-     * Create document body element
-     * @type {PseudoHTMLElement}
-     */
-    this.body = this.createElement('body')
-    html.appendChild(this.body)
+  constructor (value = '', onChange = () => undefined) {
+    this.tokens = DOMTokenListService.parse(value)
+    this.onChange = onChange
   }
 
-  /**
-   * A copy of this document with none of its html/head/body (cloneNode, from the inherited cloneShallow hook, fills
-   * them back in, deep copies own document's, empty otherwise - see cloneNode).
-   * @returns {PseudoHTMLDocument}
-   */
-  cloneShallow () {
-    const copy = new this.constructor()
-    while (copy.firstChild) {
-      copy.removeChild(copy.firstChild)
-    }
-    copy.head = null
-    copy.body = null
-    return copy
+  static parse (value) {
+    return (value || '').split(/\s+/).filter((token, index, tokens) => token !== '' &amp;&amp; tokens.indexOf(token) === index)
   }
 
-  /**
-   * Make a copy of this document. The copy has no parent or listeners, and a deep copy has copies of everything in
-   * the document (a shallow one is an empty document).
-   * @param {boolean} [deep=false] Copy everything in the document as well
-   * @returns {PseudoHTMLDocument}
-   */
-  cloneNode (deep = false) {
-    const copy = super.cloneNode(deep)
-    if (deep) {
-      const html = Array.from(copy.childNodes).find(child => child.tagName === 'html')
-      const inHtml = tagName => html ? Array.from(html.childNodes).find(child => child.tagName === tagName) || null : null
-      copy.head = inHtml('head')
-      copy.body = inHtml('body')
+  update (tokens) {
+    this.tokens = tokens
+    this.onChange(this.value)
+  }
+
+  static validate (token) {
+    if (token === '') {
+      throw new SyntaxError('The token provided must not be empty.')
     }
-    return copy
+    if (/\s/.test(token)) {
+      throw new Error('The token provided contains whitespace.')
+    }
+  }
+
+  get length () {
+    return this.tokens.length
+  }
+
+  get value () {
+    return this.tokens.join(' ')
+  }
+
+  set value (value) {
+    this.update(DOMTokenListService.parse(value))
+  }
+
+  item (index) {
+    return index >= 0 &amp;&amp; index &lt; this.tokens.length ? this.tokens[index] : null
+  }
+
+  contains (token) {
+    return this.tokens.indexOf(token) >= 0
+  }
+
+  add (...tokens) {
+    tokens.forEach(DOMTokenListService.validate)
+    this.update(this.tokens.concat(tokens).filter((token, index, all) => all.indexOf(token) === index))
+  }
+
+  remove (...tokens) {
+    tokens.forEach(DOMTokenListService.validate)
+    this.update(this.tokens.filter(token => tokens.indexOf(token) &lt; 0))
+  }
+
+  replace (oldToken, newToken) {
+    DOMTokenListService.validate(oldToken)
+    DOMTokenListService.validate(newToken)
+    if (!this.contains(oldToken)) {
+      return false
+    }
+    this.update(this.tokens.map(token => token === oldToken ? newToken : token).filter((token, index, all) => all.indexOf(token) === index))
+    return true
+  }
+
+  supports (token) {
+    // There is no list of supported tokens for arbitrary attributes, so like the DOM (for those) this is unsupported
+    throw new TypeError(`Failed to execute 'supports' on 'DOMTokenList': DOMTokenList has no supported tokens (${token}).`)
+  }
+
+  toggle (token, force) {
+    DOMTokenListService.validate(token)
+    const shouldHave = typeof force === 'boolean' ? force : !this.contains(token)
+    if (shouldHave) {
+      this.add(token)
+    } else {
+      this.remove(token)
+    }
+    return shouldHave
+  }
+
+  entries () {
+    return this.tokens.map((token, index) => [index, token])[Symbol.iterator]()
+  }
+
+  forEach (callback, thisArg) {
+    this.tokens.forEach((token, index) => callback.call(thisArg, token, index, this))
+  }
+
+  keys () {
+    return this.tokens.map((token, index) => index)[Symbol.iterator]()
+  }
+
+  values () {
+    return this.tokens.slice()[Symbol.iterator]()
   }
 }
-exports.default = PseudoHTMLDocument
+exports.DOMTokenListService = DOMTokenListService
 </code></pre>
         </article>
     </section>

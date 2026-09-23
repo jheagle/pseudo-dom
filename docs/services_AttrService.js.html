@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: classes/PseudoHTMLDocument.js</title>
+    <title>JSDoc: Source: services/AttrService.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: classes/PseudoHTMLDocument.js</h1>
+    <h1 class="page-title">Source: services/AttrService.js</h1>
 
     
 
@@ -28,78 +28,85 @@
         <article>
             <pre class="prettyprint source linenums"><code>'use strict'
 
-require('core-js/modules/esnext.iterator.constructor.js')
-require('core-js/modules/esnext.iterator.find.js')
 Object.defineProperty(exports, '__esModule', {
   value: true
 })
-const DocumentService_1 = require('../services/DocumentService')
+exports.AttrService = void 0
+const NodeService_1 = require('./NodeService')
 /**
- * Simulate the behaviour of the HTMLDocument Class when there is no DOM available. Like the real HTMLDocument, this
- * only adds the html/head/body structure on top of what Document already gives (createElement, createTextNode,
- * createComment, createDocumentFragment, getElementById, textContent always null).
+ * Simulate the behaviour of the Attr Class when there is no DOM available.
  * @author Joshua Heagle &lt;joshuaheagle@gmail.com>
  * @class
- * @augments DocumentService
- * @property {PseudoHTMLElement} head - A reference to the Head child element
- * @property {PseudoHTMLElement} body - A reference to the Body child element
+ * @augments NodeService
  */
-class PseudoHTMLDocument extends DocumentService_1.DocumentService {
+class AttrService extends NodeService_1.NodeService {
   /**
-   * The root HTML element is acts as the parent to all HTML elements in the document.
+   * @param {string} name The name of the attribute
+   * @param {string} [value=''] The value of the attribute
+   * @param {PseudoElement|null} [ownerElement=null] The element which has this attribute
+   * @param {string} [namespaceURI=''] The namespace of the attribute
+   * @param {string|null} [prefix=null] The namespace prefix of the attribute
    * @constructor
    */
-  constructor () {
+  constructor (name = '', value = '', ownerElement = null, namespaceURI = '', prefix = null) {
     super()
-    const html = this.createElement('html')
-    this.appendChild(html)
-    /**
-     * Create document head element
-     * @type {PseudoHTMLElement}
-     */
-    this.head = this.createElement('head')
-    html.appendChild(this.head)
-    /**
-     * Create document body element
-     * @type {PseudoHTMLElement}
-     */
-    this.body = this.createElement('body')
-    html.appendChild(this.body)
+    this.attributeName = name
+    this.value = value
+    this.element = ownerElement
+    this.namespace = namespaceURI
+    this.namespacePrefix = prefix
+    this.nodeNameValue = name
   }
 
-  /**
-   * A copy of this document with none of its html/head/body (cloneNode, from the inherited cloneShallow hook, fills
-   * them back in, deep copies own document's, empty otherwise - see cloneNode).
-   * @returns {PseudoHTMLDocument}
-   */
+  get acceptsChildren () {
+    return false
+  }
+
+  get nodeValue () {
+    return this.value
+  }
+
+  set nodeValue (value) {
+    this.value = value === null ? '' : String(value)
+  }
+
+  get textContent () {
+    return this.value
+  }
+
+  set textContent (text) {
+    this.value = text === null ? '' : String(text)
+  }
+
   cloneShallow () {
-    const copy = new this.constructor()
-    while (copy.firstChild) {
-      copy.removeChild(copy.firstChild)
-    }
-    copy.head = null
-    copy.body = null
-    return copy
+    return new AttrService(this.localName, this.value, null, this.namespaceURI, this.prefix)
   }
 
-  /**
-   * Make a copy of this document. The copy has no parent or listeners, and a deep copy has copies of everything in
-   * the document (a shallow one is an empty document).
-   * @param {boolean} [deep=false] Copy everything in the document as well
-   * @returns {PseudoHTMLDocument}
-   */
-  cloneNode (deep = false) {
-    const copy = super.cloneNode(deep)
-    if (deep) {
-      const html = Array.from(copy.childNodes).find(child => child.tagName === 'html')
-      const inHtml = tagName => html ? Array.from(html.childNodes).find(child => child.tagName === tagName) || null : null
-      copy.head = inHtml('head')
-      copy.body = inHtml('body')
-    }
-    return copy
+  get nodeType () {
+    return NodeService_1.NodeService.ATTRIBUTE_NODE
+  }
+
+  get localName () {
+    return this.attributeName
+  }
+
+  get name () {
+    return this.namespacePrefix ? `${this.namespacePrefix}:${this.attributeName}` : this.attributeName
+  }
+
+  get namespaceURI () {
+    return this.namespace
+  }
+
+  get ownerElement () {
+    return this.element
+  }
+
+  get prefix () {
+    return this.namespacePrefix
   }
 }
-exports.default = PseudoHTMLDocument
+exports.AttrService = AttrService
 </code></pre>
         </article>
     </section>
