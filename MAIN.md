@@ -65,5 +65,25 @@ the real DOM.
 \`getElementById\`, and \`textContent\` always \`null\`. \`PseudoHTMLDocument\` (what \`generateDocument\` actually
 creates) only adds the \`html\` / \`head\` / \`body\` structure on top.
 
-Not implemented yet (these throw a "not implemented" error or are missing): \`getElementsByTagNameNS\`, \`innerHTML\` /
-\`outerHTML\` parsing, and most of the rest of the Element and Document APIs. The API will change before 1.0.
+Attribute helpers work like the DOM's: \`getAttributeNames\`, \`hasAttributes\`, \`toggleAttribute(name, [force])\`;
+\`localName\` matches \`tagName\` and \`prefix\` is always null (there is no real namespace parsing);
+\`getElementsByTagNameNS\` behaves exactly like \`getElementsByTagName\`, ignoring the namespace.
+
+\`attachShadow({mode})\` attaches a real (\`DocumentFragmentService\`-based) \`ShadowRoot\`, with \`host\` and \`mode\`
+set; \`element.shadowRoot\` reaches it when the mode is 'open', like the DOM's (a 'closed' one still exists, just not
+this way); attaching a second one throws.
+
+There is no layout engine, so anything that would need one is settable directly rather than really computed - set the
+value a test needs and the getter/method returns it: \`clientWidth\` / \`clientHeight\` / \`clientTop\` /
+\`clientLeft\` / \`scrollWidth\` / \`scrollHeight\` (numbers, alongside the existing \`offsetWidth\` etc.),
+\`boundingClientRect\` (what \`getBoundingClientRect()\` returns), \`clientRects\` (\`getClientRects()\`),
+\`animations\` (\`getAnimations()\`) and \`isVisible\` (\`checkVisibility()\`). \`scrollLeft\` / \`scrollTop\` are real,
+plain settable numbers, and \`scroll\` / \`scrollTo\` / \`scrollBy\` (a number pair or an options object) update them
+for real; \`scrollIntoView\` is a real callable no-op (there is no viewport to scroll within).
+\`hasPointerCapture\` / \`setPointerCapture\` / \`releasePointerCapture\` genuinely track capture per pointer id.
+\`requestFullscreen\` / \`requestPointerLock\` resolve, like a browser granting the request would.
+\`computedStyleMap()\` is a thin read-only view of the element's own inline style (there is no CSS cascade).
+
+Not implemented yet (these throw a "not implemented" error or are missing): \`innerHTML\` / \`outerHTML\` parsing, the
+\`aria*\` reflected properties, and the \`Attr\`-node / namespaced attribute methods (\`getAttributeNode\`,
+\`getAttributeNS\`, ...). The API will change before 1.0.

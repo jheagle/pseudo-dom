@@ -153,6 +153,14 @@ export declare class NodeService extends EventTargetService implements PseudoNod
      */
     getElementsByClassName(className: string): HTMLCollectionService;
     /**
+     * Every element below this node with the given tag name, live. There is no real namespace parsing here, so this
+     * ignores the namespace and behaves exactly like getElementsByTagName.
+     * @param {string} namespace Ignored
+     * @param {string} tagName
+     * @returns {PseudoHTMLCollection}
+     */
+    getElementsByTagNameNS(namespace: string, tagName: string): HTMLCollectionService;
+    /**
      * The first element below this node which matches the CSS selector, in tree order, or null when there is none.
      * @param {string} selectors A CSS selector
      * @returns {PseudoElement|null}

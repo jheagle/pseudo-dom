@@ -65,8 +65,28 @@ the real DOM.
 \`getElementById\`, and \`textContent\` always \`null\`. \`PseudoHTMLDocument\` (what \`generateDocument\` actually
 creates) only adds the \`html\` / \`head\` / \`body\` structure on top.
 
-Not implemented yet (these throw a "not implemented" error or are missing): \`getElementsByTagNameNS\`, \`innerHTML\` /
-\`outerHTML\` parsing, and most of the rest of the Element and Document APIs. The API will change before 1.0.
+Attribute helpers work like the DOM's: \`getAttributeNames\`, \`hasAttributes\`, \`toggleAttribute(name, [force])\`;
+\`localName\` matches \`tagName\` and \`prefix\` is always null (there is no real namespace parsing);
+\`getElementsByTagNameNS\` behaves exactly like \`getElementsByTagName\`, ignoring the namespace.
+
+\`attachShadow({mode})\` attaches a real (\`DocumentFragmentService\`-based) \`ShadowRoot\`, with \`host\` and \`mode\`
+set; \`element.shadowRoot\` reaches it when the mode is 'open', like the DOM's (a 'closed' one still exists, just not
+this way); attaching a second one throws.
+
+There is no layout engine, so anything that would need one is settable directly rather than really computed - set the
+value a test needs and the getter/method returns it: \`clientWidth\` / \`clientHeight\` / \`clientTop\` /
+\`clientLeft\` / \`scrollWidth\` / \`scrollHeight\` (numbers, alongside the existing \`offsetWidth\` etc.),
+\`boundingClientRect\` (what \`getBoundingClientRect()\` returns), \`clientRects\` (\`getClientRects()\`),
+\`animations\` (\`getAnimations()\`) and \`isVisible\` (\`checkVisibility()\`). \`scrollLeft\` / \`scrollTop\` are real,
+plain settable numbers, and \`scroll\` / \`scrollTo\` / \`scrollBy\` (a number pair or an options object) update them
+for real; \`scrollIntoView\` is a real callable no-op (there is no viewport to scroll within).
+\`hasPointerCapture\` / \`setPointerCapture\` / \`releasePointerCapture\` genuinely track capture per pointer id.
+\`requestFullscreen\` / \`requestPointerLock\` resolve, like a browser granting the request would.
+\`computedStyleMap()\` is a thin read-only view of the element's own inline style (there is no CSS cascade).
+
+Not implemented yet (these throw a "not implemented" error or are missing): \`innerHTML\` / \`outerHTML\` parsing, the
+\`aria*\` reflected properties, and the \`Attr\`-node / namespaced attribute methods (\`getAttributeNode\`,
+\`getAttributeNS\`, ...). The API will change before 1.0.
 ## Modules
 
 <dl>
@@ -84,6 +104,10 @@ Not implemented yet (these throw a "not implemented" error or are missing): \`ge
 <dt><a href="#UIEventService">UIEventService</a> ⇐ <code><a href="#EventService">EventService</a></code></dt>
 <dd><p>Simulate the behaviour of the UIEvent Class when there is no DOM available: the events which come from a user
 interface (the mouse, the keyboard, focus and input).</p>
+</dd>
+<dt><a href="#ShadowRootService">ShadowRootService</a> ⇐ <code><a href="#DocumentFragmentService">DocumentFragmentService</a></code></dt>
+<dd><p>Simulate the behaviour of the ShadowRoot Class when there is no DOM available: a DocumentFragment attached to an
+element via attachShadow, which sets host and mode.</p>
 </dd>
 <dt><a href="#PointerEventService">PointerEventService</a> ⇐ <code><a href="#MouseEventService">MouseEventService</a></code></dt>
 <dd><p>Simulate the behaviour of the PointerEvent Class when there is no DOM available.</p>
@@ -369,6 +393,410 @@ Stops the propagation of events further along in the Dom.
 
 **Kind**: instance method of [<code>UIEventService</code>](#UIEventService)  
 **Overrides**: [<code>stopPropagation</code>](#EventService+stopPropagation)  
+<a name="ShadowRootService"></a>
+
+## ShadowRootService ⇐ [<code>DocumentFragmentService</code>](#DocumentFragmentService)
+Simulate the behaviour of the ShadowRoot Class when there is no DOM available: a DocumentFragment attached to an
+element via attachShadow, which sets host and mode.
+
+**Kind**: global class  
+**Extends**: [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
+**Author**: Joshua Heagle <joshuaheagle@gmail.com>  
+
+* [ShadowRootService](#ShadowRootService) ⇐ [<code>DocumentFragmentService</code>](#DocumentFragmentService)
+    * [.host](#ShadowRootService+host)
+    * [.mode](#ShadowRootService+mode)
+    * [.acceptsChildren](#NodeService+acceptsChildren) ⇒ <code>boolean</code>
+    * [.getElementById(id)](#DocumentFragmentService+getElementById) ⇒ <code>PseudoElement</code> \| <code>null</code>
+    * [.appendChild(childNode)](#NodeService+appendChild) ⇒ <code>PseudoNode</code>
+    * [.cloneShallow()](#NodeService+cloneShallow) ⇒ [<code>NodeService</code>](#NodeService)
+    * [.equalsShallow(other)](#NodeService+equalsShallow) ⇒ <code>boolean</code>
+    * [.append(...nodes)](#NodeService+append)
+    * [.prepend(...nodes)](#NodeService+prepend)
+    * [.replaceChildren(...nodes)](#NodeService+replaceChildren)
+    * [.before(...nodes)](#NodeService+before)
+    * [.after(...nodes)](#NodeService+after)
+    * [.replaceWith(...nodes)](#NodeService+replaceWith)
+    * [.remove()](#NodeService+remove)
+    * [.toChildNode(value)](#NodeService+toChildNode) ⇒ <code>PseudoNode</code>
+    * [.getElementsByTagName(tagName)](#NodeService+getElementsByTagName) ⇒ <code>PseudoHTMLCollection</code>
+    * [.getElementsByClassName(className)](#NodeService+getElementsByClassName) ⇒ <code>PseudoHTMLCollection</code>
+    * [.getElementsByTagNameNS(namespace, tagName)](#NodeService+getElementsByTagNameNS) ⇒ <code>PseudoHTMLCollection</code>
+    * [.querySelector(selectors)](#NodeService+querySelector) ⇒ <code>PseudoElement</code> \| <code>null</code>
+    * [.querySelectorAll(selectors)](#NodeService+querySelectorAll) ⇒ <code>Array.&lt;PseudoElement&gt;</code>
+    * [.childInserted(child)](#NodeService+childInserted)
+    * [.cloneNode([deep])](#NodeService+cloneNode) ⇒ <code>PseudoNode</code>
+    * [.compareDocumentPosition(otherNode)](#NodeService+compareDocumentPosition) ⇒ <code>number</code>
+    * [.contains(otherNode)](#NodeService+contains) ⇒ <code>boolean</code>
+    * [.insertBefore(newNode, [referenceNode])](#NodeService+insertBefore) ⇒ <code>PseudoNode</code>
+    * [.isEqualNode(otherNode)](#NodeService+isEqualNode) ⇒ <code>boolean</code>
+    * [.normalize()](#NodeService+normalize)
+    * [.removeChild(childElement)](#NodeService+removeChild) ⇒ <code>PseudoNode</code>
+    * [.replaceChild(newChild, oldChild)](#NodeService+replaceChild) ⇒ <code>PseudoNode</code>
+
+<a name="ShadowRootService+host"></a>
+
+### shadowRootService.host
+The element this shadow root is attached to. Set by attachShadow.
+
+**Kind**: instance property of [<code>ShadowRootService</code>](#ShadowRootService)  
+<a name="ShadowRootService+mode"></a>
+
+### shadowRootService.mode
+'open' (reachable via element.shadowRoot) or 'closed' (not). Set by attachShadow.
+
+**Kind**: instance property of [<code>ShadowRootService</code>](#ShadowRootService)  
+<a name="NodeService+acceptsChildren"></a>
+
+### shadowRootService.acceptsChildren ⇒ <code>boolean</code>
+Whether this kind of node can have children (text, comments and attributes cannot).
+
+**Kind**: instance property of [<code>ShadowRootService</code>](#ShadowRootService)  
+**Overrides**: [<code>acceptsChildren</code>](#NodeService+acceptsChildren)  
+<a name="DocumentFragmentService+getElementById"></a>
+
+### shadowRootService.getElementById(id) ⇒ <code>PseudoElement</code> \| <code>null</code>
+The first element, in tree order, whose id matches the given value, or null when there is none (the DOM's
+NonElementParentNode mixin, which Document and DocumentFragment both implement).
+
+**Kind**: instance method of [<code>ShadowRootService</code>](#ShadowRootService)  
+**Overrides**: [<code>getElementById</code>](#DocumentFragmentService+getElementById)  
+
+| Param | Type |
+| --- | --- |
+| id | <code>string</code> | 
+
+<a name="NodeService+appendChild"></a>
+
+### shadowRootService.appendChild(childNode) ⇒ <code>PseudoNode</code>
+Add a node as the last child of this node (a node which is already in a tree is moved).
+
+**Kind**: instance method of [<code>ShadowRootService</code>](#ShadowRootService)  
+**Overrides**: [<code>appendChild</code>](#NodeService+appendChild)  
+**Returns**: <code>PseudoNode</code> - The added node  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| childNode | <code>PseudoNode</code> | The node to add |
+
+<a name="NodeService+cloneShallow"></a>
+
+### shadowRootService.cloneShallow() ⇒ [<code>NodeService</code>](#NodeService)
+Make a copy of this node without its children, its parent or its listeners, which is what cloneNode starts from.
+Kinds of node which are made with arguments override this to give them.
+
+**Kind**: instance method of [<code>ShadowRootService</code>](#ShadowRootService)  
+**Overrides**: [<code>cloneShallow</code>](#NodeService+cloneShallow)  
+<a name="NodeService+equalsShallow"></a>
+
+### shadowRootService.equalsShallow(other) ⇒ <code>boolean</code>
+Whether another node of the same type is equal to this one apart from its children, which isEqualNode compares
+afterwards. Kinds of node with more to compare (an element has attributes) override this.
+
+**Kind**: instance method of [<code>ShadowRootService</code>](#ShadowRootService)  
+**Overrides**: [<code>equalsShallow</code>](#NodeService+equalsShallow)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| other | [<code>NodeService</code>](#NodeService) | The node to compare with |
+
+<a name="NodeService+append"></a>
+
+### shadowRootService.append(...nodes)
+Add nodes (strings become text nodes) as the last children of this node, in the order given.
+
+**Kind**: instance method of [<code>ShadowRootService</code>](#ShadowRootService)  
+**Overrides**: [<code>append</code>](#NodeService+append)  
+**Throws**:
+
+- <code>Error</code> When this kind of node cannot have children
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+prepend"></a>
+
+### shadowRootService.prepend(...nodes)
+Add nodes (strings become text nodes) as the first children of this node, in the order given.
+
+**Kind**: instance method of [<code>ShadowRootService</code>](#ShadowRootService)  
+**Overrides**: [<code>prepend</code>](#NodeService+prepend)  
+**Throws**:
+
+- <code>Error</code> When this kind of node cannot have children
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+replaceChildren"></a>
+
+### shadowRootService.replaceChildren(...nodes)
+Remove every child of this node and put the given nodes (strings become text nodes) in their place, in order.
+
+**Kind**: instance method of [<code>ShadowRootService</code>](#ShadowRootService)  
+**Overrides**: [<code>replaceChildren</code>](#NodeService+replaceChildren)  
+**Throws**:
+
+- <code>Error</code> When this kind of node cannot have children
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+before"></a>
+
+### shadowRootService.before(...nodes)
+Add nodes (strings become text nodes) as this node's previous siblings, in order. Does nothing when this node has
+no parent.
+
+**Kind**: instance method of [<code>ShadowRootService</code>](#ShadowRootService)  
+**Overrides**: [<code>before</code>](#NodeService+before)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+after"></a>
+
+### shadowRootService.after(...nodes)
+Add nodes (strings become text nodes) as this node's next siblings, in order. Does nothing when this node has no
+parent.
+
+**Kind**: instance method of [<code>ShadowRootService</code>](#ShadowRootService)  
+**Overrides**: [<code>after</code>](#NodeService+after)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to add |
+
+<a name="NodeService+replaceWith"></a>
+
+### shadowRootService.replaceWith(...nodes)
+Put the given nodes (strings become text nodes) where this node is, in order, then remove this node. Does nothing
+when this node has no parent.
+
+**Kind**: instance method of [<code>ShadowRootService</code>](#ShadowRootService)  
+**Overrides**: [<code>replaceWith</code>](#NodeService+replaceWith)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ...nodes | <code>PseudoNode</code> \| <code>string</code> | The nodes (or text) to put in this node's place |
+
+<a name="NodeService+remove"></a>
+
+### shadowRootService.remove()
+Remove this node from its parent. Does nothing when it has no parent.
+
+**Kind**: instance method of [<code>ShadowRootService</code>](#ShadowRootService)  
+**Overrides**: [<code>remove</code>](#NodeService+remove)  
+<a name="NodeService+toChildNode"></a>
+
+### shadowRootService.toChildNode(value) ⇒ <code>PseudoNode</code>
+Turn a value given to append / prepend / before / after / replaceWith / replaceChildren into a node: a string
+becomes a text node belonging to this node's document, anything else is returned as it is.
+
+**Kind**: instance method of [<code>ShadowRootService</code>](#ShadowRootService)  
+**Overrides**: [<code>toChildNode</code>](#NodeService+toChildNode)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| value | <code>PseudoNode</code> \| <code>string</code> | The value to add |
+
+<a name="NodeService+getElementsByTagName"></a>
+
+### shadowRootService.getElementsByTagName(tagName) ⇒ <code>PseudoHTMLCollection</code>
+Every element below this node with the given tag name (or every element when tagName is *), live.
+
+**Kind**: instance method of [<code>ShadowRootService</code>](#ShadowRootService)  
+**Overrides**: [<code>getElementsByTagName</code>](#NodeService+getElementsByTagName)  
+
+| Param | Type |
+| --- | --- |
+| tagName | <code>string</code> | 
+
+<a name="NodeService+getElementsByClassName"></a>
+
+### shadowRootService.getElementsByClassName(className) ⇒ <code>PseudoHTMLCollection</code>
+Every element below this node which has all of the given (space separated) classes, live.
+
+**Kind**: instance method of [<code>ShadowRootService</code>](#ShadowRootService)  
+**Overrides**: [<code>getElementsByClassName</code>](#NodeService+getElementsByClassName)  
+
+| Param | Type |
+| --- | --- |
+| className | <code>string</code> | 
+
+<a name="NodeService+getElementsByTagNameNS"></a>
+
+### shadowRootService.getElementsByTagNameNS(namespace, tagName) ⇒ <code>PseudoHTMLCollection</code>
+Every element below this node with the given tag name, live. There is no real namespace parsing here, so this
+ignores the namespace and behaves exactly like getElementsByTagName.
+
+**Kind**: instance method of [<code>ShadowRootService</code>](#ShadowRootService)  
+**Overrides**: [<code>getElementsByTagNameNS</code>](#NodeService+getElementsByTagNameNS)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| namespace | <code>string</code> | Ignored |
+| tagName | <code>string</code> |  |
+
+<a name="NodeService+querySelector"></a>
+
+### shadowRootService.querySelector(selectors) ⇒ <code>PseudoElement</code> \| <code>null</code>
+The first element below this node which matches the CSS selector, in tree order, or null when there is none.
+
+**Kind**: instance method of [<code>ShadowRootService</code>](#ShadowRootService)  
+**Overrides**: [<code>querySelector</code>](#NodeService+querySelector)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selectors | <code>string</code> | A CSS selector |
+
+<a name="NodeService+querySelectorAll"></a>
+
+### shadowRootService.querySelectorAll(selectors) ⇒ <code>Array.&lt;PseudoElement&gt;</code>
+Every element below this node which matches the CSS selector, in tree order. A plain array (not a live
+collection): like the DOM's querySelectorAll, it is a snapshot taken when it is called.
+
+**Kind**: instance method of [<code>ShadowRootService</code>](#ShadowRootService)  
+**Overrides**: [<code>querySelectorAll</code>](#NodeService+querySelectorAll)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selectors | <code>string</code> | A CSS selector |
+
+<a name="NodeService+childInserted"></a>
+
+### shadowRootService.childInserted(child)
+Called each time a node has been inserted as a child of this node, so that nodes which need to react to children
+(for example elements applying default events) can do so.
+
+**Kind**: instance method of [<code>ShadowRootService</code>](#ShadowRootService)  
+**Overrides**: [<code>childInserted</code>](#NodeService+childInserted)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| child | [<code>NodeService</code>](#NodeService) | The node which was inserted |
+
+<a name="NodeService+cloneNode"></a>
+
+### shadowRootService.cloneNode([deep]) ⇒ <code>PseudoNode</code>
+Make a copy of this node (without its parent, and without its event listeners). With deep the children are copied
+too, all the way down.
+
+**Kind**: instance method of [<code>ShadowRootService</code>](#ShadowRootService)  
+**Overrides**: [<code>cloneNode</code>](#NodeService+cloneNode)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [deep] | <code>boolean</code> | <code>false</code> | Copy the children as well |
+
+<a name="NodeService+compareDocumentPosition"></a>
+
+### shadowRootService.compareDocumentPosition(otherNode) ⇒ <code>number</code>
+Say where another node is in relation to this one, as the bits of NodeService.DOCUMENT_POSITION_*: 0 for this node
+itself, DISCONNECTED (with IMPLEMENTATION_SPECIFIC and a consistent PRECEDING or FOLLOWING) for a node in another tree,
+CONTAINS + PRECEDING when the other node is an ancestor, CONTAINED_BY + FOLLOWING when it is a descendant,
+otherwise PRECEDING or FOLLOWING by their order in the tree.
+
+**Kind**: instance method of [<code>ShadowRootService</code>](#ShadowRootService)  
+**Overrides**: [<code>compareDocumentPosition</code>](#NodeService+compareDocumentPosition)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| otherNode | <code>PseudoNode</code> | The node to locate |
+
+<a name="NodeService+contains"></a>
+
+### shadowRootService.contains(otherNode) ⇒ <code>boolean</code>
+Check whether a node is this node or one of its descendants.
+
+**Kind**: instance method of [<code>ShadowRootService</code>](#ShadowRootService)  
+**Overrides**: [<code>contains</code>](#NodeService+contains)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| otherNode | <code>PseudoNode</code> \| <code>null</code> | The node to look for |
+
+<a name="NodeService+insertBefore"></a>
+
+### shadowRootService.insertBefore(newNode, [referenceNode]) ⇒ <code>PseudoNode</code>
+Insert a node as a child of this node, before the given child (or at the end when there is none). A node which is
+already in a tree is moved, and the children of a document fragment are moved in order.
+
+**Kind**: instance method of [<code>ShadowRootService</code>](#ShadowRootService)  
+**Overrides**: [<code>insertBefore</code>](#NodeService+insertBefore)  
+**Returns**: <code>PseudoNode</code> - The inserted node  
+**Throws**:
+
+- <code>Error</code> When the reference node is not a child of this node, or the new node is this node or contains it
+
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| newNode | <code>PseudoNode</code> |  | The node to insert |
+| [referenceNode] | <code>PseudoNode</code> \| <code>null</code> | <code></code> | The child of this node to insert before, or null to insert at the end |
+
+<a name="NodeService+isEqualNode"></a>
+
+### shadowRootService.isEqualNode(otherNode) ⇒ <code>boolean</code>
+Whether another node is the same as this one, by what they hold: the same type, name and value (an element also
+needs the same attributes), and children which are equal in the same order.
+
+**Kind**: instance method of [<code>ShadowRootService</code>](#ShadowRootService)  
+**Overrides**: [<code>isEqualNode</code>](#NodeService+isEqualNode)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| otherNode | <code>PseudoNode</code> \| <code>null</code> | The node to compare with |
+
+<a name="NodeService+normalize"></a>
+
+### shadowRootService.normalize()
+Tidy the text below this node: neighbouring text nodes are joined into one and empty text nodes are removed.
+
+**Kind**: instance method of [<code>ShadowRootService</code>](#ShadowRootService)  
+**Overrides**: [<code>normalize</code>](#NodeService+normalize)  
+<a name="NodeService+removeChild"></a>
+
+### shadowRootService.removeChild(childElement) ⇒ <code>PseudoNode</code>
+Remove a child from this node, it no longer has a parent or siblings afterwards.
+
+**Kind**: instance method of [<code>ShadowRootService</code>](#ShadowRootService)  
+**Overrides**: [<code>removeChild</code>](#NodeService+removeChild)  
+**Returns**: <code>PseudoNode</code> - The removed node  
+**Throws**:
+
+- <code>Error</code> When the node is not a child of this node
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| childElement | <code>PseudoNode</code> | The child node to remove |
+
+<a name="NodeService+replaceChild"></a>
+
+### shadowRootService.replaceChild(newChild, oldChild) ⇒ <code>PseudoNode</code>
+Replace a child of this node with another node (which is moved if it is already in a tree).
+
+**Kind**: instance method of [<code>ShadowRootService</code>](#ShadowRootService)  
+**Overrides**: [<code>replaceChild</code>](#NodeService+replaceChild)  
+**Returns**: <code>PseudoNode</code> - The replaced node  
+**Throws**:
+
+- <code>Error</code> When the old node is not a child of this node
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| newChild | <code>PseudoNode</code> | The node which takes the place |
+| oldChild | <code>PseudoNode</code> | The child of this node to replace |
+
 <a name="PointerEventService"></a>
 
 ## PointerEventService ⇐ [<code>MouseEventService</code>](#MouseEventService)
@@ -488,6 +916,7 @@ Simulate the behaviour of the Node Class when there is no DOM available.
     * [.toChildNode(value)](#NodeService+toChildNode) ⇒ <code>PseudoNode</code>
     * [.getElementsByTagName(tagName)](#NodeService+getElementsByTagName) ⇒ <code>PseudoHTMLCollection</code>
     * [.getElementsByClassName(className)](#NodeService+getElementsByClassName) ⇒ <code>PseudoHTMLCollection</code>
+    * [.getElementsByTagNameNS(namespace, tagName)](#NodeService+getElementsByTagNameNS) ⇒ <code>PseudoHTMLCollection</code>
     * [.querySelector(selectors)](#NodeService+querySelector) ⇒ <code>PseudoElement</code> \| <code>null</code>
     * [.querySelectorAll(selectors)](#NodeService+querySelectorAll) ⇒ <code>Array.&lt;PseudoElement&gt;</code>
     * [.childInserted(child)](#NodeService+childInserted)
@@ -657,6 +1086,19 @@ Every element below this node which has all of the given (space separated) class
 | Param | Type |
 | --- | --- |
 | className | <code>string</code> | 
+
+<a name="NodeService+getElementsByTagNameNS"></a>
+
+### nodeService.getElementsByTagNameNS(namespace, tagName) ⇒ <code>PseudoHTMLCollection</code>
+Every element below this node with the given tag name, live. There is no real namespace parsing here, so this
+ignores the namespace and behaves exactly like getElementsByTagName.
+
+**Kind**: instance method of [<code>NodeService</code>](#NodeService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| namespace | <code>string</code> | Ignored |
+| tagName | <code>string</code> |  |
 
 <a name="NodeService+querySelector"></a>
 
@@ -833,6 +1275,7 @@ Simulate the behaviour of the Text Class when there is no DOM available: the tex
     * [.toChildNode(value)](#NodeService+toChildNode) ⇒ <code>PseudoNode</code>
     * [.getElementsByTagName(tagName)](#NodeService+getElementsByTagName) ⇒ <code>PseudoHTMLCollection</code>
     * [.getElementsByClassName(className)](#NodeService+getElementsByClassName) ⇒ <code>PseudoHTMLCollection</code>
+    * [.getElementsByTagNameNS(namespace, tagName)](#NodeService+getElementsByTagNameNS) ⇒ <code>PseudoHTMLCollection</code>
     * [.querySelector(selectors)](#NodeService+querySelector) ⇒ <code>PseudoElement</code> \| <code>null</code>
     * [.querySelectorAll(selectors)](#NodeService+querySelectorAll) ⇒ <code>Array.&lt;PseudoElement&gt;</code>
     * [.childInserted(child)](#NodeService+childInserted)
@@ -1042,6 +1485,20 @@ Every element below this node which has all of the given (space separated) class
 | --- | --- |
 | className | <code>string</code> | 
 
+<a name="NodeService+getElementsByTagNameNS"></a>
+
+### textService.getElementsByTagNameNS(namespace, tagName) ⇒ <code>PseudoHTMLCollection</code>
+Every element below this node with the given tag name, live. There is no real namespace parsing here, so this
+ignores the namespace and behaves exactly like getElementsByTagName.
+
+**Kind**: instance method of [<code>TextService</code>](#TextService)  
+**Overrides**: [<code>getElementsByTagNameNS</code>](#NodeService+getElementsByTagNameNS)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| namespace | <code>string</code> | Ignored |
+| tagName | <code>string</code> |  |
+
 <a name="NodeService+querySelector"></a>
 
 ### textService.querySelector(selectors) ⇒ <code>PseudoElement</code> \| <code>null</code>
@@ -1226,6 +1683,7 @@ Simulate the behaviour of the Comment Class when there is no DOM available: a no
     * [.toChildNode(value)](#NodeService+toChildNode) ⇒ <code>PseudoNode</code>
     * [.getElementsByTagName(tagName)](#NodeService+getElementsByTagName) ⇒ <code>PseudoHTMLCollection</code>
     * [.getElementsByClassName(className)](#NodeService+getElementsByClassName) ⇒ <code>PseudoHTMLCollection</code>
+    * [.getElementsByTagNameNS(namespace, tagName)](#NodeService+getElementsByTagNameNS) ⇒ <code>PseudoHTMLCollection</code>
     * [.querySelector(selectors)](#NodeService+querySelector) ⇒ <code>PseudoElement</code> \| <code>null</code>
     * [.querySelectorAll(selectors)](#NodeService+querySelectorAll) ⇒ <code>Array.&lt;PseudoElement&gt;</code>
     * [.childInserted(child)](#NodeService+childInserted)
@@ -1417,6 +1875,20 @@ Every element below this node which has all of the given (space separated) class
 | Param | Type |
 | --- | --- |
 | className | <code>string</code> | 
+
+<a name="NodeService+getElementsByTagNameNS"></a>
+
+### commentService.getElementsByTagNameNS(namespace, tagName) ⇒ <code>PseudoHTMLCollection</code>
+Every element below this node with the given tag name, live. There is no real namespace parsing here, so this
+ignores the namespace and behaves exactly like getElementsByTagName.
+
+**Kind**: instance method of [<code>CommentService</code>](#CommentService)  
+**Overrides**: [<code>getElementsByTagNameNS</code>](#NodeService+getElementsByTagNameNS)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| namespace | <code>string</code> | Ignored |
+| tagName | <code>string</code> |  |
 
 <a name="NodeService+querySelector"></a>
 
@@ -2295,12 +2767,19 @@ Simulate the behaviour of the Element Class when there is no DOM available.
 
 * [ElementService](#ElementService) ⇐ <code>PseudoNode</code>
     * [new ElementService([settings])](#new_ElementService_new)
+    * [.boundingClientRect](#ElementService+boundingClientRect)
+    * [.clientRects](#ElementService+clientRects)
+    * [.animations](#ElementService+animations)
+    * [.isVisible](#ElementService+isVisible)
+    * [.localName](#ElementService+localName) ⇒ <code>string</code>
+    * [.prefix](#ElementService+prefix) ⇒ <code>string</code> \| <code>null</code>
     * [.children](#ElementService+children) ⇒ <code>PseudoHTMLCollection</code>
     * [.childElementCount](#ElementService+childElementCount) ⇒ <code>number</code>
     * [.firstElementChild](#ElementService+firstElementChild) ⇒ <code>PseudoElement</code> \| <code>null</code>
     * [.lastElementChild](#ElementService+lastElementChild) ⇒ <code>PseudoElement</code> \| <code>null</code>
     * [.nextElementSibling](#ElementService+nextElementSibling) ⇒ <code>PseudoElement</code> \| <code>null</code>
     * [.previousElementSibling](#ElementService+previousElementSibling) ⇒ <code>PseudoElement</code> \| <code>null</code>
+    * [.shadowRoot](#ElementService+shadowRoot) ⇒ <code>PseudoShadowRoot</code> \| <code>null</code>
     * [.currentAttributes()](#ElementService+currentAttributes) ⇒ <code>Array.&lt;{name: string, value: \*}&gt;</code>
     * [.cloneShallow()](#ElementService+cloneShallow) ⇒ [<code>ElementService</code>](#ElementService)
     * [.equalsShallow(other)](#ElementService+equalsShallow) ⇒ <code>boolean</code>
@@ -2315,6 +2794,24 @@ Simulate the behaviour of the Element Class when there is no DOM available.
     * [.setAttribute(attributeName, attributeValue)](#ElementService+setAttribute) ⇒ <code>undefined</code>
     * [.getAttribute(attributeName)](#ElementService+getAttribute) ⇒ <code>string</code> \| <code>null</code>
     * [.removeAttribute(attributeName)](#ElementService+removeAttribute) ⇒ <code>undefined</code>
+    * [.getAttributeNames()](#ElementService+getAttributeNames) ⇒ <code>Array.&lt;string&gt;</code>
+    * [.hasAttributes()](#ElementService+hasAttributes) ⇒ <code>boolean</code>
+    * [.toggleAttribute(attributeName, [force])](#ElementService+toggleAttribute) ⇒ <code>boolean</code>
+    * [.getBoundingClientRect()](#ElementService+getBoundingClientRect) ⇒ <code>DOMRect</code>
+    * [.getClientRects()](#ElementService+getClientRects) ⇒ <code>Array.&lt;DOMRect&gt;</code>
+    * [.getAnimations()](#ElementService+getAnimations) ⇒ <code>Array.&lt;\*&gt;</code>
+    * [.checkVisibility()](#ElementService+checkVisibility) ⇒ <code>boolean</code>
+    * [.computedStyleMap()](#ElementService+computedStyleMap) ⇒ <code>Object</code>
+    * [.hasPointerCapture(pointerId)](#ElementService+hasPointerCapture) ⇒ <code>boolean</code>
+    * [.setPointerCapture(pointerId)](#ElementService+setPointerCapture) ⇒ <code>undefined</code>
+    * [.releasePointerCapture(pointerId)](#ElementService+releasePointerCapture) ⇒ <code>undefined</code>
+    * [.scroll([x], [y])](#ElementService+scroll) ⇒ <code>undefined</code>
+    * [.scrollTo([x], [y])](#ElementService+scrollTo) ⇒ <code>undefined</code>
+    * [.scrollBy([x], [y])](#ElementService+scrollBy) ⇒ <code>undefined</code>
+    * [.scrollIntoView()](#ElementService+scrollIntoView) ⇒ <code>undefined</code>
+    * [.requestFullscreen()](#ElementService+requestFullscreen) ⇒ <code>Promise.&lt;void&gt;</code>
+    * [.requestPointerLock()](#ElementService+requestPointerLock) ⇒ <code>Promise.&lt;void&gt;</code>
+    * [.attachShadow(options)](#ElementService+attachShadow) ⇒ <code>PseudoShadowRoot</code>
 
 <a name="new_ElementService_new"></a>
 
@@ -2328,6 +2825,44 @@ Simulate the behaviour of the Element Class when there is no DOM available.
 | [settings.parent] | <code>PseudoNode</code> \| <code>null</code> | <code></code> | The node to add this element to as its last child |
 | [settings.children] | <code>Array.&lt;PseudoNode&gt;</code> | <code>[]</code> | The nodes to start as children |
 
+<a name="ElementService+boundingClientRect"></a>
+
+### elementService.boundingClientRect
+What getBoundingClientRect() returns - not really computed (there is no layout engine), set this directly.
+
+**Kind**: instance property of [<code>ElementService</code>](#ElementService)  
+<a name="ElementService+clientRects"></a>
+
+### elementService.clientRects
+What getClientRects() returns - set this directly.
+
+**Kind**: instance property of [<code>ElementService</code>](#ElementService)  
+<a name="ElementService+animations"></a>
+
+### elementService.animations
+What getAnimations() returns - set this directly.
+
+**Kind**: instance property of [<code>ElementService</code>](#ElementService)  
+<a name="ElementService+isVisible"></a>
+
+### elementService.isVisible
+What checkVisibility() returns - set this directly.
+
+**Kind**: instance property of [<code>ElementService</code>](#ElementService)  
+<a name="ElementService+localName"></a>
+
+### elementService.localName ⇒ <code>string</code>
+The local part of the element's qualified name. There is no real namespace parsing here, so this is always the
+same as tagName.
+
+**Kind**: instance property of [<code>ElementService</code>](#ElementService)  
+<a name="ElementService+prefix"></a>
+
+### elementService.prefix ⇒ <code>string</code> \| <code>null</code>
+The element's namespace prefix, or null when it has none. There is no real namespace parsing here, so this is
+always null.
+
+**Kind**: instance property of [<code>ElementService</code>](#ElementService)  
 <a name="ElementService+children"></a>
 
 ### elementService.children ⇒ <code>PseudoHTMLCollection</code>
@@ -2362,6 +2897,13 @@ The sibling after this one which is an element, or null when there is none.
 
 ### elementService.previousElementSibling ⇒ <code>PseudoElement</code> \| <code>null</code>
 The sibling before this one which is an element, or null when there is none.
+
+**Kind**: instance property of [<code>ElementService</code>](#ElementService)  
+<a name="ElementService+shadowRoot"></a>
+
+### elementService.shadowRoot ⇒ <code>PseudoShadowRoot</code> \| <code>null</code>
+This element's shadow root, when it has one attached in 'open' mode, or null (including when the mode is
+'closed' - it still exists, but is not reachable this way, like the DOM's).
 
 **Kind**: instance property of [<code>ElementService</code>](#ElementService)  
 <a name="ElementService+currentAttributes"></a>
@@ -2538,6 +3080,169 @@ Remove an attribute from the element.
 | --- | --- |
 | attributeName | <code>string</code> | 
 
+<a name="ElementService+getAttributeNames"></a>
+
+### elementService.getAttributeNames() ⇒ <code>Array.&lt;string&gt;</code>
+The name of every attribute on the element, in the order they were set.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+<a name="ElementService+hasAttributes"></a>
+
+### elementService.hasAttributes() ⇒ <code>boolean</code>
+Whether the element has any attributes at all.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+<a name="ElementService+toggleAttribute"></a>
+
+### elementService.toggleAttribute(attributeName, [force]) ⇒ <code>boolean</code>
+Add the attribute (with an empty value) when it is not present, or remove it when it is - unless force says
+which of those to do instead. Returns whether the attribute is present after the call.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+
+| Param | Type |
+| --- | --- |
+| attributeName | <code>string</code> | 
+| [force] | <code>boolean</code> | 
+
+<a name="ElementService+getBoundingClientRect"></a>
+
+### elementService.getBoundingClientRect() ⇒ <code>DOMRect</code>
+The size of the element and its position, settable directly - there is no layout engine here to compute it.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+<a name="ElementService+getClientRects"></a>
+
+### elementService.getClientRects() ⇒ <code>Array.&lt;DOMRect&gt;</code>
+The bounding rectangles for each line of text in the element, settable directly - there is no layout engine
+here to compute it.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+<a name="ElementService+getAnimations"></a>
+
+### elementService.getAnimations() ⇒ <code>Array.&lt;\*&gt;</code>
+The Animation objects currently active on the element, settable directly - there is no animation engine here.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+<a name="ElementService+checkVisibility"></a>
+
+### elementService.checkVisibility() ⇒ <code>boolean</code>
+Whether the element is expected to be visible, settable directly - there is no rendering here to check it.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+<a name="ElementService+computedStyleMap"></a>
+
+### elementService.computedStyleMap() ⇒ <code>Object</code>
+A read-only view of the element's own inline style declarations (there is no CSS cascade here, so this is not a
+real computed style - just what the element's own style object holds).
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+<a name="ElementService+hasPointerCapture"></a>
+
+### elementService.hasPointerCapture(pointerId) ⇒ <code>boolean</code>
+Whether this element currently has capture of the given pointer.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+
+| Param | Type |
+| --- | --- |
+| pointerId | <code>number</code> | 
+
+<a name="ElementService+setPointerCapture"></a>
+
+### elementService.setPointerCapture(pointerId) ⇒ <code>undefined</code>
+Give this element capture of the given pointer.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+
+| Param | Type |
+| --- | --- |
+| pointerId | <code>number</code> | 
+
+<a name="ElementService+releasePointerCapture"></a>
+
+### elementService.releasePointerCapture(pointerId) ⇒ <code>undefined</code>
+Release this element's capture of the given pointer, if it had it.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+
+| Param | Type |
+| --- | --- |
+| pointerId | <code>number</code> | 
+
+<a name="ElementService+scroll"></a>
+
+### elementService.scroll([x], [y]) ⇒ <code>undefined</code>
+Scroll to the given position (or, given an options object, the position(s) it has). There is no real scrollable
+viewport here: this just sets scrollLeft / scrollTop.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+
+| Param | Type | Default |
+| --- | --- | --- |
+| [x] | <code>number</code> \| <code>Object</code> | <code>0</code> | 
+| [y] | <code>number</code> | <code>0</code> | 
+
+<a name="ElementService+scrollTo"></a>
+
+### elementService.scrollTo([x], [y]) ⇒ <code>undefined</code>
+Scroll to the given position. An alias for scroll.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+
+| Param | Type | Default |
+| --- | --- | --- |
+| [x] | <code>number</code> \| <code>Object</code> | <code>0</code> | 
+| [y] | <code>number</code> | <code>0</code> | 
+
+<a name="ElementService+scrollBy"></a>
+
+### elementService.scrollBy([x], [y]) ⇒ <code>undefined</code>
+Scroll by the given amount, relative to the current position.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+
+| Param | Type | Default |
+| --- | --- | --- |
+| [x] | <code>number</code> \| <code>Object</code> | <code>0</code> | 
+| [y] | <code>number</code> | <code>0</code> | 
+
+<a name="ElementService+scrollIntoView"></a>
+
+### elementService.scrollIntoView() ⇒ <code>undefined</code>
+Scroll an ancestor until this element is in view. There is no real viewport here for that to mean anything, so
+this does nothing (override it on an instance in a test which needs to observe the call).
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+<a name="ElementService+requestFullscreen"></a>
+
+### elementService.requestFullscreen() ⇒ <code>Promise.&lt;void&gt;</code>
+Asynchronously ask for the element to be shown fullscreen. There is no real fullscreen here, so this just
+resolves, like a browser granting the request would.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+<a name="ElementService+requestPointerLock"></a>
+
+### elementService.requestPointerLock() ⇒ <code>Promise.&lt;void&gt;</code>
+Asynchronously ask for the pointer to be locked to this element. There is no real pointer lock here, so this
+just resolves, like a browser granting the request would.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+<a name="ElementService+attachShadow"></a>
+
+### elementService.attachShadow(options) ⇒ <code>PseudoShadowRoot</code>
+Attach a shadow tree to this element and return its ShadowRoot. Throws when it already hosts one.
+
+**Kind**: instance method of [<code>ElementService</code>](#ElementService)  
+**Throws**:
+
+- <code>Error</code> 
+
+
+| Param | Type |
+| --- | --- |
+| options | <code>Object</code> | 
+
 <a name="DocumentService"></a>
 
 ## DocumentService ⇐ [<code>NodeService</code>](#NodeService)
@@ -2567,6 +3272,7 @@ Simulate the behaviour of the Document Class when there is no DOM available.
     * [.toChildNode(value)](#NodeService+toChildNode) ⇒ <code>PseudoNode</code>
     * [.getElementsByTagName(tagName)](#NodeService+getElementsByTagName) ⇒ <code>PseudoHTMLCollection</code>
     * [.getElementsByClassName(className)](#NodeService+getElementsByClassName) ⇒ <code>PseudoHTMLCollection</code>
+    * [.getElementsByTagNameNS(namespace, tagName)](#NodeService+getElementsByTagNameNS) ⇒ <code>PseudoHTMLCollection</code>
     * [.querySelector(selectors)](#NodeService+querySelector) ⇒ <code>PseudoElement</code> \| <code>null</code>
     * [.querySelectorAll(selectors)](#NodeService+querySelectorAll) ⇒ <code>Array.&lt;PseudoElement&gt;</code>
     * [.childInserted(child)](#NodeService+childInserted)
@@ -2788,6 +3494,19 @@ Every element below this node which has all of the given (space separated) class
 | --- | --- |
 | className | <code>string</code> | 
 
+<a name="NodeService+getElementsByTagNameNS"></a>
+
+### documentService.getElementsByTagNameNS(namespace, tagName) ⇒ <code>PseudoHTMLCollection</code>
+Every element below this node with the given tag name, live. There is no real namespace parsing here, so this
+ignores the namespace and behaves exactly like getElementsByTagName.
+
+**Kind**: instance method of [<code>DocumentService</code>](#DocumentService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| namespace | <code>string</code> | Ignored |
+| tagName | <code>string</code> |  |
+
 <a name="NodeService+querySelector"></a>
 
 ### documentService.querySelector(selectors) ⇒ <code>PseudoElement</code> \| <code>null</code>
@@ -2955,6 +3674,7 @@ not part of a tree, when it is inserted its children are moved into the tree ins
     * [.toChildNode(value)](#NodeService+toChildNode) ⇒ <code>PseudoNode</code>
     * [.getElementsByTagName(tagName)](#NodeService+getElementsByTagName) ⇒ <code>PseudoHTMLCollection</code>
     * [.getElementsByClassName(className)](#NodeService+getElementsByClassName) ⇒ <code>PseudoHTMLCollection</code>
+    * [.getElementsByTagNameNS(namespace, tagName)](#NodeService+getElementsByTagNameNS) ⇒ <code>PseudoHTMLCollection</code>
     * [.querySelector(selectors)](#NodeService+querySelector) ⇒ <code>PseudoElement</code> \| <code>null</code>
     * [.querySelectorAll(selectors)](#NodeService+querySelectorAll) ⇒ <code>Array.&lt;PseudoElement&gt;</code>
     * [.childInserted(child)](#NodeService+childInserted)
@@ -3136,6 +3856,19 @@ Every element below this node which has all of the given (space separated) class
 | Param | Type |
 | --- | --- |
 | className | <code>string</code> | 
+
+<a name="NodeService+getElementsByTagNameNS"></a>
+
+### documentFragmentService.getElementsByTagNameNS(namespace, tagName) ⇒ <code>PseudoHTMLCollection</code>
+Every element below this node with the given tag name, live. There is no real namespace parsing here, so this
+ignores the namespace and behaves exactly like getElementsByTagName.
+
+**Kind**: instance method of [<code>DocumentFragmentService</code>](#DocumentFragmentService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| namespace | <code>string</code> | Ignored |
+| tagName | <code>string</code> |  |
 
 <a name="NodeService+querySelector"></a>
 
@@ -3501,6 +4234,7 @@ Simulate the behaviour of the Attr Class when there is no DOM available.
     * [.toChildNode(value)](#NodeService+toChildNode) ⇒ <code>PseudoNode</code>
     * [.getElementsByTagName(tagName)](#NodeService+getElementsByTagName) ⇒ <code>PseudoHTMLCollection</code>
     * [.getElementsByClassName(className)](#NodeService+getElementsByClassName) ⇒ <code>PseudoHTMLCollection</code>
+    * [.getElementsByTagNameNS(namespace, tagName)](#NodeService+getElementsByTagNameNS) ⇒ <code>PseudoHTMLCollection</code>
     * [.querySelector(selectors)](#NodeService+querySelector) ⇒ <code>PseudoElement</code> \| <code>null</code>
     * [.querySelectorAll(selectors)](#NodeService+querySelectorAll) ⇒ <code>Array.&lt;PseudoElement&gt;</code>
     * [.childInserted(child)](#NodeService+childInserted)
@@ -3696,6 +4430,20 @@ Every element below this node which has all of the given (space separated) class
 | Param | Type |
 | --- | --- |
 | className | <code>string</code> | 
+
+<a name="NodeService+getElementsByTagNameNS"></a>
+
+### attrService.getElementsByTagNameNS(namespace, tagName) ⇒ <code>PseudoHTMLCollection</code>
+Every element below this node with the given tag name, live. There is no real namespace parsing here, so this
+ignores the namespace and behaves exactly like getElementsByTagName.
+
+**Kind**: instance method of [<code>AttrService</code>](#AttrService)  
+**Overrides**: [<code>getElementsByTagNameNS</code>](#NodeService+getElementsByTagNameNS)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| namespace | <code>string</code> | Ignored |
+| tagName | <code>string</code> |  |
 
 <a name="NodeService+querySelector"></a>
 
@@ -3923,6 +4671,7 @@ createComment, createDocumentFragment, getElementById, textContent always null).
     * [.toChildNode(value)](#NodeService+toChildNode) ⇒ <code>PseudoNode</code>
     * [.getElementsByTagName(tagName)](#NodeService+getElementsByTagName) ⇒ <code>PseudoHTMLCollection</code>
     * [.getElementsByClassName(className)](#NodeService+getElementsByClassName) ⇒ <code>PseudoHTMLCollection</code>
+    * [.getElementsByTagNameNS(namespace, tagName)](#NodeService+getElementsByTagNameNS) ⇒ <code>PseudoHTMLCollection</code>
     * [.querySelector(selectors)](#NodeService+querySelector) ⇒ <code>PseudoElement</code> \| <code>null</code>
     * [.querySelectorAll(selectors)](#NodeService+querySelectorAll) ⇒ <code>Array.&lt;PseudoElement&gt;</code>
     * [.childInserted(child)](#NodeService+childInserted)
@@ -4191,6 +4940,20 @@ Every element below this node which has all of the given (space separated) class
 | Param | Type |
 | --- | --- |
 | className | <code>string</code> | 
+
+<a name="NodeService+getElementsByTagNameNS"></a>
+
+### pseudoHTMLDocument.getElementsByTagNameNS(namespace, tagName) ⇒ <code>PseudoHTMLCollection</code>
+Every element below this node with the given tag name, live. There is no real namespace parsing here, so this
+ignores the namespace and behaves exactly like getElementsByTagName.
+
+**Kind**: instance method of [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)  
+**Overrides**: [<code>getElementsByTagNameNS</code>](#NodeService+getElementsByTagNameNS)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| namespace | <code>string</code> | Ignored |
+| tagName | <code>string</code> |  |
 
 <a name="NodeService+querySelector"></a>
 

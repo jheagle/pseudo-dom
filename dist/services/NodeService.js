@@ -298,6 +298,17 @@ class NodeService extends EventTargetService_1.default {
   }
 
   /**
+   * Every element below this node with the given tag name, live. There is no real namespace parsing here, so this
+   * ignores the namespace and behaves exactly like getElementsByTagName.
+   * @param {string} namespace Ignored
+   * @param {string} tagName
+   * @returns {PseudoHTMLCollection}
+   */
+  getElementsByTagNameNS (namespace, tagName) {
+    return this.getElementsByTagName(tagName)
+  }
+
+  /**
    * The first element below this node which matches the CSS selector, in tree order, or null when there is none.
    * @param {string} selectors A CSS selector
    * @returns {PseudoElement|null}

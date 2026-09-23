@@ -147,9 +147,10 @@ export interface PseudoElement extends PseudoNode {
   set part (part: PseudoDOMTokenList)
 
   /**
-   * A string representing the namespace prefix of the element, or null if no prefix is specified.
+   * A string representing the namespace prefix of the element, or null if no prefix is specified. There is no real
+   * namespace parsing here, so this is always null.
    */
-  get prefix (): string
+  get prefix (): string | null
 
   /**
    * An Element, the element immediately preceding the given one in the tree, or null if there is no sibling element.
@@ -601,14 +602,12 @@ export interface PseudoElement extends PseudoNode {
   append (...nodes: Array<PseudoNode | string>): void
 
   /**
-   * Attaches a shadow DOM tree to the specified element and returns a reference to its ShadowRoot.
+   * Attaches a shadow DOM tree to the specified element and returns a reference to its ShadowRoot. Throws when the
+   * element already hosts one.
+   * @param {{mode: string}} options
+   * @returns {PseudoShadowRoot}
    */
-  attachShadow (options: {
-    mode: string,
-    cloneable: boolean,
-    delegatesFocus: boolean,
-    slotAssignment: string
-  }): PseudoShadowRoot
+  attachShadow (options: { mode: string }): PseudoShadowRoot
 
   /**
    * Inserts a set of Node objects or strings in the children list of the Element's parent, just before the Element. Does
@@ -617,9 +616,11 @@ export interface PseudoElement extends PseudoNode {
   before (...nodes: Array<PseudoNode | string>): void
 
   /**
-   * Returns whether an element is  expected to be visible or not based on configurable checks.
+   * Returns whether an element is expected to be visible or not. Settable directly (boundingClientRect / isVisible /
+   * etc.) rather than really computed - there is no layout engine here.
+   * @returns {boolean}
    */
-  checkVisibility (): string
+  checkVisibility (): boolean
 
   /**
    * Returns the Element which is the closest ancestor of the current element (or the current element itself) which matches the selectors given in parameter.
@@ -629,14 +630,18 @@ export interface PseudoElement extends PseudoNode {
   closest (selectors: string): PseudoElement | null
 
   /**
-   * Returns a StylePropertyMapReadOnly interface which provides a read-only representation of a CSS declaration block that is an alternative to CSSStyleDeclaration.
+   * Returns a read-only view of the element's own inline style declarations (there is no CSS cascade here, so this
+   * is not a real computed style).
+   * @returns {{get: function(string): (string|undefined)}}
    */
-  computedStyleMap (): string
+  computedStyleMap (): { get: (property: string) => string | undefined }
 
   /**
-   * Returns an array of Animation objects currently active on the element.
+   * Returns an array of Animation objects currently active on the element. Settable directly (animations) - there is
+   * no animation engine here.
+   * @returns {Array<*>}
    */
-  getAnimations (): string
+  getAnimations (): Array<any>
 
   /**
    * Retrieves the value of the named attribute from the current node and returns it as a string.
@@ -645,8 +650,9 @@ export interface PseudoElement extends PseudoNode {
 
   /**
    * Returns an array of attribute names from the current element.
+   * @returns {Array<string>}
    */
-  getAttributeNames (): string
+  getAttributeNames (): Array<string>
 
   /**
    * Retrieves the node representation of the named attribute from the current node and returns it as an Attr.
@@ -664,14 +670,18 @@ export interface PseudoElement extends PseudoNode {
   getAttributeNS (): string
 
   /**
-   * Returns the size of an element and its position relative to the viewport.
+   * Returns the size of an element and its position relative to the viewport. Settable directly
+   * (boundingClientRect) rather than really computed - there is no layout engine here.
+   * @returns {{x: number, y: number, width: number, height: number, top: number, right: number, bottom: number, left: number}}
    */
-  getBoundingClientRect (): string
+  getBoundingClientRect (): { x: number, y: number, width: number, height: number, top: number, right: number, bottom: number, left: number }
 
   /**
    * Returns a collection of rectangles that indicate the bounding rectangles for each line of text in a client.
+   * Settable directly (clientRects) rather than really computed - there is no layout engine here.
+   * @returns {Array<*>}
    */
-  getClientRects (): string
+  getClientRects (): Array<any>
 
   /**
    * Returns a live HTMLCollection that contains all descendants of the current element that possess the list of classes given in the parameter.
@@ -688,10 +698,14 @@ export interface PseudoElement extends PseudoNode {
   getElementsByTagName (tagName: string): PseudoHTMLCollection
 
   /**
-   * Returns a live HTMLCollection containing all descendant elements, of a particular tag name and namespace, from
-   * the current element. Not implemented yet (namespaces are out of scope for now).
+   * Returns a live HTMLCollection containing all descendant elements, of a particular tag name, from the current
+   * element. There is no real namespace parsing here, so this ignores the namespace and behaves exactly like
+   * getElementsByTagName.
+   * @param {string} namespace Ignored
+   * @param {string} tagName
+   * @returns {PseudoHTMLCollection}
    */
-  getElementsByTagNameNS (): string
+  getElementsByTagNameNS (namespace: string, tagName: string): PseudoHTMLCollection
 
   /**
    * Returns a boolean value indicating if the element has the specified attribute or not.
@@ -705,13 +719,16 @@ export interface PseudoElement extends PseudoNode {
 
   /**
    * Returns a boolean value indicating if the element has one or more HTML attributes present.
+   * @returns {boolean}
    */
-  hasAttributes (): string
+  hasAttributes (): boolean
 
   /**
    * Indicates whether the element on which it is invoked has pointer capture for the pointer identified by the given pointer ID.
+   * @param {number} pointerId
+   * @returns {boolean}
    */
-  hasPointerCapture (): string
+  hasPointerCapture (pointerId: number): boolean
 
   /**
    * Inserts a given element at a given position relative to the element it is invoked upon.
@@ -764,8 +781,10 @@ export interface PseudoElement extends PseudoNode {
 
   /**
    * Releases (stops) pointer capture that was previously set for a specific pointer event.
+   * @param {number} pointerId
+   * @returns {undefined}
    */
-  releasePointerCapture (): string
+  releasePointerCapture (pointerId: number): void
 
   /**
    * Removes the element from the children list of its parent. Does nothing when it has no parent.
@@ -799,34 +818,50 @@ export interface PseudoElement extends PseudoNode {
   replaceWith (...nodes: Array<PseudoNode | string>): void
 
   /**
-   * Asynchronously asks the browser to make the element fullscreen.
+   * Asynchronously asks the browser to make the element fullscreen. There is no real fullscreen here, so this just
+   * resolves, like a browser granting the request would.
+   * @returns {Promise<void>}
    */
-  requestFullscreen (): string
+  requestFullscreen (): Promise<void>
 
   /**
-   * Allows to asynchronously ask for the pointer to be locked on the given element.
+   * Allows to asynchronously ask for the pointer to be locked on the given element. There is no real pointer lock
+   * here, so this just resolves, like a browser granting the request would.
+   * @returns {Promise<void>}
    */
-  requestPointerLock (): string
+  requestPointerLock (): Promise<void>
 
   /**
-   * Scrolls to a particular set of coordinates inside a given element.
+   * Scrolls to a particular set of coordinates inside a given element. There is no real scrollable viewport here:
+   * this just sets scrollLeft / scrollTop.
+   * @param {number|{left: number, top: number}} [x]
+   * @param {number} [y]
+   * @returns {undefined}
    */
-  scroll (): string
+  scroll (x: number | { left?: number, top?: number }, y: number): void
 
   /**
-   * Scrolls an element by the given amount.
+   * Scrolls an element by the given amount, relative to the current position.
+   * @param {number|{left: number, top: number}} [x]
+   * @param {number} [y]
+   * @returns {undefined}
    */
-  scrollBy (): string
+  scrollBy (x: number | { left?: number, top?: number }, y: number): void
 
   /**
-   * Scrolls the page until the element gets into the view.
+   * Scrolls an ancestor until the element gets into view. There is no real viewport here for that to mean anything,
+   * so this does nothing.
+   * @returns {undefined}
    */
-  scrollIntoView (): string
+  scrollIntoView (): void
 
   /**
-   * Scrolls to a particular set of coordinates inside a given element.
+   * Scrolls to a particular set of coordinates inside a given element. An alias for scroll.
+   * @param {number|{left: number, top: number}} [x]
+   * @param {number} [y]
+   * @returns {undefined}
    */
-  scrollTo (): string
+  scrollTo (x: number | { left?: number, top?: number }, y: number): void
 
   /**
    * Sets the value of a named attribute of the current node.
@@ -850,11 +885,17 @@ export interface PseudoElement extends PseudoNode {
 
   /**
    * Designates a specific element as the capture target of future pointer events.
+   * @param {number} pointerId
+   * @returns {undefined}
    */
-  setPointerCapture (): string
+  setPointerCapture (pointerId: number): void
 
   /**
-   * Toggles a boolean attribute, removing it if it is present and adding it if it is not present, on the specified element.
+   * Toggles a boolean attribute, removing it if it is present and adding it if it is not present, on the specified
+   * element - unless force says which of those to do instead. Returns whether the attribute is present afterwards.
+   * @param {string} attributeName
+   * @param {boolean} [force]
+   * @returns {boolean}
    */
-  toggleAttribute (): string
+  toggleAttribute (attributeName: string, force: boolean): boolean
 }
