@@ -141,7 +141,8 @@ describe('cloneNode', () => {
     copy.firstChild.style.color = 'red'
     expect(ul.getAttribute('id')).toBe('list')
     expect(ul.firstChild.textContent).toBe('one')
-    expect(ul.firstChild.style.color).toBeUndefined()
+    // Like a real CSSStyleDeclaration, an unset property is '' rather than undefined
+    expect(ul.firstChild.style.color).toBe('')
   })
 
   test('the copy of the children has its own class list and attribute objects', () => {

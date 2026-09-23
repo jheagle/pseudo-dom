@@ -18,6 +18,13 @@ else, document fragments insert their children, and a node cannot be put inside 
 `DOMTokenListService`, `NamedNodeMapService`, `DocumentService` / `DocumentFragmentService`, `PseudoNodeList`, and
 `generateDocument` for creating a document.
 
+`style` is a real, live `CSSStyleDeclaration`: named property access (\`el.style.backgroundColor = 'red'\`) alongside
+\`getPropertyValue\` / \`setProperty\` / \`removeProperty\` / \`getPropertyPriority\` / \`cssText\`; an unset property
+reads as \`''\`, like the DOM's. \`dataset\` is a live `DOMStringMap`: reading/writing/deleting a camelCase name
+(\`el.dataset.fooBar\`) reads/writes/removes the matching \`data-foo-bar\` attribute directly, so it can never fall out
+of sync with the attributes themselves. Both are on \`HTMLElementService\`, matching the DOM (they are not on the base
+Element).
+
 Standard events: `createEvent(type, init, { browser, trusted })` makes the kind of event which suits the type (a click is a
 `MouseEvent`, a keydown a `KeyboardEvent`, ...). Like the constructor in a browser it gives nothing (no bubbling, no
 cancelling, not trusted) unless asked, but with `browser: true` it uses `eventDefaults`, the table of how the browser
@@ -137,6 +144,13 @@ not part of a tree, when it is inserted its children are moved into the tree ins
 <dt><a href="#CustomEventService">CustomEventService</a> ⇐ <code><a href="#EventService">EventService</a></code></dt>
 <dd><p>Simulate the behaviour of the CustomEvent Class when there is no DOM available: an event which carries data.</p>
 </dd>
+<dt><a href="#CSSStyleDeclarationService">CSSStyleDeclarationService</a></dt>
+<dd><p>Simulate the behaviour of the CSSStyleDeclaration Class when there is no DOM available: an ordered map of CSS
+property/value pairs, parsed from and serialized back to a cssText string. Values are stored and returned as
+given, with no unit conversion, shorthand expansion or validation - this is a data structure, not a real CSS
+engine. Named property access (declaration.backgroundColor, camelCase) is added on top of this by
+createStyleDeclaration, which wraps an instance of this class in a Proxy.</p>
+</dd>
 <dt><a href="#AttrService">AttrService</a> ⇐ <code><a href="#NodeService">NodeService</a></code></dt>
 <dd><p>Simulate the behaviour of the Attr Class when there is no DOM available.</p>
 </dd>
@@ -207,12 +221,21 @@ context.</p>
 <dt><a href="#nearestElementSibling">nearestElementSibling(node, direction)</a> ⇒ <code>*</code> | <code>null</code></dt>
 <dd><p>Walk up from a node (not including it) to find the nearest element, in the given direction.</p>
 </dd>
+<dt><a href="#kebabToCamel">kebabToCamel(name)</a> ⇒ <code>string</code></dt>
+<dd><p>kebab-case -&gt; camelCase (&quot;background-color&quot; -&gt; &quot;backgroundColor&quot;).</p>
+</dd>
+<dt><a href="#camelToKebab">camelToKebab(name)</a> ⇒ <code>string</code></dt>
+<dd><p>camelCase -&gt; kebab-case (&quot;backgroundColor&quot; -&gt; &quot;background-color&quot;).</p>
+</dd>
 <dt><a href="#createEvent">createEvent(type, [init], [options])</a> ⇒ <code><a href="#EventService">EventService</a></code></dt>
 <dd><p>Create an event of the kind which suits its type (a click is a MouseEvent, a keydown a KeyboardEvent, ...).
 By default this is like using the constructor of the event in a script: nothing bubbles or can be cancelled unless
 the init says so, and the event is not trusted. With browser: true the event is created the way the browser creates
 it, using the standard options for its type (see eventDefaults), and trusted: true makes it look like it came from a
 real user action (isTrusted).</p>
+</dd>
+<dt><a href="#dataAttributes">dataAttributes(element)</a> ⇒ <code>Array.&lt;Array.&lt;string&gt;&gt;</code></dt>
+<dd><p>Every data-* attribute name currently on the element, as [attributeName, camelCaseName] pairs.</p>
 </dd>
 </dl>
 
@@ -1823,13 +1846,18 @@ Simulate the behaviour of the HTMLElement Class when there is no DOM available.
 | offsetParent | <code>PseudoHTMLElement</code> | A reference to the closest positioned parent element |
 | offsetTop | <code>number</code> | The position of the top side of the element based on the parent element |
 | offsetWidth | <code>number</code> | The width of the element as offset by the parent element |
-| style | <code>Object</code> | A container to define all applied inline-styles |
+| style | [<code>CSSStyleDeclarationService</code>](#CSSStyleDeclarationService) | The element's inline styles, live and settable per property |
+| dataset | <code>Object.&lt;string, string&gt;</code> | The element's data-* attributes, live, under their camelCase names |
 | title | <code>string</code> | The title attribute which affects the text visible on hover |
 
 
 * [HTMLElementService](#HTMLElementService) ⇐ <code>PseudoElement</code>
     * [new HTMLElementService([elementOptions])](#new_HTMLElementService_new)
+    * [.style](#HTMLElementService+style) ⇒ [<code>CSSStyleDeclarationService</code>](#CSSStyleDeclarationService)
+    * [.dataset](#HTMLElementService+dataset) ⇒ <code>Object.&lt;string, string&gt;</code>
     * [.canFocus](#HTMLElementService+canFocus) ⇒ <code>boolean</code>
+    * [.cloneShallow()](#HTMLElementService+cloneShallow) ⇒ [<code>NodeService</code>](#NodeService)
+    * [.equalsShallow(other)](#HTMLElementService+equalsShallow) ⇒ <code>boolean</code>
     * [.click()](#HTMLElementService+click)
     * [.focus()](#HTMLElementService+focus)
     * [.blur()](#HTMLElementService+blur)
@@ -1847,12 +1875,43 @@ Simulate the HTMLElement object when the Dom is not available
 | [elementOptions.parent] | <code>PseudoNode</code> \| <code>Object</code> | <code>{}</code> | 
 | [elementOptions.children] | <code>Array</code> | <code>[]</code> | 
 
+<a name="HTMLElementService+style"></a>
+
+### htmlElementService.style ⇒ [<code>CSSStyleDeclarationService</code>](#CSSStyleDeclarationService)
+The element's inline styles: a live CSSStyleDeclaration-like object, so both style.setProperty('color', 'red')
+and style.color = 'red' work.
+
+**Kind**: instance property of [<code>HTMLElementService</code>](#HTMLElementService)  
+<a name="HTMLElementService+dataset"></a>
+
+### htmlElementService.dataset ⇒ <code>Object.&lt;string, string&gt;</code>
+The element's data-* attributes, live, under their camelCase names (data-foo-bar <-> dataset.fooBar). Backed
+directly by getAttribute / setAttribute, so it is never out of sync with the attributes themselves.
+
+**Kind**: instance property of [<code>HTMLElementService</code>](#HTMLElementService)  
 <a name="HTMLElementService+canFocus"></a>
 
 ### htmlElementService.canFocus ⇒ <code>boolean</code>
 Whether this element can have the focus: form controls and links which are not disabled, and anything with a tabindex.
 
 **Kind**: instance property of [<code>HTMLElementService</code>](#HTMLElementService)  
+<a name="HTMLElementService+cloneShallow"></a>
+
+### htmlElementService.cloneShallow() ⇒ [<code>NodeService</code>](#NodeService)
+Style is not attribute-backed like most properties (see the constructor), so cloneNode needs its own copy of it.
+
+**Kind**: instance method of [<code>HTMLElementService</code>](#HTMLElementService)  
+<a name="HTMLElementService+equalsShallow"></a>
+
+### htmlElementService.equalsShallow(other) ⇒ <code>boolean</code>
+Style is not attribute-backed like most properties, so isEqualNode needs to compare it separately too.
+
+**Kind**: instance method of [<code>HTMLElementService</code>](#HTMLElementService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| other | [<code>NodeService</code>](#NodeService) | The node to compare with |
+
 <a name="HTMLElementService+click"></a>
 
 ### htmlElementService.click()
@@ -3304,6 +3363,119 @@ Stops the propagation of events further along in the Dom.
 
 **Kind**: instance method of [<code>CustomEventService</code>](#CustomEventService)  
 **Overrides**: [<code>stopPropagation</code>](#EventService+stopPropagation)  
+<a name="CSSStyleDeclarationService"></a>
+
+## CSSStyleDeclarationService
+Simulate the behaviour of the CSSStyleDeclaration Class when there is no DOM available: an ordered map of CSS
+property/value pairs, parsed from and serialized back to a cssText string. Values are stored and returned as
+given, with no unit conversion, shorthand expansion or validation - this is a data structure, not a real CSS
+engine. Named property access (declaration.backgroundColor, camelCase) is added on top of this by
+createStyleDeclaration, which wraps an instance of this class in a Proxy.
+
+**Kind**: global class  
+**Author**: Joshua Heagle <joshuaheagle@gmail.com>  
+
+* [CSSStyleDeclarationService](#CSSStyleDeclarationService)
+    * [new CSSStyleDeclarationService([cssText])](#new_CSSStyleDeclarationService_new)
+    * [.length](#CSSStyleDeclarationService+length) ⇒ <code>number</code>
+    * [.cssText](#CSSStyleDeclarationService+cssText) ⇒ <code>string</code>
+    * [.cssText](#CSSStyleDeclarationService+cssText) ⇒ <code>undefined</code>
+    * [.item(index)](#CSSStyleDeclarationService+item) ⇒ <code>string</code>
+    * [.getPropertyValue(property)](#CSSStyleDeclarationService+getPropertyValue) ⇒ <code>string</code>
+    * [.getPropertyPriority(property)](#CSSStyleDeclarationService+getPropertyPriority) ⇒ <code>string</code>
+    * [.setProperty(property, value, [priority])](#CSSStyleDeclarationService+setProperty) ⇒ <code>undefined</code>
+    * [.removeProperty(property)](#CSSStyleDeclarationService+removeProperty) ⇒ <code>string</code>
+
+<a name="new_CSSStyleDeclarationService_new"></a>
+
+### new CSSStyleDeclarationService([cssText])
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [cssText] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | Initial declarations, as CSS text ("color: red; font-size: 12px;") |
+
+<a name="CSSStyleDeclarationService+length"></a>
+
+### cssStyleDeclarationService.length ⇒ <code>number</code>
+How many properties are currently set.
+
+**Kind**: instance property of [<code>CSSStyleDeclarationService</code>](#CSSStyleDeclarationService)  
+<a name="CSSStyleDeclarationService+cssText"></a>
+
+### cssStyleDeclarationService.cssText ⇒ <code>string</code>
+All the declarations as one CSS text string.
+
+**Kind**: instance property of [<code>CSSStyleDeclarationService</code>](#CSSStyleDeclarationService)  
+<a name="CSSStyleDeclarationService+cssText"></a>
+
+### cssStyleDeclarationService.cssText ⇒ <code>undefined</code>
+Replace every declaration by parsing a CSS text string ("color: red; font-size: 12px !important;").
+
+**Kind**: instance property of [<code>CSSStyleDeclarationService</code>](#CSSStyleDeclarationService)  
+
+| Param | Type |
+| --- | --- |
+| cssText | <code>string</code> | 
+
+<a name="CSSStyleDeclarationService+item"></a>
+
+### cssStyleDeclarationService.item(index) ⇒ <code>string</code>
+The name of the property at the given index, in the order it was set, or '' when there is none (matches the
+DOM's CSSStyleDeclaration, which is array-like).
+
+**Kind**: instance method of [<code>CSSStyleDeclarationService</code>](#CSSStyleDeclarationService)  
+
+| Param | Type |
+| --- | --- |
+| index | <code>number</code> | 
+
+<a name="CSSStyleDeclarationService+getPropertyValue"></a>
+
+### cssStyleDeclarationService.getPropertyValue(property) ⇒ <code>string</code>
+The value of the given property, or '' when it is not set.
+
+**Kind**: instance method of [<code>CSSStyleDeclarationService</code>](#CSSStyleDeclarationService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| property | <code>string</code> | A CSS property name (kebab-case, e.g. "background-color") |
+
+<a name="CSSStyleDeclarationService+getPropertyPriority"></a>
+
+### cssStyleDeclarationService.getPropertyPriority(property) ⇒ <code>string</code>
+"important" when the property was set with !important, otherwise ''.
+
+**Kind**: instance method of [<code>CSSStyleDeclarationService</code>](#CSSStyleDeclarationService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| property | <code>string</code> | A CSS property name (kebab-case) |
+
+<a name="CSSStyleDeclarationService+setProperty"></a>
+
+### cssStyleDeclarationService.setProperty(property, value, [priority]) ⇒ <code>undefined</code>
+Set a property's value (and optionally its priority). An empty, null or undefined value removes the property
+instead, like the DOM.
+
+**Kind**: instance method of [<code>CSSStyleDeclarationService</code>](#CSSStyleDeclarationService)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| property | <code>string</code> |  | A CSS property name (kebab-case) |
+| value | <code>string</code> |  | The value, or '' to remove the property |
+| [priority] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | "important" to mark it !important |
+
+<a name="CSSStyleDeclarationService+removeProperty"></a>
+
+### cssStyleDeclarationService.removeProperty(property) ⇒ <code>string</code>
+Remove a property, returning the value it had (or '' when it was not set).
+
+**Kind**: instance method of [<code>CSSStyleDeclarationService</code>](#CSSStyleDeclarationService)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| property | <code>string</code> | A CSS property name (kebab-case) |
+
 <a name="AttrService"></a>
 
 ## AttrService ⇐ [<code>NodeService</code>](#NodeService)
@@ -4443,6 +4615,28 @@ Walk up from a node (not including it) to find the nearest element, in the given
 | node | <code>\*</code> | The node to start from |
 | direction | <code>&#x27;nextSibling&#x27;</code> \| <code>&#x27;previousSibling&#x27;</code> | Which sibling reference to follow |
 
+<a name="kebabToCamel"></a>
+
+## kebabToCamel(name) ⇒ <code>string</code>
+kebab-case -> camelCase ("background-color" -> "backgroundColor").
+
+**Kind**: global function  
+
+| Param | Type |
+| --- | --- |
+| name | <code>string</code> | 
+
+<a name="camelToKebab"></a>
+
+## camelToKebab(name) ⇒ <code>string</code>
+camelCase -> kebab-case ("backgroundColor" -> "background-color").
+
+**Kind**: global function  
+
+| Param | Type |
+| --- | --- |
+| name | <code>string</code> | 
+
 <a name="createEvent"></a>
 
 ## createEvent(type, [init], [options]) ⇒ [<code>EventService</code>](#EventService)
@@ -4459,4 +4653,15 @@ real user action (isTrusted).
 | type | <code>string</code> |  | The type of the event, such as click |
 | [init] | <code>Object</code> | <code>{}</code> | The options for the event (bubbles, cancelable, composed and those of its kind of event) |
 | [options] | <code>CreateEventOptions</code> | <code>{}</code> | Whether the browser is creating the event, and whether it is trusted |
+
+<a name="dataAttributes"></a>
+
+## dataAttributes(element) ⇒ <code>Array.&lt;Array.&lt;string&gt;&gt;</code>
+Every data-* attribute name currently on the element, as [attributeName, camelCaseName] pairs.
+
+**Kind**: global function  
+
+| Param | Type |
+| --- | --- |
+| element | <code>\*</code> | 
 

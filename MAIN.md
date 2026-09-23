@@ -18,6 +18,13 @@ else, document fragments insert their children, and a node cannot be put inside 
 `DOMTokenListService`, `NamedNodeMapService`, `DocumentService` / `DocumentFragmentService`, `PseudoNodeList`, and
 `generateDocument` for creating a document.
 
+`style` is a real, live `CSSStyleDeclaration`: named property access (\`el.style.backgroundColor = 'red'\`) alongside
+\`getPropertyValue\` / \`setProperty\` / \`removeProperty\` / \`getPropertyPriority\` / \`cssText\`; an unset property
+reads as \`''\`, like the DOM's. \`dataset\` is a live `DOMStringMap`: reading/writing/deleting a camelCase name
+(\`el.dataset.fooBar\`) reads/writes/removes the matching \`data-foo-bar\` attribute directly, so it can never fall out
+of sync with the attributes themselves. Both are on \`HTMLElementService\`, matching the DOM (they are not on the base
+Element).
+
 Standard events: `createEvent(type, init, { browser, trusted })` makes the kind of event which suits the type (a click is a
 `MouseEvent`, a keydown a `KeyboardEvent`, ...). Like the constructor in a browser it gives nothing (no bubbling, no
 cancelling, not trusted) unless asked, but with `browser: true` it uses `eventDefaults`, the table of how the browser
