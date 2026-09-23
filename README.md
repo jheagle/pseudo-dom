@@ -144,10 +144,12 @@ if (typeof document === 'undefined') {
 }
 ```
 
-`installGlobal(target = globalThis)` fills in `document` / `Node` / `Element` / `HTMLElement` on `target`, using
+`installGlobal(target = globalThis)` fills in `document` / `Node` / `Element` / `HTMLElement` / `HTMLDocument` /
+`window` (a self-reference, like a real browser's) on `target`, using
 [browser-or-node](https://www.npmjs.com/package/browser-or-node) to check whether a real DOM (a real browser, or a
 jsdom-based test environment) is already there first - it's always safe to call, everywhere: it does nothing when
-one is.
+one is. `Node` / `Element` / `HTMLElement` / `HTMLDocument` are the classes themselves (not instances), so
+`x instanceof Element` works, matching the real DOM's.
 
 There's no real rendering to look at, so `logElement(node, [label])` prints a readable, indented view of a node's
 markup to the console (`prettyPrint(node, [indent])`, from the same module, returns the string instead of printing
@@ -5566,9 +5568,10 @@ context.
 
 * [generateDocument(root, context)](#generateDocument) ⇒ <code>Window</code> \| <code>PseudoEventTarget</code>
     * [~newWindow](#generateDocument..newWindow) : <code>Window</code> \| <code>PseudoEventTarget</code>
-    * [~Node](#generateDocument..Node) : <code>Node</code> \| <code>PseudoNode</code>
-    * [~Element](#generateDocument..Element) : <code>Element</code> \| <code>PseudoElement</code>
-    * [~HTMLElement](#generateDocument..HTMLElement) : <code>HTMLElement</code> \| <code>PseudoHTMLElement</code>
+    * [~Node](#generateDocument..Node) : <code>function</code>
+    * [~Element](#generateDocument..Element) : <code>function</code>
+    * [~HTMLElement](#generateDocument..HTMLElement) : <code>function</code>
+    * [~HTMLDocument](#generateDocument..HTMLDocument) : <code>function</code>
     * [~document](#generateDocument..document) : <code>Document</code> \| [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)
 
 <a name="generateDocument..newWindow"></a>
@@ -5577,22 +5580,35 @@ context.
 **Kind**: inner constant of [<code>generateDocument</code>](#generateDocument)  
 <a name="generateDocument..Node"></a>
 
-### generateDocument~Node : <code>Node</code> \| <code>PseudoNode</code>
+### generateDocument~Node : <code>function</code>
+The Node class itself (matching the DOM's window.Node), not an instance - the right-hand side of `instanceof`
+must be a constructor, so `x instanceof Node` needs this, not `new PseudoNode()`.
+
 **Kind**: inner constant of [<code>generateDocument</code>](#generateDocument)  
 <a name="generateDocument..Element"></a>
 
-### generateDocument~Element : <code>Element</code> \| <code>PseudoElement</code>
+### generateDocument~Element : <code>function</code>
+The Element class itself, for the same reason as Node.
+
 **Kind**: inner constant of [<code>generateDocument</code>](#generateDocument)  
 <a name="generateDocument..HTMLElement"></a>
 
-### generateDocument~HTMLElement : <code>HTMLElement</code> \| <code>PseudoHTMLElement</code>
-Create an instance of HTMLElement if not available
+### generateDocument~HTMLElement : <code>function</code>
+The HTMLElement class itself, for the same reason as Node.
+
+**Kind**: inner constant of [<code>generateDocument</code>](#generateDocument)  
+<a name="generateDocument..HTMLDocument"></a>
+
+### generateDocument~HTMLDocument : <code>function</code>
+The HTMLDocument class itself, for the same reason as Node (so `document instanceof HTMLDocument`, a common
+real-DOM-detection check, works).
 
 **Kind**: inner constant of [<code>generateDocument</code>](#generateDocument)  
 <a name="generateDocument..document"></a>
 
 ### generateDocument~document : <code>Document</code> \| [<code>PseudoHTMLDocument</code>](#PseudoHTMLDocument)
-Define document when not available
+Define document when not available - a real instance, unlike the classes above (window.document IS an object,
+not a constructor).
 
 **Kind**: inner constant of [<code>generateDocument</code>](#generateDocument)  
 <a name="nearestElementSibling"></a>

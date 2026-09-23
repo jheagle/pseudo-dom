@@ -5,15 +5,34 @@ import { HTMLElementService } from '../services/HTMLElementService'
 import PseudoHTMLDocument from '../classes/PseudoHTMLDocument'
 
 describe('generateDocument', () => {
-  test('with no real document, fills document / Node / Element / HTMLElement in on root, and merges them into a separate context', () => {
+  test('with no real document, fills document / Node / Element / HTMLElement / HTMLDocument in on root, and merges them into a separate context', () => {
     const root = {}
     const context = {}
     generateDocument(root, context)
     expect(root.document).toBeInstanceOf(PseudoHTMLDocument)
-    expect(root.Node).toBeInstanceOf(NodeService)
-    expect(root.Element).toBeInstanceOf(ElementService)
-    expect(root.HTMLElement).toBeInstanceOf(HTMLElementService)
+    // Node / Element / HTMLElement / HTMLDocument must be the classes themselves, not instances - the right-hand
+    // side of `instanceof` has to be a constructor, and real window.Node etc. are constructors too
+    expect(root.Node).toBe(NodeService)
+    expect(root.Element).toBe(ElementService)
+    expect(root.HTMLElement).toBe(HTMLElementService)
+    expect(root.HTMLDocument).toBe(PseudoHTMLDocument)
     expect(context.document).toBe(root.document)
+  })
+
+  test('document is a real instance you can use instanceof with, against the classes just installed', () => {
+    const root = {}
+    generateDocument(root)
+    expect(root.document instanceof root.HTMLDocument).toBe(true)
+    expect(root.document instanceof root.Node).toBe(true)
+  })
+
+  test('elements created through document.createElement satisfy instanceof Element / HTMLElement / Node', () => {
+    const root = {}
+    generateDocument(root)
+    const div = root.document.createElement('div')
+    expect(div instanceof root.Node).toBe(true)
+    expect(div instanceof root.Element).toBe(true)
+    expect(div instanceof root.HTMLElement).toBe(true)
   })
 
   test('with no context given, root is still mutated directly (context defaults to a separate object)', () => {

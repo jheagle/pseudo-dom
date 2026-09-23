@@ -15,6 +15,32 @@ describe('installGlobal', () => {
     expect(target.document.createElement('div')).toBeInstanceOf(HTMLElementService)
   })
 
+  test('Node / Element / HTMLElement / HTMLDocument are the classes themselves, so instanceof works', () => {
+    const target = {}
+    installGlobal(target)
+    const div = target.document.createElement('div')
+    expect(div instanceof target.Node).toBe(true)
+    expect(div instanceof target.Element).toBe(true)
+    expect(div instanceof target.HTMLElement).toBe(true)
+    expect(target.document instanceof target.HTMLDocument).toBe(true)
+  })
+
+  // Some code (matrix-dom's `void 0 || window || global || {}`, for example) checks for a bare `window` before
+  // falling back to `global` - without a typeof guard, that throws ReferenceError when window is not declared at
+  // all, so window needs to resolve to something (a self-reference, like a real browser's) too
+  test('window is a self-reference to the target, matching a real browser\'s global scope', () => {
+    const target = {}
+    installGlobal(target)
+    expect(target.window).toBe(target)
+  })
+
+  test('does not overwrite a real window already on the target', () => {
+    const realWindow = { real: true }
+    const target = { window: realWindow }
+    installGlobal(target)
+    expect(target.window).toBe(realWindow)
+  })
+
   test('does not overwrite a real document already on the target', () => {
     const realDocument = { real: true }
     const target = { document: realDocument }
@@ -34,5 +60,7 @@ describe('installGlobal', () => {
     delete globalThis.Node
     delete globalThis.Element
     delete globalThis.HTMLElement
+    delete globalThis.HTMLDocument
+    delete globalThis.window
   })
 })
