@@ -56,6 +56,13 @@ else, document fragments insert their children instead of themselves, and a node
 `localName` matches `tagName` and `prefix` is always `null` (there's no real namespace parsing);
 `getElementsByTagNameNS` behaves exactly like `getElementsByTagName`, ignoring the namespace.
 
+`getAttributeNode` / `setAttributeNode` / `removeAttributeNode` give and take real `Attr` nodes (backed by
+`AttrService`) instead of plain strings - `setAttributeNode` returns whatever `Attr` previously held that name (or
+`null` when it's new), and `removeAttributeNode` throws when the element has no attribute matching the one given, like
+the DOM's. Every `*NS` method (`getAttributeNS`, `hasAttributeNS`, `setAttributeNS`, `removeAttributeNS`,
+`getAttributeNodeNS`, `setAttributeNodeNS`) behaves exactly like its non-NS counterpart, ignoring the namespace
+argument entirely - there's no real namespace parsing here, matching `getElementsByTagNameNS`.
+
 **`style`** is a real, live `CSSStyleDeclaration`:
 
 - Named property access (`el.style.backgroundColor = 'red'`) alongside `getPropertyValue` / `setProperty` /
@@ -169,4 +176,3 @@ it) - useful for watching pseudo-dom-driven code run, or checking a final result
 ## Not implemented yet
 
 - The `aria*` reflected properties
-- The `Attr`-node / namespaced attribute methods (`getAttributeNode`, `getAttributeNS`, ...)
