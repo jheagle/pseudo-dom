@@ -66,6 +66,11 @@ the DOM's. Every `*NS` method (`getAttributeNS`, `hasAttributeNS`, `setAttribute
 `getAttributeNodeNS`, `setAttributeNodeNS`) behaves exactly like its non-NS counterpart, ignoring the namespace
 argument entirely - there's no real namespace parsing here, matching `getElementsByTagNameNS`.
 
+**Form controls** have a real `value` (`input`, `textarea`, `select`, `button`, `option`, `output`) and `checked`
+(`input`). Like the DOM's, they start from the `value` / `checked` attributes (a checkbox with no `value` reads
+`'on'`), and once set they stop following the attribute - setting them never changes the attribute. `value` is always
+a string, so `parseInt(input.value)` works on a number attribute. `cloneNode` keeps the current value and checkedness.
+
 **`style`** is a real, live `CSSStyleDeclaration`:
 
 - Named property access (`el.style.backgroundColor = 'red'`) alongside `getPropertyValue` / `setProperty` /
@@ -2437,9 +2442,14 @@ Simulate the behaviour of the HTMLElement Class when there is no DOM available.
     * [new HTMLElementService([elementOptions])](#new_HTMLElementService_new)
     * [.style](#HTMLElementService+style) ⇒ [<code>CSSStyleDeclarationService</code>](#CSSStyleDeclarationService)
     * [.dataset](#HTMLElementService+dataset) ⇒ <code>Object.&lt;string, string&gt;</code>
+    * [.value](#HTMLElementService+value) ⇒ <code>string</code> \| <code>undefined</code>
+    * [.checked](#HTMLElementService+checked) ⇒ <code>boolean</code> \| <code>undefined</code>
     * [.innerHTML](#HTMLElementService+innerHTML) ⇒ <code>undefined</code>
     * [.outerHTML](#HTMLElementService+outerHTML) ⇒ <code>undefined</code>
     * [.canFocus](#HTMLElementService+canFocus) ⇒ <code>boolean</code>
+    * [.hasValueProperty()](#HTMLElementService+hasValueProperty) ⇒ <code>boolean</code>
+    * [.hasCheckedProperty()](#HTMLElementService+hasCheckedProperty) ⇒ <code>boolean</code>
+    * [.setExpando(name, value)](#HTMLElementService+setExpando) ⇒ <code>undefined</code>
     * [.cloneShallow()](#HTMLElementService+cloneShallow) ⇒ [<code>NodeService</code>](#NodeService)
     * [.equalsShallow(other)](#HTMLElementService+equalsShallow) ⇒ <code>boolean</code>
     * [.parse(html)](#HTMLElementService+parse) ⇒ <code>Array.&lt;\*&gt;</code>
@@ -2475,6 +2485,21 @@ The element's data-* attributes, live, under their camelCase names (data-foo-bar
 directly by getAttribute / setAttribute, so it is never out of sync with the attributes themselves.
 
 **Kind**: instance property of [<code>HTMLElementService</code>](#HTMLElementService)  
+<a name="HTMLElementService+value"></a>
+
+### htmlElementService.value ⇒ <code>string</code> \| <code>undefined</code>
+The current value of a form control. Until it is set (or edited), it is the value attribute (the default value),
+or '' when there is none ('on' for a checkbox or radio); setting it never changes the attribute, like the DOM's.
+Only form controls (input, textarea, select, button, option, output) have one.
+
+**Kind**: instance property of [<code>HTMLElementService</code>](#HTMLElementService)  
+<a name="HTMLElementService+checked"></a>
+
+### htmlElementService.checked ⇒ <code>boolean</code> \| <code>undefined</code>
+Whether a checkbox or radio input is checked. Until it is set, it follows the checked attribute (which sets the
+default); setting it never changes the attribute, like the DOM's. Only input has one.
+
+**Kind**: instance property of [<code>HTMLElementService</code>](#HTMLElementService)  
 <a name="HTMLElementService+innerHTML"></a>
 
 ### htmlElementService.innerHTML ⇒ <code>undefined</code>
@@ -2505,10 +2530,35 @@ replaceWith. outerHTML's setter is here rather than on ElementService for the sa
 Whether this element can have the focus: form controls and links which are not disabled, and anything with a tabindex.
 
 **Kind**: instance property of [<code>HTMLElementService</code>](#HTMLElementService)  
+<a name="HTMLElementService+hasValueProperty"></a>
+
+### htmlElementService.hasValueProperty() ⇒ <code>boolean</code>
+Whether this tag has a `value` (the form controls which do).
+
+**Kind**: instance method of [<code>HTMLElementService</code>](#HTMLElementService)  
+<a name="HTMLElementService+hasCheckedProperty"></a>
+
+### htmlElementService.hasCheckedProperty() ⇒ <code>boolean</code>
+Whether this tag has a `checked` (only input does).
+
+**Kind**: instance method of [<code>HTMLElementService</code>](#HTMLElementService)  
+<a name="HTMLElementService+setExpando"></a>
+
+### htmlElementService.setExpando(name, value) ⇒ <code>undefined</code>
+Put a plain own property on the element, as assigning a property this element does not have does in the DOM.
+
+**Kind**: instance method of [<code>HTMLElementService</code>](#HTMLElementService)  
+
+| Param | Type |
+| --- | --- |
+| name | <code>string</code> | 
+| value | <code>\*</code> | 
+
 <a name="HTMLElementService+cloneShallow"></a>
 
 ### htmlElementService.cloneShallow() ⇒ [<code>NodeService</code>](#NodeService)
-Style is not attribute-backed like most properties (see the constructor), so cloneNode needs its own copy of it.
+Style is not attribute-backed like most properties (see the constructor), so cloneNode needs its own copy of it,
+and a form control keeps its current value and checkedness (as the DOM's cloneNode does).
 
 **Kind**: instance method of [<code>HTMLElementService</code>](#HTMLElementService)  
 <a name="HTMLElementService+equalsShallow"></a>

@@ -26,6 +26,8 @@ import { CSSStyleDeclarationService } from './CSSStyleDeclarationService';
 export declare class HTMLElementService extends ElementService implements Partial<PseudoHTMLElement> {
     private readonly styleDeclaration;
     private readonly datasetProxy;
+    private dirtyValue;
+    private dirtyChecked;
     /**
      * Simulate the HTMLElement object when the Dom is not available
      * @param {Object} [elementOptions={}]
@@ -54,7 +56,40 @@ export declare class HTMLElementService extends ElementService implements Partia
         [key: string]: string;
     };
     /**
-     * Style is not attribute-backed like most properties (see the constructor), so cloneNode needs its own copy of it.
+     * Whether this tag has a `value` (the form controls which do).
+     * @returns {boolean}
+     */
+    private hasValueProperty;
+    /**
+     * Whether this tag has a `checked` (only input does).
+     * @returns {boolean}
+     */
+    private hasCheckedProperty;
+    /**
+     * Put a plain own property on the element, as assigning a property this element does not have does in the DOM.
+     * @param {string} name
+     * @param {*} value
+     * @returns {undefined}
+     */
+    private setExpando;
+    /**
+     * The current value of a form control. Until it is set (or edited), it is the value attribute (the default value),
+     * or '' when there is none ('on' for a checkbox or radio); setting it never changes the attribute, like the DOM's.
+     * Only form controls (input, textarea, select, button, option, output) have one.
+     * @returns {string|undefined}
+     */
+    get value(): string | undefined;
+    set value(value: string | undefined);
+    /**
+     * Whether a checkbox or radio input is checked. Until it is set, it follows the checked attribute (which sets the
+     * default); setting it never changes the attribute, like the DOM's. Only input has one.
+     * @returns {boolean|undefined}
+     */
+    get checked(): boolean | undefined;
+    set checked(checked: boolean | undefined);
+    /**
+     * Style is not attribute-backed like most properties (see the constructor), so cloneNode needs its own copy of it,
+     * and a form control keeps its current value and checkedness (as the DOM's cloneNode does).
      * @returns {NodeService}
      */
     protected cloneShallow(): NodeService;

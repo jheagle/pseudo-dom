@@ -66,6 +66,11 @@ the DOM's. Every `*NS` method (`getAttributeNS`, `hasAttributeNS`, `setAttribute
 `getAttributeNodeNS`, `setAttributeNodeNS`) behaves exactly like its non-NS counterpart, ignoring the namespace
 argument entirely - there's no real namespace parsing here, matching `getElementsByTagNameNS`.
 
+**Form controls** have a real `value` (`input`, `textarea`, `select`, `button`, `option`, `output`) and `checked`
+(`input`). Like the DOM's, they start from the `value` / `checked` attributes (a checkbox with no `value` reads
+`'on'`), and once set they stop following the attribute - setting them never changes the attribute. `value` is always
+a string, so `parseInt(input.value)` works on a number attribute. `cloneNode` keeps the current value and checkedness.
+
 **`style`** is a real, live `CSSStyleDeclaration`:
 
 - Named property access (`el.style.backgroundColor = 'red'`) alongside `getPropertyValue` / `setProperty` /
