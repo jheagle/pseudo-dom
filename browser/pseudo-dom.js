@@ -3908,6 +3908,8 @@
           parent,
           children
         })
+        this.dirtyValue = null
+        this.dirtyChecked = null
         this.styleDeclaration = (0, createStyleDeclaration_1.default)()
         this.datasetProxy = (0, createDataset_1.default)(this)
       }
@@ -3931,12 +3933,94 @@
       }
 
       /**
-   * Style is not attribute-backed like most properties (see the constructor), so cloneNode needs its own copy of it.
+   * Whether this tag has a `value` (the form controls which do).
+   * @returns {boolean}
+   */
+      hasValueProperty () {
+        return ['input', 'textarea', 'select', 'button', 'option', 'output'].indexOf(this.tagName.toLowerCase()) >= 0
+      }
+
+      /**
+   * Whether this tag has a `checked` (only input does).
+   * @returns {boolean}
+   */
+      hasCheckedProperty () {
+        return this.tagName.toLowerCase() === 'input'
+      }
+
+      /**
+   * Put a plain own property on the element, as assigning a property this element does not have does in the DOM.
+   * @param {string} name
+   * @param {*} value
+   * @returns {undefined}
+   */
+      setExpando (name, value) {
+        Object.defineProperty(this, name, {
+          value,
+          writable: true,
+          configurable: true,
+          enumerable: true
+        })
+      }
+
+      /**
+   * The current value of a form control. Until it is set (or edited), it is the value attribute (the default value),
+   * or '' when there is none ('on' for a checkbox or radio); setting it never changes the attribute, like the DOM's.
+   * Only form controls (input, textarea, select, button, option, output) have one.
+   * @returns {string|undefined}
+   */
+      get value () {
+        if (!this.hasValueProperty()) {
+          return undefined
+        }
+        if (this.dirtyValue !== null) {
+          return this.dirtyValue
+        }
+        const attribute = this.getAttribute('value')
+        if (attribute !== null) {
+          return String(attribute)
+        }
+        return this.tagName.toLowerCase() === 'input' && /^(checkbox|radio)$/i.test(String(this.getAttribute('type'))) ? 'on' : ''
+      }
+
+      set value (value) {
+        if (this.hasValueProperty()) {
+          this.dirtyValue = String(value)
+        } else {
+          this.setExpando('value', value)
+        }
+      }
+
+      /**
+   * Whether a checkbox or radio input is checked. Until it is set, it follows the checked attribute (which sets the
+   * default); setting it never changes the attribute, like the DOM's. Only input has one.
+   * @returns {boolean|undefined}
+   */
+      get checked () {
+        if (!this.hasCheckedProperty()) {
+          return undefined
+        }
+        return this.dirtyChecked !== null ? this.dirtyChecked : this.hasAttribute('checked')
+      }
+
+      set checked (checked) {
+        if (this.hasCheckedProperty()) {
+          this.dirtyChecked = Boolean(checked)
+        } else {
+          this.setExpando('checked', checked)
+        }
+      }
+
+      /**
+   * Style is not attribute-backed like most properties (see the constructor), so cloneNode needs its own copy of it,
+   * and a form control keeps its current value and checkedness (as the DOM's cloneNode does).
    * @returns {NodeService}
    */
       cloneShallow () {
         const copy = super.cloneShallow()
         copy.style.cssText = this.style.cssText
+        copy.dirtyValue = this.dirtyValue
+        copy.dirtyChecked = this.dirtyChecked
         return copy
       }
 
