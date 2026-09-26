@@ -1,8 +1,6 @@
 /**
  * A live DOMStringMap-like object for an element's data-* attributes.
- * @memberOf module:factories
- * @param {*} element The element whose data-* attributes this reflects
- * @returns {Object.<string, string>}
+ * @param element The element whose data-* attributes this reflects
  */
 declare const createDataset: (element: any) => {
     [key: string]: string;

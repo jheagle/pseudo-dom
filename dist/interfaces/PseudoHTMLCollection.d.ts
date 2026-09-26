@@ -10,14 +10,12 @@ export interface PseudoHTMLCollection extends Iterable<PseudoElement> {
     get length(): number;
     /**
      * The element at the given index, or null when there is none.
-     * @param {number} index
-     * @returns {PseudoElement|null}
+     * @param index
      */
     item(index: number): PseudoElement | null;
     /**
      * The element whose id, or whose name attribute, is the given value, or null when there is none.
-     * @param {string} name
-     * @returns {PseudoElement|null}
+     * @param name
      */
     namedItem(name: string): PseudoElement | null;
 }

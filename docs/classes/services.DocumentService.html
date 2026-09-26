@@ -1,0 +1,1307 @@
+<!DOCTYPE html><html class="default" lang="en" data-base="../"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>DocumentService | pseudo-dom</title><meta name="description" content="Documentation for pseudo-dom"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/icons.js" id="tsd-icons-script"></script><script async src="../assets/search.js" id="tsd-search-script"></script><script async src="../assets/navigation.js" id="tsd-nav-script"></script><script async src="../assets/hierarchy.js" id="tsd-hierarchy-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => window.app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar">
+<div class="tsd-toolbar-contents container"><a href="../index.html" class="title">pseudo-dom</a>
+<div id="tsd-toolbar-links"></div><button id="tsd-search-trigger" class="tsd-widget" aria-label="Search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-search"></use></svg></button><dialog id="tsd-search" aria-label="Search"><input role="combobox" id="tsd-search-input" aria-controls="tsd-search-results" aria-autocomplete="list" aria-expanded="true" autocapitalize="off" autocomplete="off" placeholder="Search the docs" maxLength="100"/>
+<ul role="listbox" id="tsd-search-results"></ul>
+<div id="tsd-search-status" aria-live="polite" aria-atomic="true">
+<div>Preparing search index...</div></div></dialog><a href="#" class="tsd-widget menu" id="tsd-toolbar-menu-trigger" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-menu"></use></svg></a></div></header>
+<div class="container container-main">
+<div class="col-content">
+<div class="tsd-page-title">
+<ul class="tsd-breadcrumb" aria-label="Breadcrumb">
+<li><a href="../modules/services.html">services</a></li>
+<li><a href="" aria-current="page">DocumentService</a></li></ul>
+<h1>Class DocumentService</h1></div>
+<section class="tsd-panel tsd-comment">
+<div class="tsd-comment tsd-typography"><p>Simulate the behaviour of the Document Class when there is no DOM available.</p>
+</div></section>
+<section class="tsd-panel tsd-hierarchy" data-refl="2773">
+<h4>Hierarchy (<a href="../hierarchy.html#services.DocumentService">View Summary</a>)</h4>
+<ul class="tsd-hierarchy">
+<li class="tsd-hierarchy-item"><a href="services.NodeService.html" class="tsd-signature-type tsd-kind-class">NodeService</a>
+<ul class="tsd-hierarchy">
+<li class="tsd-hierarchy-item"><span class="tsd-hierarchy-target">DocumentService</span>
+<ul class="tsd-hierarchy">
+<li class="tsd-hierarchy-item"><a href="classes.PseudoHTMLDocument.html" class="tsd-signature-type tsd-kind-class">PseudoHTMLDocument</a></li></ul></li></ul></li></ul></section>
+<section class="tsd-panel">
+<h4>Implements</h4>
+<ul class="tsd-hierarchy">
+<li><a href="../interfaces/interfaces.PseudoDocument.html" class="tsd-signature-type tsd-kind-interface">PseudoDocument</a></li></ul></section><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/DocumentService.ts#L11">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/DocumentService.ts:11</a></li></ul></aside>
+<section class="tsd-panel-group tsd-index-group">
+<section class="tsd-panel tsd-index-panel">
+<details class="tsd-index-content tsd-accordion" open><summary class="tsd-accordion-summary tsd-index-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h5 class="tsd-index-heading uppercase">Index</h5></summary>
+<div class="tsd-accordion-details">
+<section class="tsd-index-section">
+<h3 class="tsd-index-heading tsd-anchor-link" id="constructors">Constructors<a href="#constructors" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-index-list"><a href="#constructor" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Constructor"><use href="../assets/icons.svg#icon-512"></use></svg><span>constructor</span></a>
+</div></section>
+<section class="tsd-index-section">
+<h3 class="tsd-index-heading tsd-anchor-link" id="properties">Properties<a href="#properties" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-index-list"><a href="#childlist" class="tsd-index-link tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>child<wbr/>List</span></a>
+<a href="#listlinker" class="tsd-index-link tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>list<wbr/>Linker</span></a>
+<a href="#nodenamevalue" class="tsd-index-link tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>node<wbr/>Name<wbr/>Value</span></a>
+<a href="#ownerdocumentstore" class="tsd-index-link tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>owner<wbr/>Document<wbr/>Store</span></a>
+<a href="#parent" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>parent</span></a>
+<a href="#attribute_node" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>ATTRIBUTE_<wbr/>NODE</span></a>
+<a href="#cdata_section_node" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>CDATA_<wbr/>SECTION_<wbr/>NODE</span></a>
+<a href="#comment_node" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>COMMENT_<wbr/>NODE</span></a>
+<a href="#default_node" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>DEFAULT_<wbr/>NODE</span></a>
+<a href="#document_fragment_node" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>DOCUMENT_<wbr/>FRAGMENT_<wbr/>NODE</span></a>
+<a href="#document_node" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>DOCUMENT_<wbr/>NODE</span></a>
+<a href="#document_position_contained_by" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>DOCUMENT_<wbr/>POSITION_<wbr/>CONTAINED_<wbr/>BY</span></a>
+<a href="#document_position_contains" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>DOCUMENT_<wbr/>POSITION_<wbr/>CONTAINS</span></a>
+<a href="#document_position_disconnected" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>DOCUMENT_<wbr/>POSITION_<wbr/>DISCONNECTED</span></a>
+<a href="#document_position_following" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>DOCUMENT_<wbr/>POSITION_<wbr/>FOLLOWING</span></a>
+<a href="#document_position_implementation_specific" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>DOCUMENT_<wbr/>POSITION_<wbr/>IMPLEMENTATION_<wbr/>SPECIFIC</span></a>
+<a href="#document_position_preceding" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>DOCUMENT_<wbr/>POSITION_<wbr/>PRECEDING</span></a>
+<a href="#document_type_node" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>DOCUMENT_<wbr/>TYPE_<wbr/>NODE</span></a>
+<a href="#element_node" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>ELEMENT_<wbr/>NODE</span></a>
+<a href="#entity_node" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>ENTITY_<wbr/>NODE</span></a>
+<a href="#entity_reference_node" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>ENTITY_<wbr/>REFERENCE_<wbr/>NODE</span></a>
+<a href="#notation_node" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>NOTATION_<wbr/>NODE</span></a>
+<a href="#processing_instruction_node" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>PROCESSING_<wbr/>INSTRUCTION_<wbr/>NODE</span></a>
+<a href="#text_node" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>TEXT_<wbr/>NODE</span></a>
+</div></section>
+<section class="tsd-index-section">
+<h3 class="tsd-index-heading tsd-anchor-link" id="accessors">Accessors<a href="#accessors" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-index-list"><a href="#acceptschildren" class="tsd-index-link tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>accepts<wbr/>Children</span></a>
+<a href="#baseuri" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>base<wbr/>URI</span></a>
+<a href="#childnodes" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>child<wbr/>Nodes</span></a>
+<a href="#firstchild" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>first<wbr/>Child</span></a>
+<a href="#isconnected" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>is<wbr/>Connected</span></a>
+<a href="#lastchild" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>last<wbr/>Child</span></a>
+<a href="#nextsibling" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>next<wbr/>Sibling</span></a>
+<a href="#nodename" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>node<wbr/>Name</span></a>
+<a href="#nodetype" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>node<wbr/>Type</span></a>
+<a href="#nodevalue" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>node<wbr/>Value</span></a>
+<a href="#ownerdocument" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>owner<wbr/>Document</span></a>
+<a href="#parentelement" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>parent<wbr/>Element</span></a>
+<a href="#parentnode" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>parent<wbr/>Node</span></a>
+<a href="#previoussibling" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>previous<wbr/>Sibling</span></a>
+<a href="#textcontent" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>text<wbr/>Content</span></a>
+</div></section>
+<section class="tsd-index-section">
+<h3 class="tsd-index-heading tsd-anchor-link" id="methods">Methods<a href="#methods" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-index-list"><a href="#addeventlistener" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>add<wbr/>Event<wbr/>Listener</span></a>
+<a href="#after" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>after</span></a>
+<a href="#append" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>append</span></a>
+<a href="#appendchild" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>append<wbr/>Child</span></a>
+<a href="#before" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>before</span></a>
+<a href="#childinserted" class="tsd-index-link tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>child<wbr/>Inserted</span></a>
+<a href="#clonenode" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>clone<wbr/>Node</span></a>
+<a href="#cloneshallow" class="tsd-index-link tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>clone<wbr/>Shallow</span></a>
+<a href="#comparedocumentposition" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>compare<wbr/>Document<wbr/>Position</span></a>
+<a href="#contains" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>contains</span></a>
+<a href="#createcomment" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>create<wbr/>Comment</span></a>
+<a href="#createdocumentfragment" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>create<wbr/>Document<wbr/>Fragment</span></a>
+<a href="#createelement" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>create<wbr/>Element</span></a>
+<a href="#createtextnode" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>create<wbr/>Text<wbr/>Node</span></a>
+<a href="#dispatchevent" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>dispatch<wbr/>Event</span></a>
+<a href="#equalsshallow" class="tsd-index-link tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>equals<wbr/>Shallow</span></a>
+<a href="#getelementbyid" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Element<wbr/>By<wbr/>Id</span></a>
+<a href="#getelementsbyclassname" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Elements<wbr/>By<wbr/>Class<wbr/>Name</span></a>
+<a href="#getelementsbytagname" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Elements<wbr/>By<wbr/>Tag<wbr/>Name</span></a>
+<a href="#getelementsbytagnamens" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Elements<wbr/>By<wbr/>Tag<wbr/>Name<wbr/>NS</span></a>
+<a href="#getrootnode" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Root<wbr/>Node</span></a>
+<a href="#haschildnodes" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>has<wbr/>Child<wbr/>Nodes</span></a>
+<a href="#insertbefore" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>insert<wbr/>Before</span></a>
+<a href="#isdefaultnamespace" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>is<wbr/>Default<wbr/>Namespace</span></a>
+<a href="#isequalnode" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>is<wbr/>Equal<wbr/>Node</span></a>
+<a href="#issamenode" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>is<wbr/>Same<wbr/>Node</span></a>
+<a href="#lookupnamespaceuri" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>lookup<wbr/>Namespace<wbr/>URI</span></a>
+<a href="#lookupprefix" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>lookup<wbr/>Prefix</span></a>
+<a href="#normalize" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>normalize</span></a>
+<a href="#prepend" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>prepend</span></a>
+<a href="#queryselector" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>query<wbr/>Selector</span></a>
+<a href="#queryselectorall" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>query<wbr/>Selector<wbr/>All</span></a>
+<a href="#remove" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>remove</span></a>
+<a href="#removechild" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>remove<wbr/>Child</span></a>
+<a href="#removeeventlistener" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>remove<wbr/>Event<wbr/>Listener</span></a>
+<a href="#replacechild" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>replace<wbr/>Child</span></a>
+<a href="#replacechildren" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>replace<wbr/>Children</span></a>
+<a href="#replacewith" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>replace<wbr/>With</span></a>
+<a href="#setdefaultevent" class="tsd-index-link tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>set<wbr/>Default<wbr/>Event</span></a>
+</div></section></div></details></section></section>
+<details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Constructors"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h2 class="tsd-anchor-link" id="constructors-1">Constructors<a href="#constructors-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2></summary>
+<section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="constructor"><span>constructor</span><a href="#constructor" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="">
+<div class="tsd-signature tsd-anchor-link" id="constructordocumentservice"><span class="tsd-signature-keyword">new</span> <span class="tsd-kind-constructor-signature">DocumentService</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <a href="" class="tsd-signature-type tsd-kind-class">DocumentService</a><a href="#constructordocumentservice" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">DocumentService</a></h4><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#constructor">constructor</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L52">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:52</a></li></ul></aside></div></li></ul></section></section></details>
+<details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Properties"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h2 class="tsd-anchor-link" id="properties-1">Properties<a href="#properties-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2></summary>
+<section>
+<section class="tsd-panel tsd-member tsd-is-protected tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="childlist"><code class="tsd-tag">Protected</code><span>child<wbr/>List</span><a href="#childlist" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">childList</span><span class="tsd-signature-symbol">:</span> <a href="classes.PseudoNodeList.html" class="tsd-signature-type tsd-kind-class">PseudoNodeList</a> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">LinkedTreeList</span></div>
+<div class="tsd-comment tsd-typography"><p>The raw list of every child node (all types), used to implement childNodes/firstChild/lastChild/insertBefore/removeChild. Not the same thing as Element.children (an HTMLCollection of just the element children).</p>
+</div><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#childlist">childList</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L41">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:41</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-protected tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="listlinker"><code class="tsd-tag">Protected</code><span>list<wbr/>Linker</span><a href="#listlinker" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">listLinker</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">TreeLinker</span></div>
+<div class="tsd-comment tsd-typography"><p>The linker which holds this node in the children list of its parent, from which its siblings are found (null while it has no parent).</p>
+</div><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#listlinker">listLinker</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L50">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:50</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-protected tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="nodenamevalue"><code class="tsd-tag">Protected</code><span>node<wbr/>Name<wbr/>Value</span><a href="#nodenamevalue" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">nodeNameValue</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#nodenamevalue">nodeNameValue</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L43">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:43</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-protected tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="ownerdocumentstore"><code class="tsd-tag">Protected</code><span>owner<wbr/>Document<wbr/>Store</span><a href="#ownerdocumentstore" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">ownerDocumentStore</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/interfaces.PseudoDocument.html" class="tsd-signature-type tsd-kind-interface">PseudoDocument</a></div>
+<div class="tsd-comment tsd-typography"><p>The document which made this node (createElement and the like), for when it is not in a tree yet.</p>
+</div><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#ownerdocumentstore">ownerDocumentStore</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L46">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:46</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="parent"><span>parent</span><a href="#parent" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">parent</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a></div><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#parent">parent</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L42">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:42</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="attribute_node"><code class="tsd-tag">Static</code> <code class="tsd-tag">Readonly</code><span>ATTRIBUTE_<wbr/>NODE</span><a href="#attribute_node" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">ATTRIBUTE_NODE</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">2</span></div><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#attribute_node">ATTRIBUTE_NODE</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L22">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:22</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="cdata_section_node"><code class="tsd-tag">Static</code> <code class="tsd-tag">Readonly</code><span>CDATA_<wbr/>SECTION_<wbr/>NODE</span><a href="#cdata_section_node" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">CDATA_SECTION_NODE</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">4</span></div><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#cdata_section_node">CDATA_SECTION_NODE</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L24">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:24</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="comment_node"><code class="tsd-tag">Static</code> <code class="tsd-tag">Readonly</code><span>COMMENT_<wbr/>NODE</span><a href="#comment_node" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">COMMENT_NODE</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">8</span></div><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#comment_node">COMMENT_NODE</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L28">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:28</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="default_node"><code class="tsd-tag">Static</code> <code class="tsd-tag">Readonly</code><span>DEFAULT_<wbr/>NODE</span><a href="#default_node" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">DEFAULT_NODE</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">0</span></div><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#default_node">DEFAULT_NODE</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L20">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:20</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="document_fragment_node"><code class="tsd-tag">Static</code> <code class="tsd-tag">Readonly</code><span>DOCUMENT_<wbr/>FRAGMENT_<wbr/>NODE</span><a href="#document_fragment_node" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">DOCUMENT_FRAGMENT_NODE</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">11</span></div><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#document_fragment_node">DOCUMENT_FRAGMENT_NODE</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L31">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:31</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="document_node"><code class="tsd-tag">Static</code> <code class="tsd-tag">Readonly</code><span>DOCUMENT_<wbr/>NODE</span><a href="#document_node" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">DOCUMENT_NODE</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">9</span></div><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#document_node">DOCUMENT_NODE</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L29">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:29</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="document_position_contained_by"><code class="tsd-tag">Static</code> <code class="tsd-tag">Readonly</code><span>DOCUMENT_<wbr/>POSITION_<wbr/>CONTAINED_<wbr/>BY</span><a href="#document_position_contained_by" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">DOCUMENT_POSITION_CONTAINED_BY</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">16</span></div><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#document_position_contained_by">DOCUMENT_POSITION_CONTAINED_BY</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L37">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:37</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="document_position_contains"><code class="tsd-tag">Static</code> <code class="tsd-tag">Readonly</code><span>DOCUMENT_<wbr/>POSITION_<wbr/>CONTAINS</span><a href="#document_position_contains" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">DOCUMENT_POSITION_CONTAINS</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">8</span></div><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#document_position_contains">DOCUMENT_POSITION_CONTAINS</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L36">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:36</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="document_position_disconnected"><code class="tsd-tag">Static</code> <code class="tsd-tag">Readonly</code><span>DOCUMENT_<wbr/>POSITION_<wbr/>DISCONNECTED</span><a href="#document_position_disconnected" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">DOCUMENT_POSITION_DISCONNECTED</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">1</span></div><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#document_position_disconnected">DOCUMENT_POSITION_DISCONNECTED</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L33">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:33</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="document_position_following"><code class="tsd-tag">Static</code> <code class="tsd-tag">Readonly</code><span>DOCUMENT_<wbr/>POSITION_<wbr/>FOLLOWING</span><a href="#document_position_following" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">DOCUMENT_POSITION_FOLLOWING</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">4</span></div><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#document_position_following">DOCUMENT_POSITION_FOLLOWING</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L35">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:35</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="document_position_implementation_specific"><code class="tsd-tag">Static</code> <code class="tsd-tag">Readonly</code><span>DOCUMENT_<wbr/>POSITION_<wbr/>IMPLEMENTATION_<wbr/>SPECIFIC</span><a href="#document_position_implementation_specific" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">32</span></div><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#document_position_implementation_specific">DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L38">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:38</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="document_position_preceding"><code class="tsd-tag">Static</code> <code class="tsd-tag">Readonly</code><span>DOCUMENT_<wbr/>POSITION_<wbr/>PRECEDING</span><a href="#document_position_preceding" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">DOCUMENT_POSITION_PRECEDING</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">2</span></div><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#document_position_preceding">DOCUMENT_POSITION_PRECEDING</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L34">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:34</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="document_type_node"><code class="tsd-tag">Static</code> <code class="tsd-tag">Readonly</code><span>DOCUMENT_<wbr/>TYPE_<wbr/>NODE</span><a href="#document_type_node" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">DOCUMENT_TYPE_NODE</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">10</span></div><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#document_type_node">DOCUMENT_TYPE_NODE</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L30">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:30</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="element_node"><code class="tsd-tag">Static</code> <code class="tsd-tag">Readonly</code><span>ELEMENT_<wbr/>NODE</span><a href="#element_node" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">ELEMENT_NODE</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">1</span></div><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#element_node">ELEMENT_NODE</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L21">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:21</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="entity_node"><code class="tsd-tag">Static</code> <code class="tsd-tag">Readonly</code><span>ENTITY_<wbr/>NODE</span><a href="#entity_node" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">ENTITY_NODE</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">6</span></div><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#entity_node">ENTITY_NODE</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L26">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:26</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="entity_reference_node"><code class="tsd-tag">Static</code> <code class="tsd-tag">Readonly</code><span>ENTITY_<wbr/>REFERENCE_<wbr/>NODE</span><a href="#entity_reference_node" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">ENTITY_REFERENCE_NODE</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">5</span></div><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#entity_reference_node">ENTITY_REFERENCE_NODE</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L25">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:25</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="notation_node"><code class="tsd-tag">Static</code> <code class="tsd-tag">Readonly</code><span>NOTATION_<wbr/>NODE</span><a href="#notation_node" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">NOTATION_NODE</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">12</span></div><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#notation_node">NOTATION_NODE</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L32">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:32</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="processing_instruction_node"><code class="tsd-tag">Static</code> <code class="tsd-tag">Readonly</code><span>PROCESSING_<wbr/>INSTRUCTION_<wbr/>NODE</span><a href="#processing_instruction_node" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">PROCESSING_INSTRUCTION_NODE</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">7</span></div><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#processing_instruction_node">PROCESSING_INSTRUCTION_NODE</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L27">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:27</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="text_node"><code class="tsd-tag">Static</code> <code class="tsd-tag">Readonly</code><span>TEXT_<wbr/>NODE</span><a href="#text_node" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">TEXT_NODE</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">3</span></div><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#text_node">TEXT_NODE</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L23">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:23</a></li></ul></aside></section></section></details>
+<details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Accessors"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h2 class="tsd-anchor-link" id="accessors-1">Accessors<a href="#accessors-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2></summary>
+<section>
+<section class="tsd-panel tsd-member tsd-is-protected tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="acceptschildren"><code class="tsd-tag">Protected</code><span>accepts<wbr/>Children</span><a href="#acceptschildren" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-protected tsd-is-inherited">
+<li>
+<div class="tsd-signature" id="acceptschildrenacceptschildren"><span class="tsd-signature-keyword">get</span> <span class="tsd-kind-get-signature">acceptsChildren</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Whether this kind of node can have children (text, comments and attributes cannot).</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><aside class="tsd-sources">
+<p>Inherited from NodeService.acceptsChildren</p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L167">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:167</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="baseuri"><span>base<wbr/>URI</span><a href="#baseuri" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li>
+<div class="tsd-signature" id="baseuribaseuri"><span class="tsd-signature-keyword">get</span> <span class="tsd-kind-get-signature">baseURI</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">Location</span></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Returns a string representing the base URL of the document containing the Node.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">Location</span></h4><aside class="tsd-sources">
+<p>Implementation of PseudoDocument.baseURI</p>
+<p>Inherited from NodeService.baseURI</p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L63">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:63</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="childnodes"><span>child<wbr/>Nodes</span><a href="#childnodes" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li>
+<div class="tsd-signature" id="childnodeschildnodes"><span class="tsd-signature-keyword">get</span> <span class="tsd-kind-get-signature">childNodes</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <a href="classes.PseudoNodeList.html" class="tsd-signature-type tsd-kind-class">PseudoNodeList</a> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">LinkedTreeList</span></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Returns a live NodeList containing all the children of this node (including elements, text and comments). NodeList being live means that if the children of the Node change, the NodeList object is automatically updated.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <a href="classes.PseudoNodeList.html" class="tsd-signature-type tsd-kind-class">PseudoNodeList</a> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">LinkedTreeList</span></h4><aside class="tsd-sources">
+<p>Implementation of PseudoDocument.childNodes</p>
+<p>Inherited from NodeService.childNodes</p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L67">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:67</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="firstchild"><span>first<wbr/>Child</span><a href="#firstchild" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li>
+<div class="tsd-signature" id="firstchildfirstchild"><span class="tsd-signature-keyword">get</span> <span class="tsd-kind-get-signature">firstChild</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Returns a Node representing the first direct child node of the node, or null if the node has no child.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a></h4><aside class="tsd-sources">
+<p>Implementation of PseudoDocument.firstChild</p>
+<p>Inherited from NodeService.firstChild</p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L71">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:71</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="isconnected"><span>is<wbr/>Connected</span><a href="#isconnected" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li>
+<div class="tsd-signature" id="isconnectedisconnected"><span class="tsd-signature-keyword">get</span> <span class="tsd-kind-get-signature">isConnected</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>A boolean indicating whether or not the Node is connected (directly or indirectly) to the context object, e.g. the Document object in the case of the normal DOM, or the ShadowRoot in the case of a shadow DOM.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><aside class="tsd-sources">
+<p>Implementation of PseudoDocument.isConnected</p>
+<p>Inherited from NodeService.isConnected</p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L75">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:75</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="lastchild"><span>last<wbr/>Child</span><a href="#lastchild" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li>
+<div class="tsd-signature" id="lastchildlastchild"><span class="tsd-signature-keyword">get</span> <span class="tsd-kind-get-signature">lastChild</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Returns a Node representing the last direct child node of the node, or null if the node has no child.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a></h4><aside class="tsd-sources">
+<p>Implementation of PseudoDocument.lastChild</p>
+<p>Inherited from NodeService.lastChild</p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L80">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:80</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="nextsibling"><span>next<wbr/>Sibling</span><a href="#nextsibling" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li>
+<div class="tsd-signature" id="nextsiblingnextsibling"><span class="tsd-signature-keyword">get</span> <span class="tsd-kind-get-signature">nextSibling</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Returns a Node representing the next node in the tree, or null if there isn't such node.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a></h4><aside class="tsd-sources">
+<p>Implementation of PseudoDocument.nextSibling</p>
+<p>Inherited from NodeService.nextSibling</p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L84">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:84</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="nodename"><span>node<wbr/>Name</span><a href="#nodename" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li>
+<div class="tsd-signature" id="nodenamenodename"><span class="tsd-signature-keyword">get</span> <span class="tsd-kind-get-signature">nodeName</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Returns a string containing the name of the Node. The structure of the name will differ with the node type. E.g. An HTMLElement will contain the name of the corresponding tag, like 'audio' for an HTMLAudioElement, a Text node will have the '#text' string, or a Document node will have the '#document' string.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4><aside class="tsd-sources">
+<p>Implementation of PseudoDocument.nodeName</p>
+<p>Overrides NodeService.nodeName</p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/DocumentService.ts#L12">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/DocumentService.ts:12</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="nodetype"><span>node<wbr/>Type</span><a href="#nodetype" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li>
+<div class="tsd-signature" id="nodetypenodetype"><span class="tsd-signature-keyword">get</span> <span class="tsd-kind-get-signature">nodeType</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Returns an unsigned short representing the type of the node. Possible values are:</p>
+<hr>
+<p>|  Name                         | Value |
+|----------------------------------------
+|  ELEMENT_NODE                 |   1   |
+|  ATTRIBUTE_NODE               |   2   |
+|  TEXT_NODE                    |   3   |
+|  CDATA_SECTION_NODE           |   4   |
+|  PROCESSING_INSTRUCTION_NODE  |   7   |
+|  COMMENT_NODE                 |   8   |
+|  DOCUMENT_NODE                |   9   |
+|  DOCUMENT_TYPE_NODE           |  10   |
+|  DOCUMENT_FRAGMENT_NODE       |  11   |</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4><aside class="tsd-sources">
+<p>Implementation of PseudoDocument.nodeType</p>
+<p>Overrides NodeService.nodeType</p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/DocumentService.ts#L16">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/DocumentService.ts:16</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="nodevalue"><span>node<wbr/>Value</span><a href="#nodevalue" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li>
+<div class="tsd-signature" id="nodevaluenodevalue"><span class="tsd-signature-keyword">get</span> <span class="tsd-kind-get-signature">nodeValue</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Returns the value of the current node.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4><aside class="tsd-sources">
+<p>Implementation of PseudoDocument.nodeValue</p>
+<p>Inherited from NodeService.nodeValue</p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L96">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:96</a></li></ul></aside></div></li>
+<li>
+<div class="tsd-signature" id="nodevaluenodevalue-1"><span class="tsd-signature-keyword">set</span> <span class="tsd-kind-set-signature">nodeValue</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">value</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">void</span></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Returns the value of the current node.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">value</span>: <span class="tsd-signature-type">string</span></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
+<p>Implementation of PseudoDocument.nodeValue</p>
+<p>Inherited from NodeService.nodeValue</p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L100">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:100</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="ownerdocument"><span>owner<wbr/>Document</span><a href="#ownerdocument" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li>
+<div class="tsd-signature" id="ownerdocumentownerdocument"><span class="tsd-signature-keyword">get</span> <span class="tsd-kind-get-signature">ownerDocument</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/interfaces.PseudoDocument.html" class="tsd-signature-type tsd-kind-interface">PseudoDocument</a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Returns the Document that this node belongs to. If the node is itself a document, returns null.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <a href="../interfaces/interfaces.PseudoDocument.html" class="tsd-signature-type tsd-kind-interface">PseudoDocument</a></h4><aside class="tsd-sources">
+<p>Implementation of PseudoDocument.ownerDocument</p>
+<p>Inherited from NodeService.ownerDocument</p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L104">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:104</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="parentelement"><span>parent<wbr/>Element</span><a href="#parentelement" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li>
+<div class="tsd-signature" id="parentelementparentelement"><span class="tsd-signature-keyword">get</span> <span class="tsd-kind-get-signature">parentElement</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/interfaces.PseudoElement.html" class="tsd-signature-type tsd-kind-interface">PseudoElement</a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Returns an Element that is the parent of this node. If the node has no parent, or if that parent is not an Element, this property returns null.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <a href="../interfaces/interfaces.PseudoElement.html" class="tsd-signature-type tsd-kind-interface">PseudoElement</a></h4><aside class="tsd-sources">
+<p>Implementation of PseudoDocument.parentElement</p>
+<p>Inherited from NodeService.parentElement</p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L116">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:116</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="parentnode"><span>parent<wbr/>Node</span><a href="#parentnode" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li>
+<div class="tsd-signature" id="parentnodeparentnode"><span class="tsd-signature-keyword">get</span> <span class="tsd-kind-get-signature">parentNode</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Returns a Node that is the parent of this node. If there is no such node, like if this node is the top of the tree or if doesn't participate in a tree, this property returns null.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a></h4><aside class="tsd-sources">
+<p>Implementation of PseudoDocument.parentNode</p>
+<p>Inherited from NodeService.parentNode</p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L112">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:112</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="previoussibling"><span>previous<wbr/>Sibling</span><a href="#previoussibling" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li>
+<div class="tsd-signature" id="previoussiblingprevioussibling"><span class="tsd-signature-keyword">get</span> <span class="tsd-kind-get-signature">previousSibling</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Returns a Node representing the previous node in the tree, or null if there isn't such node.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a></h4><aside class="tsd-sources">
+<p>Implementation of PseudoDocument.previousSibling</p>
+<p>Inherited from NodeService.previousSibling</p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L120">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:120</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="textcontent"><span>text<wbr/>Content</span><a href="#textcontent" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li>
+<div class="tsd-signature" id="textcontenttextcontent"><span class="tsd-signature-keyword">get</span> <span class="tsd-kind-get-signature">textContent</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Returns the textual content of an element and all its descendants.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4><aside class="tsd-sources">
+<p>Implementation of PseudoDocument.textContent</p>
+<p>Overrides NodeService.textContent</p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/DocumentService.ts#L21">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/DocumentService.ts:21</a></li></ul></aside></div></li>
+<li>
+<div class="tsd-signature" id="textcontenttextcontent-1"><span class="tsd-signature-keyword">set</span> <span class="tsd-kind-set-signature">textContent</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">text</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">void</span></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Sets the textual content of an element and all its descendants.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">text</span>: <span class="tsd-signature-type">string</span></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
+<p>Implementation of PseudoDocument.textContent</p>
+<p>Overrides NodeService.textContent</p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/DocumentService.ts#L25">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/DocumentService.ts:25</a></li></ul></aside></div></li></ul></section></section></details>
+<details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Methods"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h2 class="tsd-anchor-link" id="methods-1">Methods<a href="#methods-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2></summary>
+<section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="addeventlistener"><span>add<wbr/>Event<wbr/>Listener</span><a href="#addeventlistener" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="addeventlistener-1"><span class="tsd-kind-call-signature">addEventListener</span><span class="tsd-signature-symbol">(</span><br/>    <span class="tsd-kind-parameter">type</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">callback</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">useCapture</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span> <span class="tsd-signature-symbol">|</span> <a href="../types/interfaces.listenerOptions.html" class="tsd-signature-type tsd-kind-type-alias">listenerOptions</a><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">void</span><a href="#addeventlistener-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Registers an event handler of a specific event type. Adding the same handler again for the same type and phase does
+nothing, like the DOM.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">type</span>: <span class="tsd-signature-type">string</span></span>
+<div class="tsd-comment tsd-typography"><p>The type of event to listen for</p>
+</div></li>
+<li><span><span class="tsd-kind-parameter">callback</span>: <span class="tsd-signature-type">any</span></span>
+<div class="tsd-comment tsd-typography"><p>The function to call (or an object with a handleEvent function)</p>
+</div></li>
+<li><span><span class="tsd-kind-parameter">useCapture</span>: <span class="tsd-signature-type">boolean</span> <span class="tsd-signature-symbol">|</span> <a href="../types/interfaces.listenerOptions.html" class="tsd-signature-type tsd-kind-type-alias">listenerOptions</a><span class="tsd-signature-symbol"> = false</span></span>
+<div class="tsd-comment tsd-typography"><p>Listen while the event travels down to the target (true), or an object with capture, once and passive</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/interfaces.PseudoDocument.html">PseudoDocument</a>.<a href="../interfaces/interfaces.PseudoDocument.html#addeventlistener">addEventListener</a></p>
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#addeventlistener">addEventListener</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/EventTargetService.ts#L111">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/EventTargetService.ts:111</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="after"><span>after</span><a href="#after" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="after-1"><span class="tsd-kind-call-signature">after</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">nodes</span><span class="tsd-signature-symbol">:</span> (<span class="tsd-signature-type">string</span> <span class="tsd-signature-symbol">|</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a>)<span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">void</span><a href="#after-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Add nodes (strings become text nodes) as this node's next siblings, in order. Does nothing when this node has no
+parent.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">nodes</span>: (<span class="tsd-signature-type">string</span> <span class="tsd-signature-symbol">|</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a>)<span class="tsd-signature-symbol">[]</span></span>
+<div class="tsd-comment tsd-typography"><p>The nodes (or text) to add</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#after">after</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L240">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:240</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="append"><span>append</span><a href="#append" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="append-1"><span class="tsd-kind-call-signature">append</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">nodes</span><span class="tsd-signature-symbol">:</span> (<span class="tsd-signature-type">string</span> <span class="tsd-signature-symbol">|</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a>)<span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">void</span><a href="#append-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Add nodes (strings become text nodes) as the last children of this node, in the order given.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">nodes</span>: (<span class="tsd-signature-type">string</span> <span class="tsd-signature-symbol">|</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a>)<span class="tsd-signature-symbol">[]</span></span>
+<div class="tsd-comment tsd-typography"><p>The nodes (or text) to add</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-throws">
+<h4 class="tsd-anchor-link" id="throws">Throws<a href="#throws" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>When this kind of node cannot have children</p>
+</div></div><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#append">append</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L196">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:196</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="appendchild"><span>append<wbr/>Child</span><a href="#appendchild" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="appendchild-1"><span class="tsd-kind-call-signature">appendChild</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">childNode</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a><a href="#appendchild-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Add a node as the last child of this node (a node which is already in a tree is moved).</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">childNode</span>: <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a></span>
+<div class="tsd-comment tsd-typography"><p>The node to add</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a></h4><p>The added node</p>
+<aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/interfaces.PseudoDocument.html">PseudoDocument</a>.<a href="../interfaces/interfaces.PseudoDocument.html#appendchild">appendChild</a></p>
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#appendchild">appendChild</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L160">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:160</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="before"><span>before</span><a href="#before" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="before-1"><span class="tsd-kind-call-signature">before</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">nodes</span><span class="tsd-signature-symbol">:</span> (<span class="tsd-signature-type">string</span> <span class="tsd-signature-symbol">|</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a>)<span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">void</span><a href="#before-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Add nodes (strings become text nodes) as this node's previous siblings, in order. Does nothing when this node has
+no parent.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">nodes</span>: (<span class="tsd-signature-type">string</span> <span class="tsd-signature-symbol">|</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a>)<span class="tsd-signature-symbol">[]</span></span>
+<div class="tsd-comment tsd-typography"><p>The nodes (or text) to add</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#before">before</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L227">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:227</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-protected tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="childinserted"><code class="tsd-tag">Protected</code><span>child<wbr/>Inserted</span><a href="#childinserted" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-protected tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="childinserted-1"><span class="tsd-kind-call-signature">childInserted</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">child</span><span class="tsd-signature-symbol">:</span> <a href="services.NodeService.html" class="tsd-signature-type tsd-kind-class">NodeService</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">void</span><a href="#childinserted-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Called each time a node has been inserted as a child of this node, so that nodes which need to react to children
+(for example elements applying default events) can do so.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">child</span>: <a href="services.NodeService.html" class="tsd-signature-type tsd-kind-class">NodeService</a></span>
+<div class="tsd-comment tsd-typography"><p>The node which was inserted</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#childinserted">childInserted</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L336">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:336</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="clonenode"><span>clone<wbr/>Node</span><a href="#clonenode" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="clonenode-1"><span class="tsd-kind-call-signature">cloneNode</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">deep</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a><a href="#clonenode-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Make a copy of this node (without its parent, and without its event listeners). With deep the children are copied
+too, all the way down.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">deep</span>: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></span>
+<div class="tsd-comment tsd-typography"><p>Copy the children as well</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/interfaces.PseudoDocument.html">PseudoDocument</a>.<a href="../interfaces/interfaces.PseudoDocument.html#clonenode">cloneNode</a></p>
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#clonenode">cloneNode</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L343">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:343</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-protected tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="cloneshallow"><code class="tsd-tag">Protected</code><span>clone<wbr/>Shallow</span><a href="#cloneshallow" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-protected tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="cloneshallow-1"><span class="tsd-kind-call-signature">cloneShallow</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <a href="services.NodeService.html" class="tsd-signature-type tsd-kind-class">NodeService</a><a href="#cloneshallow-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Make a copy of this node without its children, its parent or its listeners, which is what cloneNode starts from.
+Kinds of node which are made with arguments override this to give them.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <a href="services.NodeService.html" class="tsd-signature-type tsd-kind-class">NodeService</a></h4><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#cloneshallow">cloneShallow</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L175">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:175</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="comparedocumentposition"><span>compare<wbr/>Document<wbr/>Position</span><a href="#comparedocumentposition" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="comparedocumentposition-1"><span class="tsd-kind-call-signature">compareDocumentPosition</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">otherNode</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><a href="#comparedocumentposition-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Say where another node is in relation to this one, as the bits of NodeService.DOCUMENT_POSITION_*: 0 for this node
+itself, DISCONNECTED (with IMPLEMENTATION_SPECIFIC and a consistent PRECEDING or FOLLOWING) for a node in another tree,
+CONTAINS + PRECEDING when the other node is an ancestor, CONTAINED_BY + FOLLOWING when it is a descendant,
+otherwise PRECEDING or FOLLOWING by their order in the tree.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">otherNode</span>: <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a></span>
+<div class="tsd-comment tsd-typography"><p>The node to locate</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/interfaces.PseudoDocument.html">PseudoDocument</a>.<a href="../interfaces/interfaces.PseudoDocument.html#comparedocumentposition">compareDocumentPosition</a></p>
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#comparedocumentposition">compareDocumentPosition</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L358">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:358</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="contains"><span>contains</span><a href="#contains" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="contains-1"><span class="tsd-kind-call-signature">contains</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">otherNode</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><a href="#contains-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Check whether a node is this node or one of its descendants.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">otherNode</span>: <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a></span>
+<div class="tsd-comment tsd-typography"><p>The node to look for</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/interfaces.PseudoDocument.html">PseudoDocument</a>.<a href="../interfaces/interfaces.PseudoDocument.html#contains">contains</a></p>
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#contains">contains</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L401">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:401</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="createcomment"><span>create<wbr/>Comment</span><a href="#createcomment" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="">
+<div class="tsd-signature tsd-anchor-link" id="createcomment-1"><span class="tsd-kind-call-signature">createComment</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">data</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <a href="services.CommentService.html" class="tsd-signature-type tsd-kind-class">CommentService</a><a href="#createcomment-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Make a comment which belongs to this document.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">data</span>: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &#39;&#39;</span></span>
+<div class="tsd-comment tsd-typography"><p>The comment</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="services.CommentService.html" class="tsd-signature-type tsd-kind-class">CommentService</a></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/interfaces.PseudoDocument.html">PseudoDocument</a>.<a href="../interfaces/interfaces.PseudoDocument.html#createcomment">createComment</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/DocumentService.ts#L60">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/DocumentService.ts:60</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="createdocumentfragment"><span>create<wbr/>Document<wbr/>Fragment</span><a href="#createdocumentfragment" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="">
+<div class="tsd-signature tsd-anchor-link" id="createdocumentfragment-1"><span class="tsd-kind-call-signature">createDocumentFragment</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <a href="services.DocumentFragmentService.html" class="tsd-signature-type tsd-kind-class">DocumentFragmentService</a><a href="#createdocumentfragment-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Make an empty document fragment which belongs to this document, a container for nodes which can be built up and
+then inserted in one go.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <a href="services.DocumentFragmentService.html" class="tsd-signature-type tsd-kind-class">DocumentFragmentService</a></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/interfaces.PseudoDocument.html">PseudoDocument</a>.<a href="../interfaces/interfaces.PseudoDocument.html#createdocumentfragment">createDocumentFragment</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/DocumentService.ts#L70">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/DocumentService.ts:70</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="createelement"><span>create<wbr/>Element</span><a href="#createelement" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="">
+<div class="tsd-signature tsd-anchor-link" id="createelement-1"><span class="tsd-kind-call-signature">createElement</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">tagName</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/interfaces.PseudoElement.html" class="tsd-signature-type tsd-kind-interface">PseudoElement</a><a href="#createelement-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Make an element of the given type which belongs to this document but is not added anywhere until it is appended.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">tagName</span>: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &#39;div&#39;</span></span>
+<div class="tsd-comment tsd-typography"><p>The type of element to create</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="../interfaces/interfaces.PseudoElement.html" class="tsd-signature-type tsd-kind-interface">PseudoElement</a></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/interfaces.PseudoDocument.html">PseudoDocument</a>.<a href="../interfaces/interfaces.PseudoDocument.html#createelement">createElement</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/DocumentService.ts#L39">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/DocumentService.ts:39</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="createtextnode"><span>create<wbr/>Text<wbr/>Node</span><a href="#createtextnode" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="">
+<div class="tsd-signature tsd-anchor-link" id="createtextnode-1"><span class="tsd-kind-call-signature">createTextNode</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">data</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <a href="services.TextService.html" class="tsd-signature-type tsd-kind-class">TextService</a><a href="#createtextnode-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Make a text node which belongs to this document.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">data</span>: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &#39;&#39;</span></span>
+<div class="tsd-comment tsd-typography"><p>The text</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="services.TextService.html" class="tsd-signature-type tsd-kind-class">TextService</a></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/interfaces.PseudoDocument.html">PseudoDocument</a>.<a href="../interfaces/interfaces.PseudoDocument.html#createtextnode">createTextNode</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/DocumentService.ts#L50">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/DocumentService.ts:50</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="dispatchevent"><span>dispatch<wbr/>Event</span><a href="#dispatchevent" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="dispatchevent-1"><span class="tsd-kind-call-signature">dispatchEvent</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">event</span><span class="tsd-signature-symbol">:</span> <a href="services.EventService.html" class="tsd-signature-type tsd-kind-class">EventService</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><a href="#dispatchevent-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Dispatches an event to this target and through the tree: capture listeners of the ancestors from the root down,
+then the listeners of this target, then (when the event bubbles) the other listeners of the ancestors from the
+parent up to the root. stopPropagation() stops it reaching further targets, stopImmediatePropagation() also stops
+the remaining listeners of the current target. Afterwards, unless the default was prevented, the default action
+of this target (see setDefaultEvent) runs. The event can be dispatched again afterwards.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">event</span>: <a href="services.EventService.html" class="tsd-signature-type tsd-kind-class">EventService</a></span>
+<div class="tsd-comment tsd-typography"><p>The event to dispatch</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><p>False when the event was cancelable and a listener prevented the default, otherwise true</p>
+
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-throws">
+<h4 class="tsd-anchor-link" id="throws-1">Throws<a href="#throws-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>When the event is already being dispatched, or (after the whole dispatch has finished) the error
+which a listener threw (an error with all of them in its errors property when several did)</p>
+</div></div><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/interfaces.PseudoDocument.html">PseudoDocument</a>.<a href="../interfaces/interfaces.PseudoDocument.html#dispatchevent">dispatchEvent</a></p>
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#dispatchevent">dispatchEvent</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/EventTargetService.ts#L168">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/EventTargetService.ts:168</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-protected tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="equalsshallow"><code class="tsd-tag">Protected</code><span>equals<wbr/>Shallow</span><a href="#equalsshallow" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-protected tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="equalsshallow-1"><span class="tsd-kind-call-signature">equalsShallow</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">other</span><span class="tsd-signature-symbol">:</span> <a href="services.NodeService.html" class="tsd-signature-type tsd-kind-class">NodeService</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><a href="#equalsshallow-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Whether another node of the same type is equal to this one apart from its children, which isEqualNode compares
+afterwards. Kinds of node with more to compare (an element has attributes) override this.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">other</span>: <a href="services.NodeService.html" class="tsd-signature-type tsd-kind-class">NodeService</a></span>
+<div class="tsd-comment tsd-typography"><p>The node to compare with</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#equalsshallow">equalsShallow</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L187">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:187</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="getelementbyid"><span>get<wbr/>Element<wbr/>By<wbr/>Id</span><a href="#getelementbyid" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="">
+<div class="tsd-signature tsd-anchor-link" id="getelementbyid-1"><span class="tsd-kind-call-signature">getElementById</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">id</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/interfaces.PseudoElement.html" class="tsd-signature-type tsd-kind-interface">PseudoElement</a><a href="#getelementbyid-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>The first element, in tree order, whose id matches the given value, or null when there is none.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">id</span>: <span class="tsd-signature-type">string</span></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="../interfaces/interfaces.PseudoElement.html" class="tsd-signature-type tsd-kind-interface">PseudoElement</a></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/interfaces.PseudoDocument.html">PseudoDocument</a>.<a href="../interfaces/interfaces.PseudoDocument.html#getelementbyid">getElementById</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/DocumentService.ts#L31">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/DocumentService.ts:31</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="getelementsbyclassname"><span>get<wbr/>Elements<wbr/>By<wbr/>Class<wbr/>Name</span><a href="#getelementsbyclassname" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="getelementsbyclassname-1"><span class="tsd-kind-call-signature">getElementsByClassName</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">className</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <a href="services.HTMLCollectionService.html" class="tsd-signature-type tsd-kind-class">HTMLCollectionService</a><a href="#getelementsbyclassname-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Every element below this node which has all of the given (space separated) classes, live.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">className</span>: <span class="tsd-signature-type">string</span></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="services.HTMLCollectionService.html" class="tsd-signature-type tsd-kind-class">HTMLCollectionService</a></h4><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#getelementsbyclassname">getElementsByClassName</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L299">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:299</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="getelementsbytagname"><span>get<wbr/>Elements<wbr/>By<wbr/>Tag<wbr/>Name</span><a href="#getelementsbytagname" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="getelementsbytagname-1"><span class="tsd-kind-call-signature">getElementsByTagName</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">tagName</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <a href="services.HTMLCollectionService.html" class="tsd-signature-type tsd-kind-class">HTMLCollectionService</a><a href="#getelementsbytagname-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Every element below this node with the given tag name (or every element when tagName is *), live.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">tagName</span>: <span class="tsd-signature-type">string</span></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="services.HTMLCollectionService.html" class="tsd-signature-type tsd-kind-class">HTMLCollectionService</a></h4><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#getelementsbytagname">getElementsByTagName</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L290">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:290</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="getelementsbytagnamens"><span>get<wbr/>Elements<wbr/>By<wbr/>Tag<wbr/>Name<wbr/>NS</span><a href="#getelementsbytagnamens" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="getelementsbytagnamens-1"><span class="tsd-kind-call-signature">getElementsByTagNameNS</span><span class="tsd-signature-symbol">(</span><br/>    <span class="tsd-kind-parameter">namespace</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">tagName</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <a href="services.HTMLCollectionService.html" class="tsd-signature-type tsd-kind-class">HTMLCollectionService</a><a href="#getelementsbytagnamens-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Every element below this node with the given tag name, live. There is no real namespace parsing here, so this
+ignores the namespace and behaves exactly like getElementsByTagName.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">namespace</span>: <span class="tsd-signature-type">string</span></span>
+<div class="tsd-comment tsd-typography"><p>Ignored</p>
+</div></li>
+<li><span><span class="tsd-kind-parameter">tagName</span>: <span class="tsd-signature-type">string</span></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="services.HTMLCollectionService.html" class="tsd-signature-type tsd-kind-class">HTMLCollectionService</a></h4><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#getelementsbytagnamens">getElementsByTagNameNS</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L310">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:310</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="getrootnode"><span>get<wbr/>Root<wbr/>Node</span><a href="#getrootnode" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="getrootnode-1"><span class="tsd-kind-call-signature">getRootNode</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">options</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">{</span> <span class="tsd-kind-property">composed</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span> <span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a><a href="#getrootnode-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Returns the context object's root which optionally includes the shadow root if it is available.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">options</span>: <span class="tsd-signature-symbol">{</span> <span class="tsd-kind-property">composed</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span> <span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol"> = ...</span></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/interfaces.PseudoDocument.html">PseudoDocument</a>.<a href="../interfaces/interfaces.PseudoDocument.html#getrootnode">getRootNode</a></p>
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#getrootnode">getRootNode</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L412">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:412</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="haschildnodes"><span>has<wbr/>Child<wbr/>Nodes</span><a href="#haschildnodes" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="haschildnodes-1"><span class="tsd-kind-call-signature">hasChildNodes</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><a href="#haschildnodes-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Returns a boolean value indicating whether the element has any child nodes.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/interfaces.PseudoDocument.html">PseudoDocument</a>.<a href="../interfaces/interfaces.PseudoDocument.html#haschildnodes">hasChildNodes</a></p>
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#haschildnodes">hasChildNodes</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L416">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:416</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="insertbefore"><span>insert<wbr/>Before</span><a href="#insertbefore" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="insertbefore-1"><span class="tsd-kind-call-signature">insertBefore</span><span class="tsd-signature-symbol">(</span><br/>    <span class="tsd-kind-parameter">newNode</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">referenceNode</span><span class="tsd-signature-symbol">?:</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a> <span class="tsd-signature-symbol">|</span> <a href="../interfaces/interfaces.PseudoDocumentFragment.html" class="tsd-signature-type tsd-kind-interface">PseudoDocumentFragment</a><a href="#insertbefore-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Insert a node as a child of this node, before the given child (or at the end when there is none). A node which is
+already in a tree is moved, and the children of a document fragment are moved in order.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">newNode</span>: <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a></span>
+<div class="tsd-comment tsd-typography"><p>The node to insert</p>
+</div></li>
+<li><span><span class="tsd-kind-parameter">referenceNode</span>: <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a><span class="tsd-signature-symbol"> = null</span></span>
+<div class="tsd-comment tsd-typography"><p>The child of this node to insert before, or null to insert at the end</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a> <span class="tsd-signature-symbol">|</span> <a href="../interfaces/interfaces.PseudoDocumentFragment.html" class="tsd-signature-type tsd-kind-interface">PseudoDocumentFragment</a></h4><p>The inserted node</p>
+
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-throws">
+<h4 class="tsd-anchor-link" id="throws-2">Throws<a href="#throws-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>When the reference node is not a child of this node, or the new node is this node or contains it</p>
+</div></div><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/interfaces.PseudoDocument.html">PseudoDocument</a>.<a href="../interfaces/interfaces.PseudoDocument.html#insertbefore">insertBefore</a></p>
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#insertbefore">insertBefore</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L428">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:428</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="isdefaultnamespace"><span>is<wbr/>Default<wbr/>Namespace</span><a href="#isdefaultnamespace" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="isdefaultnamespace-1"><span class="tsd-kind-call-signature">isDefaultNamespace</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">namespaceURI</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><a href="#isdefaultnamespace-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Accepts a namespace URI as an argument and returns a boolean value with a value of true if the namespace is the default namespace on the given node or false if not.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">namespaceURI</span>: <span class="tsd-signature-type">string</span></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/interfaces.PseudoDocument.html">PseudoDocument</a>.<a href="../interfaces/interfaces.PseudoDocument.html#isdefaultnamespace">isDefaultNamespace</a></p>
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#isdefaultnamespace">isDefaultNamespace</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L462">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:462</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="isequalnode"><span>is<wbr/>Equal<wbr/>Node</span><a href="#isequalnode" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="isequalnode-1"><span class="tsd-kind-call-signature">isEqualNode</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">otherNode</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><a href="#isequalnode-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Whether another node is the same as this one, by what they hold: the same type, name and value (an element also
+needs the same attributes), and children which are equal in the same order.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">otherNode</span>: <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a></span>
+<div class="tsd-comment tsd-typography"><p>The node to compare with</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/interfaces.PseudoDocument.html">PseudoDocument</a>.<a href="../interfaces/interfaces.PseudoDocument.html#isequalnode">isEqualNode</a></p>
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#isequalnode">isEqualNode</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L471">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:471</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="issamenode"><span>is<wbr/>Same<wbr/>Node</span><a href="#issamenode" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="issamenode-1"><span class="tsd-kind-call-signature">isSameNode</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">otherNode</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><a href="#issamenode-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Returns a boolean value indicating whether the two nodes are the same (that is, they reference the same object).</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">otherNode</span>: <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/interfaces.PseudoDocument.html">PseudoDocument</a>.<a href="../interfaces/interfaces.PseudoDocument.html#issamenode">isSameNode</a></p>
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#issamenode">isSameNode</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L480">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:480</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="lookupnamespaceuri"><span>lookup<wbr/>Namespace<wbr/>URI</span><a href="#lookupnamespaceuri" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="lookupnamespaceuri-1"><span class="tsd-kind-call-signature">lookupNamespaceURI</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">prefix</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><a href="#lookupnamespaceuri-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Accepts a prefix and returns the namespace URI associated with it on the given node if found (and null if not). Supplying null for the prefix will return the default namespace.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">prefix</span>: <span class="tsd-signature-type">string</span></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/interfaces.PseudoDocument.html">PseudoDocument</a>.<a href="../interfaces/interfaces.PseudoDocument.html#lookupnamespaceuri">lookupNamespaceURI</a></p>
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#lookupnamespaceuri">lookupNamespaceURI</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L488">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:488</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="lookupprefix"><span>lookup<wbr/>Prefix</span><a href="#lookupprefix" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="lookupprefix-1"><span class="tsd-kind-call-signature">lookupPrefix</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">namespace</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><a href="#lookupprefix-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Returns a string containing the prefix for a given namespace URI, if present, and null if not. When multiple prefixes are possible, the result is implementation-dependent.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">namespace</span>: <span class="tsd-signature-type">string</span></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/interfaces.PseudoDocument.html">PseudoDocument</a>.<a href="../interfaces/interfaces.PseudoDocument.html#lookupprefix">lookupPrefix</a></p>
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#lookupprefix">lookupPrefix</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L484">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:484</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="normalize"><span>normalize</span><a href="#normalize" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="normalize-1"><span class="tsd-kind-call-signature">normalize</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">void</span><a href="#normalize-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Tidy the text below this node: neighbouring text nodes are joined into one and empty text nodes are removed.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/interfaces.PseudoDocument.html">PseudoDocument</a>.<a href="../interfaces/interfaces.PseudoDocument.html#normalize">normalize</a></p>
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#normalize">normalize</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L495">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:495</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="prepend"><span>prepend</span><a href="#prepend" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="prepend-1"><span class="tsd-kind-call-signature">prepend</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">nodes</span><span class="tsd-signature-symbol">:</span> (<span class="tsd-signature-type">string</span> <span class="tsd-signature-symbol">|</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a>)<span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">void</span><a href="#prepend-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Add nodes (strings become text nodes) as the first children of this node, in the order given.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">nodes</span>: (<span class="tsd-signature-type">string</span> <span class="tsd-signature-symbol">|</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a>)<span class="tsd-signature-symbol">[]</span></span>
+<div class="tsd-comment tsd-typography"><p>The nodes (or text) to add</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-throws">
+<h4 class="tsd-anchor-link" id="throws-3">Throws<a href="#throws-3" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>When this kind of node cannot have children</p>
+</div></div><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#prepend">prepend</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L205">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:205</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="queryselector"><span>query<wbr/>Selector</span><a href="#queryselector" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="queryselector-1"><span class="tsd-kind-call-signature">querySelector</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">selectors</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/interfaces.PseudoElement.html" class="tsd-signature-type tsd-kind-interface">PseudoElement</a><a href="#queryselector-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>The first element below this node which matches the CSS selector, in tree order, or null when there is none.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">selectors</span>: <span class="tsd-signature-type">string</span></span>
+<div class="tsd-comment tsd-typography"><p>A CSS selector</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="../interfaces/interfaces.PseudoElement.html" class="tsd-signature-type tsd-kind-interface">PseudoElement</a></h4><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#queryselector">querySelector</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L318">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:318</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="queryselectorall"><span>query<wbr/>Selector<wbr/>All</span><a href="#queryselectorall" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="queryselectorall-1"><span class="tsd-kind-call-signature">querySelectorAll</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">selectors</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/interfaces.PseudoElement.html" class="tsd-signature-type tsd-kind-interface">PseudoElement</a><span class="tsd-signature-symbol">[]</span><a href="#queryselectorall-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Every element below this node which matches the CSS selector, in tree order. A plain array (not a live
+collection): like the DOM's querySelectorAll, it is a snapshot taken when it is called.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">selectors</span>: <span class="tsd-signature-type">string</span></span>
+<div class="tsd-comment tsd-typography"><p>A CSS selector</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="../interfaces/interfaces.PseudoElement.html" class="tsd-signature-type tsd-kind-interface">PseudoElement</a><span class="tsd-signature-symbol">[]</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#queryselectorall">querySelectorAll</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L327">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:327</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="remove"><span>remove</span><a href="#remove" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="remove-1"><span class="tsd-kind-call-signature">remove</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">void</span><a href="#remove-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Remove this node from its parent. Does nothing when it has no parent.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#remove">remove</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L266">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:266</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="removechild"><span>remove<wbr/>Child</span><a href="#removechild" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="removechild-1"><span class="tsd-kind-call-signature">removeChild</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">childElement</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a><a href="#removechild-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Remove a child from this node, it no longer has a parent or siblings afterwards.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">childElement</span>: <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a></span>
+<div class="tsd-comment tsd-typography"><p>The child node to remove</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a></h4><p>The removed node</p>
+
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-throws">
+<h4 class="tsd-anchor-link" id="throws-4">Throws<a href="#throws-4" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>When the node is not a child of this node</p>
+</div></div><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/interfaces.PseudoDocument.html">PseudoDocument</a>.<a href="../interfaces/interfaces.PseudoDocument.html#removechild">removeChild</a></p>
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#removechild">removeChild</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L526">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:526</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="removeeventlistener"><span>remove<wbr/>Event<wbr/>Listener</span><a href="#removeeventlistener" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="removeeventlistener-1"><span class="tsd-kind-call-signature">removeEventListener</span><span class="tsd-signature-symbol">(</span><br/>    <span class="tsd-kind-parameter">type</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">callback</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">options</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span> <span class="tsd-signature-symbol">|</span> <a href="../types/interfaces.listenerOptions.html" class="tsd-signature-type tsd-kind-type-alias">listenerOptions</a><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">void</span><a href="#removeeventlistener-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Removes an event listener, the one which was added with the same type, handler and phase.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">type</span>: <span class="tsd-signature-type">string</span></span>
+<div class="tsd-comment tsd-typography"><p>The type of event</p>
+</div></li>
+<li><span><span class="tsd-kind-parameter">callback</span>: <span class="tsd-signature-type">Function</span></span>
+<div class="tsd-comment tsd-typography"><p>The handler which was added</p>
+</div></li>
+<li><span><span class="tsd-kind-parameter">options</span>: <span class="tsd-signature-type">boolean</span> <span class="tsd-signature-symbol">|</span> <a href="../types/interfaces.listenerOptions.html" class="tsd-signature-type tsd-kind-type-alias">listenerOptions</a><span class="tsd-signature-symbol"> = false</span></span>
+<div class="tsd-comment tsd-typography"><p>Whether the listener was a capture listener (true), or an object with capture</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/interfaces.PseudoDocument.html">PseudoDocument</a>.<a href="../interfaces/interfaces.PseudoDocument.html#removeeventlistener">removeEventListener</a></p>
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#removeeventlistener">removeEventListener</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/EventTargetService.ts#L146">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/EventTargetService.ts:146</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="replacechild"><span>replace<wbr/>Child</span><a href="#replacechild" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="replacechild-1"><span class="tsd-kind-call-signature">replaceChild</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">newChild</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a><span class="tsd-signature-symbol">,</span> <span class="tsd-kind-parameter">oldChild</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a><a href="#replacechild-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Replace a child of this node with another node (which is moved if it is already in a tree).</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">newChild</span>: <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a></span>
+<div class="tsd-comment tsd-typography"><p>The node which takes the place</p>
+</div></li>
+<li><span><span class="tsd-kind-parameter">oldChild</span>: <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a></span>
+<div class="tsd-comment tsd-typography"><p>The child of this node to replace</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a></h4><p>The replaced node</p>
+
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-throws">
+<h4 class="tsd-anchor-link" id="throws-5">Throws<a href="#throws-5" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>When the old node is not a child of this node</p>
+</div></div><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/interfaces.PseudoDocument.html">PseudoDocument</a>.<a href="../interfaces/interfaces.PseudoDocument.html#replacechild">replaceChild</a></p>
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#replacechild">replaceChild</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L544">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:544</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="replacechildren"><span>replace<wbr/>Children</span><a href="#replacechildren" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="replacechildren-1"><span class="tsd-kind-call-signature">replaceChildren</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">nodes</span><span class="tsd-signature-symbol">:</span> (<span class="tsd-signature-type">string</span> <span class="tsd-signature-symbol">|</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a>)<span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">void</span><a href="#replacechildren-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Remove every child of this node and put the given nodes (strings become text nodes) in their place, in order.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">nodes</span>: (<span class="tsd-signature-type">string</span> <span class="tsd-signature-symbol">|</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a>)<span class="tsd-signature-symbol">[]</span></span>
+<div class="tsd-comment tsd-typography"><p>The nodes (or text) to add</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-throws">
+<h4 class="tsd-anchor-link" id="throws-6">Throws<a href="#throws-6" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>When this kind of node cannot have children</p>
+</div></div><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#replacechildren">replaceChildren</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L215">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:215</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="replacewith"><span>replace<wbr/>With</span><a href="#replacewith" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="replacewith-1"><span class="tsd-kind-call-signature">replaceWith</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">nodes</span><span class="tsd-signature-symbol">:</span> (<span class="tsd-signature-type">string</span> <span class="tsd-signature-symbol">|</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a>)<span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">void</span><a href="#replacewith-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Put the given nodes (strings become text nodes) where this node is, in order, then remove this node. Does nothing
+when this node has no parent.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">nodes</span>: (<span class="tsd-signature-type">string</span> <span class="tsd-signature-symbol">|</span> <a href="../interfaces/interfaces.PseudoNode.html" class="tsd-signature-type tsd-kind-interface">PseudoNode</a>)<span class="tsd-signature-symbol">[]</span></span>
+<div class="tsd-comment tsd-typography"><p>The nodes (or text) to put in this node's place</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#replacewith">replaceWith</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/NodeService.ts#L254">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/NodeService.ts:254</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-protected tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="setdefaultevent"><code class="tsd-tag">Protected</code><span>set<wbr/>Default<wbr/>Event</span><a href="#setdefaultevent" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-protected tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="setdefaultevent-1"><span class="tsd-kind-call-signature">setDefaultEvent</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">type</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-kind-parameter">callback</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">void</span><a href="#setdefaultevent-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Register the function to run when nothing else has prevented the default for this type of event.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">type</span>: <span class="tsd-signature-type">string</span></span></li>
+<li><span><span class="tsd-kind-parameter">callback</span>: <span class="tsd-signature-type">Function</span></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="services.NodeService.html">NodeService</a>.<a href="services.NodeService.html#setdefaultevent">setDefaultEvent</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/jheagle/pseudo-dom/blob/457d0e60ccd091f11c3abcb3720e81f19d51bc3a/src/services/EventTargetService.ts#L99">claude-1000/-home-jheagle/adb51498-3fae-4573-b337-c0d06e2def1c/scratchpad/pd12/src/services/EventTargetService.ts:99</a></li></ul></aside></div></li></ul></section></section></details></div>
+<div class="col-sidebar">
+<div class="page-menu">
+<div class="tsd-navigation settings">
+<details class="tsd-accordion"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h3>Settings</h3></summary>
+<div class="tsd-accordion-details">
+<div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span>
+<ul id="tsd-filter-options">
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-external" name="external"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>External</span></label></li></ul></div>
+<div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div>
+<details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h3>On This Page</h3></summary>
+<div class="tsd-accordion-details">
+<details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Constructors"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Constructors</summary>
+<div><a href="#constructor"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Constructor"><use href="../assets/icons.svg#icon-512"></use></svg><span>constructor</span></a></div></details>
+<details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Properties"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Properties</summary>
+<div><a href="#childlist" class="tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>child<wbr/>List</span></a><a href="#listlinker" class="tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>list<wbr/>Linker</span></a><a href="#nodenamevalue" class="tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>node<wbr/>Name<wbr/>Value</span></a><a href="#ownerdocumentstore" class="tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>owner<wbr/>Document<wbr/>Store</span></a><a href="#parent" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>parent</span></a><a href="#attribute_node" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>ATTRIBUTE_<wbr/>NODE</span></a><a href="#cdata_section_node" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>CDATA_<wbr/>SECTION_<wbr/>NODE</span></a><a href="#comment_node" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>COMMENT_<wbr/>NODE</span></a><a href="#default_node" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>DEFAULT_<wbr/>NODE</span></a><a href="#document_fragment_node" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>DOCUMENT_<wbr/>FRAGMENT_<wbr/>NODE</span></a><a href="#document_node" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>DOCUMENT_<wbr/>NODE</span></a><a href="#document_position_contained_by" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>DOCUMENT_<wbr/>POSITION_<wbr/>CONTAINED_<wbr/>BY</span></a><a href="#document_position_contains" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>DOCUMENT_<wbr/>POSITION_<wbr/>CONTAINS</span></a><a href="#document_position_disconnected" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>DOCUMENT_<wbr/>POSITION_<wbr/>DISCONNECTED</span></a><a href="#document_position_following" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>DOCUMENT_<wbr/>POSITION_<wbr/>FOLLOWING</span></a><a href="#document_position_implementation_specific" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>DOCUMENT_<wbr/>POSITION_<wbr/>IMPLEMENTATION_<wbr/>SPECIFIC</span></a><a href="#document_position_preceding" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>DOCUMENT_<wbr/>POSITION_<wbr/>PRECEDING</span></a><a href="#document_type_node" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>DOCUMENT_<wbr/>TYPE_<wbr/>NODE</span></a><a href="#element_node" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>ELEMENT_<wbr/>NODE</span></a><a href="#entity_node" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>ENTITY_<wbr/>NODE</span></a><a href="#entity_reference_node" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>ENTITY_<wbr/>REFERENCE_<wbr/>NODE</span></a><a href="#notation_node" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>NOTATION_<wbr/>NODE</span></a><a href="#processing_instruction_node" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>PROCESSING_<wbr/>INSTRUCTION_<wbr/>NODE</span></a><a href="#text_node" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>TEXT_<wbr/>NODE</span></a></div></details>
+<details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Accessors"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Accessors</summary>
+<div><a href="#acceptschildren" class="tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>accepts<wbr/>Children</span></a><a href="#baseuri" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>base<wbr/>URI</span></a><a href="#childnodes" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>child<wbr/>Nodes</span></a><a href="#firstchild" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>first<wbr/>Child</span></a><a href="#isconnected" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>is<wbr/>Connected</span></a><a href="#lastchild" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>last<wbr/>Child</span></a><a href="#nextsibling" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>next<wbr/>Sibling</span></a><a href="#nodename"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>node<wbr/>Name</span></a><a href="#nodetype"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>node<wbr/>Type</span></a><a href="#nodevalue" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>node<wbr/>Value</span></a><a href="#ownerdocument" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>owner<wbr/>Document</span></a><a href="#parentelement" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>parent<wbr/>Element</span></a><a href="#parentnode" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>parent<wbr/>Node</span></a><a href="#previoussibling" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>previous<wbr/>Sibling</span></a><a href="#textcontent"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>text<wbr/>Content</span></a></div></details>
+<details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Methods"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Methods</summary>
+<div><a href="#addeventlistener" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>add<wbr/>Event<wbr/>Listener</span></a><a href="#after" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>after</span></a><a href="#append" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>append</span></a><a href="#appendchild" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>append<wbr/>Child</span></a><a href="#before" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>before</span></a><a href="#childinserted" class="tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>child<wbr/>Inserted</span></a><a href="#clonenode" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>clone<wbr/>Node</span></a><a href="#cloneshallow" class="tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>clone<wbr/>Shallow</span></a><a href="#comparedocumentposition" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>compare<wbr/>Document<wbr/>Position</span></a><a href="#contains" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>contains</span></a><a href="#createcomment"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>create<wbr/>Comment</span></a><a href="#createdocumentfragment"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>create<wbr/>Document<wbr/>Fragment</span></a><a href="#createelement"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>create<wbr/>Element</span></a><a href="#createtextnode"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>create<wbr/>Text<wbr/>Node</span></a><a href="#dispatchevent" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>dispatch<wbr/>Event</span></a><a href="#equalsshallow" class="tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>equals<wbr/>Shallow</span></a><a href="#getelementbyid"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Element<wbr/>By<wbr/>Id</span></a><a href="#getelementsbyclassname" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Elements<wbr/>By<wbr/>Class<wbr/>Name</span></a><a href="#getelementsbytagname" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Elements<wbr/>By<wbr/>Tag<wbr/>Name</span></a><a href="#getelementsbytagnamens" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Elements<wbr/>By<wbr/>Tag<wbr/>Name<wbr/>NS</span></a><a href="#getrootnode" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Root<wbr/>Node</span></a><a href="#haschildnodes" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>has<wbr/>Child<wbr/>Nodes</span></a><a href="#insertbefore" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>insert<wbr/>Before</span></a><a href="#isdefaultnamespace" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>is<wbr/>Default<wbr/>Namespace</span></a><a href="#isequalnode" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>is<wbr/>Equal<wbr/>Node</span></a><a href="#issamenode" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>is<wbr/>Same<wbr/>Node</span></a><a href="#lookupnamespaceuri" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>lookup<wbr/>Namespace<wbr/>URI</span></a><a href="#lookupprefix" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>lookup<wbr/>Prefix</span></a><a href="#normalize" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>normalize</span></a><a href="#prepend" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>prepend</span></a><a href="#queryselector" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>query<wbr/>Selector</span></a><a href="#queryselectorall" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>query<wbr/>Selector<wbr/>All</span></a><a href="#remove" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>remove</span></a><a href="#removechild" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>remove<wbr/>Child</span></a><a href="#removeeventlistener" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>remove<wbr/>Event<wbr/>Listener</span></a><a href="#replacechild" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>replace<wbr/>Child</span></a><a href="#replacechildren" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>replace<wbr/>Children</span></a><a href="#replacewith" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>replace<wbr/>With</span></a><a href="#setdefaultevent" class="tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>set<wbr/>Default<wbr/>Event</span></a></div></details></div></details></div>
+<div class="site-menu">
+<nav class="tsd-navigation"><a href="../modules.html">pseudo-dom</a>
+<ul class="tsd-small-nested-navigation" id="tsd-nav-container">
+<li>Loading...</li></ul></nav></div></div></div><footer>
+<p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer>
+<div class="overlay"></div></body></html>

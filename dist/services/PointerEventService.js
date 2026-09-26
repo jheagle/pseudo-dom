@@ -5,28 +5,16 @@ Object.defineProperty(exports, '__esModule', {
 })
 exports.PointerEventService = void 0
 /**
- * @file Substitute for the DOM PointerEvent Class.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the DOM PointerEvent Class.
  */
 const MouseEventService_1 = require('./MouseEventService')
 /**
  * Simulate the behaviour of the PointerEvent Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments MouseEventService
- * @property {number} pointerId
- * @property {number} width
- * @property {number} height
- * @property {number} pressure
- * @property {string} pointerType
- * @property {boolean} isPrimary
  */
 class PointerEventService extends MouseEventService_1.MouseEventService {
   /**
-   * @param {string} [typeArg=''] The type of the event
-   * @param {PointerEventInit} [init={}] The options for the event
-   * @constructor
+   * @param typeArg The type of the event
+   * @param init The options for the event
    */
   constructor (typeArg = '', init = {}) {
     super(typeArg, init)

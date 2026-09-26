@@ -4,9 +4,6 @@ import { PseudoElement } from '../interfaces/PseudoElement';
 /**
  * Simulate the behaviour of the ShadowRoot Class when there is no DOM available: a DocumentFragment attached to an
  * element via attachShadow, which sets host and mode.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments DocumentFragmentService
  */
 export declare class ShadowRootService extends DocumentFragmentService implements PseudoShadowRoot {
     /** The element this shadow root is attached to. Set by attachShadow. */

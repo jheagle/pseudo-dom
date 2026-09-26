@@ -10,14 +10,11 @@ Object.defineProperty(exports, '__esModule', {
 exports.DOMTokenListService = void 0
 /**
  * Simulate the behaviour of the DOMTokenList Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
  */
 class DOMTokenListService {
   /**
-   * @param {string} [value=''] The space separated tokens to start with
-   * @param {function(string): void} [onChange] Called with the new value whenever the tokens change
-   * @constructor
+   * @param value The space separated tokens to start with
+   * @param onChange Called with the new value whenever the tokens change
    */
   constructor (value = '', onChange = () => undefined) {
     this.tokens = DOMTokenListService.parse(value)

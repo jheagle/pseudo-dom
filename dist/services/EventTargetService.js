@@ -17,9 +17,7 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 })
 /**
- * @file Substitute for the DOM EventTarget Class.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the DOM EventTarget Class.
  */
 const EventService_1 = require('./EventService')
 const PseudoEventListener_1 = __importDefault(require('../classes/PseudoEventListener'))
@@ -30,17 +28,8 @@ const LinkedList_1 = require('collect-your-stuff/dist/collections/linked-list/Li
  * Dispatching an event sends it through the tree the way the DOM does: down from the root to the target (capture
  * listeners), to the target itself, then back up to the root (the listeners which are not capture listeners, when the
  * event bubbles).
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @property {Object.<string, Array.<PseudoEventListener>>} listeners
- * @property {function} addEventListener
- * @property {function} removeEventListener
- * @property {function} dispatchEvent
  */
 class EventTargetService {
-  /**
-   * @constructor
-   */
   constructor () {
     this.listeners = {}
     this.defaultEvent = {}
@@ -48,8 +37,7 @@ class EventTargetService {
 
   /**
    * The listeners registered for a type of event, creating the (empty) list of them when there are none yet.
-   * @param {string} type
-   * @returns {LinkedList}
+   * @param type
    */
   listenersFor (type) {
     if (!(type in this.listeners)) {
@@ -63,8 +51,8 @@ class EventTargetService {
    * (at the target, the capture listeners run before the others). Listeners which are added while this runs do not run
    * for this event, and listeners which are removed while it runs no longer do. Running stops as soon as immediate
    * propagation is stopped. A listener which throws does not stop the others.
-   * @param {EventService} event The event, which is at a phase and has a current target
-   * @returns {Array<*>} The errors which the listeners threw
+   * @param event The event, which is at a phase and has a current target
+   * @returns The errors which the listeners threw
    */
   runEvents (event) {
     const errors = []
@@ -97,8 +85,8 @@ class EventTargetService {
 
   /**
    * Take a listener out of the registered listeners, so that it does not run again.
-   * @param {string} type
-   * @param {PseudoEventListener} listener
+   * @param type
+   * @param listener
    */
   removeListener (type, listener) {
     listener.removed = true
@@ -108,8 +96,8 @@ class EventTargetService {
 
   /**
    * Register the function to run when nothing else has prevented the default for this type of event.
-   * @param {string} type
-   * @param {Function} callback
+   * @param type
+   * @param callback
    */
   setDefaultEvent (type, callback) {
     this.listenersFor(type)
@@ -119,9 +107,9 @@ class EventTargetService {
   /**
    * Registers an event handler of a specific event type. Adding the same handler again for the same type and phase does
    * nothing, like the DOM.
-   * @param {string} type The type of event to listen for
-   * @param {Function|Object} callback The function to call (or an object with a handleEvent function)
-   * @param {Object|boolean} [useCapture=false] Listen while the event travels down to the target (true), or an object with capture, once and passive
+   * @param type The type of event to listen for
+   * @param callback The function to call (or an object with a handleEvent function)
+   * @param useCapture Listen while the event travels down to the target (true), or an object with capture, once and passive
    */
   addEventListener (type, callback, useCapture = false) {
     let options = {
@@ -155,9 +143,9 @@ class EventTargetService {
 
   /**
    * Removes an event listener, the one which was added with the same type, handler and phase.
-   * @param {string} type The type of event
-   * @param {Function|Object} callback The handler which was added
-   * @param {Object|boolean} [options=false] Whether the listener was a capture listener (true), or an object with capture
+   * @param type The type of event
+   * @param callback The handler which was added
+   * @param options Whether the listener was a capture listener (true), or an object with capture
    */
   removeEventListener (type, callback, options = false) {
     if (!(type in this.listeners)) {
@@ -173,8 +161,8 @@ class EventTargetService {
    * parent up to the root. stopPropagation() stops it reaching further targets, stopImmediatePropagation() also stops
    * the remaining listeners of the current target. Afterwards, unless the default was prevented, the default action
    * of this target (see setDefaultEvent) runs. The event can be dispatched again afterwards.
-   * @param {EventService} event The event to dispatch
-   * @returns {boolean} False when the event was cancelable and a listener prevented the default, otherwise true
+   * @param event The event to dispatch
+   * @returns False when the event was cancelable and a listener prevented the default, otherwise true
    * @throws {Error} When the event is already being dispatched, or (after the whole dispatch has finished) the error
    * which a listener threw (an error with all of them in its errors property when several did)
    */

@@ -16,9 +16,6 @@ const getElementById_1 = __importDefault(require('../functions/getElementById'))
 /**
  * Simulate the behaviour of the DocumentFragment Class when there is no DOM available: a container for nodes which is
  * not part of a tree, when it is inserted its children are moved into the tree instead.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments NodeService
  */
 class DocumentFragmentService extends NodeService_1.NodeService {
   get nodeName () {
@@ -32,8 +29,7 @@ class DocumentFragmentService extends NodeService_1.NodeService {
   /**
    * The first element, in tree order, whose id matches the given value, or null when there is none (the DOM's
    * NonElementParentNode mixin, which Document and DocumentFragment both implement).
-   * @param {string} id
-   * @returns {PseudoElement|null}
+   * @param id
    */
   getElementById (id) {
     return (0, getElementById_1.default)(this, id)

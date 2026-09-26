@@ -5,23 +5,16 @@ Object.defineProperty(exports, '__esModule', {
 })
 exports.FocusEventService = void 0
 /**
- * @file Substitute for the DOM FocusEvent Class.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the DOM FocusEvent Class.
  */
 const UIEventService_1 = require('./UIEventService')
 /**
  * Simulate the behaviour of the FocusEvent Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments UIEventService
- * @property {PseudoEventTarget|null} relatedTarget
  */
 class FocusEventService extends UIEventService_1.UIEventService {
   /**
-   * @param {string} [typeArg=''] The type of the event
-   * @param {FocusEventInit} [init={}] The options for the event
-   * @constructor
+   * @param typeArg The type of the event
+   * @param init The options for the event
    */
   constructor (typeArg = '', init = {}) {
     super(typeArg, init)

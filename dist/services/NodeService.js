@@ -16,9 +16,7 @@ Object.defineProperty(exports, '__esModule', {
 })
 exports.CommentService = exports.TextService = exports.NodeService = void 0
 /**
- * @file Substitute for the DOM Node Class.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the DOM Node Class.
  */
 const generateNodeList_1 = __importDefault(require('../factories/generateNodeList'))
 const TreeLinker_1 = require('collect-your-stuff/dist/collections/linked-tree-list/TreeLinker')
@@ -27,18 +25,8 @@ const HTMLCollectionService_1 = require('./HTMLCollectionService')
 const query_1 = require('../factories/query')
 /**
  * Simulate the behaviour of the Node Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments PseudoEventTarget
- * @property {string} name
- * @property {function} appendChild
- * @property {function} removeChild
  */
 class NodeService extends EventTargetService_1.default {
-  /**
-   *
-   * @constructor
-   */
   constructor () {
     super()
     this.nodeValueStore = null
@@ -144,8 +132,8 @@ class NodeService extends EventTargetService_1.default {
 
   /**
    * Add a node as the last child of this node (a node which is already in a tree is moved).
-   * @param {PseudoNode} childNode The node to add
-   * @returns {PseudoNode} The added node
+   * @param childNode The node to add
+   * @returns The added node
    */
   appendChild (childNode) {
     return this.insertBefore(childNode, null)
@@ -153,7 +141,6 @@ class NodeService extends EventTargetService_1.default {
 
   /**
    * Whether this kind of node can have children (text, comments and attributes cannot).
-   * @returns {boolean}
    */
   get acceptsChildren () {
     return true
@@ -162,7 +149,6 @@ class NodeService extends EventTargetService_1.default {
   /**
    * Make a copy of this node without its children, its parent or its listeners, which is what cloneNode starts from.
    * Kinds of node which are made with arguments override this to give them.
-   * @returns {NodeService}
    */
   cloneShallow () {
     const copy = new this.constructor()
@@ -174,8 +160,7 @@ class NodeService extends EventTargetService_1.default {
   /**
    * Whether another node of the same type is equal to this one apart from its children, which isEqualNode compares
    * afterwards. Kinds of node with more to compare (an element has attributes) override this.
-   * @param {NodeService} other The node to compare with
-   * @returns {boolean}
+   * @param other The node to compare with
    */
   equalsShallow (other) {
     return this.nodeName === other.nodeName && this.nodeValue === other.nodeValue
@@ -183,7 +168,7 @@ class NodeService extends EventTargetService_1.default {
 
   /**
    * Add nodes (strings become text nodes) as the last children of this node, in the order given.
-   * @param {...(PseudoNode|string)} nodes The nodes (or text) to add
+   * @param nodes The nodes (or text) to add
    * @throws {Error} When this kind of node cannot have children
    */
   append (...nodes) {
@@ -192,7 +177,7 @@ class NodeService extends EventTargetService_1.default {
 
   /**
    * Add nodes (strings become text nodes) as the first children of this node, in the order given.
-   * @param {...(PseudoNode|string)} nodes The nodes (or text) to add
+   * @param nodes The nodes (or text) to add
    * @throws {Error} When this kind of node cannot have children
    */
   prepend (...nodes) {
@@ -202,7 +187,7 @@ class NodeService extends EventTargetService_1.default {
 
   /**
    * Remove every child of this node and put the given nodes (strings become text nodes) in their place, in order.
-   * @param {...(PseudoNode|string)} nodes The nodes (or text) to add
+   * @param nodes The nodes (or text) to add
    * @throws {Error} When this kind of node cannot have children
    */
   replaceChildren (...nodes) {
@@ -215,7 +200,7 @@ class NodeService extends EventTargetService_1.default {
   /**
    * Add nodes (strings become text nodes) as this node's previous siblings, in order. Does nothing when this node has
    * no parent.
-   * @param {...(PseudoNode|string)} nodes The nodes (or text) to add
+   * @param nodes The nodes (or text) to add
    */
   before (...nodes) {
     const parent = this.parentNode
@@ -228,7 +213,7 @@ class NodeService extends EventTargetService_1.default {
   /**
    * Add nodes (strings become text nodes) as this node's next siblings, in order. Does nothing when this node has no
    * parent.
-   * @param {...(PseudoNode|string)} nodes The nodes (or text) to add
+   * @param nodes The nodes (or text) to add
    */
   after (...nodes) {
     const parent = this.parentNode
@@ -242,7 +227,7 @@ class NodeService extends EventTargetService_1.default {
   /**
    * Put the given nodes (strings become text nodes) where this node is, in order, then remove this node. Does nothing
    * when this node has no parent.
-   * @param {...(PseudoNode|string)} nodes The nodes (or text) to put in this node's place
+   * @param nodes The nodes (or text) to put in this node's place
    */
   replaceWith (...nodes) {
     const parent = this.parentNode
@@ -265,8 +250,7 @@ class NodeService extends EventTargetService_1.default {
   /**
    * Turn a value given to append / prepend / before / after / replaceWith / replaceChildren into a node: a string
    * becomes a text node belonging to this node's document, anything else is returned as it is.
-   * @param {PseudoNode|string} value The value to add
-   * @returns {PseudoNode}
+   * @param value The value to add
    */
   toChildNode (value) {
     if (typeof value !== 'string') {
@@ -279,8 +263,7 @@ class NodeService extends EventTargetService_1.default {
 
   /**
    * Every element below this node with the given tag name (or every element when tagName is *), live.
-   * @param {string} tagName
-   * @returns {PseudoHTMLCollection}
+   * @param tagName
    */
   getElementsByTagName (tagName) {
     const matchesTag = tagName === '*' ? () => true : element => element.tagName === tagName
@@ -289,8 +272,7 @@ class NodeService extends EventTargetService_1.default {
 
   /**
    * Every element below this node which has all of the given (space separated) classes, live.
-   * @param {string} className
-   * @returns {PseudoHTMLCollection}
+   * @param className
    */
   getElementsByClassName (className) {
     const names = className.trim().split(/\s+/).filter(Boolean)
@@ -300,9 +282,8 @@ class NodeService extends EventTargetService_1.default {
   /**
    * Every element below this node with the given tag name, live. There is no real namespace parsing here, so this
    * ignores the namespace and behaves exactly like getElementsByTagName.
-   * @param {string} namespace Ignored
-   * @param {string} tagName
-   * @returns {PseudoHTMLCollection}
+   * @param namespace Ignored
+   * @param tagName
    */
   getElementsByTagNameNS (namespace, tagName) {
     return this.getElementsByTagName(tagName)
@@ -310,8 +291,7 @@ class NodeService extends EventTargetService_1.default {
 
   /**
    * The first element below this node which matches the CSS selector, in tree order, or null when there is none.
-   * @param {string} selectors A CSS selector
-   * @returns {PseudoElement|null}
+   * @param selectors A CSS selector
    */
   querySelector (selectors) {
     return (0, query_1.querySelector)(selectors, this)
@@ -320,8 +300,7 @@ class NodeService extends EventTargetService_1.default {
   /**
    * Every element below this node which matches the CSS selector, in tree order. A plain array (not a live
    * collection): like the DOM's querySelectorAll, it is a snapshot taken when it is called.
-   * @param {string} selectors A CSS selector
-   * @returns {Array<PseudoElement>}
+   * @param selectors A CSS selector
    */
   querySelectorAll (selectors) {
     return (0, query_1.querySelectorAll)(selectors, this)
@@ -330,14 +309,13 @@ class NodeService extends EventTargetService_1.default {
   /**
    * Called each time a node has been inserted as a child of this node, so that nodes which need to react to children
    * (for example elements applying default events) can do so.
-   * @param {NodeService} child The node which was inserted
+   * @param child The node which was inserted
    */
   childInserted (child) {}
   /**
    * Make a copy of this node (without its parent, and without its event listeners). With deep the children are copied
    * too, all the way down.
-   * @param {boolean} [deep=false] Copy the children as well
-   * @returns {PseudoNode}
+   * @param deep Copy the children as well
    */
   cloneNode (deep = false) {
     const copy = this.cloneShallow()
@@ -352,8 +330,7 @@ class NodeService extends EventTargetService_1.default {
    * itself, DISCONNECTED (with IMPLEMENTATION_SPECIFIC and a consistent PRECEDING or FOLLOWING) for a node in another tree,
    * CONTAINS + PRECEDING when the other node is an ancestor, CONTAINED_BY + FOLLOWING when it is a descendant,
    * otherwise PRECEDING or FOLLOWING by their order in the tree.
-   * @param {PseudoNode} otherNode The node to locate
-   * @returns {number}
+   * @param otherNode The node to locate
    */
   compareDocumentPosition (otherNode) {
     if (otherNode === this) {
@@ -394,8 +371,7 @@ class NodeService extends EventTargetService_1.default {
 
   /**
    * Check whether a node is this node or one of its descendants.
-   * @param {PseudoNode|null} otherNode The node to look for
-   * @returns {boolean}
+   * @param otherNode The node to look for
    */
   contains (otherNode) {
     let current = otherNode
@@ -421,9 +397,9 @@ class NodeService extends EventTargetService_1.default {
   /**
    * Insert a node as a child of this node, before the given child (or at the end when there is none). A node which is
    * already in a tree is moved, and the children of a document fragment are moved in order.
-   * @param {PseudoNode} newNode The node to insert
-   * @param {PseudoNode|null} [referenceNode=null] The child of this node to insert before, or null to insert at the end
-   * @returns {PseudoNode} The inserted node
+   * @param newNode The node to insert
+   * @param referenceNode The child of this node to insert before, or null to insert at the end
+   * @returns The inserted node
    * @throws {Error} When the reference node is not a child of this node, or the new node is this node or contains it
    */
   insertBefore (newNode, referenceNode = null) {
@@ -469,8 +445,7 @@ class NodeService extends EventTargetService_1.default {
   /**
    * Whether another node is the same as this one, by what they hold: the same type, name and value (an element also
    * needs the same attributes), and children which are equal in the same order.
-   * @param {PseudoNode|null} otherNode The node to compare with
-   * @returns {boolean}
+   * @param otherNode The node to compare with
    */
   isEqualNode (otherNode) {
     if (!otherNode || otherNode.nodeType !== this.nodeType || !this.equalsShallow(otherNode)) {
@@ -523,8 +498,8 @@ class NodeService extends EventTargetService_1.default {
 
   /**
    * Remove a child from this node, it no longer has a parent or siblings afterwards.
-   * @param {PseudoNode} childElement The child node to remove
-   * @returns {PseudoNode} The removed node
+   * @param childElement The child node to remove
+   * @returns The removed node
    * @throws {Error} When the node is not a child of this node
    */
   removeChild (childElement) {
@@ -540,9 +515,9 @@ class NodeService extends EventTargetService_1.default {
 
   /**
    * Replace a child of this node with another node (which is moved if it is already in a tree).
-   * @param {PseudoNode} newChild The node which takes the place
-   * @param {PseudoNode} oldChild The child of this node to replace
-   * @returns {PseudoNode} The replaced node
+   * @param newChild The node which takes the place
+   * @param oldChild The child of this node to replace
+   * @returns The replaced node
    * @throws {Error} When the old node is not a child of this node
    */
   replaceChild (newChild, oldChild) {
@@ -585,17 +560,10 @@ NodeService.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC = 32
 NodeService.nextNodeId = 1
 /**
  * Simulate the behaviour of the Text Class when there is no DOM available: the text in an element.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments NodeService
- * @property {string} data - The text
- * @property {number} length - How many characters there are
- * @property {string} wholeText - The text of this node and of the text nodes next to it
  */
 class TextService extends NodeService {
   /**
-   * @param {string} [data=''] The text
-   * @constructor
+   * @param data The text
    */
   constructor (data = '') {
     super()
@@ -614,6 +582,7 @@ class TextService extends NodeService {
     return NodeService.TEXT_NODE
   }
 
+  /** The text */
   get data () {
     return this.nodeValue
   }
@@ -622,6 +591,7 @@ class TextService extends NodeService {
     this.nodeValue = String(data)
   }
 
+  /** How many characters there are */
   get length () {
     return this.data.length
   }
@@ -634,6 +604,7 @@ class TextService extends NodeService {
     this.data = text === null ? '' : String(text)
   }
 
+  /** The text of this node and of the text nodes next to it */
   get wholeText () {
     let first = this
     while (first.previousSibling && first.previousSibling.nodeType === NodeService.TEXT_NODE) {
@@ -649,8 +620,8 @@ class TextService extends NodeService {
   /**
    * Break this text node in two at a position: this node keeps the text before it and a new node with the rest is put
    * after this one.
-   * @param {number} offset How many characters stay in this node
-   * @returns {TextService} The new node
+   * @param offset How many characters stay in this node
+   * @returns The new node
    * @throws {Error} When the offset is beyond the end of the text
    */
   splitText (offset) {
@@ -675,16 +646,10 @@ class TextService extends NodeService {
 exports.TextService = TextService
 /**
  * Simulate the behaviour of the Comment Class when there is no DOM available: a note in the markup which is not shown.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments NodeService
- * @property {string} data - The comment
- * @property {number} length - How many characters there are
  */
 class CommentService extends NodeService {
   /**
-   * @param {string} [data=''] The comment
-   * @constructor
+   * @param data The comment
    */
   constructor (data = '') {
     super()
@@ -703,6 +668,7 @@ class CommentService extends NodeService {
     return NodeService.COMMENT_NODE
   }
 
+  /** The comment */
   get data () {
     return this.nodeValue
   }
@@ -711,6 +677,7 @@ class CommentService extends NodeService {
     this.nodeValue = String(data)
   }
 
+  /** How many characters there are */
   get length () {
     return this.data.length
   }

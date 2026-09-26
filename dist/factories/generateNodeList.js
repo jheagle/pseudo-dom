@@ -6,8 +6,7 @@ Object.defineProperty(exports, '__esModule', {
 const PseudoNodeList_1 = require('../classes/PseudoNodeList')
 /**
  * Create a PseudoNodeList, optionally starting from an existing chain of linkers.
- * @param {TreeLinker|null} [innerList=null]
- * @returns {PseudoNodeList}
+ * @param innerList
  */
 const generateNodeList = (innerList = null) => new PseudoNodeList_1.PseudoNodeList().initialize(innerList)
 exports.default = generateNodeList

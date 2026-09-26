@@ -8,10 +8,8 @@ const NodeService_1 = require('../services/NodeService')
  * The first element, in tree order, below (not including) the given node whose id matches the given value, or null
  * when there is none. Shared by Document and DocumentFragment, which both implement the DOM's NonElementParentNode
  * mixin (so ShadowRoot, a DocumentFragment, gets it too).
- * @memberOf module:functions
- * @param {NodeService} root The node to search below
- * @param {string} id
- * @returns {PseudoElement|null}
+ * @param root The node to search below
+ * @param id
  */
 const getElementById = (root, id) => {
   const search = node => {

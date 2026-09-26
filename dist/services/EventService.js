@@ -1,9 +1,7 @@
 'use strict'
 
 /**
- * @file Substitute for the DOM Event Class.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the DOM Event Class.
  */
 Object.defineProperty(exports, '__esModule', {
   value: true
@@ -11,42 +9,15 @@ Object.defineProperty(exports, '__esModule', {
 exports.EventService = void 0
 /**
  * Simulate the behaviour of the Event Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @property {number} NONE
- * @property {number} CAPTURING_PHASE
- * @property {number} AT_TARGET
- * @property {number} BUBBLING_PHASE
- * @property {boolean} bubbles - A Boolean indicating whether the event bubbles up through the Dom or not.
- * @property {boolean} cancelable - A Boolean indicating whether the event is cancelable.
- * @property {boolean} composed - A Boolean value indicating whether the event can bubble across the boundary
- * between the shadow Dom and the regular Dom.
- * @property {function|PseudoEventTarget} currentTarget - A reference to the currently registered target for the event. This
- * is the object to which the event is currently slated to be sent; it's possible this has been changed along the way
- * through re-targeting.
- * @property {boolean} defaultPrevented - Indicates whether event.preventDefault() has been called on the event.
- * @property {boolean} immediatePropagationStopped - Flag that no further propagation should occur, including on current
- * target.
- * @property {boolean} propagationStopped - Flag that no further propagation should occur.
- * @property {int} eventPhase - Indicates which phase of the event flow is being processed. Uses EventService constants.
- * @property {EventTarget|PseudoEventTarget} target - A reference to the target to which the event was originally
- * dispatched.
- * @property {int} timeStamp - The time at which the event was created (in milliseconds). By specification, this
- * value is time since epoch, but in reality browsers' definitions vary; in addition, work is underway to change this
- * to be a DomHighResTimeStamp instead.
- * @property {string} type - The name of the event (case-insensitive).
- * @property {boolean} isTrusted - Indicates whether the event was initiated by the browser (after a user
- * click for instance) or by a script (using an event creation method, like event.initEvent)
  */
 class EventService {
   /**
    *
-   * @param {string} typeArg
-   * @param {Object} [eventOptions={}]
-   * @param {boolean} [eventOptions.bubbles=false]
-   * @param {boolean} [eventOptions.cancelable=false]
-   * @param {boolean} [eventOptions.composed=false]
-   * @constructor
+   * @param typeArg
+   * @param eventOptions
+   * @param eventOptions.bubbles
+   * @param eventOptions.cancelable
+   * @param eventOptions.composed
    */
   constructor (typeArg = '', {
     bubbles = false,
@@ -54,17 +25,29 @@ class EventService {
     composed = false
   } = {}) {
     this.properties = {
+      /** A Boolean indicating whether the event bubbles up through the Dom or not. */
       bubbles: false,
+      /** A Boolean indicating whether the event is cancelable. */
       cancelable: false,
+      /** A Boolean value indicating whether the event can bubble across the boundary between the shadow Dom and the regular Dom. */
       composed: false,
+      /** A reference to the currently registered target for the event. This is the object to which the event is currently slated to be sent; it's possible this has been changed along the way through re-targeting. */
       currentTarget: null,
+      /** Indicates whether event.preventDefault() has been called on the event. */
       defaultPrevented: false,
+      /** Flag that no further propagation should occur, including on current target. */
       immediatePropagationStopped: false,
+      /** Flag that no further propagation should occur. */
       propagationStopped: false,
+      /** Indicates which phase of the event flow is being processed. Uses EventService constants. */
       eventPhase: 0,
+      /** A reference to the target to which the event was originally dispatched. */
       target: null,
+      /** The time at which the event was created (in milliseconds). By specification, this value is time since epoch, but in reality browsers' definitions vary; in addition, work is underway to change this to be a DomHighResTimeStamp instead. */
       timeStamp: Math.floor(Date.now() / 1000),
+      /** The name of the event (case-insensitive). */
       type: '',
+      /** Indicates whether the event was initiated by the browser (after a user click for instance) or by a script (using an event creation method, like event.initEvent) */
       isTrusted: false,
       dispatching: false,
       inPassiveListener: false,
@@ -120,7 +103,6 @@ class EventService {
 
   /**
    * Scope several accessors inside the inner object. These are only intended for usage by other DOM classes.
-   * @returns {EventInner}
    */
   get inner () {
     const self = this
@@ -189,8 +171,6 @@ class EventService {
 
   /**
    * Return an array of targets that will have the event executed open them. The order is based on the eventPhase
-   * @method
-   * @returns {Array.<PseudoEventTarget>}
    */
   composedPath () {
     // While the event is being dispatched this is every target it travels through, the target first and the root last
@@ -199,8 +179,6 @@ class EventService {
 
   /**
    * Cancels the event (if it is cancelable).
-   * @method
-   * @returns {null}
    */
   preventDefault () {
     // Only an event which can be cancelled can be prevented, and a passive listener cannot prevent the default
@@ -216,8 +194,6 @@ class EventService {
    * For this particular event, no other listener will be called.
    * Neither those attached on the same element, nor those attached on elements which will be traversed later (in
    * capture phase, for instance)
-   * @method
-   * @returns {null}
    */
   stopImmediatePropagation () {
     this.setReadOnlyProperties({
@@ -228,8 +204,6 @@ class EventService {
 
   /**
    * Stops the propagation of events further along in the Dom.
-   * @method
-   * @returns {null}
    */
   stopPropagation () {
     this.setReadOnlyProperties({

@@ -5,28 +5,17 @@ Object.defineProperty(exports, '__esModule', {
 })
 exports.KeyboardEventService = void 0
 /**
- * @file Substitute for the DOM KeyboardEvent Class.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the DOM KeyboardEvent Class.
  */
 const UIEventService_1 = require('./UIEventService')
 const modifierState_1 = require('../functions/modifierState')
 /**
  * Simulate the behaviour of the KeyboardEvent Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments UIEventService
- * @property {string} key
- * @property {string} code
- * @property {number} location
- * @property {boolean} repeat
- * @property {boolean} isComposing
  */
 class KeyboardEventService extends UIEventService_1.UIEventService {
   /**
-   * @param {string} [typeArg=''] The type of the event
-   * @param {KeyboardEventInit} [init={}] The options for the event
-   * @constructor
+   * @param typeArg The type of the event
+   * @param init The options for the event
    */
   constructor (typeArg = '', init = {}) {
     super(typeArg, init)
@@ -76,8 +65,7 @@ class KeyboardEventService extends UIEventService_1.UIEventService {
 
   /**
    * Whether a modifier key was held down when the event happened.
-   * @param {string} key Control, Shift, Alt or Meta
-   * @returns {boolean}
+   * @param key Control, Shift, Alt or Meta
    */
   getModifierState (key) {
     return (0, modifierState_1.modifierState)(this.modifiers, key)

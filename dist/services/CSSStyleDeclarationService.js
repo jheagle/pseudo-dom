@@ -1,9 +1,7 @@
 'use strict'
 
 /**
- * @file Substitute for the DOM CSSStyleDeclaration Class (the object behind Element.style).
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the DOM CSSStyleDeclaration Class (the object behind Element.style).
  */
 require('core-js/modules/esnext.iterator.constructor.js')
 require('core-js/modules/esnext.iterator.for-each.js')
@@ -31,13 +29,10 @@ exports.CSSStyleDeclarationService = void 0
  * given, with no unit conversion, shorthand expansion or validation - this is a data structure, not a real CSS
  * engine. Named property access (declaration.backgroundColor, camelCase) is added on top of this by
  * createStyleDeclaration, which wraps an instance of this class in a Proxy.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
  */
 class CSSStyleDeclarationService {
   /**
-   * @param {string} [cssText=''] Initial declarations, as CSS text ("color: red; font-size: 12px;")
-   * @constructor
+   * @param cssText Initial declarations, as CSS text ("color: red; font-size: 12px;")
    */
   constructor (cssText = '') {
     this.properties = new Map()
@@ -46,7 +41,6 @@ class CSSStyleDeclarationService {
 
   /**
    * How many properties are currently set.
-   * @returns {number}
    */
   get length () {
     return this.properties.size
@@ -55,8 +49,7 @@ class CSSStyleDeclarationService {
   /**
    * The name of the property at the given index, in the order it was set, or '' when there is none (matches the
    * DOM's CSSStyleDeclaration, which is array-like).
-   * @param {number} index
-   * @returns {string}
+   * @param index
    */
   item (index) {
     return Array.from(this.properties.keys())[index] || ''
@@ -64,8 +57,7 @@ class CSSStyleDeclarationService {
 
   /**
    * The value of the given property, or '' when it is not set.
-   * @param {string} property A CSS property name (kebab-case, e.g. "background-color")
-   * @returns {string}
+   * @param property A CSS property name (kebab-case, e.g. "background-color")
    */
   getPropertyValue (property) {
     const entry = this.properties.get(property)
@@ -74,8 +66,7 @@ class CSSStyleDeclarationService {
 
   /**
    * "important" when the property was set with !important, otherwise ''.
-   * @param {string} property A CSS property name (kebab-case)
-   * @returns {string}
+   * @param property A CSS property name (kebab-case)
    */
   getPropertyPriority (property) {
     const entry = this.properties.get(property)
@@ -85,10 +76,9 @@ class CSSStyleDeclarationService {
   /**
    * Set a property's value (and optionally its priority). An empty, null or undefined value removes the property
    * instead, like the DOM.
-   * @param {string} property A CSS property name (kebab-case)
-   * @param {string} value The value, or '' to remove the property
-   * @param {string} [priority=''] "important" to mark it !important
-   * @returns {undefined}
+   * @param property A CSS property name (kebab-case)
+   * @param value The value, or '' to remove the property
+   * @param priority "important" to mark it !important
    */
   setProperty (property, value, priority = '') {
     if (value === '' || value === null || typeof value === 'undefined') {
@@ -103,8 +93,7 @@ class CSSStyleDeclarationService {
 
   /**
    * Remove a property, returning the value it had (or '' when it was not set).
-   * @param {string} property A CSS property name (kebab-case)
-   * @returns {string}
+   * @param property A CSS property name (kebab-case)
    */
   removeProperty (property) {
     const value = this.getPropertyValue(property)
@@ -114,7 +103,6 @@ class CSSStyleDeclarationService {
 
   /**
    * All the declarations as one CSS text string.
-   * @returns {string}
    */
   get cssText () {
     return Array.from(this.properties.entries()).map(([property, {
@@ -125,8 +113,7 @@ class CSSStyleDeclarationService {
 
   /**
    * Replace every declaration by parsing a CSS text string ("color: red; font-size: 12px !important;").
-   * @param {string} cssText
-   * @returns {undefined}
+   * @param cssText
    */
   set cssText (cssText) {
     this.properties.clear()

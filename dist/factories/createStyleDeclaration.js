@@ -5,24 +5,20 @@ Object.defineProperty(exports, '__esModule', {
 })
 exports.camelToKebab = exports.kebabToCamel = void 0
 /**
- * @file Wraps a CSSStyleDeclarationService in a Proxy so arbitrary camelCase CSS properties (element.style.
+ * Wraps a CSSStyleDeclarationService in a Proxy so arbitrary camelCase CSS properties (element.style.
  * backgroundColor) work like the DOM's, on top of its real methods (getPropertyValue, setProperty, cssText, ...).
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
  */
 const CSSStyleDeclarationService_1 = require('../services/CSSStyleDeclarationService')
 const isIndex = property => /^\d+$/.test(property)
 /**
  * kebab-case -> camelCase ("background-color" -> "backgroundColor").
- * @param {string} name
- * @returns {string}
+ * @param name
  */
 const kebabToCamel = name => name.replace(/-([a-z0-9])/gi, (_match, letter) => letter.toUpperCase())
 exports.kebabToCamel = kebabToCamel
 /**
  * camelCase -> kebab-case ("backgroundColor" -> "background-color").
- * @param {string} name
- * @returns {string}
+ * @param name
  */
 const camelToKebab = name => name.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`)
 exports.camelToKebab = camelToKebab
@@ -30,9 +26,7 @@ exports.camelToKebab = camelToKebab
  * A live CSSStyleDeclaration-like object: its real methods (cssText, getPropertyValue, setProperty, ...) work as
  * declared, and any other property name is treated as a camelCase CSS property (declaration.backgroundColor reads /
  * writes the "background-color" declaration), matching what a real element.style supports.
- * @memberOf module:factories
- * @param {string} [cssText=''] Initial declarations
- * @returns {CSSStyleDeclarationService}
+ * @param cssText Initial declarations
  */
 const createStyleDeclaration = (cssText = '') => {
   const target = new CSSStyleDeclarationService_1.CSSStyleDeclarationService(cssText)

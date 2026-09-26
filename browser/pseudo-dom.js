@@ -6,26 +6,18 @@
       value: true
     })
     /**
- * @file Substitute for the DOM EventEventListener Class.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the DOM EventEventListener Class.
  */
     const EventService_1 = require('../services/EventService')
     /**
  * Handle events as they are stored and implemented.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @property {string} eventType
- * @property {Object} eventOptions
- * @property {boolean} isDefault
  */
     class PseudoEventListener {
       /**
-   * @param {string} eventType The type of event this listens for
-   * @param {Object} [options] The capture, once and passive options
-   * @param {Function} handleEvent The function which is called with the event, already bound to what it should run as
-   * @param {Function} [originalCallback=handleEvent] The function (or object) which was given when registering, used to find this listener again
-   * @constructor
+   * @param eventType The type of event this listens for
+   * @param options The capture, once and passive options
+   * @param handleEvent The function which is called with the event, already bound to what it should run as
+   * @param originalCallback The function (or object) which was given when registering, used to find this listener again
    */
       constructor (eventType, {
         capture = false,
@@ -85,10 +77,7 @@
       }
 
       /**
-   * @method
-   * @name PseudoEventListener#handleEvent
-   * @param {PseudoEvent} event
-   * @returns {*}
+   * @param event
    */
       handleEvent (event) {
         return this.handler(event)
@@ -96,10 +85,7 @@
 
       /**
    * A capture listener runs while the event travels down to the target.
-   * @method
-   * @name PseudoEventListener#doCapturePhase
-   * @param {PseudoEvent} event
-   * @returns {boolean}
+   * @param event
    */
       doCapturePhase (event) {
         return event.eventPhase === EventService_1.EventService.CAPTURING_PHASE && this.eventOptions.capture
@@ -107,10 +93,7 @@
 
       /**
    * Every listener of the target itself runs, capture listeners first.
-   * @method
-   * @name PseudoEventListener#doTargetPhase
-   * @param {PseudoEvent} event
-   * @returns {boolean}
+   * @param event
    */
       doTargetPhase (event) {
         return event.eventPhase === EventService_1.EventService.AT_TARGET
@@ -118,20 +101,14 @@
 
       /**
    * A listener which is not a capture listener runs while the event travels back up (when it bubbles).
-   * @method
-   * @name PseudoEventListener#doBubblePhase
-   * @param {PseudoEvent} event
-   * @returns {boolean}
+   * @param event
    */
       doBubblePhase (event) {
         return event.eventPhase === EventService_1.EventService.BUBBLING_PHASE && !this.eventOptions.capture
       }
 
       /**
-   * @method
-   * @name PseudoEventListener#skipPhase
-   * @param {PseudoEvent} event
-   * @returns {boolean}
+   * @param event
    */
       skipPhase (event) {
         return !this.doCapturePhase(event) && !this.doTargetPhase(event) && !this.doBubblePhase(event)
@@ -141,10 +118,7 @@
    * Whether this listener should not run for the event as it is now (it was removed, or it is for another phase).
    * Stopping propagation is handled by the dispatching, since it stops other targets and not the listeners of the
    * current one.
-   * @method
-   * @name PseudoEventListener#rejectEvent
-   * @param {PseudoEvent} event
-   * @returns {boolean}
+   * @param event
    */
       rejectEvent (event) {
         return this.isRemoved || this.skipPhase(event)
@@ -165,16 +139,10 @@
  * Simulate the behaviour of the HTMLDocument Class when there is no DOM available. Like the real HTMLDocument, this
  * only adds the html/head/body structure on top of what Document already gives (createElement, createTextNode,
  * createComment, createDocumentFragment, getElementById, textContent always null).
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments DocumentService
- * @property {PseudoHTMLElement} head - A reference to the Head child element
- * @property {PseudoHTMLElement} body - A reference to the Body child element
  */
     class PseudoHTMLDocument extends DocumentService_1.DocumentService {
       /**
    * The root HTML element is acts as the parent to all HTML elements in the document.
-   * @constructor
    */
       constructor () {
         super()
@@ -182,13 +150,11 @@
         this.appendChild(html)
         /**
      * Create document head element
-     * @type {PseudoHTMLElement}
      */
         this.head = this.createElement('head')
         html.appendChild(this.head)
         /**
      * Create document body element
-     * @type {PseudoHTMLElement}
      */
         this.body = this.createElement('body')
         html.appendChild(this.body)
@@ -197,7 +163,6 @@
       /**
    * A copy of this document with none of its html/head/body (cloneNode, from the inherited cloneShallow hook, fills
    * them back in, deep copies own document's, empty otherwise - see cloneNode).
-   * @returns {PseudoHTMLDocument}
    */
       cloneShallow () {
         const copy = new this.constructor()
@@ -212,8 +177,7 @@
       /**
    * Make a copy of this document. The copy has no parent or listeners, and a deep copy has copies of everything in
    * the document (a shallow one is an empty document).
-   * @param {boolean} [deep=false] Copy everything in the document as well
-   * @returns {PseudoHTMLDocument}
+   * @param deep Copy everything in the document as well
    */
       cloneNode (deep = false) {
         const copy = super.cloneNode(deep)
@@ -238,21 +202,16 @@
     })
     exports.PseudoNodeList = void 0
     /**
- * @file Substitute for the NodeList interface.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the NodeList interface.
  */
     const LinkedTreeList_1 = require('collect-your-stuff/dist/collections/linked-tree-list/LinkedTreeList')
     /**
  * A NodeList, like the DOM one, iterates over the nodes themselves (the data stored in each TreeLinker), rather than
  * the linkers that hold them.
- * @class
- * @augments LinkedTreeList
  */
     class PseudoNodeList extends LinkedTreeList_1.LinkedTreeList {
       /**
    * Iterate over the nodes in this list.
-   * @returns {Iterator}
    */
       [Symbol.iterator] () {
         // Walk the nodes of this list only (the linkers of a child list have no children of their own)
@@ -277,7 +236,6 @@
 
       /**
    * Iterate over [index, node] pairs.
-   * @returns {Iterator}
    */
       entries () {
         return Array.from(this).map((node, index) => [index, node])[Symbol.iterator]()
@@ -285,7 +243,6 @@
 
       /**
    * Iterate over the indexes.
-   * @returns {Iterator}
    */
       keys () {
         return Array.from(this).map((node, index) => index)[Symbol.iterator]()
@@ -293,7 +250,6 @@
 
       /**
    * Iterate over the nodes.
-   * @returns {Iterator}
    */
       values () {
         return Array.from(this)[Symbol.iterator]()
@@ -310,20 +266,17 @@
       value: true
     })
     /**
- * @file Wraps an element in a Proxy which behaves like the DOM's DOMStringMap (element.dataset): a live view of its
+ * Wraps an element in a Proxy which behaves like the DOM's DOMStringMap (element.dataset): a live view of its
  * data-* attributes, under their camelCase names, backed by the element's own getAttribute / setAttribute /
  * hasAttribute / removeAttribute (nothing is stored separately, so it can never fall out of sync with the
  * attributes).
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
  */
     const createStyleDeclaration_1 = require('./createStyleDeclaration')
     const DATA_PREFIX = 'data-'
     const attributeName = property => `${DATA_PREFIX}${(0, createStyleDeclaration_1.camelToKebab)(property)}`
     /**
  * Every data-* attribute name currently on the element, as [attributeName, camelCaseName] pairs.
- * @param {*} element
- * @returns {Array<Array<string>>}
+ * @param element
  */
     const dataAttributes = element => {
       const names = []
@@ -337,9 +290,7 @@
     }
     /**
  * A live DOMStringMap-like object for an element's data-* attributes.
- * @memberOf module:factories
- * @param {*} element The element whose data-* attributes this reflects
- * @returns {Object.<string, string>}
+ * @param element The element whose data-* attributes this reflects
  */
     const createDataset = element => new Proxy({}, {
       get (_target, property) {
@@ -413,11 +364,9 @@
  * the init says so, and the event is not trusted. With browser: true the event is created the way the browser creates
  * it, using the standard options for its type (see eventDefaults), and trusted: true makes it look like it came from a
  * real user action (isTrusted).
- * @function createEvent
- * @param {string} type The type of the event, such as click
- * @param {Object} [init={}] The options for the event (bubbles, cancelable, composed and those of its kind of event)
- * @param {CreateEventOptions} [options={}] Whether the browser is creating the event, and whether it is trusted
- * @returns {EventService}
+ * @param type The type of the event, such as click
+ * @param init The options for the event (bubbles, cancelable, composed and those of its kind of event)
+ * @param options Whether the browser is creating the event, and whether it is trusted
  */
     const createEvent = (type, init = {}, {
       browser = false,
@@ -447,24 +396,20 @@
     })
     exports.camelToKebab = exports.kebabToCamel = void 0
     /**
- * @file Wraps a CSSStyleDeclarationService in a Proxy so arbitrary camelCase CSS properties (element.style.
+ * Wraps a CSSStyleDeclarationService in a Proxy so arbitrary camelCase CSS properties (element.style.
  * backgroundColor) work like the DOM's, on top of its real methods (getPropertyValue, setProperty, cssText, ...).
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
  */
     const CSSStyleDeclarationService_1 = require('../services/CSSStyleDeclarationService')
     const isIndex = property => /^\d+$/.test(property)
     /**
  * kebab-case -> camelCase ("background-color" -> "backgroundColor").
- * @param {string} name
- * @returns {string}
+ * @param name
  */
     const kebabToCamel = name => name.replace(/-([a-z0-9])/gi, (_match, letter) => letter.toUpperCase())
     exports.kebabToCamel = kebabToCamel
     /**
  * camelCase -> kebab-case ("backgroundColor" -> "background-color").
- * @param {string} name
- * @returns {string}
+ * @param name
  */
     const camelToKebab = name => name.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`)
     exports.camelToKebab = camelToKebab
@@ -472,9 +417,7 @@
  * A live CSSStyleDeclaration-like object: its real methods (cssText, getPropertyValue, setProperty, ...) work as
  * declared, and any other property name is treated as a camelCase CSS property (declaration.backgroundColor reads /
  * writes the "background-color" declaration), matching what a real element.style supports.
- * @memberOf module:factories
- * @param {string} [cssText=''] Initial declarations
- * @returns {CSSStyleDeclarationService}
+ * @param cssText Initial declarations
  */
     const createStyleDeclaration = (cssText = '') => {
       const target = new CSSStyleDeclarationService_1.CSSStyleDeclarationService(cssText)
@@ -517,17 +460,14 @@
     })
     exports.cssSelectAdapter = void 0
     /**
- * @file The css-select Adapter which lets it query pseudo-dom's own tree, instead of the domutils-based tree it
+ * The css-select Adapter which lets it query pseudo-dom's own tree, instead of the domutils-based tree it
  * defaults to.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
  */
     const NodeService_1 = require('../services/NodeService')
     /**
  * Walk up from a node (not including it) to find the nearest element, in the given direction.
- * @param {*} node The node to start from
- * @param {'nextSibling'|'previousSibling'} direction Which sibling reference to follow
- * @returns {*|null}
+ * @param node The node to start from
+ * @param direction Which sibling reference to follow
  */
     const nearestElementSibling = (node, direction) => {
       let current = node ? node[direction] : null
@@ -540,8 +480,6 @@
  * Maps pseudo-dom's own Node / Element API onto the Adapter interface css-select needs to query a tree which is not
  * domutils' own (css-select's own Adapter<Node, ElementNode> type). Every method here is one pseudo-dom already has
  * under a different name; nothing here reimplements DOM behaviour.
- * @memberOf module:factories
- * @type {Object}
  */
     exports.cssSelectAdapter = {
       isTag: node => !!node && node.nodeType === NodeService_1.NodeService.ELEMENT_NODE,
@@ -598,9 +536,7 @@
     'use strict'
 
     /**
- * @file The standard event types of the browser, and how the browser creates them.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * The standard event types of the browser, and how the browser creates them.
  */
     Object.defineProperty(exports, '__esModule', {
       value: true
@@ -617,7 +553,6 @@
  * options. A script which creates an event with the constructor gets none of them (everything is false) unless it asks
  * for them, which is why createEvent only uses this table when it is told the browser is creating the event.
  * The values follow the UI Events, HTML, Pointer Events, Clipboard, Drag and Drop, Touch and CSS specifications.
- * @type {Object.<string, EventDefinition>}
  */
     exports.eventDefaults = {
       // Mouse (UI Events)
@@ -722,21 +657,14 @@
     /**
  * Construct the Pseudo Dom to provide access to Dom objects which are otherwise not available outside the browser
  * context.
- * @function generateDocument
- * @param {Object} root
- * @param {Object} context
- * @returns {Window|PseudoEventTarget}
+ * @param root
+ * @param context
  */
     const generateDocument = (root, context = {}) => {
-      /**
-   *
-   * @type {Window|PseudoEventTarget}
-   */
       const newWindow = typeof root.document === 'undefined' ? root : new EventTargetService_1.default()
       /**
    * The Node class itself (matching the DOM's window.Node), not an instance - the right-hand side of `instanceof`
    * must be a constructor, so `x instanceof Node` needs this, not `new PseudoNode()`.
-   * @type {Function}
    */
       const Node = root.Node || NodeService_1.NodeService
       if (typeof newWindow.Node === 'undefined') {
@@ -744,7 +672,6 @@
       }
       /**
    * The Element class itself, for the same reason as Node.
-   * @type {Function}
    */
       const Element = root.Element || ElementService_1.ElementService
       if (typeof newWindow.Element === 'undefined') {
@@ -752,7 +679,6 @@
       }
       /**
    * The HTMLElement class itself, for the same reason as Node.
-   * @type {Function}
    */
       const HTMLElement = root.HTMLElement || HTMLElementService_1.HTMLElementService
       if (typeof newWindow.HTMLElement === 'undefined') {
@@ -761,7 +687,6 @@
       /**
    * The HTMLDocument class itself, for the same reason as Node (so `document instanceof HTMLDocument`, a common
    * real-DOM-detection check, works).
-   * @type {Function}
    */
       const HTMLDocument = root.HTMLDocument || PseudoHTMLDocument_1.default
       if (typeof newWindow.HTMLDocument === 'undefined') {
@@ -770,7 +695,6 @@
       /**
    * Define document when not available - a real instance, unlike the classes above (window.document IS an object,
    * not a constructor).
-   * @type {Document|PseudoHTMLDocument}
    */
       const document = root.document || new PseudoHTMLDocument_1.default()
       if (typeof newWindow.document === 'undefined') {
@@ -794,8 +718,7 @@
     const PseudoNodeList_1 = require('../classes/PseudoNodeList')
     /**
  * Create a PseudoNodeList, optionally starting from an existing chain of linkers.
- * @param {TreeLinker|null} [innerList=null]
- * @returns {PseudoNodeList}
+ * @param innerList
  */
     const generateNodeList = (innerList = null) => new PseudoNodeList_1.PseudoNodeList().initialize(innerList)
     exports.default = generateNodeList
@@ -814,11 +737,9 @@
       value: true
     })
     /**
- * @file Makes pseudo-dom a drop-in swap for a real DOM: code written against bare globals (document.createElement,
+ * Makes pseudo-dom a drop-in swap for a real DOM: code written against bare globals (document.createElement,
  * new Node(), ...) works unmodified, in the browser or in Node, without an if (typeof document === 'undefined')
  * check at every call site.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
  */
     const browser_or_node_1 = require('browser-or-node')
     const generateDocument_1 = __importDefault(require('./generateDocument'))
@@ -830,10 +751,9 @@
  * real browser's global scope - some code checks for a bare `window` before falling back to `global`), so code
  * written against a real DOM's globals works as-is. Does nothing when a real DOM is already there, matching
  * generateDocument's own only-fill-what-is-missing behaviour - calling this is always safe, in any environment.
- * @memberOf module:factories
- * @param {*} [target] The object to add document / Node / Element / HTMLElement / window onto - defaults to
+ * @param target The object to add document / Node / Element / HTMLElement / window onto - defaults to
  * globalThis, so bare `document`, `Node`, `window`, etc. resolve from anywhere once this has run
- * @returns {*} The same target, for convenience
+ * @returns The same target, for convenience
  */
     const installGlobal = (target = typeof globalThis !== 'undefined' ? globalThis : {}) => {
       if (!browser_or_node_1.isBrowser) {
@@ -853,18 +773,14 @@
       value: true
     })
     /**
- * @file Prints an element (or any node) to the console, readably - the point of pseudo-dom running headlessly is
+ * Prints an element (or any node) to the console, readably - the point of pseudo-dom running headlessly is
  * usually to watch what code does to a tree without a real browser to look at.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
  */
     const serializeHTML_1 = require('./serializeHTML')
     /**
  * Print a node's markup to the console, indented for readability (see prettyPrint).
- * @memberOf module:factories
- * @param {*} node
- * @param {string} [label=''] A label printed above the markup, to identify this log call
- * @returns {undefined}
+ * @param node
+ * @param label A label printed above the markup, to identify this log call
  */
     const logElement = (node, label = '') => {
       console.log(`${label ? `${label}\n` : ''}${(0, serializeHTML_1.prettyPrint)(node)}`)
@@ -878,7 +794,7 @@
       value: true
     })
     /**
- * @file Parses an HTML string into pseudo-dom nodes, for innerHTML / outerHTML / insertAdjacentHTML. Built on
+ * Parses an HTML string into pseudo-dom nodes, for innerHTML / outerHTML / insertAdjacentHTML. Built on
  * htmlparser2's Parser (a SAX-style tokenizer) with a custom handler which builds pseudo-dom nodes directly -
  * htmlparser2's own default DomHandler / domutils tree (which this never uses) is stubbed out of the browser bundle
  * by the browser.ignore config, the same way css-select's unused default adapter already is.
@@ -886,19 +802,15 @@
  * The class to build parsed elements with is given by the caller (rather than imported here) so this has no
  * dependency on ElementService / HTMLElementService - importing either here, from a factory ElementService itself
  * would need to call, would create an import cycle.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
  */
     const htmlparser2_1 = require('htmlparser2')
     const NodeService_1 = require('../services/NodeService')
     /**
  * Parse an HTML string into the nodes it describes (siblings at the top level, exactly like the DOM's own HTML
  * parsing does for innerHTML / insertAdjacentHTML - there is no single root unless the markup itself has one).
- * @memberOf module:factories
- * @param {string} html
- * @param {*} ownerDocument The document the new nodes belong to (matches what innerHTML etc. would set), or null
- * @param {function(new: *, {tagName: string})} ElementClass The class to build each parsed element with
- * @returns {Array<*>}
+ * @param html
+ * @param ownerDocument The document the new nodes belong to (matches what innerHTML etc. would set), or null
+ * @param ElementClass The class to build each parsed element with
  */
     const parseHTML = (html, ownerDocument, ElementClass) => {
       const roots = []
@@ -965,19 +877,15 @@
     })
     exports.closest = exports.matches = exports.querySelector = exports.querySelectorAll = void 0
     /**
- * @file Selector queries (querySelector, querySelectorAll, matches, closest), built on css-select and the
+ * Selector queries (querySelector, querySelectorAll, matches, closest), built on css-select and the
  * cssSelectAdapter which lets it query pseudo-dom's own tree.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
  */
     const css_select_1 = require('css-select')
     const cssSelectAdapter_1 = require('./cssSelectAdapter')
     /**
  * All of the elements below (not including) scope which match the selector, in tree order.
- * @memberOf module:factories
- * @param {string} selector A CSS selector
- * @param {*} scope The node to search below
- * @returns {Array<*>}
+ * @param selector A CSS selector
+ * @param scope The node to search below
  */
     const querySelectorAll = (selector, scope) => (0, css_select_1.selectAll)(selector, scope, {
       adapter: cssSelectAdapter_1.cssSelectAdapter
@@ -985,10 +893,8 @@
     exports.querySelectorAll = querySelectorAll
     /**
  * The first element below (not including) scope which matches the selector, in tree order, or null when there is none.
- * @memberOf module:factories
- * @param {string} selector A CSS selector
- * @param {*} scope The node to search below
- * @returns {*|null}
+ * @param selector A CSS selector
+ * @param scope The node to search below
  */
     const querySelector = (selector, scope) => (0, css_select_1.selectOne)(selector, scope, {
       adapter: cssSelectAdapter_1.cssSelectAdapter
@@ -996,10 +902,8 @@
     exports.querySelector = querySelector
     /**
  * Whether an element itself (not its descendants) matches the selector.
- * @memberOf module:factories
- * @param {*} element The element to test
- * @param {string} selector A CSS selector
- * @returns {boolean}
+ * @param element The element to test
+ * @param selector A CSS selector
  */
     const matches = (element, selector) => (0, css_select_1.is)(element, selector, {
       adapter: cssSelectAdapter_1.cssSelectAdapter
@@ -1008,10 +912,8 @@
     /**
  * The nearest ancestor of an element (starting with the element itself) which matches the selector, or null when
  * none of them do.
- * @memberOf module:factories
- * @param {*} element The element to start from
- * @param {string} selector A CSS selector
- * @returns {*|null}
+ * @param element The element to start from
+ * @param selector A CSS selector
  */
     const closest = (element, selector) => {
       let current = element
@@ -1052,9 +954,7 @@
     })
     exports.prettyPrint = exports.serializeOuter = exports.serializeChildren = void 0
     /**
- * @file Serializes pseudo-dom nodes back into an HTML string, for innerHTML / outerHTML.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Serializes pseudo-dom nodes back into an HTML string, for innerHTML / outerHTML.
  */
     const NodeService_1 = require('../services/NodeService')
     // Void elements are self-closing and never serialize a closing tag or children (there is no HTML parsing of their
@@ -1074,23 +974,20 @@
  * Escape text so it is safe inside HTML text content. Coerces to a string first - unlike a real DOM, pseudo-dom's
  * setAttribute does not itself coerce (see the same note on escapeAttributeValue), and nodeValue is not guaranteed
  * to be a string either.
- * @param {*} text
- * @returns {string}
+ * @param text
  */
     const escapeText = text => String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     /**
  * Escape a value so it is safe inside a double-quoted HTML attribute. Coerces to a string first: a real DOM's
  * setAttribute always stores a string, however pseudo-dom's does not coerce what it is given, so a value set via
  * setAttribute(name, 5) is stored (and read back by getAttribute) as the number 5, not the string '5'.
- * @param {*} value
- * @returns {string}
+ * @param value
  */
     const escapeAttributeValue = value => String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;')
     /**
  * Every attribute of the element, serialized (class instead of className, boolean attributes bare, the never-real
  * mock properties left out, style added from the live CSSStyleDeclaration when it is not empty).
- * @param {*} element
- * @returns {string}
+ * @param element
  */
     const serializeAttributes = element => {
       let result = (element.getAttributeNames ? element.getAttributeNames() : []).filter(name => !NEVER_SERIALIZE.has(name)).map(name => {
@@ -1108,8 +1005,7 @@
     }
     /**
  * One node, serialized (its own markup only - see serializeChildren for its descendants too).
- * @param {*} node
- * @returns {string}
+ * @param node
  */
     const serializeNode = node => {
       if (node.nodeType === NodeService_1.NodeService.TEXT_NODE) {
@@ -1130,27 +1026,22 @@
     }
     /**
  * A node's children, serialized in order (this is what innerHTML returns).
- * @memberOf module:factories
- * @param {*} node
- * @returns {string}
+ * @param node
  */
     const serializeChildren = node => Array.from(node.childNodes).map(serializeNode).join('')
     exports.serializeChildren = serializeChildren
     /**
  * An element itself, serialized with its children (this is what outerHTML returns).
- * @memberOf module:factories
- * @param {*} element
- * @returns {string}
+ * @param element
  */
     const serializeOuter = element => serializeNode(element)
     exports.serializeOuter = serializeOuter
     /**
  * One node, indented for readability (see prettyPrint) - unlike serializeNode, every non-empty node is its own
  * line, so the structure of a whole tree is easy to read at a glance.
- * @param {*} node
- * @param {number} depth
- * @param {string} indent
- * @returns {string}
+ * @param node
+ * @param depth
+ * @param indent
  */
     const prettyPrintNode = (node, depth, indent) => {
       const pad = indent.repeat(depth)
@@ -1179,10 +1070,8 @@
  * A node's markup, indented one level per level of nesting - a real DOM's outerHTML / innerHTML has no line breaks
  * at all, which does not read well for a whole tree (a board full of cells, say). Useful for watching pseudo-dom-
  * driven code run headlessly, printed to a terminal - see also logElement, which does the printing too.
- * @memberOf module:factories
- * @param {*} node
- * @param {string} [indent='  '] The indentation used per level of nesting
- * @returns {string}
+ * @param node
+ * @param indent The indentation used per level of nesting
  */
     const prettyPrint = (node, indent = '  ') => prettyPrintNode(node, 0, indent)
     exports.prettyPrint = prettyPrint
@@ -1201,17 +1090,14 @@
     const focused = new WeakMap()
     /**
  * Find the element which has the focus in a tree.
- * @function getActiveElement
- * @param {Object} root The root node of the tree
- * @returns {Object|null}
+ * @param root The root node of the tree
  */
     const getActiveElement = root => focused.get(root) || null
     exports.getActiveElement = getActiveElement
     /**
  * Remember the element which has the focus in a tree.
- * @function setActiveElement
- * @param {Object} root The root node of the tree
- * @param {Object|null} element The element which now has the focus, or null when nothing has it
+ * @param root The root node of the tree
+ * @param element The element which now has the focus, or null when nothing has it
  */
     const setActiveElement = (root, element) => {
       if (element === null) {
@@ -1233,10 +1119,8 @@
  * The first element, in tree order, below (not including) the given node whose id matches the given value, or null
  * when there is none. Shared by Document and DocumentFragment, which both implement the DOM's NonElementParentNode
  * mixin (so ShadowRoot, a DocumentFragment, gets it too).
- * @memberOf module:functions
- * @param {NodeService} root The node to search below
- * @param {string} id
- * @returns {PseudoElement|null}
+ * @param root The node to search below
+ * @param id
  */
     const getElementById = (root, id) => {
       const search = node => {
@@ -1266,9 +1150,7 @@
     /**
  * Get all of the ancestors of a node, starting with the root of the tree and ending with the node's own parent (the
  * order in which an event travels down through them). A node which has no parent has no ancestors.
- * @function getParentNodes
- * @param {PseudoEventTarget|PseudoNode|*} node The node to find the ancestors of
- * @returns {Array<PseudoNode>}
+ * @param node The node to find the ancestors of
  */
     const getParentNodes = node => {
       const parents = []
@@ -1301,11 +1183,9 @@
  * A selector function for retrieving existing parent PseudoNode from the given child item.
  * This function will check all the parents starting from node, and scan the attributes
  * property for matches. The return array contains all matching parent ancestors, starting with the root of the tree.
- * @function getParentNodesFromAttribute
- * @param {string} attr The property to compare on each ancestor (a missing property counts as false)
- * @param {boolean|number|string} value The value the property must have
- * @param {PseudoEventTarget|PseudoNode|*} node The node to find the matching ancestors of
- * @returns {Array.<PseudoNode>}
+ * @param attr The property to compare on each ancestor (a missing property counts as false)
+ * @param value The value the property must have
+ * @param node The node to find the matching ancestors of
  */
     const getParentNodesFromAttribute = (attr, value, node) => {
       return (0, getParentNodes_1.default)(node).filter(parent => (parent[attr] || false) === value)
@@ -1321,9 +1201,7 @@
     exports.modifierState = exports.modifierKeys = void 0
     /**
  * Pick the modifier keys out of the init object of an event.
- * @function modifierKeys
- * @param {Object} [init={}] The init of an event
- * @returns {ModifierKeys}
+ * @param init The init of an event
  */
     const modifierKeys = (init = {}) => ({
       ctrlKey: !!init.ctrlKey,
@@ -1334,10 +1212,8 @@
     exports.modifierKeys = modifierKeys
     /**
  * Answer getModifierState for a set of held modifier keys.
- * @function modifierState
- * @param {ModifierKeys} keys The modifier keys which were held down
- * @param {string} key The name of the modifier (Control, Shift, Alt or Meta)
- * @returns {boolean}
+ * @param keys The modifier keys which were held down
+ * @param key The name of the modifier (Control, Shift, Alt or Meta)
  */
     const modifierState = (keys, key) => {
       switch (key) {
@@ -1359,9 +1235,7 @@
     'use strict'
 
     /**
- * @file All of the Pseudo Dom Helper Objects functions for simulating parts of the DOM when running scripts in NodeJs.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * All of the Pseudo Dom Helper Objects functions for simulating parts of the DOM when running scripts in NodeJs.
  */
     const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
       return mod && mod.__esModule
@@ -1489,9 +1363,6 @@
     })
     /**
  * All methods exported from this module are encapsulated within pseudoDom.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @typedef {Object} pseudoDom
- * @module pseudoDom/objects
  */
     const pseudoDom = {
       generateDocument: generateDocument_1.default,
@@ -1536,18 +1407,14 @@
     const NodeService_1 = require('./NodeService')
     /**
  * Simulate the behaviour of the Attr Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments NodeService
  */
     class AttrService extends NodeService_1.NodeService {
       /**
-   * @param {string} name The name of the attribute
-   * @param {string} [value=''] The value of the attribute
-   * @param {PseudoElement|null} [ownerElement=null] The element which has this attribute
-   * @param {string} [namespaceURI=''] The namespace of the attribute
-   * @param {string|null} [prefix=null] The namespace prefix of the attribute
-   * @constructor
+   * @param name The name of the attribute
+   * @param value The value of the attribute
+   * @param ownerElement The element which has this attribute
+   * @param namespaceURI The namespace of the attribute
+   * @param prefix The namespace prefix of the attribute
    */
       constructor (name = '', value = '', ownerElement = null, namespaceURI = '', prefix = null) {
         super()
@@ -1613,9 +1480,7 @@
     'use strict'
 
     /**
- * @file Substitute for the DOM CSSStyleDeclaration Class (the object behind Element.style).
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the DOM CSSStyleDeclaration Class (the object behind Element.style).
  */
     require('core-js/modules/esnext.iterator.constructor.js')
     require('core-js/modules/esnext.iterator.for-each.js')
@@ -1643,13 +1508,10 @@
  * given, with no unit conversion, shorthand expansion or validation - this is a data structure, not a real CSS
  * engine. Named property access (declaration.backgroundColor, camelCase) is added on top of this by
  * createStyleDeclaration, which wraps an instance of this class in a Proxy.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
  */
     class CSSStyleDeclarationService {
       /**
-   * @param {string} [cssText=''] Initial declarations, as CSS text ("color: red; font-size: 12px;")
-   * @constructor
+   * @param cssText Initial declarations, as CSS text ("color: red; font-size: 12px;")
    */
       constructor (cssText = '') {
         this.properties = new Map()
@@ -1658,7 +1520,6 @@
 
       /**
    * How many properties are currently set.
-   * @returns {number}
    */
       get length () {
         return this.properties.size
@@ -1667,8 +1528,7 @@
       /**
    * The name of the property at the given index, in the order it was set, or '' when there is none (matches the
    * DOM's CSSStyleDeclaration, which is array-like).
-   * @param {number} index
-   * @returns {string}
+   * @param index
    */
       item (index) {
         return Array.from(this.properties.keys())[index] || ''
@@ -1676,8 +1536,7 @@
 
       /**
    * The value of the given property, or '' when it is not set.
-   * @param {string} property A CSS property name (kebab-case, e.g. "background-color")
-   * @returns {string}
+   * @param property A CSS property name (kebab-case, e.g. "background-color")
    */
       getPropertyValue (property) {
         const entry = this.properties.get(property)
@@ -1686,8 +1545,7 @@
 
       /**
    * "important" when the property was set with !important, otherwise ''.
-   * @param {string} property A CSS property name (kebab-case)
-   * @returns {string}
+   * @param property A CSS property name (kebab-case)
    */
       getPropertyPriority (property) {
         const entry = this.properties.get(property)
@@ -1697,10 +1555,9 @@
       /**
    * Set a property's value (and optionally its priority). An empty, null or undefined value removes the property
    * instead, like the DOM.
-   * @param {string} property A CSS property name (kebab-case)
-   * @param {string} value The value, or '' to remove the property
-   * @param {string} [priority=''] "important" to mark it !important
-   * @returns {undefined}
+   * @param property A CSS property name (kebab-case)
+   * @param value The value, or '' to remove the property
+   * @param priority "important" to mark it !important
    */
       setProperty (property, value, priority = '') {
         if (value === '' || value === null || typeof value === 'undefined') {
@@ -1715,8 +1572,7 @@
 
       /**
    * Remove a property, returning the value it had (or '' when it was not set).
-   * @param {string} property A CSS property name (kebab-case)
-   * @returns {string}
+   * @param property A CSS property name (kebab-case)
    */
       removeProperty (property) {
         const value = this.getPropertyValue(property)
@@ -1726,7 +1582,6 @@
 
       /**
    * All the declarations as one CSS text string.
-   * @returns {string}
    */
       get cssText () {
         return Array.from(this.properties.entries()).map(([property, {
@@ -1737,8 +1592,7 @@
 
       /**
    * Replace every declaration by parsing a CSS text string ("color: red; font-size: 12px !important;").
-   * @param {string} cssText
-   * @returns {undefined}
+   * @param cssText
    */
       set cssText (cssText) {
         this.properties.clear()
@@ -1775,23 +1629,16 @@
     })
     exports.CustomEventService = void 0
     /**
- * @file Substitute for the DOM CustomEvent Class.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the DOM CustomEvent Class.
  */
     const EventService_1 = require('./EventService')
     /**
  * Simulate the behaviour of the CustomEvent Class when there is no DOM available: an event which carries data.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments EventService
- * @property {*} detail
  */
     class CustomEventService extends EventService_1.EventService {
       /**
-   * @param {string} [typeArg=''] The type of the event
-   * @param {CustomEventInit} [init={}] The options for the event
-   * @constructor
+   * @param typeArg The type of the event
+   * @param init The options for the event
    */
       constructor (typeArg = '', init = {}) {
         super(typeArg, init)
@@ -1817,14 +1664,11 @@
     exports.DOMTokenListService = void 0
     /**
  * Simulate the behaviour of the DOMTokenList Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
  */
     class DOMTokenListService {
       /**
-   * @param {string} [value=''] The space separated tokens to start with
-   * @param {function(string): void} [onChange] Called with the new value whenever the tokens change
-   * @constructor
+   * @param value The space separated tokens to start with
+   * @param onChange Called with the new value whenever the tokens change
    */
       constructor (value = '', onChange = () => undefined) {
         this.tokens = DOMTokenListService.parse(value)
@@ -1942,9 +1786,6 @@
     /**
  * Simulate the behaviour of the DocumentFragment Class when there is no DOM available: a container for nodes which is
  * not part of a tree, when it is inserted its children are moved into the tree instead.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments NodeService
  */
     class DocumentFragmentService extends NodeService_1.NodeService {
       get nodeName () {
@@ -1958,8 +1799,7 @@
       /**
    * The first element, in tree order, whose id matches the given value, or null when there is none (the DOM's
    * NonElementParentNode mixin, which Document and DocumentFragment both implement).
-   * @param {string} id
-   * @returns {PseudoElement|null}
+   * @param id
    */
       getElementById (id) {
         return (0, getElementById_1.default)(this, id)
@@ -1987,9 +1827,6 @@
     const getElementById_1 = __importDefault(require('../functions/getElementById'))
     /**
  * Simulate the behaviour of the Document Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments NodeService
  */
     class DocumentService extends NodeService_1.NodeService {
       get nodeName () {
@@ -2008,8 +1845,7 @@
       set textContent (text) {}
       /**
    * The first element, in tree order, whose id matches the given value, or null when there is none.
-   * @param {string} id
-   * @returns {PseudoElement|null}
+   * @param id
    */
       getElementById (id) {
         return (0, getElementById_1.default)(this, id)
@@ -2017,8 +1853,7 @@
 
       /**
    * Make an element of the given type which belongs to this document but is not added anywhere until it is appended.
-   * @param {string} [tagName='div'] The type of element to create
-   * @returns {PseudoElement}
+   * @param tagName The type of element to create
    */
       createElement (tagName = 'div') {
         // Like the DOM, the new element is not added anywhere: it has no parent until it is appended
@@ -2031,8 +1866,7 @@
 
       /**
    * Make a text node which belongs to this document.
-   * @param {string} [data=''] The text
-   * @returns {TextService}
+   * @param data The text
    */
       createTextNode (data = '') {
         const text = new NodeService_1.TextService(data)
@@ -2042,8 +1876,7 @@
 
       /**
    * Make a comment which belongs to this document.
-   * @param {string} [data=''] The comment
-   * @returns {CommentService}
+   * @param data The comment
    */
       createComment (data = '') {
         const comment = new NodeService_1.CommentService(data)
@@ -2054,7 +1887,6 @@
       /**
    * Make an empty document fragment which belongs to this document, a container for nodes which can be built up and
    * then inserted in one go.
-   * @returns {DocumentFragmentService}
    */
       createDocumentFragment () {
         const fragment = new DocumentFragmentService_1.DocumentFragmentService()
@@ -2124,27 +1956,14 @@
     })
     /**
  * Simulate the behaviour of the Element Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments PseudoNode
- * @property {string} tagName
- * @property {string} className
- * @property {string} id
- * @property {string} innerHtml
- * @property {Array} attributes
- * @property {function} hasAttribute
- * @property {function} setAttribute
- * @property {function} getAttribute
- * @property {function} removeAttribute
  */
     class ElementService extends NodeService_1.NodeService {
       /**
-   * @param {Object} [settings={}]
-   * @param {string} [settings.tagName=''] The name of the tag this element represents
-   * @param {Array<{name: string, value: *}>} [settings.attributes=[]] The attributes (also assigned as properties) to start with
-   * @param {PseudoNode|null} [settings.parent=null] The node to add this element to as its last child
-   * @param {Array<PseudoNode>} [settings.children=[]] The nodes to start as children
-   * @constructor
+   * @param settings
+   * @param settings.tagName The name of the tag this element represents
+   * @param settings.attributes The attributes (also assigned as properties) to start with
+   * @param settings.parent The node to add this element to as its last child
+   * @param settings.children The nodes to start as children
    */
       constructor ({
         tagName = '',
@@ -2223,7 +2042,6 @@
       /**
    * The attributes with the values they have now: the ones which are also properties (className, id, style, ...) can
    * have been changed through the property, which does not change the stored list.
-   * @returns {Array<{name: string, value: *}>}
    */
       currentAttributes () {
         return this.attributeList.map(({
@@ -2242,7 +2060,6 @@
       /**
    * A copy of this element without its children: the same tag and attributes (the values which are objects, such as
    * style, are copied too rather than shared), but not its parent or listeners.
-   * @returns {ElementService}
    */
       cloneShallow () {
         const copy = new this.constructor({
@@ -2269,8 +2086,7 @@
       /**
    * Elements are equal when they have the same tag and the same attributes (in any order), which is what isEqualNode
    * checks before it compares the children.
-   * @param {NodeService} other The element to compare with
-   * @returns {boolean}
+   * @param other The element to compare with
    */
       equalsShallow (other) {
         const mine = this.currentAttributes()
@@ -2291,7 +2107,6 @@
       /**
    * The local part of the element's qualified name. There is no real namespace parsing here, so this is always the
    * same as tagName.
-   * @returns {string}
    */
       get localName () {
         return this.tag
@@ -2300,7 +2115,6 @@
       /**
    * The element's namespace prefix, or null when it has none. There is no real namespace parsing here, so this is
    * always null.
-   * @returns {string|null}
    */
       get prefix () {
         return null
@@ -2309,7 +2123,6 @@
       /**
    * The HTML markup of this element's children. Only the getter is here (the setter, which needs to build new
    * elements from parsed HTML, is on HTMLElementService - see its class comment).
-   * @returns {string}
    */
       get innerHTML () {
         return (0, serializeHTML_1.serializeChildren)(this)
@@ -2317,7 +2130,6 @@
 
       /**
    * The HTML markup of this element itself, including its children. Only the getter is here (see innerHTML).
-   * @returns {string}
    */
       get outerHTML () {
         return (0, serializeHTML_1.serializeOuter)(this)
@@ -2348,11 +2160,9 @@
 
       /**
    * Some elements have default behaviour, this registers it when the element is added.
-   * @returns {Function}
    */
       /**
    * A live view of this element's element children (text, comments and the like are not included).
-   * @returns {PseudoHTMLCollection}
    */
       get children () {
         return new HTMLCollectionService_1.HTMLCollectionService(this)
@@ -2360,7 +2170,6 @@
 
       /**
    * How many element children this element has.
-   * @returns {number}
    */
       get childElementCount () {
         return this.children.length
@@ -2368,7 +2177,6 @@
 
       /**
    * The first child of this element which is an element, or null when there is none.
-   * @returns {PseudoElement|null}
    */
       get firstElementChild () {
         return this.children.item(0)
@@ -2376,7 +2184,6 @@
 
       /**
    * The last child of this element which is an element, or null when there is none.
-   * @returns {PseudoElement|null}
    */
       get lastElementChild () {
         const elementChildren = this.children
@@ -2385,7 +2192,6 @@
 
       /**
    * The sibling after this one which is an element, or null when there is none.
-   * @returns {PseudoElement|null}
    */
       get nextElementSibling () {
         let sibling = this.nextSibling
@@ -2397,7 +2203,6 @@
 
       /**
    * The sibling before this one which is an element, or null when there is none.
-   * @returns {PseudoElement|null}
    */
       get previousElementSibling () {
         let sibling = this.previousSibling
@@ -2411,9 +2216,9 @@
    * Put an element at a position relative to this one: beforebegin (before this element, as its previous sibling),
    * afterbegin (as this element's first child), beforeend (as this element's last child) or afterend (after this
    * element, as its next sibling).
-   * @param {string} position beforebegin, afterbegin, beforeend or afterend
-   * @param {ElementService} element The element to insert
-   * @returns {ElementService|null} The inserted element, or null when the position needed a parent this element does not have
+   * @param position beforebegin, afterbegin, beforeend or afterend
+   * @param element The element to insert
+   * @returns The inserted element, or null when the position needed a parent this element does not have
    * @throws {Error} When the position is not one of the four above
    */
       insertAdjacentElement (position, element) {
@@ -2422,8 +2227,8 @@
 
       /**
    * Put text at a position relative to this element, the same as insertAdjacentElement but the text becomes a text node.
-   * @param {string} position beforebegin, afterbegin, beforeend or afterend
-   * @param {string} text The text to insert
+   * @param position beforebegin, afterbegin, beforeend or afterend
+   * @param text The text to insert
    * @throws {Error} When the position is not one of the four above
    */
       insertAdjacentText (position, text) {
@@ -2432,9 +2237,9 @@
 
       /**
    * Shared implementation for insertAdjacentElement / insertAdjacentText.
-   * @param {string} position beforebegin, afterbegin, beforeend or afterend
-   * @param {PseudoNode|string} node The node (or text) to insert
-   * @returns {PseudoNode|null} The inserted node, or null when the position needed a parent this element does not have
+   * @param position beforebegin, afterbegin, beforeend or afterend
+   * @param node The node (or text) to insert
+   * @returns The inserted node, or null when the position needed a parent this element does not have
    * @throws {Error} When the position is not one of the four above
    */
       insertAdjacent (position, node) {
@@ -2464,8 +2269,8 @@
 
       /**
    * Not implemented yet (HTML parsing is out of scope for now).
-   * @param {string} position beforebegin, afterbegin, beforeend or afterend
-   * @param {string} text The markup which would be parsed
+   * @param position beforebegin, afterbegin, beforeend or afterend
+   * @param text The markup which would be parsed
    * @throws {Error}
    */
       insertAdjacentHTML (position, text) {
@@ -2474,8 +2279,7 @@
 
       /**
    * Whether this element itself (not its descendants) matches the given CSS selector.
-   * @param {string} selectors A CSS selector
-   * @returns {boolean}
+   * @param selectors A CSS selector
    */
       matches (selectors) {
         return (0, query_1.matches)(this, selectors)
@@ -2484,8 +2288,7 @@
       /**
    * The nearest ancestor of this element (starting with this element itself) which matches the CSS selector, or
    * null when none of them do.
-   * @param {string} selectors A CSS selector
-   * @returns {PseudoElement|null}
+   * @param selectors A CSS selector
    */
       closest (selectors) {
         return (0, query_1.closest)(this, selectors)
@@ -2519,7 +2322,7 @@
 
       /**
    * An element which is added as a child gets its default events (for example a submit button submits its form).
-   * @param {NodeService} child The node which was inserted
+   * @param child The node which was inserted
    */
       childInserted (child) {
         if (typeof child.applyDefaultEvent === 'function') {
@@ -2529,8 +2332,7 @@
 
       /**
    * Check whether the element has an attribute by that name.
-   * @param {string} attributeName
-   * @returns {boolean}
+   * @param attributeName
    */
       hasAttribute (attributeName) {
         return this.attributeList.some(({
@@ -2540,9 +2342,8 @@
 
       /**
    * Set the value of an attribute, adding the attribute if it did not exist.
-   * @param {string} attributeName
-   * @param {string} attributeValue
-   * @returns {undefined}
+   * @param attributeName
+   * @param attributeValue
    */
       setAttribute (attributeName, attributeValue) {
         const existing = this.attributeList.find(({
@@ -2563,8 +2364,8 @@
 
       /**
    * Retrieve the value of an attribute.
-   * @param {string} attributeName
-   * @returns {string|null} The value, or null when there is no such attribute
+   * @param attributeName
+   * @returns The value, or null when there is no such attribute
    */
       getAttribute (attributeName) {
         const found = this.currentAttributes().find(({
@@ -2575,8 +2376,7 @@
 
       /**
    * Remove an attribute from the element.
-   * @param {string} attributeName
-   * @returns {undefined}
+   * @param attributeName
    */
       removeAttribute (attributeName) {
         const index = this.attributeList.findIndex(({
@@ -2589,7 +2389,6 @@
 
       /**
    * The name of every attribute on the element, in the order they were set.
-   * @returns {Array<string>}
    */
       getAttributeNames () {
         return this.currentAttributes().map(({
@@ -2599,7 +2398,6 @@
 
       /**
    * Whether the element has any attributes at all.
-   * @returns {boolean}
    */
       hasAttributes () {
         return this.attributeList.length > 0
@@ -2607,8 +2405,8 @@
 
       /**
    * Retrieve the node representation of an attribute.
-   * @param {string} attributeName
-   * @returns {AttrService|null} An Attr for the attribute, or null when there is no such attribute
+   * @param attributeName
+   * @returns An Attr for the attribute, or null when there is no such attribute
    */
       getAttributeNode (attributeName) {
         return this.hasAttribute(attributeName) ? new AttrService_1.AttrService(attributeName, this.getAttribute(attributeName) || '', this) : null
@@ -2617,9 +2415,9 @@
       /**
    * Retrieve the node representation of an attribute. There is no real namespace parsing here, so this ignores
    * the namespace and behaves exactly like getAttributeNode.
-   * @param {string} namespace Ignored
-   * @param {string} attributeName
-   * @returns {AttrService|null} An Attr for the attribute, or null when there is no such attribute
+   * @param namespace Ignored
+   * @param attributeName
+   * @returns An Attr for the attribute, or null when there is no such attribute
    */
       getAttributeNodeNS (namespace, attributeName) {
         return this.getAttributeNode(attributeName)
@@ -2628,9 +2426,9 @@
       /**
    * Retrieve the value of an attribute. There is no real namespace parsing here, so this ignores the namespace
    * and behaves exactly like getAttribute.
-   * @param {string} namespace Ignored
-   * @param {string} attributeName
-   * @returns {string|null} The value, or null when there is no such attribute
+   * @param namespace Ignored
+   * @param attributeName
+   * @returns The value, or null when there is no such attribute
    */
       getAttributeNS (namespace, attributeName) {
         return this.getAttribute(attributeName)
@@ -2639,9 +2437,8 @@
       /**
    * Check whether the element has an attribute by that name. There is no real namespace parsing here, so this
    * ignores the namespace and behaves exactly like hasAttribute.
-   * @param {string} namespace Ignored
-   * @param {string} attributeName
-   * @returns {boolean}
+   * @param namespace Ignored
+   * @param attributeName
    */
       hasAttributeNS (namespace, attributeName) {
         return this.hasAttribute(attributeName)
@@ -2649,8 +2446,8 @@
 
       /**
    * Remove the node representation of an attribute from the element, and return it.
-   * @param {AttrService} attr
-   * @returns {AttrService} The removed Attr
+   * @param attr
+   * @returns The removed Attr
    * @throws {Error} When the element has no attribute matching attr.name
    */
       removeAttributeNode (attr) {
@@ -2665,9 +2462,8 @@
       /**
    * Remove an attribute from the element. There is no real namespace parsing here, so this ignores the namespace
    * and behaves exactly like removeAttribute.
-   * @param {string} namespace Ignored
-   * @param {string} attributeName
-   * @returns {undefined}
+   * @param namespace Ignored
+   * @param attributeName
    */
       removeAttributeNS (namespace, attributeName) {
         this.removeAttribute(attributeName)
@@ -2676,8 +2472,8 @@
       /**
    * Set the node representation of an attribute, adding the attribute if it did not exist. Returns any previous
    * Attr that had the same name, or null when there was none.
-   * @param {AttrService} attr
-   * @returns {AttrService|null} The replaced Attr, or null when the attribute was new
+   * @param attr
+   * @returns The replaced Attr, or null when the attribute was new
    */
       setAttributeNode (attr) {
         const existing = this.getAttributeNode(attr.name)
@@ -2688,8 +2484,8 @@
       /**
    * Set the node representation of an attribute. There is no real namespace parsing here, so this behaves
    * exactly like setAttributeNode (Attr.name already carries any prefix).
-   * @param {AttrService} attr
-   * @returns {AttrService|null} The replaced Attr, or null when the attribute was new
+   * @param attr
+   * @returns The replaced Attr, or null when the attribute was new
    */
       setAttributeNodeNS (attr) {
         return this.setAttributeNode(attr)
@@ -2698,10 +2494,9 @@
       /**
    * Set the value of an attribute, adding the attribute if it did not exist. There is no real namespace parsing
    * here, so this ignores the namespace and behaves exactly like setAttribute.
-   * @param {string} namespace Ignored
-   * @param {string} attributeName
-   * @param {string} attributeValue
-   * @returns {undefined}
+   * @param namespace Ignored
+   * @param attributeName
+   * @param attributeValue
    */
       setAttributeNS (namespace, attributeName, attributeValue) {
         this.setAttribute(attributeName, attributeValue)
@@ -2710,9 +2505,8 @@
       /**
    * Add the attribute (with an empty value) when it is not present, or remove it when it is - unless force says
    * which of those to do instead. Returns whether the attribute is present after the call.
-   * @param {string} attributeName
-   * @param {boolean} [force]
-   * @returns {boolean}
+   * @param attributeName
+   * @param force
    */
       toggleAttribute (attributeName, force) {
         const present = this.hasAttribute(attributeName)
@@ -2727,7 +2521,6 @@
 
       /**
    * The size of the element and its position, settable directly - there is no layout engine here to compute it.
-   * @returns {DOMRect}
    */
       getBoundingClientRect () {
         return this.boundingClientRect
@@ -2736,7 +2529,6 @@
       /**
    * The bounding rectangles for each line of text in the element, settable directly - there is no layout engine
    * here to compute it.
-   * @returns {Array<DOMRect>}
    */
       getClientRects () {
         return this.clientRects
@@ -2744,7 +2536,6 @@
 
       /**
    * The Animation objects currently active on the element, settable directly - there is no animation engine here.
-   * @returns {Array<*>}
    */
       getAnimations () {
         return this.animations
@@ -2752,7 +2543,6 @@
 
       /**
    * Whether the element is expected to be visible, settable directly - there is no rendering here to check it.
-   * @returns {boolean}
    */
       checkVisibility () {
         return this.isVisible
@@ -2761,7 +2551,6 @@
       /**
    * A read-only view of the element's own inline style declarations (there is no CSS cascade here, so this is not a
    * real computed style - just what the element's own style object holds).
-   * @returns {{get: function(string): (string|undefined)}}
    */
       computedStyleMap () {
         const style = this.style
@@ -2775,8 +2564,7 @@
 
       /**
    * Whether this element currently has capture of the given pointer.
-   * @param {number} pointerId
-   * @returns {boolean}
+   * @param pointerId
    */
       hasPointerCapture (pointerId) {
         return this.capturedPointers.has(pointerId)
@@ -2784,8 +2572,7 @@
 
       /**
    * Give this element capture of the given pointer.
-   * @param {number} pointerId
-   * @returns {undefined}
+   * @param pointerId
    */
       setPointerCapture (pointerId) {
         this.capturedPointers.add(pointerId)
@@ -2793,8 +2580,7 @@
 
       /**
    * Release this element's capture of the given pointer, if it had it.
-   * @param {number} pointerId
-   * @returns {undefined}
+   * @param pointerId
    */
       releasePointerCapture (pointerId) {
         this.capturedPointers.delete(pointerId)
@@ -2803,9 +2589,8 @@
       /**
    * Scroll to the given position (or, given an options object, the position(s) it has). There is no real scrollable
    * viewport here: this just sets scrollLeft / scrollTop.
-   * @param {number|{left: number, top: number}} [x=0]
-   * @param {number} [y=0]
-   * @returns {undefined}
+   * @param x
+   * @param y
    */
       scroll (x = 0, y = 0) {
         if (typeof x === 'number') {
@@ -2823,9 +2608,8 @@
 
       /**
    * Scroll to the given position. An alias for scroll.
-   * @param {number|{left: number, top: number}} [x=0]
-   * @param {number} [y=0]
-   * @returns {undefined}
+   * @param x
+   * @param y
    */
       scrollTo (x = 0, y = 0) {
         this.scroll(x, y)
@@ -2833,9 +2617,8 @@
 
       /**
    * Scroll by the given amount, relative to the current position.
-   * @param {number|{left: number, top: number}} [x=0]
-   * @param {number} [y=0]
-   * @returns {undefined}
+   * @param x
+   * @param y
    */
       scrollBy (x = 0, y = 0) {
         if (typeof x === 'number') {
@@ -2851,13 +2634,11 @@
       /**
    * Scroll an ancestor until this element is in view. There is no real viewport here for that to mean anything, so
    * this does nothing (override it on an instance in a test which needs to observe the call).
-   * @returns {undefined}
    */
       scrollIntoView () {}
       /**
    * Asynchronously ask for the element to be shown fullscreen. There is no real fullscreen here, so this just
    * resolves, like a browser granting the request would.
-   * @returns {Promise<void>}
    */
       requestFullscreen () {
         return Promise.resolve()
@@ -2866,7 +2647,6 @@
       /**
    * Asynchronously ask for the pointer to be locked to this element. There is no real pointer lock here, so this
    * just resolves, like a browser granting the request would.
-   * @returns {Promise<void>}
    */
       requestPointerLock () {
         return Promise.resolve()
@@ -2874,8 +2654,7 @@
 
       /**
    * Attach a shadow tree to this element and return its ShadowRoot. Throws when it already hosts one.
-   * @param {{mode: string}} options
-   * @returns {PseudoShadowRoot}
+   * @param options
    * @throws {Error}
    */
       attachShadow (options) {
@@ -2892,7 +2671,6 @@
       /**
    * This element's shadow root, when it has one attached in 'open' mode, or null (including when the mode is
    * 'closed' - it still exists, but is not reachable this way, like the DOM's).
-   * @returns {PseudoShadowRoot|null}
    */
       get shadowRoot () {
         return this.shadowRootInstance && this.shadowRootInstance.mode === 'open' ? this.shadowRootInstance : null
@@ -2900,8 +2678,7 @@
 
       /**
    * Read one of the aria-* reflected properties (see the individual aria* getters/setters below).
-   * @param {string} attributeName A real aria-* attribute name (aria-label, ...)
-   * @returns {string}
+   * @param attributeName A real aria-* attribute name (aria-label, ...)
    */
       getAriaAttribute (attributeName) {
         return this.getAttribute(attributeName) || ''
@@ -2909,9 +2686,8 @@
 
       /**
    * Write one of the aria-* reflected properties.
-   * @param {string} attributeName A real aria-* attribute name (aria-label, ...)
-   * @param {string} value
-   * @returns {undefined}
+   * @param attributeName A real aria-* attribute name (aria-label, ...)
+   * @param value
    */
       setAriaAttribute (attributeName, value) {
         this.setAttribute(attributeName, value)
@@ -3219,9 +2995,7 @@
     'use strict'
 
     /**
- * @file Substitute for the DOM Event Class.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the DOM Event Class.
  */
     Object.defineProperty(exports, '__esModule', {
       value: true
@@ -3229,42 +3003,15 @@
     exports.EventService = void 0
     /**
  * Simulate the behaviour of the Event Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @property {number} NONE
- * @property {number} CAPTURING_PHASE
- * @property {number} AT_TARGET
- * @property {number} BUBBLING_PHASE
- * @property {boolean} bubbles - A Boolean indicating whether the event bubbles up through the Dom or not.
- * @property {boolean} cancelable - A Boolean indicating whether the event is cancelable.
- * @property {boolean} composed - A Boolean value indicating whether the event can bubble across the boundary
- * between the shadow Dom and the regular Dom.
- * @property {function|PseudoEventTarget} currentTarget - A reference to the currently registered target for the event. This
- * is the object to which the event is currently slated to be sent; it's possible this has been changed along the way
- * through re-targeting.
- * @property {boolean} defaultPrevented - Indicates whether event.preventDefault() has been called on the event.
- * @property {boolean} immediatePropagationStopped - Flag that no further propagation should occur, including on current
- * target.
- * @property {boolean} propagationStopped - Flag that no further propagation should occur.
- * @property {int} eventPhase - Indicates which phase of the event flow is being processed. Uses EventService constants.
- * @property {EventTarget|PseudoEventTarget} target - A reference to the target to which the event was originally
- * dispatched.
- * @property {int} timeStamp - The time at which the event was created (in milliseconds). By specification, this
- * value is time since epoch, but in reality browsers' definitions vary; in addition, work is underway to change this
- * to be a DomHighResTimeStamp instead.
- * @property {string} type - The name of the event (case-insensitive).
- * @property {boolean} isTrusted - Indicates whether the event was initiated by the browser (after a user
- * click for instance) or by a script (using an event creation method, like event.initEvent)
  */
     class EventService {
       /**
    *
-   * @param {string} typeArg
-   * @param {Object} [eventOptions={}]
-   * @param {boolean} [eventOptions.bubbles=false]
-   * @param {boolean} [eventOptions.cancelable=false]
-   * @param {boolean} [eventOptions.composed=false]
-   * @constructor
+   * @param typeArg
+   * @param eventOptions
+   * @param eventOptions.bubbles
+   * @param eventOptions.cancelable
+   * @param eventOptions.composed
    */
       constructor (typeArg = '', {
         bubbles = false,
@@ -3272,17 +3019,29 @@
         composed = false
       } = {}) {
         this.properties = {
+          /** A Boolean indicating whether the event bubbles up through the Dom or not. */
           bubbles: false,
+          /** A Boolean indicating whether the event is cancelable. */
           cancelable: false,
+          /** A Boolean value indicating whether the event can bubble across the boundary between the shadow Dom and the regular Dom. */
           composed: false,
+          /** A reference to the currently registered target for the event. This is the object to which the event is currently slated to be sent; it's possible this has been changed along the way through re-targeting. */
           currentTarget: null,
+          /** Indicates whether event.preventDefault() has been called on the event. */
           defaultPrevented: false,
+          /** Flag that no further propagation should occur, including on current target. */
           immediatePropagationStopped: false,
+          /** Flag that no further propagation should occur. */
           propagationStopped: false,
+          /** Indicates which phase of the event flow is being processed. Uses EventService constants. */
           eventPhase: 0,
+          /** A reference to the target to which the event was originally dispatched. */
           target: null,
+          /** The time at which the event was created (in milliseconds). By specification, this value is time since epoch, but in reality browsers' definitions vary; in addition, work is underway to change this to be a DomHighResTimeStamp instead. */
           timeStamp: Math.floor(Date.now() / 1000),
+          /** The name of the event (case-insensitive). */
           type: '',
+          /** Indicates whether the event was initiated by the browser (after a user click for instance) or by a script (using an event creation method, like event.initEvent) */
           isTrusted: false,
           dispatching: false,
           inPassiveListener: false,
@@ -3338,7 +3097,6 @@
 
       /**
    * Scope several accessors inside the inner object. These are only intended for usage by other DOM classes.
-   * @returns {EventInner}
    */
       get inner () {
         const self = this
@@ -3407,8 +3165,6 @@
 
       /**
    * Return an array of targets that will have the event executed open them. The order is based on the eventPhase
-   * @method
-   * @returns {Array.<PseudoEventTarget>}
    */
       composedPath () {
         // While the event is being dispatched this is every target it travels through, the target first and the root last
@@ -3417,8 +3173,6 @@
 
       /**
    * Cancels the event (if it is cancelable).
-   * @method
-   * @returns {null}
    */
       preventDefault () {
         // Only an event which can be cancelled can be prevented, and a passive listener cannot prevent the default
@@ -3434,8 +3188,6 @@
    * For this particular event, no other listener will be called.
    * Neither those attached on the same element, nor those attached on elements which will be traversed later (in
    * capture phase, for instance)
-   * @method
-   * @returns {null}
    */
       stopImmediatePropagation () {
         this.setReadOnlyProperties({
@@ -3446,8 +3198,6 @@
 
       /**
    * Stops the propagation of events further along in the Dom.
-   * @method
-   * @returns {null}
    */
       stopPropagation () {
         this.setReadOnlyProperties({
@@ -3487,9 +3237,7 @@
       value: true
     })
     /**
- * @file Substitute for the DOM EventTarget Class.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the DOM EventTarget Class.
  */
     const EventService_1 = require('./EventService')
     const PseudoEventListener_1 = __importDefault(require('../classes/PseudoEventListener'))
@@ -3500,17 +3248,8 @@
  * Dispatching an event sends it through the tree the way the DOM does: down from the root to the target (capture
  * listeners), to the target itself, then back up to the root (the listeners which are not capture listeners, when the
  * event bubbles).
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @property {Object.<string, Array.<PseudoEventListener>>} listeners
- * @property {function} addEventListener
- * @property {function} removeEventListener
- * @property {function} dispatchEvent
  */
     class EventTargetService {
-      /**
-   * @constructor
-   */
       constructor () {
         this.listeners = {}
         this.defaultEvent = {}
@@ -3518,8 +3257,7 @@
 
       /**
    * The listeners registered for a type of event, creating the (empty) list of them when there are none yet.
-   * @param {string} type
-   * @returns {LinkedList}
+   * @param type
    */
       listenersFor (type) {
         if (!(type in this.listeners)) {
@@ -3533,8 +3271,8 @@
    * (at the target, the capture listeners run before the others). Listeners which are added while this runs do not run
    * for this event, and listeners which are removed while it runs no longer do. Running stops as soon as immediate
    * propagation is stopped. A listener which throws does not stop the others.
-   * @param {EventService} event The event, which is at a phase and has a current target
-   * @returns {Array<*>} The errors which the listeners threw
+   * @param event The event, which is at a phase and has a current target
+   * @returns The errors which the listeners threw
    */
       runEvents (event) {
         const errors = []
@@ -3567,8 +3305,8 @@
 
       /**
    * Take a listener out of the registered listeners, so that it does not run again.
-   * @param {string} type
-   * @param {PseudoEventListener} listener
+   * @param type
+   * @param listener
    */
       removeListener (type, listener) {
         listener.removed = true
@@ -3578,8 +3316,8 @@
 
       /**
    * Register the function to run when nothing else has prevented the default for this type of event.
-   * @param {string} type
-   * @param {Function} callback
+   * @param type
+   * @param callback
    */
       setDefaultEvent (type, callback) {
         this.listenersFor(type)
@@ -3589,9 +3327,9 @@
       /**
    * Registers an event handler of a specific event type. Adding the same handler again for the same type and phase does
    * nothing, like the DOM.
-   * @param {string} type The type of event to listen for
-   * @param {Function|Object} callback The function to call (or an object with a handleEvent function)
-   * @param {Object|boolean} [useCapture=false] Listen while the event travels down to the target (true), or an object with capture, once and passive
+   * @param type The type of event to listen for
+   * @param callback The function to call (or an object with a handleEvent function)
+   * @param useCapture Listen while the event travels down to the target (true), or an object with capture, once and passive
    */
       addEventListener (type, callback, useCapture = false) {
         let options = {
@@ -3625,9 +3363,9 @@
 
       /**
    * Removes an event listener, the one which was added with the same type, handler and phase.
-   * @param {string} type The type of event
-   * @param {Function|Object} callback The handler which was added
-   * @param {Object|boolean} [options=false] Whether the listener was a capture listener (true), or an object with capture
+   * @param type The type of event
+   * @param callback The handler which was added
+   * @param options Whether the listener was a capture listener (true), or an object with capture
    */
       removeEventListener (type, callback, options = false) {
         if (!(type in this.listeners)) {
@@ -3643,8 +3381,8 @@
    * parent up to the root. stopPropagation() stops it reaching further targets, stopImmediatePropagation() also stops
    * the remaining listeners of the current target. Afterwards, unless the default was prevented, the default action
    * of this target (see setDefaultEvent) runs. The event can be dispatched again afterwards.
-   * @param {EventService} event The event to dispatch
-   * @returns {boolean} False when the event was cancelable and a listener prevented the default, otherwise true
+   * @param event The event to dispatch
+   * @returns False when the event was cancelable and a listener prevented the default, otherwise true
    * @throws {Error} When the event is already being dispatched, or (after the whole dispatch has finished) the error
    * which a listener threw (an error with all of them in its errors property when several did)
    */
@@ -3709,23 +3447,16 @@
     })
     exports.FocusEventService = void 0
     /**
- * @file Substitute for the DOM FocusEvent Class.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the DOM FocusEvent Class.
  */
     const UIEventService_1 = require('./UIEventService')
     /**
  * Simulate the behaviour of the FocusEvent Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments UIEventService
- * @property {PseudoEventTarget|null} relatedTarget
  */
     class FocusEventService extends UIEventService_1.UIEventService {
       /**
-   * @param {string} [typeArg=''] The type of the event
-   * @param {FocusEventInit} [init={}] The options for the event
-   * @constructor
+   * @param typeArg The type of the event
+   * @param init The options for the event
    */
       constructor (typeArg = '', init = {}) {
         super(typeArg, init)
@@ -3749,24 +3480,19 @@
     })
     exports.HTMLCollectionService = void 0
     /**
- * @file Substitute for the DOM HTMLCollection Class.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the DOM HTMLCollection Class.
  */
     const NodeService_1 = require('./NodeService')
     /**
  * Simulate the behaviour of the HTMLCollection Class when there is no DOM available: a live view of some of a node's
  * element descendants, recomputed each time it is used rather than kept in sync as they change.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
  */
     class HTMLCollectionService {
       /**
-   * @param {NodeService} owner The node this is a live view of a part of
-   * @param {function(*): boolean} [predicate] Only elements which pass this are included (every element by default)
-   * @param {boolean} [deep=false] Include every matching descendant (true, like getElementsByTagName), not just the
+   * @param owner The node this is a live view of a part of
+   * @param predicate Only elements which pass this are included (every element by default)
+   * @param deep Include every matching descendant (true, like getElementsByTagName), not just the
    * direct element children (false, like Element.children)
-   * @constructor
    */
       constructor (owner, predicate = () => true, deep = false) {
         this.owner = owner
@@ -3776,7 +3502,6 @@
 
       /**
    * The current elements the collection holds, in tree order.
-   * @returns {Array<PseudoNode>}
    */
       elements () {
         const results = []
@@ -3796,7 +3521,6 @@
 
       /**
    * How many elements are in the collection right now.
-   * @returns {number}
    */
       get length () {
         return this.elements().length
@@ -3804,8 +3528,7 @@
 
       /**
    * The element at the given index, or null when there is none.
-   * @param {number} index
-   * @returns {*}
+   * @param index
    */
       item (index) {
         return this.elements()[index] || null
@@ -3813,8 +3536,7 @@
 
       /**
    * The element whose id, or (failing that) whose name attribute, is the given value, or null when there is none.
-   * @param {string} name
-   * @returns {*}
+   * @param name
    */
       namedItem (name) {
         const elements = this.elements()
@@ -3823,7 +3545,6 @@
 
       /**
    * Iterate over the current elements.
-   * @returns {Iterator}
    */
       [Symbol.iterator] () {
         return this.elements()[Symbol.iterator]()
@@ -3854,27 +3575,21 @@
     const parseHTML_1 = __importDefault(require('../factories/parseHTML'))
     /**
  * Simulate the behaviour of the HTMLElement Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments PseudoElement
- * @property {boolean} hidden - State of whether element is visible
- * @property {number} offsetHeight - The height of the element as offset by the parent element
- * @property {number} offsetLeft - The position of the left side of the element based on the parent element
- * @property {PseudoHTMLElement} offsetParent - A reference to the closest positioned parent element
- * @property {number} offsetTop - The position of the top side of the element based on the parent element
- * @property {number} offsetWidth - The width of the element as offset by the parent element
- * @property {CSSStyleDeclarationService} style - The element's inline styles, live and settable per property
- * @property {Object.<string, string>} dataset - The element's data-* attributes, live, under their camelCase names
- * @property {string} title - The title attribute which affects the text visible on hover
+ *
+ * It also has these simple properties, which are stored as attributes:
+ * - `hidden`: state of whether the element is visible
+ * - `title`: the title attribute, which affects the text visible on hover
+ * - `offsetHeight`, `offsetWidth`: the height and width of the element as offset by the parent element
+ * - `offsetLeft`, `offsetTop`: the position of the left and top sides of the element based on the parent element
+ * - `offsetParent`: a reference to the closest positioned parent element
  */
     class HTMLElementService extends ElementService_1.ElementService {
       /**
    * Simulate the HTMLElement object when the Dom is not available
-   * @param {Object} [elementOptions={}]
-   * @param {string} [elementOptions.tagName='']
-   * @param {PseudoNode|Object} [elementOptions.parent={}]
-   * @param {Array} [elementOptions.children=[]]
-   * @constructor
+   * @param elementOptions
+   * @param elementOptions.tagName
+   * @param elementOptions.parent
+   * @param elementOptions.children
    */
       constructor ({
         tagName = '',
@@ -3917,7 +3632,6 @@
       /**
    * The element's inline styles: a live CSSStyleDeclaration-like object, so both style.setProperty('color', 'red')
    * and style.color = 'red' work.
-   * @returns {CSSStyleDeclarationService}
    */
       get style () {
         return this.styleDeclaration
@@ -3926,7 +3640,6 @@
       /**
    * The element's data-* attributes, live, under their camelCase names (data-foo-bar <-> dataset.fooBar). Backed
    * directly by getAttribute / setAttribute, so it is never out of sync with the attributes themselves.
-   * @returns {Object.<string, string>}
    */
       get dataset () {
         return this.datasetProxy
@@ -3934,7 +3647,6 @@
 
       /**
    * Whether this tag has a `value` (the form controls which do).
-   * @returns {boolean}
    */
       hasValueProperty () {
         return ['input', 'textarea', 'select', 'button', 'option', 'output'].indexOf(this.tagName.toLowerCase()) >= 0
@@ -3942,7 +3654,6 @@
 
       /**
    * Whether this tag has a `checked` (only input does).
-   * @returns {boolean}
    */
       hasCheckedProperty () {
         return this.tagName.toLowerCase() === 'input'
@@ -3950,9 +3661,8 @@
 
       /**
    * Put a plain own property on the element, as assigning a property this element does not have does in the DOM.
-   * @param {string} name
-   * @param {*} value
-   * @returns {undefined}
+   * @param name
+   * @param value
    */
       setExpando (name, value) {
         Object.defineProperty(this, name, {
@@ -3967,7 +3677,6 @@
    * The current value of a form control. Until it is set (or edited), it is the value attribute (the default value),
    * or '' when there is none ('on' for a checkbox or radio); setting it never changes the attribute, like the DOM's.
    * Only form controls (input, textarea, select, button, option, output) have one.
-   * @returns {string|undefined}
    */
       get value () {
         if (!this.hasValueProperty()) {
@@ -3994,7 +3703,6 @@
       /**
    * Whether a checkbox or radio input is checked. Until it is set, it follows the checked attribute (which sets the
    * default); setting it never changes the attribute, like the DOM's. Only input has one.
-   * @returns {boolean|undefined}
    */
       get checked () {
         if (!this.hasCheckedProperty()) {
@@ -4014,7 +3722,6 @@
       /**
    * Style is not attribute-backed like most properties (see the constructor), so cloneNode needs its own copy of it,
    * and a form control keeps its current value and checkedness (as the DOM's cloneNode does).
-   * @returns {NodeService}
    */
       cloneShallow () {
         const copy = super.cloneShallow()
@@ -4026,8 +3733,7 @@
 
       /**
    * Style is not attribute-backed like most properties, so isEqualNode needs to compare it separately too.
-   * @param {NodeService} other The node to compare with
-   * @returns {boolean}
+   * @param other The node to compare with
    */
       equalsShallow (other) {
         return super.equalsShallow(other) && this.style.cssText === other.style.cssText
@@ -4036,8 +3742,7 @@
       /**
    * Parses html with this class building each new element (matches HTML: parsed elements behave like plain
    * HTMLElements, not whatever specialized class happens to be setting innerHTML / outerHTML).
-   * @param {string} html
-   * @returns {Array<*>}
+   * @param html
    */
       parse (html) {
         return (0, parseHTML_1.default)(html, this.ownerDocument, HTMLElementService)
@@ -4046,8 +3751,7 @@
       /**
    * Replace this element's children by parsing html. innerHTML's setter is here rather than on ElementService (which
    * only has the getter) because building the new elements needs a concrete element class - see parse().
-   * @param {string} html
-   * @returns {undefined}
+   * @param html
    */
       set innerHTML (html) {
         this.replaceChildren(...this.parse(html))
@@ -4060,8 +3764,7 @@
       /**
    * Replace this element itself, in its parent, by parsing html. Does nothing when it has no parent, like
    * replaceWith. outerHTML's setter is here rather than on ElementService for the same reason as innerHTML's.
-   * @param {string} html
-   * @returns {undefined}
+   * @param html
    */
       set outerHTML (html) {
         this.replaceWith(...this.parse(html))
@@ -4074,9 +3777,8 @@
       /**
    * Parse html and insert the resulting nodes at the given position, like insertAdjacentElement /
    * insertAdjacentText.
-   * @param {string} position beforebegin, afterbegin, beforeend or afterend
-   * @param {string} html The markup to parse
-   * @returns {undefined}
+   * @param position beforebegin, afterbegin, beforeend or afterend
+   * @param html The markup to parse
    * @throws {Error} When the position is not one of the four above
    */
       insertAdjacentHTML (position, html) {
@@ -4101,7 +3803,6 @@
 
       /**
    * Whether this element can have the focus: form controls and links which are not disabled, and anything with a tabindex.
-   * @returns {boolean}
    */
       get canFocus () {
         if (this.hasAttribute('disabled')) {
@@ -4195,25 +3896,16 @@
     })
     exports.InputEventService = void 0
     /**
- * @file Substitute for the DOM InputEvent Class.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the DOM InputEvent Class.
  */
     const UIEventService_1 = require('./UIEventService')
     /**
  * Simulate the behaviour of the InputEvent Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments UIEventService
- * @property {string|null} data
- * @property {string} inputType
- * @property {boolean} isComposing
  */
     class InputEventService extends UIEventService_1.UIEventService {
       /**
-   * @param {string} [typeArg=''] The type of the event
-   * @param {InputEventInit} [init={}] The options for the event
-   * @constructor
+   * @param typeArg The type of the event
+   * @param init The options for the event
    */
       constructor (typeArg = '', init = {}) {
         super(typeArg, init)
@@ -4244,28 +3936,17 @@
     })
     exports.KeyboardEventService = void 0
     /**
- * @file Substitute for the DOM KeyboardEvent Class.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the DOM KeyboardEvent Class.
  */
     const UIEventService_1 = require('./UIEventService')
     const modifierState_1 = require('../functions/modifierState')
     /**
  * Simulate the behaviour of the KeyboardEvent Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments UIEventService
- * @property {string} key
- * @property {string} code
- * @property {number} location
- * @property {boolean} repeat
- * @property {boolean} isComposing
  */
     class KeyboardEventService extends UIEventService_1.UIEventService {
       /**
-   * @param {string} [typeArg=''] The type of the event
-   * @param {KeyboardEventInit} [init={}] The options for the event
-   * @constructor
+   * @param typeArg The type of the event
+   * @param init The options for the event
    */
       constructor (typeArg = '', init = {}) {
         super(typeArg, init)
@@ -4315,8 +3996,7 @@
 
       /**
    * Whether a modifier key was held down when the event happened.
-   * @param {string} key Control, Shift, Alt or Meta
-   * @returns {boolean}
+   * @param key Control, Shift, Alt or Meta
    */
       getModifierState (key) {
         return (0, modifierState_1.modifierState)(this.modifiers, key)
@@ -4332,30 +4012,17 @@
     })
     exports.MouseEventService = void 0
     /**
- * @file Substitute for the DOM MouseEvent Class.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the DOM MouseEvent Class.
  */
     const UIEventService_1 = require('./UIEventService')
     const modifierState_1 = require('../functions/modifierState')
     /**
  * Simulate the behaviour of the MouseEvent Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments UIEventService
- * @property {number} screenX
- * @property {number} screenY
- * @property {number} clientX
- * @property {number} clientY
- * @property {number} button
- * @property {number} buttons
- * @property {PseudoEventTarget|null} relatedTarget
  */
     class MouseEventService extends UIEventService_1.UIEventService {
       /**
-   * @param {string} [typeArg=''] The type of the event
-   * @param {MouseEventInit} [init={}] The options for the event
-   * @constructor
+   * @param typeArg The type of the event
+   * @param init The options for the event
    */
       constructor (typeArg = '', init = {}) {
         super(typeArg, init)
@@ -4425,8 +4092,7 @@
 
       /**
    * Whether a modifier key was held down when the event happened.
-   * @param {string} key Control, Shift, Alt or Meta
-   * @returns {boolean}
+   * @param key Control, Shift, Alt or Meta
    */
       getModifierState (key) {
         return (0, modifierState_1.modifierState)(this.modifiers, key)
@@ -4445,13 +4111,10 @@
     exports.NamedNodeMapService = void 0
     /**
  * Simulate the behaviour of the NamedNodeMap Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
  */
     class NamedNodeMapService {
       /**
-   * @param {Array<PseudoAttr>} [attributes=[]] The attributes to start with
-   * @constructor
+   * @param attributes The attributes to start with
    */
       constructor (attributes = []) {
         this.attributes = attributes.slice()
@@ -4532,9 +4195,7 @@
     })
     exports.CommentService = exports.TextService = exports.NodeService = void 0
     /**
- * @file Substitute for the DOM Node Class.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the DOM Node Class.
  */
     const generateNodeList_1 = __importDefault(require('../factories/generateNodeList'))
     const TreeLinker_1 = require('collect-your-stuff/dist/collections/linked-tree-list/TreeLinker')
@@ -4543,18 +4204,8 @@
     const query_1 = require('../factories/query')
     /**
  * Simulate the behaviour of the Node Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments PseudoEventTarget
- * @property {string} name
- * @property {function} appendChild
- * @property {function} removeChild
  */
     class NodeService extends EventTargetService_1.default {
-      /**
-   *
-   * @constructor
-   */
       constructor () {
         super()
         this.nodeValueStore = null
@@ -4660,8 +4311,8 @@
 
       /**
    * Add a node as the last child of this node (a node which is already in a tree is moved).
-   * @param {PseudoNode} childNode The node to add
-   * @returns {PseudoNode} The added node
+   * @param childNode The node to add
+   * @returns The added node
    */
       appendChild (childNode) {
         return this.insertBefore(childNode, null)
@@ -4669,7 +4320,6 @@
 
       /**
    * Whether this kind of node can have children (text, comments and attributes cannot).
-   * @returns {boolean}
    */
       get acceptsChildren () {
         return true
@@ -4678,7 +4328,6 @@
       /**
    * Make a copy of this node without its children, its parent or its listeners, which is what cloneNode starts from.
    * Kinds of node which are made with arguments override this to give them.
-   * @returns {NodeService}
    */
       cloneShallow () {
         const copy = new this.constructor()
@@ -4690,8 +4339,7 @@
       /**
    * Whether another node of the same type is equal to this one apart from its children, which isEqualNode compares
    * afterwards. Kinds of node with more to compare (an element has attributes) override this.
-   * @param {NodeService} other The node to compare with
-   * @returns {boolean}
+   * @param other The node to compare with
    */
       equalsShallow (other) {
         return this.nodeName === other.nodeName && this.nodeValue === other.nodeValue
@@ -4699,7 +4347,7 @@
 
       /**
    * Add nodes (strings become text nodes) as the last children of this node, in the order given.
-   * @param {...(PseudoNode|string)} nodes The nodes (or text) to add
+   * @param nodes The nodes (or text) to add
    * @throws {Error} When this kind of node cannot have children
    */
       append (...nodes) {
@@ -4708,7 +4356,7 @@
 
       /**
    * Add nodes (strings become text nodes) as the first children of this node, in the order given.
-   * @param {...(PseudoNode|string)} nodes The nodes (or text) to add
+   * @param nodes The nodes (or text) to add
    * @throws {Error} When this kind of node cannot have children
    */
       prepend (...nodes) {
@@ -4718,7 +4366,7 @@
 
       /**
    * Remove every child of this node and put the given nodes (strings become text nodes) in their place, in order.
-   * @param {...(PseudoNode|string)} nodes The nodes (or text) to add
+   * @param nodes The nodes (or text) to add
    * @throws {Error} When this kind of node cannot have children
    */
       replaceChildren (...nodes) {
@@ -4731,7 +4379,7 @@
       /**
    * Add nodes (strings become text nodes) as this node's previous siblings, in order. Does nothing when this node has
    * no parent.
-   * @param {...(PseudoNode|string)} nodes The nodes (or text) to add
+   * @param nodes The nodes (or text) to add
    */
       before (...nodes) {
         const parent = this.parentNode
@@ -4744,7 +4392,7 @@
       /**
    * Add nodes (strings become text nodes) as this node's next siblings, in order. Does nothing when this node has no
    * parent.
-   * @param {...(PseudoNode|string)} nodes The nodes (or text) to add
+   * @param nodes The nodes (or text) to add
    */
       after (...nodes) {
         const parent = this.parentNode
@@ -4758,7 +4406,7 @@
       /**
    * Put the given nodes (strings become text nodes) where this node is, in order, then remove this node. Does nothing
    * when this node has no parent.
-   * @param {...(PseudoNode|string)} nodes The nodes (or text) to put in this node's place
+   * @param nodes The nodes (or text) to put in this node's place
    */
       replaceWith (...nodes) {
         const parent = this.parentNode
@@ -4781,8 +4429,7 @@
       /**
    * Turn a value given to append / prepend / before / after / replaceWith / replaceChildren into a node: a string
    * becomes a text node belonging to this node's document, anything else is returned as it is.
-   * @param {PseudoNode|string} value The value to add
-   * @returns {PseudoNode}
+   * @param value The value to add
    */
       toChildNode (value) {
         if (typeof value !== 'string') {
@@ -4795,8 +4442,7 @@
 
       /**
    * Every element below this node with the given tag name (or every element when tagName is *), live.
-   * @param {string} tagName
-   * @returns {PseudoHTMLCollection}
+   * @param tagName
    */
       getElementsByTagName (tagName) {
         const matchesTag = tagName === '*' ? () => true : element => element.tagName === tagName
@@ -4805,8 +4451,7 @@
 
       /**
    * Every element below this node which has all of the given (space separated) classes, live.
-   * @param {string} className
-   * @returns {PseudoHTMLCollection}
+   * @param className
    */
       getElementsByClassName (className) {
         const names = className.trim().split(/\s+/).filter(Boolean)
@@ -4816,9 +4461,8 @@
       /**
    * Every element below this node with the given tag name, live. There is no real namespace parsing here, so this
    * ignores the namespace and behaves exactly like getElementsByTagName.
-   * @param {string} namespace Ignored
-   * @param {string} tagName
-   * @returns {PseudoHTMLCollection}
+   * @param namespace Ignored
+   * @param tagName
    */
       getElementsByTagNameNS (namespace, tagName) {
         return this.getElementsByTagName(tagName)
@@ -4826,8 +4470,7 @@
 
       /**
    * The first element below this node which matches the CSS selector, in tree order, or null when there is none.
-   * @param {string} selectors A CSS selector
-   * @returns {PseudoElement|null}
+   * @param selectors A CSS selector
    */
       querySelector (selectors) {
         return (0, query_1.querySelector)(selectors, this)
@@ -4836,8 +4479,7 @@
       /**
    * Every element below this node which matches the CSS selector, in tree order. A plain array (not a live
    * collection): like the DOM's querySelectorAll, it is a snapshot taken when it is called.
-   * @param {string} selectors A CSS selector
-   * @returns {Array<PseudoElement>}
+   * @param selectors A CSS selector
    */
       querySelectorAll (selectors) {
         return (0, query_1.querySelectorAll)(selectors, this)
@@ -4846,14 +4488,13 @@
       /**
    * Called each time a node has been inserted as a child of this node, so that nodes which need to react to children
    * (for example elements applying default events) can do so.
-   * @param {NodeService} child The node which was inserted
+   * @param child The node which was inserted
    */
       childInserted (child) {}
       /**
    * Make a copy of this node (without its parent, and without its event listeners). With deep the children are copied
    * too, all the way down.
-   * @param {boolean} [deep=false] Copy the children as well
-   * @returns {PseudoNode}
+   * @param deep Copy the children as well
    */
       cloneNode (deep = false) {
         const copy = this.cloneShallow()
@@ -4868,8 +4509,7 @@
    * itself, DISCONNECTED (with IMPLEMENTATION_SPECIFIC and a consistent PRECEDING or FOLLOWING) for a node in another tree,
    * CONTAINS + PRECEDING when the other node is an ancestor, CONTAINED_BY + FOLLOWING when it is a descendant,
    * otherwise PRECEDING or FOLLOWING by their order in the tree.
-   * @param {PseudoNode} otherNode The node to locate
-   * @returns {number}
+   * @param otherNode The node to locate
    */
       compareDocumentPosition (otherNode) {
         if (otherNode === this) {
@@ -4910,8 +4550,7 @@
 
       /**
    * Check whether a node is this node or one of its descendants.
-   * @param {PseudoNode|null} otherNode The node to look for
-   * @returns {boolean}
+   * @param otherNode The node to look for
    */
       contains (otherNode) {
         let current = otherNode
@@ -4937,9 +4576,9 @@
       /**
    * Insert a node as a child of this node, before the given child (or at the end when there is none). A node which is
    * already in a tree is moved, and the children of a document fragment are moved in order.
-   * @param {PseudoNode} newNode The node to insert
-   * @param {PseudoNode|null} [referenceNode=null] The child of this node to insert before, or null to insert at the end
-   * @returns {PseudoNode} The inserted node
+   * @param newNode The node to insert
+   * @param referenceNode The child of this node to insert before, or null to insert at the end
+   * @returns The inserted node
    * @throws {Error} When the reference node is not a child of this node, or the new node is this node or contains it
    */
       insertBefore (newNode, referenceNode = null) {
@@ -4985,8 +4624,7 @@
       /**
    * Whether another node is the same as this one, by what they hold: the same type, name and value (an element also
    * needs the same attributes), and children which are equal in the same order.
-   * @param {PseudoNode|null} otherNode The node to compare with
-   * @returns {boolean}
+   * @param otherNode The node to compare with
    */
       isEqualNode (otherNode) {
         if (!otherNode || otherNode.nodeType !== this.nodeType || !this.equalsShallow(otherNode)) {
@@ -5039,8 +4677,8 @@
 
       /**
    * Remove a child from this node, it no longer has a parent or siblings afterwards.
-   * @param {PseudoNode} childElement The child node to remove
-   * @returns {PseudoNode} The removed node
+   * @param childElement The child node to remove
+   * @returns The removed node
    * @throws {Error} When the node is not a child of this node
    */
       removeChild (childElement) {
@@ -5056,9 +4694,9 @@
 
       /**
    * Replace a child of this node with another node (which is moved if it is already in a tree).
-   * @param {PseudoNode} newChild The node which takes the place
-   * @param {PseudoNode} oldChild The child of this node to replace
-   * @returns {PseudoNode} The replaced node
+   * @param newChild The node which takes the place
+   * @param oldChild The child of this node to replace
+   * @returns The replaced node
    * @throws {Error} When the old node is not a child of this node
    */
       replaceChild (newChild, oldChild) {
@@ -5101,17 +4739,10 @@
     NodeService.nextNodeId = 1
     /**
  * Simulate the behaviour of the Text Class when there is no DOM available: the text in an element.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments NodeService
- * @property {string} data - The text
- * @property {number} length - How many characters there are
- * @property {string} wholeText - The text of this node and of the text nodes next to it
  */
     class TextService extends NodeService {
       /**
-   * @param {string} [data=''] The text
-   * @constructor
+   * @param data The text
    */
       constructor (data = '') {
         super()
@@ -5130,6 +4761,7 @@
         return NodeService.TEXT_NODE
       }
 
+      /** The text */
       get data () {
         return this.nodeValue
       }
@@ -5138,6 +4770,7 @@
         this.nodeValue = String(data)
       }
 
+      /** How many characters there are */
       get length () {
         return this.data.length
       }
@@ -5150,6 +4783,7 @@
         this.data = text === null ? '' : String(text)
       }
 
+      /** The text of this node and of the text nodes next to it */
       get wholeText () {
         let first = this
         while (first.previousSibling && first.previousSibling.nodeType === NodeService.TEXT_NODE) {
@@ -5165,8 +4799,8 @@
       /**
    * Break this text node in two at a position: this node keeps the text before it and a new node with the rest is put
    * after this one.
-   * @param {number} offset How many characters stay in this node
-   * @returns {TextService} The new node
+   * @param offset How many characters stay in this node
+   * @returns The new node
    * @throws {Error} When the offset is beyond the end of the text
    */
       splitText (offset) {
@@ -5191,16 +4825,10 @@
     exports.TextService = TextService
     /**
  * Simulate the behaviour of the Comment Class when there is no DOM available: a note in the markup which is not shown.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments NodeService
- * @property {string} data - The comment
- * @property {number} length - How many characters there are
  */
     class CommentService extends NodeService {
       /**
-   * @param {string} [data=''] The comment
-   * @constructor
+   * @param data The comment
    */
       constructor (data = '') {
         super()
@@ -5219,6 +4847,7 @@
         return NodeService.COMMENT_NODE
       }
 
+      /** The comment */
       get data () {
         return this.nodeValue
       }
@@ -5227,6 +4856,7 @@
         this.nodeValue = String(data)
       }
 
+      /** How many characters there are */
       get length () {
         return this.data.length
       }
@@ -5255,28 +4885,16 @@
     })
     exports.PointerEventService = void 0
     /**
- * @file Substitute for the DOM PointerEvent Class.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the DOM PointerEvent Class.
  */
     const MouseEventService_1 = require('./MouseEventService')
     /**
  * Simulate the behaviour of the PointerEvent Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments MouseEventService
- * @property {number} pointerId
- * @property {number} width
- * @property {number} height
- * @property {number} pressure
- * @property {string} pointerType
- * @property {boolean} isPrimary
  */
     class PointerEventService extends MouseEventService_1.MouseEventService {
       /**
-   * @param {string} [typeArg=''] The type of the event
-   * @param {PointerEventInit} [init={}] The options for the event
-   * @constructor
+   * @param typeArg The type of the event
+   * @param init The options for the event
    */
       constructor (typeArg = '', init = {}) {
         super(typeArg, init)
@@ -5327,9 +4945,6 @@
     /**
  * Simulate the behaviour of the ShadowRoot Class when there is no DOM available: a DocumentFragment attached to an
  * element via attachShadow, which sets host and mode.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments DocumentFragmentService
  */
     class ShadowRootService extends DocumentFragmentService_1.DocumentFragmentService {
       constructor () {
@@ -5350,25 +4965,17 @@
     })
     exports.UIEventService = void 0
     /**
- * @file Substitute for the DOM UIEvent Class.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the DOM UIEvent Class.
  */
     const EventService_1 = require('./EventService')
     /**
  * Simulate the behaviour of the UIEvent Class when there is no DOM available: the events which come from a user
  * interface (the mouse, the keyboard, focus and input).
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments EventService
- * @property {number} detail
- * @property {*} view
  */
     class UIEventService extends EventService_1.EventService {
       /**
-   * @param {string} [typeArg=''] The type of the event
-   * @param {UIEventInit} [init={}] The options for the event
-   * @constructor
+   * @param typeArg The type of the event
+   * @param init The options for the event
    */
       constructor (typeArg = '', init = {}) {
         super(typeArg, init)
@@ -5401,10 +5008,7 @@
     })
     exports.keyPress = exports.click = void 0
     /**
- * @file Simulate what a user does, with the events the browser sends for it.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
- * @module pseudoDom/simulate
+ * Simulate what a user does, with the events the browser sends for it.
  */
     const createEvent_1 = __importDefault(require('./factories/createEvent'))
     const activeElement_1 = require('./functions/activeElement')
@@ -5414,8 +5018,7 @@
     }))
     /**
  * The nearest element (starting with the element itself) which can have the focus.
- * @param {*} element Where to start
- * @returns {*|null}
+ * @param element Where to start
  */
     const focusableFrom = element => {
       let current = element
@@ -5431,10 +5034,9 @@
  * Click an element the way a user does: pointerdown and mousedown, then the focus moves to the nearest element which
  * can have it (or is taken away from the one which had it) unless mousedown was cancelled, then pointerup, mouseup
  * and finally click. Every event is trusted and has the options the browser gives it. A disabled element gets nothing.
- * @function click
- * @param {*} element The element to click
- * @param {Object} [init={}] Options for the events (for example clientX, clientY, shiftKey)
- * @returns {boolean} False when the click was cancelled (or the element is disabled), so its default action did not happen
+ * @param element The element to click
+ * @param init Options for the events (for example clientX, clientY, shiftKey)
+ * @returns False when the click was cancelled (or the element is disabled), so its default action did not happen
  */
     const click = (element, init = {}) => {
       if (element.hasAttribute && element.hasAttribute('disabled')) {
@@ -5483,11 +5085,10 @@
     exports.click = click
     /**
  * Press and release a key on an element (the element which has the focus, or one given): keydown and then keyup.
- * @function keyPress
- * @param {*} element The element which gets the key
- * @param {string} key The value of the key, such as a or Enter
- * @param {Object} [init={}] Options for the events (for example code, shiftKey)
- * @returns {boolean} False when keydown was cancelled, so its default action did not happen
+ * @param element The element which gets the key
+ * @param key The value of the key, such as a or Enter
+ * @param init Options for the events (for example code, shiftKey)
+ * @returns False when keydown was cancelled, so its default action did not happen
  */
     const keyPress = (element, key, init = {}) => {
       const options = Object.assign({
