@@ -8,24 +8,19 @@ Object.defineProperty(exports, '__esModule', {
 })
 exports.HTMLCollectionService = void 0
 /**
- * @file Substitute for the DOM HTMLCollection Class.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the DOM HTMLCollection Class.
  */
 const NodeService_1 = require('./NodeService')
 /**
  * Simulate the behaviour of the HTMLCollection Class when there is no DOM available: a live view of some of a node's
  * element descendants, recomputed each time it is used rather than kept in sync as they change.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
  */
 class HTMLCollectionService {
   /**
-   * @param {NodeService} owner The node this is a live view of a part of
-   * @param {function(*): boolean} [predicate] Only elements which pass this are included (every element by default)
-   * @param {boolean} [deep=false] Include every matching descendant (true, like getElementsByTagName), not just the
+   * @param owner The node this is a live view of a part of
+   * @param predicate Only elements which pass this are included (every element by default)
+   * @param deep Include every matching descendant (true, like getElementsByTagName), not just the
    * direct element children (false, like Element.children)
-   * @constructor
    */
   constructor (owner, predicate = () => true, deep = false) {
     this.owner = owner
@@ -35,7 +30,6 @@ class HTMLCollectionService {
 
   /**
    * The current elements the collection holds, in tree order.
-   * @returns {Array<PseudoNode>}
    */
   elements () {
     const results = []
@@ -55,7 +49,6 @@ class HTMLCollectionService {
 
   /**
    * How many elements are in the collection right now.
-   * @returns {number}
    */
   get length () {
     return this.elements().length
@@ -63,8 +56,7 @@ class HTMLCollectionService {
 
   /**
    * The element at the given index, or null when there is none.
-   * @param {number} index
-   * @returns {*}
+   * @param index
    */
   item (index) {
     return this.elements()[index] || null
@@ -72,8 +64,7 @@ class HTMLCollectionService {
 
   /**
    * The element whose id, or (failing that) whose name attribute, is the given value, or null when there is none.
-   * @param {string} name
-   * @returns {*}
+   * @param name
    */
   namedItem (name) {
     const elements = this.elements()
@@ -82,7 +73,6 @@ class HTMLCollectionService {
 
   /**
    * Iterate over the current elements.
-   * @returns {Iterator}
    */
   [Symbol.iterator] () {
     return this.elements()[Symbol.iterator]()

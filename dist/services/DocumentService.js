@@ -17,9 +17,6 @@ const DocumentFragmentService_1 = require('./DocumentFragmentService')
 const getElementById_1 = __importDefault(require('../functions/getElementById'))
 /**
  * Simulate the behaviour of the Document Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments NodeService
  */
 class DocumentService extends NodeService_1.NodeService {
   get nodeName () {
@@ -38,8 +35,7 @@ class DocumentService extends NodeService_1.NodeService {
   set textContent (text) {}
   /**
    * The first element, in tree order, whose id matches the given value, or null when there is none.
-   * @param {string} id
-   * @returns {PseudoElement|null}
+   * @param id
    */
   getElementById (id) {
     return (0, getElementById_1.default)(this, id)
@@ -47,8 +43,7 @@ class DocumentService extends NodeService_1.NodeService {
 
   /**
    * Make an element of the given type which belongs to this document but is not added anywhere until it is appended.
-   * @param {string} [tagName='div'] The type of element to create
-   * @returns {PseudoElement}
+   * @param tagName The type of element to create
    */
   createElement (tagName = 'div') {
     // Like the DOM, the new element is not added anywhere: it has no parent until it is appended
@@ -61,8 +56,7 @@ class DocumentService extends NodeService_1.NodeService {
 
   /**
    * Make a text node which belongs to this document.
-   * @param {string} [data=''] The text
-   * @returns {TextService}
+   * @param data The text
    */
   createTextNode (data = '') {
     const text = new NodeService_1.TextService(data)
@@ -72,8 +66,7 @@ class DocumentService extends NodeService_1.NodeService {
 
   /**
    * Make a comment which belongs to this document.
-   * @param {string} [data=''] The comment
-   * @returns {CommentService}
+   * @param data The comment
    */
   createComment (data = '') {
     const comment = new NodeService_1.CommentService(data)
@@ -84,7 +77,6 @@ class DocumentService extends NodeService_1.NodeService {
   /**
    * Make an empty document fragment which belongs to this document, a container for nodes which can be built up and
    * then inserted in one go.
-   * @returns {DocumentFragmentService}
    */
   createDocumentFragment () {
     const fragment = new DocumentFragmentService_1.DocumentFragmentService()

@@ -1,7 +1,5 @@
 /**
- * @file All of the Pseudo Dom Helper Objects functions for simulating parts of the DOM when running scripts in NodeJs.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * All of the Pseudo Dom Helper Objects functions for simulating parts of the DOM when running scripts in NodeJs.
  */
 
 import { EventService as PseudoEvent } from './services/EventService'
@@ -28,9 +26,6 @@ import { TextService as PseudoText, CommentService as PseudoComment } from './se
 
 /**
  * All methods exported from this module are encapsulated within pseudoDom.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @typedef {Object} pseudoDom
- * @module pseudoDom/objects
  */
 const pseudoDom = {
   generateDocument,

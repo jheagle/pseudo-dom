@@ -1,9 +1,7 @@
 'use strict'
 
 /**
- * @file All of the Pseudo Dom Helper Objects functions for simulating parts of the DOM when running scripts in NodeJs.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * All of the Pseudo Dom Helper Objects functions for simulating parts of the DOM when running scripts in NodeJs.
  */
 const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
   return mod && mod.__esModule
@@ -131,9 +129,6 @@ Object.defineProperty(exports, 'PseudoComment', {
 })
 /**
  * All methods exported from this module are encapsulated within pseudoDom.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @typedef {Object} pseudoDom
- * @module pseudoDom/objects
  */
 const pseudoDom = {
   generateDocument: generateDocument_1.default,

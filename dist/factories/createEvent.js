@@ -29,11 +29,9 @@ const eventClasses = {
  * the init says so, and the event is not trusted. With browser: true the event is created the way the browser creates
  * it, using the standard options for its type (see eventDefaults), and trusted: true makes it look like it came from a
  * real user action (isTrusted).
- * @function createEvent
- * @param {string} type The type of the event, such as click
- * @param {Object} [init={}] The options for the event (bubbles, cancelable, composed and those of its kind of event)
- * @param {CreateEventOptions} [options={}] Whether the browser is creating the event, and whether it is trusted
- * @returns {EventService}
+ * @param type The type of the event, such as click
+ * @param init The options for the event (bubbles, cancelable, composed and those of its kind of event)
+ * @param options Whether the browser is creating the event, and whether it is trusted
  */
 const createEvent = (type, init = {}, {
   browser = false,

@@ -4,8 +4,7 @@ import { PseudoElement } from './PseudoElement'
 export interface PseudoDocumentFragment extends PseudoNode {
   /**
    * The first element, in tree order, whose id matches the given value, or null when there is none.
-   * @param {string} id
-   * @returns {PseudoElement|null}
+   * @param id
    */
   getElementById (id: string): PseudoElement | null
 }

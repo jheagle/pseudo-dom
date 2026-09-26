@@ -1,7 +1,5 @@
 /**
- * @file Serializes pseudo-dom nodes back into an HTML string, for innerHTML / outerHTML.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Serializes pseudo-dom nodes back into an HTML string, for innerHTML / outerHTML.
  */
 import { NodeService } from '../services/NodeService'
 
@@ -29,8 +27,7 @@ const BOOLEAN_ATTRIBUTES: Set<string> = new Set(['hidden'])
  * Escape text so it is safe inside HTML text content. Coerces to a string first - unlike a real DOM, pseudo-dom's
  * setAttribute does not itself coerce (see the same note on escapeAttributeValue), and nodeValue is not guaranteed
  * to be a string either.
- * @param {*} text
- * @returns {string}
+ * @param text
  */
 const escapeText = (text: any): string => String(text)
   .replace(/&/g, '&amp;')
@@ -41,8 +38,7 @@ const escapeText = (text: any): string => String(text)
  * Escape a value so it is safe inside a double-quoted HTML attribute. Coerces to a string first: a real DOM's
  * setAttribute always stores a string, however pseudo-dom's does not coerce what it is given, so a value set via
  * setAttribute(name, 5) is stored (and read back by getAttribute) as the number 5, not the string '5'.
- * @param {*} value
- * @returns {string}
+ * @param value
  */
 const escapeAttributeValue = (value: any): string => String(value)
   .replace(/&/g, '&amp;')
@@ -51,8 +47,7 @@ const escapeAttributeValue = (value: any): string => String(value)
 /**
  * Every attribute of the element, serialized (class instead of className, boolean attributes bare, the never-real
  * mock properties left out, style added from the live CSSStyleDeclaration when it is not empty).
- * @param {*} element
- * @returns {string}
+ * @param element
  */
 const serializeAttributes = (element: any): string => {
   let result: string = (element.getAttributeNames ? element.getAttributeNames() : [])
@@ -74,8 +69,7 @@ const serializeAttributes = (element: any): string => {
 
 /**
  * One node, serialized (its own markup only - see serializeChildren for its descendants too).
- * @param {*} node
- * @returns {string}
+ * @param node
  */
 const serializeNode = (node: any): string => {
   if (node.nodeType === NodeService.TEXT_NODE) {
@@ -97,27 +91,22 @@ const serializeNode = (node: any): string => {
 
 /**
  * A node's children, serialized in order (this is what innerHTML returns).
- * @memberOf module:factories
- * @param {*} node
- * @returns {string}
+ * @param node
  */
 const serializeChildren = (node: any): string => Array.from(node.childNodes).map(serializeNode).join('')
 
 /**
  * An element itself, serialized with its children (this is what outerHTML returns).
- * @memberOf module:factories
- * @param {*} element
- * @returns {string}
+ * @param element
  */
 const serializeOuter = (element: any): string => serializeNode(element)
 
 /**
  * One node, indented for readability (see prettyPrint) - unlike serializeNode, every non-empty node is its own
  * line, so the structure of a whole tree is easy to read at a glance.
- * @param {*} node
- * @param {number} depth
- * @param {string} indent
- * @returns {string}
+ * @param node
+ * @param depth
+ * @param indent
  */
 const prettyPrintNode = (node: any, depth: number, indent: string): string => {
   const pad: string = indent.repeat(depth)
@@ -149,10 +138,8 @@ const prettyPrintNode = (node: any, depth: number, indent: string): string => {
  * A node's markup, indented one level per level of nesting - a real DOM's outerHTML / innerHTML has no line breaks
  * at all, which does not read well for a whole tree (a board full of cells, say). Useful for watching pseudo-dom-
  * driven code run headlessly, printed to a terminal - see also logElement, which does the printing too.
- * @memberOf module:factories
- * @param {*} node
- * @param {string} [indent='  '] The indentation used per level of nesting
- * @returns {string}
+ * @param node
+ * @param indent The indentation used per level of nesting
  */
 const prettyPrint = (node: any, indent: string = '  '): string => prettyPrintNode(node, 0, indent)
 

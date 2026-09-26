@@ -1,8 +1,8 @@
 export {
   build,
   defaultCmd as default,
+  docs,
   partials,
-  readme,
   testFull,
   testQuick,
   typescript,

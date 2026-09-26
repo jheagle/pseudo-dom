@@ -1,9 +1,7 @@
 'use strict'
 
 /**
- * @file The standard event types of the browser, and how the browser creates them.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * The standard event types of the browser, and how the browser creates them.
  */
 Object.defineProperty(exports, '__esModule', {
   value: true
@@ -20,7 +18,6 @@ const define = (bubbles, cancelable, composed, eventInterface = 'Event') => ({
  * options. A script which creates an event with the constructor gets none of them (everything is false) unless it asks
  * for them, which is why createEvent only uses this table when it is told the browser is creating the event.
  * The values follow the UI Events, HTML, Pointer Events, Clipboard, Drag and Drop, Touch and CSS specifications.
- * @type {Object.<string, EventDefinition>}
  */
 exports.eventDefaults = {
   // Mouse (UI Events)

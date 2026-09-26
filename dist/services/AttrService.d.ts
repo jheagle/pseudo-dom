@@ -3,9 +3,6 @@ import { PseudoElement } from '../interfaces/PseudoElement';
 import { NodeService } from './NodeService';
 /**
  * Simulate the behaviour of the Attr Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments NodeService
  */
 export declare class AttrService extends NodeService implements PseudoAttr {
     value: string;
@@ -14,12 +11,11 @@ export declare class AttrService extends NodeService implements PseudoAttr {
     private readonly namespace;
     private readonly namespacePrefix;
     /**
-     * @param {string} name The name of the attribute
-     * @param {string} [value=''] The value of the attribute
-     * @param {PseudoElement|null} [ownerElement=null] The element which has this attribute
-     * @param {string} [namespaceURI=''] The namespace of the attribute
-     * @param {string|null} [prefix=null] The namespace prefix of the attribute
-     * @constructor
+     * @param name The name of the attribute
+     * @param value The value of the attribute
+     * @param ownerElement The element which has this attribute
+     * @param namespaceURI The namespace of the attribute
+     * @param prefix The namespace prefix of the attribute
      */
     constructor(name?: string, value?: string, ownerElement?: PseudoElement | null, namespaceURI?: string, prefix?: string | null);
     protected get acceptsChildren(): boolean;

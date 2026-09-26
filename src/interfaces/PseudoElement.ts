@@ -1,7 +1,5 @@
 /**
- * @file Substitute for the DOM Element Class.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the DOM Element Class.
  */
 import { PseudoNode } from './PseudoNode'
 import { PseudoHTMLSlotElement } from './PseudoHTMLSlotElement'
@@ -14,18 +12,6 @@ import { PseudoAttr } from './PseudoAttr'
 
 /**
  * Simulate the behaviour of the Element Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments PseudoNode
- * @property {string} tagName
- * @property {string} className
- * @property {string} id
- * @property {string} innerHtml
- * @property {Array} attributes
- * @property {function} hasAttribute
- * @property {function} setAttribute
- * @property {function} getAttribute
- * @property {function} removeAttribute
  */
 export interface PseudoElement extends PseudoNode {
   /**
@@ -605,8 +591,7 @@ export interface PseudoElement extends PseudoNode {
   /**
    * Attaches a shadow DOM tree to the specified element and returns a reference to its ShadowRoot. Throws when the
    * element already hosts one.
-   * @param {{mode: string}} options
-   * @returns {PseudoShadowRoot}
+   * @param options
    */
   attachShadow (options: { mode: string }): PseudoShadowRoot
 
@@ -619,28 +604,24 @@ export interface PseudoElement extends PseudoNode {
   /**
    * Returns whether an element is expected to be visible or not. Settable directly (boundingClientRect / isVisible /
    * etc.) rather than really computed - there is no layout engine here.
-   * @returns {boolean}
    */
   checkVisibility (): boolean
 
   /**
    * Returns the Element which is the closest ancestor of the current element (or the current element itself) which matches the selectors given in parameter.
-   * @param {string} selectors A CSS selector
-   * @returns {PseudoElement|null}
+   * @param selectors A CSS selector
    */
   closest (selectors: string): PseudoElement | null
 
   /**
    * Returns a read-only view of the element's own inline style declarations (there is no CSS cascade here, so this
    * is not a real computed style).
-   * @returns {{get: function(string): (string|undefined)}}
    */
   computedStyleMap (): { get: (property: string) => string | undefined }
 
   /**
    * Returns an array of Animation objects currently active on the element. Settable directly (animations) - there is
    * no animation engine here.
-   * @returns {Array<*>}
    */
   getAnimations (): Array<any>
 
@@ -651,7 +632,6 @@ export interface PseudoElement extends PseudoNode {
 
   /**
    * Returns an array of attribute names from the current element.
-   * @returns {Array<string>}
    */
   getAttributeNames (): Array<string>
 
@@ -664,8 +644,8 @@ export interface PseudoElement extends PseudoNode {
    * Retrieves the node representation of the attribute with the specified name and namespace, from the current
    * node and returns it as an Attr. There is no real namespace parsing here, so this ignores the namespace and
    * behaves exactly like getAttributeNode.
-   * @param {string} namespace Ignored
-   * @param {string} attributeName
+   * @param namespace Ignored
+   * @param attributeName
    */
   getAttributeNodeNS (namespace: string, attributeName: string): PseudoAttr | null
 
@@ -673,36 +653,32 @@ export interface PseudoElement extends PseudoNode {
    * Retrieves the value of the attribute with the specified namespace and name from the current node and returns
    * it as a string. There is no real namespace parsing here, so this ignores the namespace and behaves exactly
    * like getAttribute.
-   * @param {string} namespace Ignored
-   * @param {string} attributeName
+   * @param namespace Ignored
+   * @param attributeName
    */
   getAttributeNS (namespace: string, attributeName: string): string | null
 
   /**
    * Returns the size of an element and its position relative to the viewport. Settable directly
    * (boundingClientRect) rather than really computed - there is no layout engine here.
-   * @returns {{x: number, y: number, width: number, height: number, top: number, right: number, bottom: number, left: number}}
    */
   getBoundingClientRect (): { x: number, y: number, width: number, height: number, top: number, right: number, bottom: number, left: number }
 
   /**
    * Returns a collection of rectangles that indicate the bounding rectangles for each line of text in a client.
    * Settable directly (clientRects) rather than really computed - there is no layout engine here.
-   * @returns {Array<*>}
    */
   getClientRects (): Array<any>
 
   /**
    * Returns a live HTMLCollection that contains all descendants of the current element that possess the list of classes given in the parameter.
-   * @param {string} className One or more space separated classes
-   * @returns {PseudoHTMLCollection}
+   * @param className One or more space separated classes
    */
   getElementsByClassName (className: string): PseudoHTMLCollection
 
   /**
    * Returns a live HTMLCollection containing all descendant elements, of a particular tag name, from the current element.
-   * @param {string} tagName A tag name, or * for every element
-   * @returns {PseudoHTMLCollection}
+   * @param tagName A tag name, or * for every element
    */
   getElementsByTagName (tagName: string): PseudoHTMLCollection
 
@@ -710,9 +686,8 @@ export interface PseudoElement extends PseudoNode {
    * Returns a live HTMLCollection containing all descendant elements, of a particular tag name, from the current
    * element. There is no real namespace parsing here, so this ignores the namespace and behaves exactly like
    * getElementsByTagName.
-   * @param {string} namespace Ignored
-   * @param {string} tagName
-   * @returns {PseudoHTMLCollection}
+   * @param namespace Ignored
+   * @param tagName
    */
   getElementsByTagNameNS (namespace: string, tagName: string): PseudoHTMLCollection
 
@@ -725,51 +700,48 @@ export interface PseudoElement extends PseudoNode {
    * Returns a boolean value indicating if the element has the specified attribute, in the specified namespace, or
    * not. There is no real namespace parsing here, so this ignores the namespace and behaves exactly like
    * hasAttribute.
-   * @param {string} namespace Ignored
-   * @param {string} attributeName
+   * @param namespace Ignored
+   * @param attributeName
    */
   hasAttributeNS (namespace: string, attributeName: string): boolean
 
   /**
    * Returns a boolean value indicating if the element has one or more HTML attributes present.
-   * @returns {boolean}
    */
   hasAttributes (): boolean
 
   /**
    * Indicates whether the element on which it is invoked has pointer capture for the pointer identified by the given pointer ID.
-   * @param {number} pointerId
-   * @returns {boolean}
+   * @param pointerId
    */
   hasPointerCapture (pointerId: number): boolean
 
   /**
    * Inserts a given element at a given position relative to the element it is invoked upon.
-   * @param {string} position beforebegin, afterbegin, beforeend or afterend
-   * @param {PseudoElement} element The element to insert
-   * @returns {PseudoElement|null} The inserted element, or null when the position needs a parent this element does not have
+   * @param position beforebegin, afterbegin, beforeend or afterend
+   * @param element The element to insert
+   * @returns The inserted element, or null when the position needs a parent this element does not have
    */
   insertAdjacentElement (position: string, element: PseudoElement): PseudoElement | null
 
   /**
    * Parses the text as HTML and inserts the resulting nodes into the tree in the position given.
-   * @param {string} position beforebegin, afterbegin, beforeend or afterend
-   * @param {string} text The markup to parse
+   * @param position beforebegin, afterbegin, beforeend or afterend
+   * @param text The markup to parse
    * @throws {Error} When the position is not one of the four above
    */
   insertAdjacentHTML (position: string, text: string): void
 
   /**
    * Inserts a given text at a given position relative to the element it is invoked upon.
-   * @param {string} position beforebegin, afterbegin, beforeend or afterend
-   * @param {string} text The text to insert
+   * @param position beforebegin, afterbegin, beforeend or afterend
+   * @param text The text to insert
    */
   insertAdjacentText (position: string, text: string): void
 
   /**
    * Returns a boolean value indicating whether or not the element would be selected by the specified selector string.
-   * @param {string} selectors A CSS selector
-   * @returns {boolean}
+   * @param selectors A CSS selector
    */
   matches (selectors: string): boolean
 
@@ -780,22 +752,19 @@ export interface PseudoElement extends PseudoNode {
 
   /**
    * Returns the first Node which matches the specified selector string relative to the element.
-   * @param {string} selectors A CSS selector
-   * @returns {PseudoElement|null}
+   * @param selectors A CSS selector
    */
   querySelector (selectors: string): PseudoElement | null
 
   /**
    * Returns a NodeList of nodes which match the specified selector string relative to the element.
-   * @param {string} selectors A CSS selector
-   * @returns {Array<PseudoElement>}
+   * @param selectors A CSS selector
    */
   querySelectorAll (selectors: string): Array<PseudoElement>
 
   /**
    * Releases (stops) pointer capture that was previously set for a specific pointer event.
-   * @param {number} pointerId
-   * @returns {undefined}
+   * @param pointerId
    */
   releasePointerCapture (pointerId: number): void
 
@@ -818,8 +787,8 @@ export interface PseudoElement extends PseudoNode {
   /**
    * Removes the attribute with the specified name and namespace, from the current node. There is no real
    * namespace parsing here, so this ignores the namespace and behaves exactly like removeAttribute.
-   * @param {string} namespace Ignored
-   * @param {string} attributeName
+   * @param namespace Ignored
+   * @param attributeName
    */
   removeAttributeNS (namespace: string, attributeName: string): void
 
@@ -837,46 +806,40 @@ export interface PseudoElement extends PseudoNode {
   /**
    * Asynchronously asks the browser to make the element fullscreen. There is no real fullscreen here, so this just
    * resolves, like a browser granting the request would.
-   * @returns {Promise<void>}
    */
   requestFullscreen (): Promise<void>
 
   /**
    * Allows to asynchronously ask for the pointer to be locked on the given element. There is no real pointer lock
    * here, so this just resolves, like a browser granting the request would.
-   * @returns {Promise<void>}
    */
   requestPointerLock (): Promise<void>
 
   /**
    * Scrolls to a particular set of coordinates inside a given element. There is no real scrollable viewport here:
    * this just sets scrollLeft / scrollTop.
-   * @param {number|{left: number, top: number}} [x]
-   * @param {number} [y]
-   * @returns {undefined}
+   * @param x
+   * @param y
    */
   scroll (x: number | { left?: number, top?: number }, y: number): void
 
   /**
    * Scrolls an element by the given amount, relative to the current position.
-   * @param {number|{left: number, top: number}} [x]
-   * @param {number} [y]
-   * @returns {undefined}
+   * @param x
+   * @param y
    */
   scrollBy (x: number | { left?: number, top?: number }, y: number): void
 
   /**
    * Scrolls an ancestor until the element gets into view. There is no real viewport here for that to mean anything,
    * so this does nothing.
-   * @returns {undefined}
    */
   scrollIntoView (): void
 
   /**
    * Scrolls to a particular set of coordinates inside a given element. An alias for scroll.
-   * @param {number|{left: number, top: number}} [x]
-   * @param {number} [y]
-   * @returns {undefined}
+   * @param x
+   * @param y
    */
   scrollTo (x: number | { left?: number, top?: number }, y: number): void
 
@@ -901,25 +864,23 @@ export interface PseudoElement extends PseudoNode {
   /**
    * Sets the value of the attribute with the specified name and namespace, from the current node. There is no
    * real namespace parsing here, so this ignores the namespace and behaves exactly like setAttribute.
-   * @param {string} namespace Ignored
-   * @param {string} attributeName
-   * @param {string} attributeValue
+   * @param namespace Ignored
+   * @param attributeName
+   * @param attributeValue
    */
   setAttributeNS (namespace: string, attributeName: string, attributeValue: string): void
 
   /**
    * Designates a specific element as the capture target of future pointer events.
-   * @param {number} pointerId
-   * @returns {undefined}
+   * @param pointerId
    */
   setPointerCapture (pointerId: number): void
 
   /**
    * Toggles a boolean attribute, removing it if it is present and adding it if it is not present, on the specified
    * element - unless force says which of those to do instead. Returns whether the attribute is present afterwards.
-   * @param {string} attributeName
-   * @param {boolean} [force]
-   * @returns {boolean}
+   * @param attributeName
+   * @param force
    */
   toggleAttribute (attributeName: string, force: boolean): boolean
 }

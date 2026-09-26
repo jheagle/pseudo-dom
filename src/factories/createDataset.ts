@@ -1,10 +1,8 @@
 /**
- * @file Wraps an element in a Proxy which behaves like the DOM's DOMStringMap (element.dataset): a live view of its
+ * Wraps an element in a Proxy which behaves like the DOM's DOMStringMap (element.dataset): a live view of its
  * data-* attributes, under their camelCase names, backed by the element's own getAttribute / setAttribute /
  * hasAttribute / removeAttribute (nothing is stored separately, so it can never fall out of sync with the
  * attributes).
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
  */
 import { camelToKebab, kebabToCamel } from './createStyleDeclaration'
 
@@ -14,8 +12,7 @@ const attributeName = (property: string): string => `${DATA_PREFIX}${camelToKeba
 
 /**
  * Every data-* attribute name currently on the element, as [attributeName, camelCaseName] pairs.
- * @param {*} element
- * @returns {Array<Array<string>>}
+ * @param element
  */
 const dataAttributes = (element: any): Array<[string, string]> => {
   const names: Array<[string, string]> = []
@@ -30,9 +27,7 @@ const dataAttributes = (element: any): Array<[string, string]> => {
 
 /**
  * A live DOMStringMap-like object for an element's data-* attributes.
- * @memberOf module:factories
- * @param {*} element The element whose data-* attributes this reflects
- * @returns {Object.<string, string>}
+ * @param element The element whose data-* attributes this reflects
  */
 const createDataset = (element: any): { [key: string]: string } => new Proxy({}, {
   get (_target: object, property: string | symbol): string | undefined {

@@ -1,5 +1,5 @@
 /**
- * @file Substitute for the DOM CSSStyleDeclaration Class. Real instances (from createStyleDeclaration) also accept
+ * Substitute for the DOM CSSStyleDeclaration Class. Real instances (from createStyleDeclaration) also accept
  * arbitrary camelCase CSS property names (declaration.backgroundColor), which cannot be expressed in an interface.
  */
 export interface PseudoCSSStyleDeclaration {

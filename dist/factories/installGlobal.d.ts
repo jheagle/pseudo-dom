@@ -6,10 +6,9 @@
  * real browser's global scope - some code checks for a bare `window` before falling back to `global`), so code
  * written against a real DOM's globals works as-is. Does nothing when a real DOM is already there, matching
  * generateDocument's own only-fill-what-is-missing behaviour - calling this is always safe, in any environment.
- * @memberOf module:factories
- * @param {*} [target] The object to add document / Node / Element / HTMLElement / window onto - defaults to
+ * @param target The object to add document / Node / Element / HTMLElement / window onto - defaults to
  * globalThis, so bare `document`, `Node`, `window`, etc. resolve from anywhere once this has run
- * @returns {*} The same target, for convenience
+ * @returns The same target, for convenience
  */
 declare const installGlobal: (target?: any) => any;
 export default installGlobal;

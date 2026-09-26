@@ -1,18 +1,11 @@
 /**
- * @file Substitute for the DOM EventEventListener Class.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the DOM EventEventListener Class.
  */
 import { EventService } from '../services/EventService'
 import { listenerOptions } from '../interfaces/PseudoEventTarget'
 
 /**
  * Handle events as they are stored and implemented.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @property {string} eventType
- * @property {Object} eventOptions
- * @property {boolean} isDefault
  */
 class PseudoEventListener {
   private eventOptions: listenerOptions = {
@@ -27,11 +20,10 @@ class PseudoEventListener {
   private isRemoved: boolean = false
 
   /**
-   * @param {string} eventType The type of event this listens for
-   * @param {Object} [options] The capture, once and passive options
-   * @param {Function} handleEvent The function which is called with the event, already bound to what it should run as
-   * @param {Function} [originalCallback=handleEvent] The function (or object) which was given when registering, used to find this listener again
-   * @constructor
+   * @param eventType The type of event this listens for
+   * @param options The capture, once and passive options
+   * @param handleEvent The function which is called with the event, already bound to what it should run as
+   * @param originalCallback The function (or object) which was given when registering, used to find this listener again
    */
   constructor (eventType: string, { capture = false, once = false, passive = false } = {}, handleEvent: Function, originalCallback: Function = handleEvent) {
     this.eventOptions = { capture, once, passive }
@@ -75,10 +67,7 @@ class PseudoEventListener {
   }
 
   /**
-   * @method
-   * @name PseudoEventListener#handleEvent
-   * @param {PseudoEvent} event
-   * @returns {*}
+   * @param event
    */
   handleEvent (event: EventService): any {
     return this.handler(event)
@@ -86,10 +75,7 @@ class PseudoEventListener {
 
   /**
    * A capture listener runs while the event travels down to the target.
-   * @method
-   * @name PseudoEventListener#doCapturePhase
-   * @param {PseudoEvent} event
-   * @returns {boolean}
+   * @param event
    */
   doCapturePhase (event: EventService): boolean {
     return event.eventPhase === EventService.CAPTURING_PHASE && this.eventOptions.capture
@@ -97,10 +83,7 @@ class PseudoEventListener {
 
   /**
    * Every listener of the target itself runs, capture listeners first.
-   * @method
-   * @name PseudoEventListener#doTargetPhase
-   * @param {PseudoEvent} event
-   * @returns {boolean}
+   * @param event
    */
   doTargetPhase (event: EventService): boolean {
     return event.eventPhase === EventService.AT_TARGET
@@ -108,20 +91,14 @@ class PseudoEventListener {
 
   /**
    * A listener which is not a capture listener runs while the event travels back up (when it bubbles).
-   * @method
-   * @name PseudoEventListener#doBubblePhase
-   * @param {PseudoEvent} event
-   * @returns {boolean}
+   * @param event
    */
   doBubblePhase (event: EventService): boolean {
     return event.eventPhase === EventService.BUBBLING_PHASE && !this.eventOptions.capture
   }
 
   /**
-   * @method
-   * @name PseudoEventListener#skipPhase
-   * @param {PseudoEvent} event
-   * @returns {boolean}
+   * @param event
    */
   skipPhase (event: EventService): boolean {
     return !this.doCapturePhase(event) && !this.doTargetPhase(event) && !this.doBubblePhase(event)
@@ -131,10 +108,7 @@ class PseudoEventListener {
    * Whether this listener should not run for the event as it is now (it was removed, or it is for another phase).
    * Stopping propagation is handled by the dispatching, since it stops other targets and not the listeners of the
    * current one.
-   * @method
-   * @name PseudoEventListener#rejectEvent
-   * @param {PseudoEvent} event
-   * @returns {boolean}
+   * @param event
    */
   rejectEvent (event: EventService): boolean {
     return this.isRemoved || this.skipPhase(event)

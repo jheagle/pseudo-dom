@@ -2,8 +2,6 @@
  * Maps pseudo-dom's own Node / Element API onto the Adapter interface css-select needs to query a tree which is not
  * domutils' own (css-select's own Adapter<Node, ElementNode> type). Every method here is one pseudo-dom already has
  * under a different name; nothing here reimplements DOM behaviour.
- * @memberOf module:factories
- * @type {Object}
  */
 export declare const cssSelectAdapter: {
     isTag: (node: any) => boolean;

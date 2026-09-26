@@ -24,6 +24,19 @@ change before 1.0.
 
 Everything below goes into more detail, section by section.
 
+## The modules
+
+The reference of every class, function and type is split by the folders of the source:
+
+* `services`: the classes which do the work (`NodeService`, `ElementService`, `HTMLElementService`, `DocumentService`,
+  `EventService`, the event kinds, ...). These are what you get from `document.createElement(...)` and friends.
+* `interfaces`: the `Pseudo*` interfaces, the shape of each DOM object (`PseudoNode`, `PseudoElement`, `PseudoEvent`, ...).
+* `classes`: the classes which are more than a service, such as `PseudoHTMLDocument` and `PseudoNodeList`.
+* `factories`: functions which make things: `generateDocument`, `installGlobal`, `logElement`, `createEvent`, and the
+  parsing and query helpers behind `innerHTML` and `querySelector`.
+* `functions`: small helpers such as `getElementById` and the focus tracking.
+* `simulate`: `click` and `keyPress`, which send what a real user action sends.
+
 ## Tree, nodes & events
 
 A real tree: `parentNode`, `previousSibling` / `nextSibling`, `firstChild` / `lastChild`, `appendChild`,

@@ -19,27 +19,21 @@ const createDataset_1 = __importDefault(require('../factories/createDataset'))
 const parseHTML_1 = __importDefault(require('../factories/parseHTML'))
 /**
  * Simulate the behaviour of the HTMLElement Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments PseudoElement
- * @property {boolean} hidden - State of whether element is visible
- * @property {number} offsetHeight - The height of the element as offset by the parent element
- * @property {number} offsetLeft - The position of the left side of the element based on the parent element
- * @property {PseudoHTMLElement} offsetParent - A reference to the closest positioned parent element
- * @property {number} offsetTop - The position of the top side of the element based on the parent element
- * @property {number} offsetWidth - The width of the element as offset by the parent element
- * @property {CSSStyleDeclarationService} style - The element's inline styles, live and settable per property
- * @property {Object.<string, string>} dataset - The element's data-* attributes, live, under their camelCase names
- * @property {string} title - The title attribute which affects the text visible on hover
+ *
+ * It also has these simple properties, which are stored as attributes:
+ * - `hidden`: state of whether the element is visible
+ * - `title`: the title attribute, which affects the text visible on hover
+ * - `offsetHeight`, `offsetWidth`: the height and width of the element as offset by the parent element
+ * - `offsetLeft`, `offsetTop`: the position of the left and top sides of the element based on the parent element
+ * - `offsetParent`: a reference to the closest positioned parent element
  */
 class HTMLElementService extends ElementService_1.ElementService {
   /**
    * Simulate the HTMLElement object when the Dom is not available
-   * @param {Object} [elementOptions={}]
-   * @param {string} [elementOptions.tagName='']
-   * @param {PseudoNode|Object} [elementOptions.parent={}]
-   * @param {Array} [elementOptions.children=[]]
-   * @constructor
+   * @param elementOptions
+   * @param elementOptions.tagName
+   * @param elementOptions.parent
+   * @param elementOptions.children
    */
   constructor ({
     tagName = '',
@@ -82,7 +76,6 @@ class HTMLElementService extends ElementService_1.ElementService {
   /**
    * The element's inline styles: a live CSSStyleDeclaration-like object, so both style.setProperty('color', 'red')
    * and style.color = 'red' work.
-   * @returns {CSSStyleDeclarationService}
    */
   get style () {
     return this.styleDeclaration
@@ -91,7 +84,6 @@ class HTMLElementService extends ElementService_1.ElementService {
   /**
    * The element's data-* attributes, live, under their camelCase names (data-foo-bar <-> dataset.fooBar). Backed
    * directly by getAttribute / setAttribute, so it is never out of sync with the attributes themselves.
-   * @returns {Object.<string, string>}
    */
   get dataset () {
     return this.datasetProxy
@@ -99,7 +91,6 @@ class HTMLElementService extends ElementService_1.ElementService {
 
   /**
    * Whether this tag has a `value` (the form controls which do).
-   * @returns {boolean}
    */
   hasValueProperty () {
     return ['input', 'textarea', 'select', 'button', 'option', 'output'].indexOf(this.tagName.toLowerCase()) >= 0
@@ -107,7 +98,6 @@ class HTMLElementService extends ElementService_1.ElementService {
 
   /**
    * Whether this tag has a `checked` (only input does).
-   * @returns {boolean}
    */
   hasCheckedProperty () {
     return this.tagName.toLowerCase() === 'input'
@@ -115,9 +105,8 @@ class HTMLElementService extends ElementService_1.ElementService {
 
   /**
    * Put a plain own property on the element, as assigning a property this element does not have does in the DOM.
-   * @param {string} name
-   * @param {*} value
-   * @returns {undefined}
+   * @param name
+   * @param value
    */
   setExpando (name, value) {
     Object.defineProperty(this, name, {
@@ -132,7 +121,6 @@ class HTMLElementService extends ElementService_1.ElementService {
    * The current value of a form control. Until it is set (or edited), it is the value attribute (the default value),
    * or '' when there is none ('on' for a checkbox or radio); setting it never changes the attribute, like the DOM's.
    * Only form controls (input, textarea, select, button, option, output) have one.
-   * @returns {string|undefined}
    */
   get value () {
     if (!this.hasValueProperty()) {
@@ -159,7 +147,6 @@ class HTMLElementService extends ElementService_1.ElementService {
   /**
    * Whether a checkbox or radio input is checked. Until it is set, it follows the checked attribute (which sets the
    * default); setting it never changes the attribute, like the DOM's. Only input has one.
-   * @returns {boolean|undefined}
    */
   get checked () {
     if (!this.hasCheckedProperty()) {
@@ -179,7 +166,6 @@ class HTMLElementService extends ElementService_1.ElementService {
   /**
    * Style is not attribute-backed like most properties (see the constructor), so cloneNode needs its own copy of it,
    * and a form control keeps its current value and checkedness (as the DOM's cloneNode does).
-   * @returns {NodeService}
    */
   cloneShallow () {
     const copy = super.cloneShallow()
@@ -191,8 +177,7 @@ class HTMLElementService extends ElementService_1.ElementService {
 
   /**
    * Style is not attribute-backed like most properties, so isEqualNode needs to compare it separately too.
-   * @param {NodeService} other The node to compare with
-   * @returns {boolean}
+   * @param other The node to compare with
    */
   equalsShallow (other) {
     return super.equalsShallow(other) && this.style.cssText === other.style.cssText
@@ -201,8 +186,7 @@ class HTMLElementService extends ElementService_1.ElementService {
   /**
    * Parses html with this class building each new element (matches HTML: parsed elements behave like plain
    * HTMLElements, not whatever specialized class happens to be setting innerHTML / outerHTML).
-   * @param {string} html
-   * @returns {Array<*>}
+   * @param html
    */
   parse (html) {
     return (0, parseHTML_1.default)(html, this.ownerDocument, HTMLElementService)
@@ -211,8 +195,7 @@ class HTMLElementService extends ElementService_1.ElementService {
   /**
    * Replace this element's children by parsing html. innerHTML's setter is here rather than on ElementService (which
    * only has the getter) because building the new elements needs a concrete element class - see parse().
-   * @param {string} html
-   * @returns {undefined}
+   * @param html
    */
   set innerHTML (html) {
     this.replaceChildren(...this.parse(html))
@@ -225,8 +208,7 @@ class HTMLElementService extends ElementService_1.ElementService {
   /**
    * Replace this element itself, in its parent, by parsing html. Does nothing when it has no parent, like
    * replaceWith. outerHTML's setter is here rather than on ElementService for the same reason as innerHTML's.
-   * @param {string} html
-   * @returns {undefined}
+   * @param html
    */
   set outerHTML (html) {
     this.replaceWith(...this.parse(html))
@@ -239,9 +221,8 @@ class HTMLElementService extends ElementService_1.ElementService {
   /**
    * Parse html and insert the resulting nodes at the given position, like insertAdjacentElement /
    * insertAdjacentText.
-   * @param {string} position beforebegin, afterbegin, beforeend or afterend
-   * @param {string} html The markup to parse
-   * @returns {undefined}
+   * @param position beforebegin, afterbegin, beforeend or afterend
+   * @param html The markup to parse
    * @throws {Error} When the position is not one of the four above
    */
   insertAdjacentHTML (position, html) {
@@ -266,7 +247,6 @@ class HTMLElementService extends ElementService_1.ElementService {
 
   /**
    * Whether this element can have the focus: form controls and links which are not disabled, and anything with a tabindex.
-   * @returns {boolean}
    */
   get canFocus () {
     if (this.hasAttribute('disabled')) {

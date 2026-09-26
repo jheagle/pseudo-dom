@@ -2,14 +2,11 @@ import { PseudoNamedNodeMap } from '../interfaces/PseudoNamedNodeMap';
 import { PseudoAttr } from '../interfaces/PseudoAttr';
 /**
  * Simulate the behaviour of the NamedNodeMap Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
  */
 export declare class NamedNodeMapService implements PseudoNamedNodeMap {
     private attributes;
     /**
-     * @param {Array<PseudoAttr>} [attributes=[]] The attributes to start with
-     * @constructor
+     * @param attributes The attributes to start with
      */
     constructor(attributes?: Array<PseudoAttr>);
     get length(): number;

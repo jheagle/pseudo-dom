@@ -7,22 +7,15 @@ import PseudoHTMLDocument from '../classes/PseudoHTMLDocument'
 /**
  * Construct the Pseudo Dom to provide access to Dom objects which are otherwise not available outside the browser
  * context.
- * @function generateDocument
- * @param {Object} root
- * @param {Object} context
- * @returns {Window|PseudoEventTarget}
+ * @param root
+ * @param context
  */
 const generateDocument = (root: Window | any, context: object = {}): Window | PseudoEventTarget => {
-  /**
-   *
-   * @type {Window|PseudoEventTarget}
-   */
   const newWindow: Window | PseudoEventTarget | any = typeof root.document === 'undefined' ? root : new PseudoEventTarget()
 
   /**
    * The Node class itself (matching the DOM's window.Node), not an instance - the right-hand side of `instanceof`
    * must be a constructor, so `x instanceof Node` needs this, not `new PseudoNode()`.
-   * @type {Function}
    */
   const Node = root.Node || PseudoNode
   if (typeof newWindow.Node === 'undefined') {
@@ -31,7 +24,6 @@ const generateDocument = (root: Window | any, context: object = {}): Window | Ps
 
   /**
    * The Element class itself, for the same reason as Node.
-   * @type {Function}
    */
   const Element = root.Element || PseudoElement
   if (typeof newWindow.Element === 'undefined') {
@@ -40,7 +32,6 @@ const generateDocument = (root: Window | any, context: object = {}): Window | Ps
 
   /**
    * The HTMLElement class itself, for the same reason as Node.
-   * @type {Function}
    */
   const HTMLElement = root.HTMLElement || PseudoHTMLElement
   if (typeof newWindow.HTMLElement === 'undefined') {
@@ -50,7 +41,6 @@ const generateDocument = (root: Window | any, context: object = {}): Window | Ps
   /**
    * The HTMLDocument class itself, for the same reason as Node (so `document instanceof HTMLDocument`, a common
    * real-DOM-detection check, works).
-   * @type {Function}
    */
   const HTMLDocument = root.HTMLDocument || PseudoHTMLDocument
   if (typeof newWindow.HTMLDocument === 'undefined') {
@@ -60,7 +50,6 @@ const generateDocument = (root: Window | any, context: object = {}): Window | Ps
   /**
    * Define document when not available - a real instance, unlike the classes above (window.document IS an object,
    * not a constructor).
-   * @type {Document|PseudoHTMLDocument}
    */
   const document = root.document || new PseudoHTMLDocument()
   if (typeof newWindow.document === 'undefined') {

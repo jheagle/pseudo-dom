@@ -1,5 +1,5 @@
 /**
- * @file Parses an HTML string into pseudo-dom nodes, for innerHTML / outerHTML / insertAdjacentHTML. Built on
+ * Parses an HTML string into pseudo-dom nodes, for innerHTML / outerHTML / insertAdjacentHTML. Built on
  * htmlparser2's Parser (a SAX-style tokenizer) with a custom handler which builds pseudo-dom nodes directly -
  * htmlparser2's own default DomHandler / domutils tree (which this never uses) is stubbed out of the browser bundle
  * by the browser.ignore config, the same way css-select's unused default adapter already is.
@@ -7,8 +7,6 @@
  * The class to build parsed elements with is given by the caller (rather than imported here) so this has no
  * dependency on ElementService / HTMLElementService - importing either here, from a factory ElementService itself
  * would need to call, would create an import cycle.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
  */
 import { Parser } from 'htmlparser2'
 import { TextService, CommentService } from '../services/NodeService'
@@ -16,11 +14,9 @@ import { TextService, CommentService } from '../services/NodeService'
 /**
  * Parse an HTML string into the nodes it describes (siblings at the top level, exactly like the DOM's own HTML
  * parsing does for innerHTML / insertAdjacentHTML - there is no single root unless the markup itself has one).
- * @memberOf module:factories
- * @param {string} html
- * @param {*} ownerDocument The document the new nodes belong to (matches what innerHTML etc. would set), or null
- * @param {function(new: *, {tagName: string})} ElementClass The class to build each parsed element with
- * @returns {Array<*>}
+ * @param html
+ * @param ownerDocument The document the new nodes belong to (matches what innerHTML etc. would set), or null
+ * @param ElementClass The class to build each parsed element with
  */
 const parseHTML = (html: string, ownerDocument: any, ElementClass: new (options: { tagName: string }) => any): Array<any> => {
   const roots: Array<any> = []

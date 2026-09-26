@@ -1,24 +1,10 @@
 /**
- * @file Substitute for the DOM MouseEvent Class.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the DOM MouseEvent Class.
  */
 import { UIEventInit, UIEventService } from './UIEventService';
 import { PseudoEventTarget } from '../interfaces/PseudoEventTarget';
 /**
  * The options for creating a mouse event, on top of the ones every UI event has.
- * @typedef {Object} MouseEventInit
- * @property {number} [screenX=0]
- * @property {number} [screenY=0]
- * @property {number} [clientX=0]
- * @property {number} [clientY=0]
- * @property {boolean} [ctrlKey=false]
- * @property {boolean} [shiftKey=false]
- * @property {boolean} [altKey=false]
- * @property {boolean} [metaKey=false]
- * @property {number} [button=0] The button which changed (0 is the main button)
- * @property {number} [buttons=0] The buttons which are down
- * @property {PseudoEventTarget|null} [relatedTarget=null] The other target involved (the one the mouse came from or went to)
  */
 export type MouseEventInit = UIEventInit & {
     screenX?: number;
@@ -29,22 +15,15 @@ export type MouseEventInit = UIEventInit & {
     shiftKey?: boolean;
     altKey?: boolean;
     metaKey?: boolean;
+    /** The button which changed (0 is the main button) (default 0) */
     button?: number;
+    /** The buttons which are down (default 0) */
     buttons?: number;
+    /** The other target involved (the one the mouse came from or went to) (default null) */
     relatedTarget?: PseudoEventTarget | null;
 };
 /**
  * Simulate the behaviour of the MouseEvent Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments UIEventService
- * @property {number} screenX
- * @property {number} screenY
- * @property {number} clientX
- * @property {number} clientY
- * @property {number} button
- * @property {number} buttons
- * @property {PseudoEventTarget|null} relatedTarget
  */
 export declare class MouseEventService extends UIEventService {
     private readonly position;
@@ -53,9 +32,8 @@ export declare class MouseEventService extends UIEventService {
     private readonly buttonsDown;
     private readonly related;
     /**
-     * @param {string} [typeArg=''] The type of the event
-     * @param {MouseEventInit} [init={}] The options for the event
-     * @constructor
+     * @param typeArg The type of the event
+     * @param init The options for the event
      */
     constructor(typeArg?: string, init?: MouseEventInit);
     get screenX(): number;
@@ -73,8 +51,7 @@ export declare class MouseEventService extends UIEventService {
     get relatedTarget(): PseudoEventTarget | null;
     /**
      * Whether a modifier key was held down when the event happened.
-     * @param {string} key Control, Shift, Alt or Meta
-     * @returns {boolean}
+     * @param key Control, Shift, Alt or Meta
      */
     getModifierState(key: string): boolean;
 }

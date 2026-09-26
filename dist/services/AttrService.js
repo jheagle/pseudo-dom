@@ -7,18 +7,14 @@ exports.AttrService = void 0
 const NodeService_1 = require('./NodeService')
 /**
  * Simulate the behaviour of the Attr Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments NodeService
  */
 class AttrService extends NodeService_1.NodeService {
   /**
-   * @param {string} name The name of the attribute
-   * @param {string} [value=''] The value of the attribute
-   * @param {PseudoElement|null} [ownerElement=null] The element which has this attribute
-   * @param {string} [namespaceURI=''] The namespace of the attribute
-   * @param {string|null} [prefix=null] The namespace prefix of the attribute
-   * @constructor
+   * @param name The name of the attribute
+   * @param value The value of the attribute
+   * @param ownerElement The element which has this attribute
+   * @param namespaceURI The namespace of the attribute
+   * @param prefix The namespace prefix of the attribute
    */
   constructor (name = '', value = '', ownerElement = null, namespaceURI = '', prefix = null) {
     super()

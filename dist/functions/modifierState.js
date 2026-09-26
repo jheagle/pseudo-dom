@@ -6,9 +6,7 @@ Object.defineProperty(exports, '__esModule', {
 exports.modifierState = exports.modifierKeys = void 0
 /**
  * Pick the modifier keys out of the init object of an event.
- * @function modifierKeys
- * @param {Object} [init={}] The init of an event
- * @returns {ModifierKeys}
+ * @param init The init of an event
  */
 const modifierKeys = (init = {}) => ({
   ctrlKey: !!init.ctrlKey,
@@ -19,10 +17,8 @@ const modifierKeys = (init = {}) => ({
 exports.modifierKeys = modifierKeys
 /**
  * Answer getModifierState for a set of held modifier keys.
- * @function modifierState
- * @param {ModifierKeys} keys The modifier keys which were held down
- * @param {string} key The name of the modifier (Control, Shift, Alt or Meta)
- * @returns {boolean}
+ * @param keys The modifier keys which were held down
+ * @param key The name of the modifier (Control, Shift, Alt or Meta)
  */
 const modifierState = (keys, key) => {
   switch (key) {

@@ -11,17 +11,14 @@ exports.setActiveElement = exports.getActiveElement = void 0
 const focused = new WeakMap()
 /**
  * Find the element which has the focus in a tree.
- * @function getActiveElement
- * @param {Object} root The root node of the tree
- * @returns {Object|null}
+ * @param root The root node of the tree
  */
 const getActiveElement = root => focused.get(root) || null
 exports.getActiveElement = getActiveElement
 /**
  * Remember the element which has the focus in a tree.
- * @function setActiveElement
- * @param {Object} root The root node of the tree
- * @param {Object|null} element The element which now has the focus, or null when nothing has it
+ * @param root The root node of the tree
+ * @param element The element which now has the focus, or null when nothing has it
  */
 const setActiveElement = (root, element) => {
   if (element === null) {

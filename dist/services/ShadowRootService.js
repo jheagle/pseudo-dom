@@ -8,9 +8,6 @@ const DocumentFragmentService_1 = require('./DocumentFragmentService')
 /**
  * Simulate the behaviour of the ShadowRoot Class when there is no DOM available: a DocumentFragment attached to an
  * element via attachShadow, which sets host and mode.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments DocumentFragmentService
  */
 class ShadowRootService extends DocumentFragmentService_1.DocumentFragmentService {
   constructor () {

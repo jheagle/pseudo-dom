@@ -5,25 +5,16 @@ Object.defineProperty(exports, '__esModule', {
 })
 exports.InputEventService = void 0
 /**
- * @file Substitute for the DOM InputEvent Class.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the DOM InputEvent Class.
  */
 const UIEventService_1 = require('./UIEventService')
 /**
  * Simulate the behaviour of the InputEvent Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments UIEventService
- * @property {string|null} data
- * @property {string} inputType
- * @property {boolean} isComposing
  */
 class InputEventService extends UIEventService_1.UIEventService {
   /**
-   * @param {string} [typeArg=''] The type of the event
-   * @param {InputEventInit} [init={}] The options for the event
-   * @constructor
+   * @param typeArg The type of the event
+   * @param init The options for the event
    */
   constructor (typeArg = '', init = {}) {
     super(typeArg, init)

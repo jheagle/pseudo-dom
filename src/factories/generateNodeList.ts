@@ -3,8 +3,7 @@ import { TreeLinker } from 'collect-your-stuff/dist/collections/linked-tree-list
 
 /**
  * Create a PseudoNodeList, optionally starting from an existing chain of linkers.
- * @param {TreeLinker|null} [innerList=null]
- * @returns {PseudoNodeList}
+ * @param innerList
  */
 const generateNodeList = (innerList: TreeLinker | null = null): PseudoNodeList => (new PseudoNodeList()).initialize(innerList) as PseudoNodeList
 

@@ -5,30 +5,17 @@ Object.defineProperty(exports, '__esModule', {
 })
 exports.MouseEventService = void 0
 /**
- * @file Substitute for the DOM MouseEvent Class.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the DOM MouseEvent Class.
  */
 const UIEventService_1 = require('./UIEventService')
 const modifierState_1 = require('../functions/modifierState')
 /**
  * Simulate the behaviour of the MouseEvent Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments UIEventService
- * @property {number} screenX
- * @property {number} screenY
- * @property {number} clientX
- * @property {number} clientY
- * @property {number} button
- * @property {number} buttons
- * @property {PseudoEventTarget|null} relatedTarget
  */
 class MouseEventService extends UIEventService_1.UIEventService {
   /**
-   * @param {string} [typeArg=''] The type of the event
-   * @param {MouseEventInit} [init={}] The options for the event
-   * @constructor
+   * @param typeArg The type of the event
+   * @param init The options for the event
    */
   constructor (typeArg = '', init = {}) {
     super(typeArg, init)
@@ -98,8 +85,7 @@ class MouseEventService extends UIEventService_1.UIEventService {
 
   /**
    * Whether a modifier key was held down when the event happened.
-   * @param {string} key Control, Shift, Alt or Meta
-   * @returns {boolean}
+   * @param key Control, Shift, Alt or Meta
    */
   getModifierState (key) {
     return (0, modifierState_1.modifierState)(this.modifiers, key)

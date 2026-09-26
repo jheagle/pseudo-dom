@@ -2,17 +2,14 @@ import { PseudoDOMTokenList } from '../interfaces/PseudoDOMTokenList'
 
 /**
  * Simulate the behaviour of the DOMTokenList Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
  */
 export class DOMTokenListService implements PseudoDOMTokenList {
   private tokens: Array<string>
   private readonly onChange: (value: string) => void
 
   /**
-   * @param {string} [value=''] The space separated tokens to start with
-   * @param {function(string): void} [onChange] Called with the new value whenever the tokens change
-   * @constructor
+   * @param value The space separated tokens to start with
+   * @param onChange Called with the new value whenever the tokens change
    */
   constructor (value: string = '', onChange: (value: string) => void = () => undefined) {
     this.tokens = DOMTokenListService.parse(value)

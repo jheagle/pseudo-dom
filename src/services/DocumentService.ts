@@ -7,9 +7,6 @@ import getElementById from '../functions/getElementById'
 
 /**
  * Simulate the behaviour of the Document Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments NodeService
  */
 export class DocumentService extends NodeService implements PseudoDocument {
   get nodeName (): string {
@@ -29,8 +26,7 @@ export class DocumentService extends NodeService implements PseudoDocument {
 
   /**
    * The first element, in tree order, whose id matches the given value, or null when there is none.
-   * @param {string} id
-   * @returns {PseudoElement|null}
+   * @param id
    */
   getElementById (id: string): PseudoElement | null {
     return getElementById(this, id)
@@ -38,8 +34,7 @@ export class DocumentService extends NodeService implements PseudoDocument {
 
   /**
    * Make an element of the given type which belongs to this document but is not added anywhere until it is appended.
-   * @param {string} [tagName='div'] The type of element to create
-   * @returns {PseudoElement}
+   * @param tagName The type of element to create
    */
   createElement (tagName: string = 'div'): PseudoElement {
     // Like the DOM, the new element is not added anywhere: it has no parent until it is appended
@@ -50,8 +45,7 @@ export class DocumentService extends NodeService implements PseudoDocument {
 
   /**
    * Make a text node which belongs to this document.
-   * @param {string} [data=''] The text
-   * @returns {TextService}
+   * @param data The text
    */
   createTextNode (data: string = ''): TextService {
     const text: TextService = new TextService(data)
@@ -61,8 +55,7 @@ export class DocumentService extends NodeService implements PseudoDocument {
 
   /**
    * Make a comment which belongs to this document.
-   * @param {string} [data=''] The comment
-   * @returns {CommentService}
+   * @param data The comment
    */
   createComment (data: string = ''): CommentService {
     const comment: CommentService = new CommentService(data)
@@ -73,7 +66,6 @@ export class DocumentService extends NodeService implements PseudoDocument {
   /**
    * Make an empty document fragment which belongs to this document, a container for nodes which can be built up and
    * then inserted in one go.
-   * @returns {DocumentFragmentService}
    */
   createDocumentFragment (): DocumentFragmentService {
     const fragment: DocumentFragmentService = new DocumentFragmentService()
