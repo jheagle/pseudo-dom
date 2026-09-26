@@ -1,7 +1,7 @@
 {
   "name": "pseudo-dom",
   "description": "Mock the DOM on the server side for managing state and testing",
-  "version": "0.17.0",
+  "version": "0.17.1",
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
   "author": "Joshua Heagle",
@@ -9,11 +9,10 @@
   "scripts": {
     "build": "gulp build",
     "dev": "gulp",
-    "htmldocs": "node -e \"require('fs').rmSync('docs', { recursive: true, force: true })\" && jsdoc -R MAIN.md -r dist/ -d docs",
-    "readme": "gulp readme",
+    "docs": "gulp docs",
     "test": "gulp testFull",
-    "typecheck": "tsc --noEmit -p tsconfig.json",
     "test:quick": "gulp testQuick",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
     "watch": "gulp watchFull",
     "watch:test": "gulp watchTest"
   },
@@ -26,10 +25,10 @@
     "si-funciona": "^2.6.1"
   },
   "devDependencies": {
-    "js-build-tools": "^5.2.0",
-    "jsdoc": "^4.0.5",
+    "js-build-tools": "^5.3.2",
     "standard": "^17.1.2",
-    "test-filesystem": "^1.5.1"
+    "test-filesystem": "^1.5.1",
+    "typedoc": "^0.28.20"
   },
   "directories": {
     "doc": "docs"
