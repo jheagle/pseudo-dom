@@ -1,7 +1,5 @@
 /**
- * @file Substitute for the DOM Node Class.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the DOM Node Class.
  */
 import { PseudoEventTarget } from './PseudoEventTarget'
 import { PseudoNodeList } from '../classes/PseudoNodeList'
@@ -12,12 +10,6 @@ import { PseudoDocumentFragment } from './PseudoDocumentFragment'
 
 /**
  * Simulate the behaviour of the Node Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments PseudoEventTarget
- * @property {string} name
- * @property {function} appendChild
- * @property {function} removeChild
  */
 export interface PseudoNode extends PseudoEventTarget {
   /**
@@ -116,8 +108,7 @@ export interface PseudoNode extends PseudoEventTarget {
 
   /**
    * Adds the specified childNode argument as the last child to the current node. If the argument referenced an existing node on the DOM tree, the node will be detached from its current position and attached at the new position.
-   * @param {PseudoNode} childNode
-   * @returns {PseudoNode}
+   * @param childNode
    */
   appendChild (childNode: PseudoNode): PseudoNode
 
@@ -194,8 +185,7 @@ export interface PseudoNode extends PseudoEventTarget {
 
   /**
    * Removes a child node from the current element, which must be a child of the current node.
-   * @param {PseudoNode} child
-   * @returns {PseudoNode}
+   * @param child
    */
   removeChild (child: PseudoNode): PseudoNode
 

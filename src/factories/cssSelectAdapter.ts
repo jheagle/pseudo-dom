@@ -1,16 +1,13 @@
 /**
- * @file The css-select Adapter which lets it query pseudo-dom's own tree, instead of the domutils-based tree it
+ * The css-select Adapter which lets it query pseudo-dom's own tree, instead of the domutils-based tree it
  * defaults to.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
  */
 import { NodeService } from '../services/NodeService'
 
 /**
  * Walk up from a node (not including it) to find the nearest element, in the given direction.
- * @param {*} node The node to start from
- * @param {'nextSibling'|'previousSibling'} direction Which sibling reference to follow
- * @returns {*|null}
+ * @param node The node to start from
+ * @param direction Which sibling reference to follow
  */
 const nearestElementSibling = (node: any, direction: 'nextSibling' | 'previousSibling'): any | null => {
   let current: any = node ? node[direction] : null
@@ -24,8 +21,6 @@ const nearestElementSibling = (node: any, direction: 'nextSibling' | 'previousSi
  * Maps pseudo-dom's own Node / Element API onto the Adapter interface css-select needs to query a tree which is not
  * domutils' own (css-select's own Adapter<Node, ElementNode> type). Every method here is one pseudo-dom already has
  * under a different name; nothing here reimplements DOM behaviour.
- * @memberOf module:factories
- * @type {Object}
  */
 export const cssSelectAdapter = {
   isTag: (node: any): boolean => !!node && node.nodeType === NodeService.ELEMENT_NODE,

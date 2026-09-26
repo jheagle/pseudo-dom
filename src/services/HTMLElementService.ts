@@ -1,7 +1,5 @@
 /**
- * @file Substitute for the DOM HTMLElement Class.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.0.0
+ * Substitute for the DOM HTMLElement Class.
  */
 import { PseudoHTMLElement } from '../interfaces/PseudoHTMLElement'
 import { PseudoNode } from '../interfaces/PseudoNode'
@@ -16,18 +14,13 @@ import parseHTML from '../factories/parseHTML'
 
 /**
  * Simulate the behaviour of the HTMLElement Class when there is no DOM available.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @class
- * @augments PseudoElement
- * @property {boolean} hidden - State of whether element is visible
- * @property {number} offsetHeight - The height of the element as offset by the parent element
- * @property {number} offsetLeft - The position of the left side of the element based on the parent element
- * @property {PseudoHTMLElement} offsetParent - A reference to the closest positioned parent element
- * @property {number} offsetTop - The position of the top side of the element based on the parent element
- * @property {number} offsetWidth - The width of the element as offset by the parent element
- * @property {CSSStyleDeclarationService} style - The element's inline styles, live and settable per property
- * @property {Object.<string, string>} dataset - The element's data-* attributes, live, under their camelCase names
- * @property {string} title - The title attribute which affects the text visible on hover
+ *
+ * It also has these simple properties, which are stored as attributes:
+ * - `hidden`: state of whether the element is visible
+ * - `title`: the title attribute, which affects the text visible on hover
+ * - `offsetHeight`, `offsetWidth`: the height and width of the element as offset by the parent element
+ * - `offsetLeft`, `offsetTop`: the position of the left and top sides of the element based on the parent element
+ * - `offsetParent`: a reference to the closest positioned parent element
  */
 export class HTMLElementService extends ElementService implements Partial<PseudoHTMLElement> {
   private readonly styleDeclaration: CSSStyleDeclarationService
@@ -37,11 +30,10 @@ export class HTMLElementService extends ElementService implements Partial<Pseudo
 
   /**
    * Simulate the HTMLElement object when the Dom is not available
-   * @param {Object} [elementOptions={}]
-   * @param {string} [elementOptions.tagName='']
-   * @param {PseudoNode|Object} [elementOptions.parent={}]
-   * @param {Array} [elementOptions.children=[]]
-   * @constructor
+   * @param elementOptions
+   * @param elementOptions.tagName
+   * @param elementOptions.parent
+   * @param elementOptions.children
    */
   constructor ({ tagName = '', parent = null, children = [] }: {
     tagName?: string;
@@ -69,7 +61,6 @@ export class HTMLElementService extends ElementService implements Partial<Pseudo
   /**
    * The element's inline styles: a live CSSStyleDeclaration-like object, so both style.setProperty('color', 'red')
    * and style.color = 'red' work.
-   * @returns {CSSStyleDeclarationService}
    */
   get style (): CSSStyleDeclarationService {
     return this.styleDeclaration
@@ -78,7 +69,6 @@ export class HTMLElementService extends ElementService implements Partial<Pseudo
   /**
    * The element's data-* attributes, live, under their camelCase names (data-foo-bar <-> dataset.fooBar). Backed
    * directly by getAttribute / setAttribute, so it is never out of sync with the attributes themselves.
-   * @returns {Object.<string, string>}
    */
   get dataset (): { [key: string]: string } {
     return this.datasetProxy
@@ -86,7 +76,6 @@ export class HTMLElementService extends ElementService implements Partial<Pseudo
 
   /**
    * Whether this tag has a `value` (the form controls which do).
-   * @returns {boolean}
    */
   private hasValueProperty (): boolean {
     return ['input', 'textarea', 'select', 'button', 'option', 'output'].indexOf(this.tagName.toLowerCase()) >= 0
@@ -94,7 +83,6 @@ export class HTMLElementService extends ElementService implements Partial<Pseudo
 
   /**
    * Whether this tag has a `checked` (only input does).
-   * @returns {boolean}
    */
   private hasCheckedProperty (): boolean {
     return this.tagName.toLowerCase() === 'input'
@@ -102,9 +90,8 @@ export class HTMLElementService extends ElementService implements Partial<Pseudo
 
   /**
    * Put a plain own property on the element, as assigning a property this element does not have does in the DOM.
-   * @param {string} name
-   * @param {*} value
-   * @returns {undefined}
+   * @param name
+   * @param value
    */
   private setExpando (name: string, value: any): void {
     Object.defineProperty(this, name, { value, writable: true, configurable: true, enumerable: true })
@@ -114,7 +101,6 @@ export class HTMLElementService extends ElementService implements Partial<Pseudo
    * The current value of a form control. Until it is set (or edited), it is the value attribute (the default value),
    * or '' when there is none ('on' for a checkbox or radio); setting it never changes the attribute, like the DOM's.
    * Only form controls (input, textarea, select, button, option, output) have one.
-   * @returns {string|undefined}
    */
   get value (): string | undefined {
     if (!this.hasValueProperty()) {
@@ -141,7 +127,6 @@ export class HTMLElementService extends ElementService implements Partial<Pseudo
   /**
    * Whether a checkbox or radio input is checked. Until it is set, it follows the checked attribute (which sets the
    * default); setting it never changes the attribute, like the DOM's. Only input has one.
-   * @returns {boolean|undefined}
    */
   get checked (): boolean | undefined {
     if (!this.hasCheckedProperty()) {
@@ -161,7 +146,6 @@ export class HTMLElementService extends ElementService implements Partial<Pseudo
   /**
    * Style is not attribute-backed like most properties (see the constructor), so cloneNode needs its own copy of it,
    * and a form control keeps its current value and checkedness (as the DOM's cloneNode does).
-   * @returns {NodeService}
    */
   protected cloneShallow (): NodeService {
     const copy: HTMLElementService = super.cloneShallow() as HTMLElementService
@@ -173,8 +157,7 @@ export class HTMLElementService extends ElementService implements Partial<Pseudo
 
   /**
    * Style is not attribute-backed like most properties, so isEqualNode needs to compare it separately too.
-   * @param {NodeService} other The node to compare with
-   * @returns {boolean}
+   * @param other The node to compare with
    */
   protected equalsShallow (other: NodeService): boolean {
     return super.equalsShallow(other) && this.style.cssText === (other as HTMLElementService).style.cssText
@@ -183,8 +166,7 @@ export class HTMLElementService extends ElementService implements Partial<Pseudo
   /**
    * Parses html with this class building each new element (matches HTML: parsed elements behave like plain
    * HTMLElements, not whatever specialized class happens to be setting innerHTML / outerHTML).
-   * @param {string} html
-   * @returns {Array<*>}
+   * @param html
    */
   private parse (html: string): Array<any> {
     return parseHTML(html, this.ownerDocument, HTMLElementService)
@@ -193,8 +175,7 @@ export class HTMLElementService extends ElementService implements Partial<Pseudo
   /**
    * Replace this element's children by parsing html. innerHTML's setter is here rather than on ElementService (which
    * only has the getter) because building the new elements needs a concrete element class - see parse().
-   * @param {string} html
-   * @returns {undefined}
+   * @param html
    */
   set innerHTML (html: string) {
     this.replaceChildren(...this.parse(html))
@@ -207,8 +188,7 @@ export class HTMLElementService extends ElementService implements Partial<Pseudo
   /**
    * Replace this element itself, in its parent, by parsing html. Does nothing when it has no parent, like
    * replaceWith. outerHTML's setter is here rather than on ElementService for the same reason as innerHTML's.
-   * @param {string} html
-   * @returns {undefined}
+   * @param html
    */
   set outerHTML (html: string) {
     this.replaceWith(...this.parse(html))
@@ -221,9 +201,8 @@ export class HTMLElementService extends ElementService implements Partial<Pseudo
   /**
    * Parse html and insert the resulting nodes at the given position, like insertAdjacentElement /
    * insertAdjacentText.
-   * @param {string} position beforebegin, afterbegin, beforeend or afterend
-   * @param {string} html The markup to parse
-   * @returns {undefined}
+   * @param position beforebegin, afterbegin, beforeend or afterend
+   * @param html The markup to parse
    * @throws {Error} When the position is not one of the four above
    */
   insertAdjacentHTML (position: string, html: string): void {
@@ -248,7 +227,6 @@ export class HTMLElementService extends ElementService implements Partial<Pseudo
 
   /**
    * Whether this element can have the focus: form controls and links which are not disabled, and anything with a tabindex.
-   * @returns {boolean}
    */
   public get canFocus (): boolean {
     if (this.hasAttribute('disabled')) {

@@ -4,9 +4,7 @@ import { PseudoEventTarget } from '../interfaces/PseudoEventTarget'
 /**
  * Get all of the ancestors of a node, starting with the root of the tree and ending with the node's own parent (the
  * order in which an event travels down through them). A node which has no parent has no ancestors.
- * @function getParentNodes
- * @param {PseudoEventTarget|PseudoNode|*} node The node to find the ancestors of
- * @returns {Array<PseudoNode>}
+ * @param node The node to find the ancestors of
  */
 const getParentNodes = (node: PseudoEventTarget | PseudoNode | any): Array<PseudoNode> => {
   const parents: Array<PseudoNode> = []
