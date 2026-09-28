@@ -10,7 +10,7 @@
     "enabled": true,
     "from": "src",
     "index": "MAIN.md",
-    "to": "docs"
+    "to": "../joshuaheagle.local/projects/pseudo-dom/docs"
   },
   "typescript": {
     "config": "tsconfig.json",
