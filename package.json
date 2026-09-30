@@ -1,9 +1,11 @@
 {
   "name": "pseudo-dom",
   "description": "Mock the DOM on the server side for managing state and testing",
-  "version": "0.17.1",
+  "version": "1.0.0",
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
+  "unpkg": "browser/pseudo-dom.min.js",
+  "jsdelivr": "browser/pseudo-dom.min.js",
   "author": "Joshua Heagle",
   "license": "GPL-3.0-only",
   "scripts": {
