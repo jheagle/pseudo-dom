@@ -2,16 +2,13 @@
 
 Mock the DOM for server-side DOM state and in tests.
 
-**Status: early development (0.x).** Pseudo DOM recreates the browser DOM API (following the MDN documentation) so
-DOM-dependent code can run in Node - in tests, without a real or headless browser. It is written in TypeScript and ships
-its type definitions. The API will change before 1.0.
+Pseudo DOM recreates the browser DOM API (following the MDN documentation) so DOM-dependent code can run in Node -
+in tests, without a real or headless browser. It is written in TypeScript and ships its type definitions.
 
 ## Install
 
-pseudo-dom is not on npm yet, install it from GitHub:
-
 ```shell
-npm install github:jheagle/pseudo-dom
+npm install pseudo-dom
 ```
 
 ## Example
@@ -53,10 +50,24 @@ to call everywhere.
 
 There is no layout engine or CSS cascade: what would need one (sizes, bounding boxes, ...) is settable directly.
 
+## In the browser
+
+A pre-built bundle is included (`browser/pseudo-dom.js`, `.min.js` - also served directly via
+[unpkg](https://unpkg.com/pseudo-dom) or [jsDelivr](https://cdn.jsdelivr.net/npm/pseudo-dom)) and exposes the same
+functions as a global:
+
+```html
+<script src="https://unpkg.com/pseudo-dom"></script>
+<script>
+  pseudoDom.installGlobal(window)
+</script>
+```
+
 ## Documentation
 
-The guide, and the reference for every class, function and type, is in [`docs/`](docs/index.html) (open
-`docs/index.html` in a browser). It is generated from the TypeScript source, and each module is a folder of `src/`:
+The guide, and the reference for every class, function and type, is at
+[joshuaheagle.com/projects/pseudo-dom/docs](https://joshuaheagle.com/projects/pseudo-dom/docs/index.html). It is
+generated from the TypeScript source, and each module is a folder of `src/`:
 
 | Module | What it holds |
 | --- | --- |
