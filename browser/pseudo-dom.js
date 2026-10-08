@@ -653,6 +653,7 @@
     const NodeService_1 = require('../services/NodeService')
     const ElementService_1 = require('../services/ElementService')
     const HTMLElementService_1 = require('../services/HTMLElementService')
+    const EventService_1 = require('../services/EventService')
     const PseudoHTMLDocument_1 = __importDefault(require('../classes/PseudoHTMLDocument'))
     /**
  * Construct the Pseudo Dom to provide access to Dom objects which are otherwise not available outside the browser
@@ -693,6 +694,17 @@
         newWindow.HTMLDocument = HTMLDocument
       }
       /**
+   * The Event class itself, so code which does `new Event(type)` then `target.dispatchEvent(...)` - the standard,
+   * environment-agnostic way to synthesize and dispatch an event - works the same as it would against a real DOM.
+   * Without this, a bare `new Event(...)` falls through to whatever Event the real JS engine provides (Node's own
+   * built-in one, unrelated to this module), which EventTargetService's dispatchEvent cannot read (it expects the
+   * inner/dispatching bookkeeping this class's instances carry).
+   */
+      const Event = root.Event || EventService_1.EventService
+      if (typeof newWindow.Event === 'undefined') {
+        newWindow.Event = Event
+      }
+      /**
    * Define document when not available - a real instance, unlike the classes above (window.document IS an object,
    * not a constructor).
    */
@@ -708,7 +720,7 @@
       return newWindow === mergeInto ? newWindow : Object.assign(mergeInto, newWindow)
     }
     exports.default = generateDocument
-  }, { '../classes/PseudoHTMLDocument': 2, '../services/ElementService': 28, '../services/EventTargetService': 30, '../services/HTMLElementService': 33, '../services/NodeService': 38 }],
+  }, { '../classes/PseudoHTMLDocument': 2, '../services/ElementService': 28, '../services/EventService': 29, '../services/EventTargetService': 30, '../services/HTMLElementService': 33, '../services/NodeService': 38 }],
   10: [function (require, module, exports) {
     'use strict'
 

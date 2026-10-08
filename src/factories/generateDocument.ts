@@ -2,6 +2,7 @@ import PseudoEventTarget from '../services/EventTargetService'
 import { NodeService as PseudoNode } from '../services/NodeService'
 import { ElementService as PseudoElement } from '../services/ElementService'
 import { HTMLElementService as PseudoHTMLElement } from '../services/HTMLElementService'
+import { EventService as PseudoEvent } from '../services/EventService'
 import PseudoHTMLDocument from '../classes/PseudoHTMLDocument'
 
 /**
@@ -45,6 +46,18 @@ const generateDocument = (root: Window | any, context: object = {}): Window | Ps
   const HTMLDocument = root.HTMLDocument || PseudoHTMLDocument
   if (typeof newWindow.HTMLDocument === 'undefined') {
     newWindow.HTMLDocument = HTMLDocument
+  }
+
+  /**
+   * The Event class itself, so code which does `new Event(type)` then `target.dispatchEvent(...)` - the standard,
+   * environment-agnostic way to synthesize and dispatch an event - works the same as it would against a real DOM.
+   * Without this, a bare `new Event(...)` falls through to whatever Event the real JS engine provides (Node's own
+   * built-in one, unrelated to this module), which EventTargetService's dispatchEvent cannot read (it expects the
+   * inner/dispatching bookkeeping this class's instances carry).
+   */
+  const Event = root.Event || PseudoEvent
+  if (typeof newWindow.Event === 'undefined') {
+    newWindow.Event = Event
   }
 
   /**
