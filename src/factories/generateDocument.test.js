@@ -2,21 +2,38 @@ import generateDocument from './generateDocument'
 import { NodeService } from '../services/NodeService'
 import { ElementService } from '../services/ElementService'
 import { HTMLElementService } from '../services/HTMLElementService'
+import { EventService } from '../services/EventService'
 import PseudoHTMLDocument from '../classes/PseudoHTMLDocument'
 
 describe('generateDocument', () => {
-  test('with no real document, fills document / Node / Element / HTMLElement / HTMLDocument in on root, and merges them into a separate context', () => {
+  test('with no real document, fills document / Node / Element / HTMLElement / HTMLDocument / Event in on root, and merges them into a separate context', () => {
     const root = {}
     const context = {}
     generateDocument(root, context)
     expect(root.document).toBeInstanceOf(PseudoHTMLDocument)
-    // Node / Element / HTMLElement / HTMLDocument must be the classes themselves, not instances - the right-hand
-    // side of `instanceof` has to be a constructor, and real window.Node etc. are constructors too
+    // Node / Element / HTMLElement / HTMLDocument / Event must be the classes themselves, not instances - the
+    // right-hand side of `instanceof` has to be a constructor, and real window.Node etc. are constructors too
     expect(root.Node).toBe(NodeService)
     expect(root.Element).toBe(ElementService)
     expect(root.HTMLElement).toBe(HTMLElementService)
     expect(root.HTMLDocument).toBe(PseudoHTMLDocument)
+    expect(root.Event).toBe(EventService)
     expect(context.document).toBe(root.document)
+  })
+
+  // The real bug this covers: code written the standard, environment-agnostic way - `new Event(type)` then
+  // `target.dispatchEvent(event)` - silently broke, because nothing installed a working Event global: a bare
+  // `new Event(...)` fell through to the real JS engine's own built-in Event, which dispatchEvent cannot read (it
+  // expects this module's own inner/dispatching bookkeeping). Found building a server that dispatches forwarded
+  // events against pseudo-dom elements outside a browser or jsdom.
+  test('a standard new Event(...) dispatched on a generated element actually runs its listener', () => {
+    const root = {}
+    generateDocument(root)
+    const button = root.document.createElement('button')
+    const handler = jest.fn()
+    button.addEventListener('click', handler)
+    expect(() => button.dispatchEvent(new root.Event('click'))).not.toThrow()
+    expect(handler).toHaveBeenCalledTimes(1)
   })
 
   test('document is a real instance you can use instanceof with, against the classes just installed', () => {

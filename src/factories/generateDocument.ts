@@ -2,6 +2,7 @@ import PseudoEventTarget from '../services/EventTargetService'
 import { NodeService as PseudoNode } from '../services/NodeService'
 import { ElementService as PseudoElement } from '../services/ElementService'
 import { HTMLElementService as PseudoHTMLElement } from '../services/HTMLElementService'
+import { EventService as PseudoEvent } from '../services/EventService'
 import PseudoHTMLDocument from '../classes/PseudoHTMLDocument'
 
 /**
@@ -45,6 +46,21 @@ const generateDocument = (root: Window | any, context: object = {}): Window | Ps
   const HTMLDocument = root.HTMLDocument || PseudoHTMLDocument
   if (typeof newWindow.HTMLDocument === 'undefined') {
     newWindow.HTMLDocument = HTMLDocument
+  }
+
+  /**
+   * The Event class itself, so code which does `new Event(type)` then `target.dispatchEvent(...)` - the standard,
+   * environment-agnostic way to synthesize and dispatch an event - works the same as it would against a real DOM.
+   * Unlike Node/Element/HTMLElement/HTMLDocument above, this is NOT `root.Event || PseudoEvent`: Node.js itself has
+   * had a global Event/EventTarget since v15, unrelated to this module and incompatible with it (dispatchEvent
+   * below expects the inner/dispatching bookkeeping only this module's own instances carry) - so by the time this
+   * function is reached (no real document, meaning no real browser or jsdom either), any Event already on root can
+   * only be that unrelated native one, or this module's own from an earlier install (functionally identical to
+   * reinstalling it) - never a real browser's. Preferring root.Event the way the others do would keep Node's
+   * incompatible one every time, since it is never actually undefined.
+   */
+  if (newWindow.Event !== PseudoEvent) {
+    newWindow.Event = PseudoEvent
   }
 
   /**

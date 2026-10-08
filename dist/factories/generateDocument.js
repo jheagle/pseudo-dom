@@ -14,6 +14,7 @@ const EventTargetService_1 = __importDefault(require('../services/EventTargetSer
 const NodeService_1 = require('../services/NodeService')
 const ElementService_1 = require('../services/ElementService')
 const HTMLElementService_1 = require('../services/HTMLElementService')
+const EventService_1 = require('../services/EventService')
 const PseudoHTMLDocument_1 = __importDefault(require('../classes/PseudoHTMLDocument'))
 /**
  * Construct the Pseudo Dom to provide access to Dom objects which are otherwise not available outside the browser
@@ -52,6 +53,20 @@ const generateDocument = (root, context = {}) => {
   const HTMLDocument = root.HTMLDocument || PseudoHTMLDocument_1.default
   if (typeof newWindow.HTMLDocument === 'undefined') {
     newWindow.HTMLDocument = HTMLDocument
+  }
+  /**
+   * The Event class itself, so code which does `new Event(type)` then `target.dispatchEvent(...)` - the standard,
+   * environment-agnostic way to synthesize and dispatch an event - works the same as it would against a real DOM.
+   * Unlike Node/Element/HTMLElement/HTMLDocument above, this is NOT `root.Event || PseudoEvent`: Node.js itself has
+   * had a global Event/EventTarget since v15, unrelated to this module and incompatible with it (dispatchEvent
+   * below expects the inner/dispatching bookkeeping only this module's own instances carry) - so by the time this
+   * function is reached (no real document, meaning no real browser or jsdom either), any Event already on root can
+   * only be that unrelated native one, or this module's own from an earlier install (functionally identical to
+   * reinstalling it) - never a real browser's. Preferring root.Event the way the others do would keep Node's
+   * incompatible one every time, since it is never actually undefined.
+   */
+  if (newWindow.Event !== EventService_1.EventService) {
+    newWindow.Event = EventService_1.EventService
   }
   /**
    * Define document when not available - a real instance, unlike the classes above (window.document IS an object,
