@@ -1,5 +1,6 @@
 import installGlobal from './installGlobal'
 import { HTMLElementService } from '../services/HTMLElementService'
+import { EventService } from '../services/EventService'
 
 describe('installGlobal', () => {
   // Modern Node ships a built-in navigator.userAgent ("Node.js/24"), which browser-or-node's isJsDom check
@@ -53,14 +54,34 @@ describe('installGlobal', () => {
     expect(installGlobal(target)).toBe(target)
   })
 
+  // The real bug this covers: unlike Node/Element/HTMLElement, a plain target does not already have these, so
+  // that class of bug cannot show up on a bare {} - Node.js itself ships a global Event/EventTarget (since v15),
+  // unrelated to this module and incompatible with its dispatchEvent. installGlobal must still install this
+  // module's own Event, not treat Node's native one as "already there, leave it".
+  test('overwrites an incompatible Event already on the target (Node\'s own global, not a real DOM\'s)', () => {
+    class UnrelatedNativeEvent {}
+    const target = { Event: UnrelatedNativeEvent }
+    installGlobal(target)
+    expect(target.Event).toBe(EventService)
+    const button = target.document.createElement('button')
+    const handler = jest.fn()
+    button.addEventListener('click', handler)
+    expect(() => button.dispatchEvent(new target.Event('click'))).not.toThrow()
+    expect(handler).toHaveBeenCalledTimes(1)
+  })
+
   test('defaults to globalThis when no target is given', () => {
     installGlobal()
     expect(typeof globalThis.document).not.toBe('undefined')
+    // globalThis.Event is Node's own native one before this runs (confirmed elsewhere) - this is the real,
+    // actually-exercised case the test above simulates directly.
+    expect(globalThis.Event).toBe(EventService)
     delete globalThis.document
     delete globalThis.Node
     delete globalThis.Element
     delete globalThis.HTMLElement
     delete globalThis.HTMLDocument
+    delete globalThis.Event
     delete globalThis.window
   })
 })
