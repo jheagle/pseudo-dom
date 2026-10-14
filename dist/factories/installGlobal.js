@@ -1,22 +1,20 @@
-'use strict'
+"use strict";
 
-const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
-  return mod && mod.__esModule
-    ? mod
-    : {
-        default: mod
-      }
-}
-Object.defineProperty(exports, '__esModule', {
+var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
+});
 /**
  * Makes pseudo-dom a drop-in swap for a real DOM: code written against bare globals (document.createElement,
  * new Node(), ...) works unmodified, in the browser or in Node, without an if (typeof document === 'undefined')
  * check at every call site.
  */
-const browser_or_node_1 = require('browser-or-node')
-const generateDocument_1 = __importDefault(require('./generateDocument'))
+const browser_or_node_1 = require("browser-or-node");
+const generateDocument_1 = __importDefault(require("./generateDocument"));
 /**
  * When there is no real DOM already available (a real browser, or a jsdom-based test environment - isBrowser is
  * true for both, since jsdom's window has a document too, and a jsdom document should never be overwritten, real
@@ -31,11 +29,11 @@ const generateDocument_1 = __importDefault(require('./generateDocument'))
  */
 const installGlobal = (target = typeof globalThis !== 'undefined' ? globalThis : {}) => {
   if (!browser_or_node_1.isBrowser) {
-    (0, generateDocument_1.default)(target, target)
+    (0, generateDocument_1.default)(target, target);
     if (typeof target.window === 'undefined') {
-      target.window = target
+      target.window = target;
     }
   }
-  return target
-}
-exports.default = installGlobal
+  return target;
+};
+exports.default = installGlobal;

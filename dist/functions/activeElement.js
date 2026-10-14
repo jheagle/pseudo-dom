@@ -1,20 +1,20 @@
-'use strict'
+"use strict";
 
-require('core-js/modules/esnext.weak-map.delete-all.js')
-Object.defineProperty(exports, '__esModule', {
+require("core-js/modules/esnext.weak-map.delete-all.js");
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.setActiveElement = exports.getActiveElement = void 0
+});
+exports.setActiveElement = exports.getActiveElement = void 0;
 /**
  * The element which has the focus, kept for each tree (the root node of the tree it is in), like document.activeElement.
  */
-const focused = new WeakMap()
+const focused = new WeakMap();
 /**
  * Find the element which has the focus in a tree.
  * @param root The root node of the tree
  */
-const getActiveElement = root => focused.get(root) || null
-exports.getActiveElement = getActiveElement
+const getActiveElement = root => focused.get(root) || null;
+exports.getActiveElement = getActiveElement;
 /**
  * Remember the element which has the focus in a tree.
  * @param root The root node of the tree
@@ -22,9 +22,9 @@ exports.getActiveElement = getActiveElement
  */
 const setActiveElement = (root, element) => {
   if (element === null) {
-    focused.delete(root)
+    focused.delete(root);
   } else {
-    focused.set(root, element)
+    focused.set(root, element);
   }
-}
-exports.setActiveElement = setActiveElement
+};
+exports.setActiveElement = setActiveElement;

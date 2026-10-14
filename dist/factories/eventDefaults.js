@@ -1,18 +1,18 @@
-'use strict'
+"use strict";
 
 /**
  * The standard event types of the browser, and how the browser creates them.
  */
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.eventDefaults = void 0
+});
+exports.eventDefaults = void 0;
 const define = (bubbles, cancelable, composed, eventInterface = 'Event') => ({
   bubbles,
   cancelable,
   composed,
   interface: eventInterface
-})
+});
 /**
  * The events which the browser itself creates (for a user action, or for something like element.click()) have these
  * options. A script which creates an event with the constructor gets none of them (everything is false) unless it asks
@@ -98,5 +98,5 @@ exports.eventDefaults = {
   transitionstart: define(true, false, false),
   transitionend: define(true, false, false),
   transitioncancel: define(true, false, false)
-}
-exports.default = exports.eventDefaults
+};
+exports.default = exports.eventDefaults;

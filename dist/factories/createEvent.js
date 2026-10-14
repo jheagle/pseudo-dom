@@ -1,18 +1,18 @@
-'use strict'
+"use strict";
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.createEvent = void 0
-const EventService_1 = require('../services/EventService')
-const UIEventService_1 = require('../services/UIEventService')
-const MouseEventService_1 = require('../services/MouseEventService')
-const PointerEventService_1 = require('../services/PointerEventService')
-const KeyboardEventService_1 = require('../services/KeyboardEventService')
-const FocusEventService_1 = require('../services/FocusEventService')
-const InputEventService_1 = require('../services/InputEventService')
-const CustomEventService_1 = require('../services/CustomEventService')
-const eventDefaults_1 = require('./eventDefaults')
+});
+exports.createEvent = void 0;
+const EventService_1 = require("../services/EventService");
+const UIEventService_1 = require("../services/UIEventService");
+const MouseEventService_1 = require("../services/MouseEventService");
+const PointerEventService_1 = require("../services/PointerEventService");
+const KeyboardEventService_1 = require("../services/KeyboardEventService");
+const FocusEventService_1 = require("../services/FocusEventService");
+const InputEventService_1 = require("../services/InputEventService");
+const CustomEventService_1 = require("../services/CustomEventService");
+const eventDefaults_1 = require("./eventDefaults");
 const eventClasses = {
   Event: EventService_1.EventService,
   UIEvent: UIEventService_1.UIEventService,
@@ -22,7 +22,7 @@ const eventClasses = {
   FocusEvent: FocusEventService_1.FocusEventService,
   InputEvent: InputEventService_1.InputEventService,
   CustomEvent: CustomEventService_1.CustomEventService
-}
+};
 /**
  * Create an event of the kind which suits its type (a click is a MouseEvent, a keydown a KeyboardEvent, ...).
  * By default this is like using the constructor of the event in a script: nothing bubbles or can be cancelled unless
@@ -37,18 +37,16 @@ const createEvent = (type, init = {}, {
   browser = false,
   trusted = false
 } = {}) => {
-  const definition = eventDefaults_1.eventDefaults[type]
-  const options = browser && definition
-    ? Object.assign({
-      bubbles: definition.bubbles,
-      cancelable: definition.cancelable,
-      composed: definition.composed
-    }, init)
-    : init
-  const EventClass = eventClasses[definition ? definition.interface : 'Event']
-  const event = new EventClass(type, options)
-  event.inner.trusted = trusted
-  return event
-}
-exports.createEvent = createEvent
-exports.default = exports.createEvent
+  const definition = eventDefaults_1.eventDefaults[type];
+  const options = browser && definition ? Object.assign({
+    bubbles: definition.bubbles,
+    cancelable: definition.cancelable,
+    composed: definition.composed
+  }, init) : init;
+  const EventClass = eventClasses[definition ? definition.interface : 'Event'];
+  const event = new EventClass(type, options);
+  event.inner.trusted = trusted;
+  return event;
+};
+exports.createEvent = createEvent;
+exports.default = exports.createEvent;

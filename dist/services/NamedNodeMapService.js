@@ -1,11 +1,11 @@
-'use strict'
+"use strict";
 
-require('core-js/modules/esnext.iterator.constructor.js')
-require('core-js/modules/esnext.iterator.find.js')
-Object.defineProperty(exports, '__esModule', {
+require("core-js/modules/esnext.iterator.constructor.js");
+require("core-js/modules/esnext.iterator.find.js");
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.NamedNodeMapService = void 0
+});
+exports.NamedNodeMapService = void 0;
 /**
  * Simulate the behaviour of the NamedNodeMap Class when there is no DOM available.
  */
@@ -13,62 +13,54 @@ class NamedNodeMapService {
   /**
    * @param attributes The attributes to start with
    */
-  constructor (attributes = []) {
-    this.attributes = attributes.slice()
+  constructor(attributes = []) {
+    this.attributes = attributes.slice();
   }
-
-  get length () {
-    return this.attributes.length
+  get length() {
+    return this.attributes.length;
   }
-
-  getNamedItem (name) {
-    return this.attributes.find(attr => attr.name === name) || null
+  getNamedItem(name) {
+    return this.attributes.find(attr => attr.name === name) || null;
   }
-
-  setNamedItem (attr) {
-    const index = this.attributes.findIndex(existing => existing.name === attr.name)
+  setNamedItem(attr) {
+    const index = this.attributes.findIndex(existing => existing.name === attr.name);
     if (index < 0) {
-      this.attributes.push(attr)
-      return null
+      this.attributes.push(attr);
+      return null;
     }
-    const replaced = this.attributes[index]
-    this.attributes[index] = attr
-    return replaced
+    const replaced = this.attributes[index];
+    this.attributes[index] = attr;
+    return replaced;
   }
-
-  removeNamedItem (attrName) {
-    const index = this.attributes.findIndex(attr => attr.name === attrName)
+  removeNamedItem(attrName) {
+    const index = this.attributes.findIndex(attr => attr.name === attrName);
     if (index < 0) {
-      throw new Error(`The attribute "${attrName}" was not found.`)
+      throw new Error(`The attribute "${attrName}" was not found.`);
     }
-    return this.attributes.splice(index, 1)[0]
+    return this.attributes.splice(index, 1)[0];
   }
-
-  item (index) {
-    return this.attributes[index] || null
+  item(index) {
+    return this.attributes[index] || null;
   }
-
-  getNamedItemNS (namespace, localName) {
-    return this.attributes.find(attr => attr.namespaceURI === namespace && attr.localName === localName) || null
+  getNamedItemNS(namespace, localName) {
+    return this.attributes.find(attr => attr.namespaceURI === namespace && attr.localName === localName) || null;
   }
-
-  setNamedItemNS (attr) {
-    const index = this.attributes.findIndex(existing => existing.namespaceURI === attr.namespaceURI && existing.localName === attr.localName)
+  setNamedItemNS(attr) {
+    const index = this.attributes.findIndex(existing => existing.namespaceURI === attr.namespaceURI && existing.localName === attr.localName);
     if (index < 0) {
-      this.attributes.push(attr)
-      return null
+      this.attributes.push(attr);
+      return null;
     }
-    const replaced = this.attributes[index]
-    this.attributes[index] = attr
-    return replaced
+    const replaced = this.attributes[index];
+    this.attributes[index] = attr;
+    return replaced;
   }
-
-  removeNamedItemNS (namespace, localName) {
-    const index = this.attributes.findIndex(attr => attr.namespaceURI === namespace && attr.localName === localName)
+  removeNamedItemNS(namespace, localName) {
+    const index = this.attributes.findIndex(attr => attr.namespaceURI === namespace && attr.localName === localName);
     if (index < 0) {
-      throw new Error(`The attribute "${localName}" in the namespace "${namespace}" was not found.`)
+      throw new Error(`The attribute "${localName}" in the namespace "${namespace}" was not found.`);
     }
-    return this.attributes.splice(index, 1)[0]
+    return this.attributes.splice(index, 1)[0];
   }
 }
-exports.NamedNodeMapService = NamedNodeMapService
+exports.NamedNodeMapService = NamedNodeMapService;

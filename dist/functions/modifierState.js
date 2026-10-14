@@ -1,9 +1,9 @@
-'use strict'
+"use strict";
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.modifierState = exports.modifierKeys = void 0
+});
+exports.modifierState = exports.modifierKeys = void 0;
 /**
  * Pick the modifier keys out of the init object of an event.
  * @param init The init of an event
@@ -13,8 +13,8 @@ const modifierKeys = (init = {}) => ({
   shiftKey: !!init.shiftKey,
   altKey: !!init.altKey,
   metaKey: !!init.metaKey
-})
-exports.modifierKeys = modifierKeys
+});
+exports.modifierKeys = modifierKeys;
 /**
  * Answer getModifierState for a set of held modifier keys.
  * @param keys The modifier keys which were held down
@@ -23,15 +23,15 @@ exports.modifierKeys = modifierKeys
 const modifierState = (keys, key) => {
   switch (key) {
     case 'Control':
-      return keys.ctrlKey
+      return keys.ctrlKey;
     case 'Shift':
-      return keys.shiftKey
+      return keys.shiftKey;
     case 'Alt':
-      return keys.altKey
+      return keys.altKey;
     case 'Meta':
-      return keys.metaKey
+      return keys.metaKey;
     default:
-      return false
+      return false;
   }
-}
-exports.modifierState = modifierState
+};
+exports.modifierState = modifierState;

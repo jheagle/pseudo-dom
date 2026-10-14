@@ -1,12 +1,12 @@
-'use strict'
+"use strict";
 
 /**
  * Substitute for the DOM Event Class.
  */
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.EventService = void 0
+});
+exports.EventService = void 0;
 /**
  * Simulate the behaviour of the Event Class when there is no DOM available.
  */
@@ -19,7 +19,7 @@ class EventService {
    * @param eventOptions.cancelable
    * @param eventOptions.composed
    */
-  constructor (typeArg = '', {
+  constructor(typeArg = '', {
     bubbles = false,
     cancelable = false,
     composed = false
@@ -52,110 +52,99 @@ class EventService {
       dispatching: false,
       inPassiveListener: false,
       path: []
-    }
+    };
     this.setReadOnlyProperties({
       type: typeArg,
       bubbles,
       cancelable,
       composed
-    })
+    });
   }
-
-  get bubbles () {
-    return this.properties.bubbles
+  get bubbles() {
+    return this.properties.bubbles;
   }
-
-  get cancelable () {
-    return this.properties.cancelable
+  get cancelable() {
+    return this.properties.cancelable;
   }
-
-  get composed () {
-    return this.properties.composed
+  get composed() {
+    return this.properties.composed;
   }
-
-  get currentTarget () {
-    return this.properties.currentTarget
+  get currentTarget() {
+    return this.properties.currentTarget;
   }
-
-  get defaultPrevented () {
-    return this.properties.defaultPrevented
+  get defaultPrevented() {
+    return this.properties.defaultPrevented;
   }
-
-  get eventPhase () {
-    return this.properties.eventPhase
+  get eventPhase() {
+    return this.properties.eventPhase;
   }
-
-  get isTrusted () {
-    return this.properties.isTrusted
+  get isTrusted() {
+    return this.properties.isTrusted;
   }
-
-  get target () {
-    return this.properties.target
+  get target() {
+    return this.properties.target;
   }
-
-  get timeStamp () {
-    return this.properties.timeStamp
+  get timeStamp() {
+    return this.properties.timeStamp;
   }
-
-  get type () {
-    return this.properties.type
+  get type() {
+    return this.properties.type;
   }
-
   /**
    * Scope several accessors inside the inner object. These are only intended for usage by other DOM classes.
    */
-  get inner () {
-    const self = this
+  get inner() {
+    const self = this;
     return {
-      get currentTarget () {
-        return self.properties.currentTarget
+      get currentTarget() {
+        return self.properties.currentTarget;
       },
-      set currentTarget (target) {
-        self.properties.currentTarget = target
+      set currentTarget(target) {
+        self.properties.currentTarget = target;
       },
-      get eventPhase () {
-        return self.properties.eventPhase
+      get eventPhase() {
+        return self.properties.eventPhase;
       },
-      set eventPhase (phase) {
-        self.properties.eventPhase = phase
+      set eventPhase(phase) {
+        self.properties.eventPhase = phase;
       },
-      get target () {
-        return self.properties.target
+      get target() {
+        return self.properties.target;
       },
-      set target (target) {
-        self.properties.target = target
+      set target(target) {
+        self.properties.target = target;
       },
-      get immediatePropagationStopped () {
-        return self.properties.immediatePropagationStopped
+      get immediatePropagationStopped() {
+        return self.properties.immediatePropagationStopped;
       },
-      get propagationStopped () {
-        return self.properties.propagationStopped
+      get propagationStopped() {
+        return self.properties.propagationStopped;
       },
-      get trusted () {
-        return self.properties.isTrusted
+      get trusted() {
+        return self.properties.isTrusted;
       },
-      set trusted (trusted) {
-        self.properties.isTrusted = trusted
+      set trusted(trusted) {
+        self.properties.isTrusted = trusted;
       },
-      get dispatching () {
-        return self.properties.dispatching
+      get dispatching() {
+        return self.properties.dispatching;
       },
-      set dispatching (dispatching) {
-        self.properties.dispatching = dispatching
+      set dispatching(dispatching) {
+        self.properties.dispatching = dispatching;
       },
-      get inPassiveListener () {
-        return self.properties.inPassiveListener
+      get inPassiveListener() {
+        return self.properties.inPassiveListener;
       },
-      set inPassiveListener (passive) {
-        self.properties.inPassiveListener = passive
+      set inPassiveListener(passive) {
+        self.properties.inPassiveListener = passive;
       },
-      get path () {
-        return self.properties.path
+      get path() {
+        return self.properties.path;
       },
-      set path (path) {
-        self.properties.path = path
+      set path(path) {
+        self.properties.path = path;
       },
-      finishDispatch () {
+      finishDispatch() {
         self.setReadOnlyProperties({
           currentTarget: null,
           eventPhase: EventService.NONE,
@@ -164,61 +153,56 @@ class EventService {
           inPassiveListener: false,
           propagationStopped: false,
           immediatePropagationStopped: false
-        })
+        });
       }
-    }
+    };
   }
-
   /**
    * Return an array of targets that will have the event executed open them. The order is based on the eventPhase
    */
-  composedPath () {
+  composedPath() {
     // While the event is being dispatched this is every target it travels through, the target first and the root last
-    return this.properties.dispatching ? this.properties.path.slice() : []
+    return this.properties.dispatching ? this.properties.path.slice() : [];
   }
-
   /**
    * Cancels the event (if it is cancelable).
    */
-  preventDefault () {
+  preventDefault() {
     // Only an event which can be cancelled can be prevented, and a passive listener cannot prevent the default
     if (this.cancelable && !this.properties.inPassiveListener) {
       this.setReadOnlyProperties({
         defaultPrevented: true
-      })
+      });
     }
-    return null
+    return null;
   }
-
   /**
    * For this particular event, no other listener will be called.
    * Neither those attached on the same element, nor those attached on elements which will be traversed later (in
    * capture phase, for instance)
    */
-  stopImmediatePropagation () {
+  stopImmediatePropagation() {
     this.setReadOnlyProperties({
       immediatePropagationStopped: true
-    })
-    return null
+    });
+    return null;
   }
-
   /**
    * Stops the propagation of events further along in the Dom.
    */
-  stopPropagation () {
+  stopPropagation() {
     this.setReadOnlyProperties({
       propagationStopped: true
-    })
-    return null
+    });
+    return null;
   }
-
-  setReadOnlyProperties (updateProps = {}) {
-    this.properties = Object.assign({}, this.properties, updateProps)
-    return this
+  setReadOnlyProperties(updateProps = {}) {
+    this.properties = Object.assign({}, this.properties, updateProps);
+    return this;
   }
 }
-exports.EventService = EventService
-EventService.NONE = 0
-EventService.CAPTURING_PHASE = 1
-EventService.AT_TARGET = 2
-EventService.BUBBLING_PHASE = 3
+exports.EventService = EventService;
+EventService.NONE = 0;
+EventService.CAPTURING_PHASE = 1;
+EventService.AT_TARGET = 2;
+EventService.BUBBLING_PHASE = 3;

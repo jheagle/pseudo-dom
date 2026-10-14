@@ -96,7 +96,7 @@ export class EventService implements PseudoEvent {
     cancelable?: boolean;
     composed?: boolean
   } = {}) {
-    this.setReadOnlyProperties({ type: typeArg, bubbles: bubbles, cancelable: cancelable, composed: composed })
+    this.setReadOnlyProperties({ type: typeArg, bubbles, cancelable, composed })
   }
 
   get bubbles (): boolean {

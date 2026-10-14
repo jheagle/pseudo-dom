@@ -1,4 +1,3 @@
-
 export interface PseudoDOMTokenList {
   get length(): number
 
