@@ -1,7 +1,7 @@
 {
   "name": "pseudo-dom",
   "description": "Mock the DOM on the server side for managing state and testing",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
   "unpkg": "browser/pseudo-dom.min.js",
@@ -20,16 +20,16 @@
   },
   "dependencies": {
     "browser-or-node": "^3.0.0",
-    "collect-your-stuff": "^2.1.2",
+    "collect-your-stuff": "^2.2.0",
     "core-js": "^3.50.0",
     "css-select": "^6.0.0",
     "htmlparser2": "^9.1.0",
-    "si-funciona": "^2.6.1"
+    "si-funciona": "^2.7.2"
   },
   "devDependencies": {
     "js-build-tools": "^6.1.0",
     "standard": "^17.1.2",
-    "test-filesystem": "^1.5.1",
+    "test-filesystem": "^2.0.0",
     "typedoc": "^0.28.20"
   },
   "directories": {
