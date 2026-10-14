@@ -4762,14 +4762,14 @@ var isBun = typeof process !== "undefined" && process.versions != null && proces
 },{"_process":260}],45:[function(require,module,exports){
 
 },{}],46:[function(require,module,exports){
-'use strict'
+"use strict";
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.ArrayElement = void 0
-require('core-js/modules/esnext.iterator.constructor.js')
-require('core-js/modules/esnext.iterator.reduce.js')
+});
+exports.ArrayElement = void 0;
+require("core-js/modules/esnext.iterator.constructor.js");
+require("core-js/modules/esnext.iterator.reduce.js");
 /**
  * Element represents a node in an Arrayable.
  */
@@ -4778,12 +4778,12 @@ class ArrayElement {
    * Create the new Element instance, provide the data and optionally configure the type of Element.
    * @param data The data to be stored in this element.
    */
-  constructor (data = null) {
+  constructor(data = null) {
     /** The class used to create this instance, so that it can be recognized as valid without an instanceof check. */
-    this.classType = ArrayElement
+    this.classType = ArrayElement;
     /** The data stored in this element. */
-    this.data = null
-    this.data = data
+    this.data = null;
+    this.data = data;
   }
 }
 /**
@@ -4791,51 +4791,50 @@ class ArrayElement {
  * @param element Return a valid ArrayElement instance from given data, or even an already valid one.
  * @param classType Provide the type of IsElement to use.
  */
-exports.ArrayElement = ArrayElement
+exports.ArrayElement = ArrayElement;
 ArrayElement.make = (element, classType = ArrayElement) => {
   if (element === null || typeof element !== 'object') {
     // It is not an object (or it is null), so instantiate the Element with element as the data
-    return new classType(element)
+    return new classType(element);
   }
   if (element.classType) {
     // Already valid Element, return as-is
-    return element
+    return element;
   }
   // Create the new node as the configured #classType
-  return new classType(element)
-}
+  return new classType(element);
+};
 /**
  * Convert an array into Element instances, return the head and tail Elements.
  * @param values Provide an array of data that will be converted to array of elements.
  * @param classType Provide the type of IsElement to use.
  */
 ArrayElement.fromArray = (values = [], classType = ArrayElement) => values.reduce((references, element) => {
-  const newElement = classType.make(element, classType)
+  const newElement = classType.make(element, classType);
   if (!references.head.length) {
     // Initialize the head and tail with the new node
     return {
       head: [newElement],
       tail: newElement
-    }
+    };
   }
   // Only update the tail once head has been set, tail is always the most recent node
-  references.head.push(newElement)
-  references.tail = newElement
-  return references
+  references.head.push(newElement);
+  references.tail = newElement;
+  return references;
 }, {
   head: [],
   tail: null
-})
-
+});
 },{"core-js/modules/esnext.iterator.constructor.js":193,"core-js/modules/esnext.iterator.reduce.js":199}],47:[function(require,module,exports){
-'use strict'
+"use strict";
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.Arrayable = void 0
-const _ArrayElement = require('./ArrayElement')
-const _ArrayIterator = require('../../recipes/ArrayIterator')
+});
+exports.Arrayable = void 0;
+var _ArrayElement = require("./ArrayElement");
+var _ArrayIterator = require("../../recipes/ArrayIterator");
 /**
  * arrayable list.
  */
@@ -4848,181 +4847,167 @@ class Arrayable {
    * Create the new Arrayable instance, configure the Arrayable class.
    * @param elementClass The class used to wrap given data as elements.
    */
-  constructor (elementClass = _ArrayElement.ArrayElement) {
+  constructor(elementClass = _ArrayElement.ArrayElement) {
     /** The class used to create this instance, so that it can be recognized as valid without an instanceof check. */
-    this.classType = Arrayable
+    this.classType = Arrayable;
     /** The array which stores the elements of this Arrayable. */
-    this.innerList = []
+    this.innerList = [];
     /** Whether the inner list has been initialized (it can only be initialized once). */
-    this.initialized = false
-    this.elementClass = elementClass
+    this.initialized = false;
+    this.elementClass = elementClass;
   }
-
   /**
    * Find the position of an element which must be in this list.
    * @param node The element to find
    * @throws {Error} When the element is not in this list
    */
-  indexOfElement (node) {
-    const index = this.innerList.indexOf(node)
+  indexOfElement(node) {
+    const index = this.innerList.indexOf(node);
     if (index < 0) {
-      throw new Error('The reference element is not in this list.')
+      throw new Error('The reference element is not in this list.');
     }
-    return index
+    return index;
   }
-
   /**
    * Initialize the inner list, should only run once.
    * @param initialList Give the array of elements to start in this Arrayable.
    */
-  initialize (initialList) {
+  initialize(initialList) {
     if (this.initialized) {
-      console.warn('Attempt to initialize non-empty list.')
-      return this
+      console.warn('Attempt to initialize non-empty list.');
+      return this;
     }
-    this.initialized = true
-    this.innerList = initialList
-    return this
+    this.initialized = true;
+    this.innerList = initialList;
+    return this;
   }
-
   /**
    * Retrieve the innerList used (the list itself, not a copy).
    */
-  get list () {
-    return this.innerList
+  get list() {
+    return this.innerList;
   }
-
   /**
    * Retrieve the first Element from the Arrayable
    * @returns The first element, or null when the Arrayable is empty
    */
-  get first () {
-    return this.length ? this.innerList[0] : null
+  get first() {
+    return this.length ? this.innerList[0] : null;
   }
-
   /**
    * Retrieve the last Element from the Arrayable
    * @returns The last element, or null when the Arrayable is empty
    */
-  get last () {
-    return this.length ? this.innerList[this.length - 1] : null
+  get last() {
+    return this.length ? this.innerList[this.length - 1] : null;
   }
-
   /**
    * Return the length of the list.
    */
-  get length () {
-    return this.innerList.length
+  get length() {
+    return this.innerList.length;
   }
-
   /**
    * Insert a new node (or data) after a node.
    * @param node The existing node as reference, or null to insert at the start of the list
    * @param newNode The new node to go after the existing node
    * @throws {Error} When the reference node is not in this list
    */
-  insertAfter (node, newNode) {
+  insertAfter(node, newNode) {
     // With no reference element, the new one goes after nothing: at the start of the list
-    const insertAt = node === null || typeof node === 'undefined' ? -1 : this.indexOfElement(node)
-    this.innerList.splice(insertAt + 1, 0, this.elementClass.make(newNode, this.elementClass))
-    return this
+    const insertAt = node === null || typeof node === 'undefined' ? -1 : this.indexOfElement(node);
+    this.innerList.splice(insertAt + 1, 0, this.elementClass.make(newNode, this.elementClass));
+    return this;
   }
-
   /**
    * Insert a new node (or data) before a node.
    * @param node The existing node as reference, or null to insert at the end of the list
    * @param newNode The new node to go before the existing node
    * @throws {Error} When the reference node is not in this list
    */
-  insertBefore (node, newNode) {
+  insertBefore(node, newNode) {
     // With no reference element, the new one goes before nothing: at the end of the list
-    const insertAt = node === null || typeof node === 'undefined' ? this.length : this.indexOfElement(node)
-    this.innerList.splice(insertAt, 0, this.elementClass.make(newNode, this.elementClass))
-    return this
+    const insertAt = node === null || typeof node === 'undefined' ? this.length : this.indexOfElement(node);
+    this.innerList.splice(insertAt, 0, this.elementClass.make(newNode, this.elementClass));
+    return this;
   }
-
   /**
    * Add a node (or data) after the given (or last) node in the list.
    * @param node The new node to add to the end of the list
    * @param after The existing last node
    */
-  append (node, after = this.last) {
+  append(node, after = this.last) {
     if (after === this.last) {
       // Adding to the end does not need to search for where that is
-      this.innerList.push(this.elementClass.make(node, this.elementClass))
-      return this
+      this.innerList.push(this.elementClass.make(node, this.elementClass));
+      return this;
     }
-    return this.insertAfter(after, node)
+    return this.insertAfter(after, node);
   }
-
   /**
    * Add a node (or data) before the given (or first) node in the list.
    * @param node The new node to add to the start of the list
    * @param before The existing first node
    */
-  prepend (node, before = this.first) {
+  prepend(node, before = this.first) {
     if (before === this.first) {
       // Adding to the start does not need to search for where that is
-      this.innerList.unshift(this.elementClass.make(node, this.elementClass))
-      return this
+      this.innerList.unshift(this.elementClass.make(node, this.elementClass));
+      return this;
     }
-    return this.insertBefore(before, node)
+    return this.insertBefore(before, node);
   }
-
   /**
    * Remove an element from this arrayable.
    * @param node The node we wish to remove (and it will be returned after removal)
    * @returns The removed node, or null when it was not in this list (nothing is removed)
    */
-  remove (node) {
-    const deleteAt = this.innerList.indexOf(node)
+  remove(node) {
+    const deleteAt = this.innerList.indexOf(node);
     if (deleteAt < 0) {
-      return null
+      return null;
     }
-    this.innerList.splice(deleteAt, 1)
-    return node
+    this.innerList.splice(deleteAt, 1);
+    return node;
   }
-
   /**
    * Retrieve an ArrayElement item from this list by numeric index, otherwise return null.
    * @param index The integer number for retrieving a node by position.
    */
-  item (index) {
+  item(index) {
     if (index >= this.length) {
       // index is beyond array limit
-      return null
+      return null;
     }
     if (index >= 0) {
       // use the positive index at nth position from the beginning of the array
-      return this.innerList[index]
+      return this.innerList[index];
     }
-    const calculatedIndex = this.length + index
+    const calculatedIndex = this.length + index;
     if (calculatedIndex < 0) {
       // negative index is beyond array limit (minus direction)
-      return null
+      return null;
     }
     // Return the item at nth position from the end of the array
-    return this.innerList[calculatedIndex]
+    return this.innerList[calculatedIndex];
   }
-
   /**
    * Be able to run forEach on this Arrayable to iterate over the elements.
    * @param callback The function to call for-each element
    * @param thisArg Optional, 'this' reference
    */
-  forEach (callback, thisArg = this) {
+  forEach(callback, thisArg = this) {
     for (let i = 0; i < thisArg.length; ++i) {
-      callback(thisArg.item(i), i, thisArg)
+      callback(thisArg.item(i), i, thisArg);
     }
-    return thisArg
+    return thisArg;
   }
-
   /**
    * Be able to iterate over this class.
    */
-  [Symbol.iterator] () {
-    const index = 0
-    return new _ArrayIterator.ArrayIterator(this.innerList, index)
+  [Symbol.iterator]() {
+    const index = 0;
+    return new _ArrayIterator.ArrayIterator(this.innerList, index);
   }
 }
 /**
@@ -5031,22 +5016,21 @@ class Arrayable {
  * @param elementClass The class to use for each element
  * @param classType Provide the type of IsArrayable to use.
  */
-exports.Arrayable = Arrayable
+exports.Arrayable = Arrayable;
 Arrayable.fromArray = (values = [], elementClass = _ArrayElement.ArrayElement, classType = Arrayable) => {
-  const list = new classType(elementClass)
-  return list.initialize(elementClass.fromArray(values).head)
-}
-
+  const list = new classType(elementClass);
+  return list.initialize(elementClass.fromArray(values).head);
+};
 },{"../../recipes/ArrayIterator":54,"./ArrayElement":46}],48:[function(require,module,exports){
-'use strict'
+"use strict";
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.DoubleLinker = void 0
-require('core-js/modules/esnext.iterator.constructor.js')
-require('core-js/modules/esnext.iterator.reduce.js')
-const _Linker = require('../linked-list/Linker')
+});
+exports.DoubleLinker = void 0;
+require("core-js/modules/esnext.iterator.constructor.js");
+require("core-js/modules/esnext.iterator.reduce.js");
+var _Linker = require("../linked-list/Linker");
 /**
  * DoubleLinker represents a node in a DoublyLinkedList which is chained by next and prev.
  * @extends Linker
@@ -5059,22 +5043,22 @@ class DoubleLinker {
    * @param nodeData.next The reference to the next linker if any
    * @param nodeData.prev The reference to the previous linker if any
    */
-  constructor ({
+  constructor({
     data = null,
     next = null,
     prev = null
   } = {}) {
     /** The class used to create this instance, so that it can be recognized as valid without an instanceof check. */
-    this.classType = DoubleLinker
+    this.classType = DoubleLinker;
     /** The data stored in this linker. */
-    this.data = null
+    this.data = null;
     /** The linker after this one, or null when this is the last. */
-    this.next = null
+    this.next = null;
     /** The linker before this one, or null when this is the first. */
-    this.prev = null
-    this.data = data
-    this.next = next
-    this.prev = prev
+    this.prev = null;
+    this.data = data;
+    this.next = next;
+    this.prev = prev;
   }
 }
 /**
@@ -5082,46 +5066,45 @@ class DoubleLinker {
  * @param linker Return a valid Linker instance from given data, or even an already valid one.
  * @param classType Provide the type of IsDoubleLinker to use.
  */
-exports.DoubleLinker = DoubleLinker
+exports.DoubleLinker = DoubleLinker;
 DoubleLinker.make = (linker, classType = DoubleLinker) => {
-  return _Linker.Linker.make(linker, classType)
-}
+  return _Linker.Linker.make(linker, classType);
+};
 /**
  * Convert an array into DoubleLinker instances, return the head and tail DoubleLinkers.
  * @param values Provide an array of data that will be converted to a chain of linkers.
  * @param classType Provide the type of IsDoubleLinker to use.
  */
 DoubleLinker.fromArray = (values = [], classType = DoubleLinker) => values.reduce((references, linker) => {
-  const newLinker = classType.make(linker, classType)
+  const newLinker = classType.make(linker, classType);
   if (references.head === null) {
     // Initialize the head and tail with the new node
     return {
       head: newLinker,
       tail: newLinker
-    }
+    };
   }
-  newLinker.prev = references.tail
+  newLinker.prev = references.tail;
   // Only update the tail once head has been set, tail is always the most recent node
-  references.tail.next = newLinker
-  references.tail = newLinker
-  return references
+  references.tail.next = newLinker;
+  references.tail = newLinker;
+  return references;
 }, {
   head: null,
   tail: null
-})
-
+});
 },{"../linked-list/Linker":51,"core-js/modules/esnext.iterator.constructor.js":193,"core-js/modules/esnext.iterator.reduce.js":199}],49:[function(require,module,exports){
-'use strict'
+"use strict";
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.DoublyLinkedList = void 0
-require('core-js/modules/esnext.iterator.constructor.js')
-require('core-js/modules/esnext.iterator.for-each.js')
-const _DoubleLinker = require('./DoubleLinker')
-const _DoubleLinkerIterator = require('../../recipes/DoubleLinkerIterator')
-const _LinkedList = require('../linked-list/LinkedList')
+});
+exports.DoublyLinkedList = void 0;
+require("core-js/modules/esnext.iterator.constructor.js");
+require("core-js/modules/esnext.iterator.for-each.js");
+var _DoubleLinker = require("./DoubleLinker");
+var _DoubleLinkerIterator = require("../../recipes/DoubleLinkerIterator");
+var _LinkedList = require("../linked-list/LinkedList");
 /**
  * doubly linked list.
  */
@@ -5135,280 +5118,266 @@ class DoublyLinkedList {
    * Create the new DoublyLinkedList instance.
    * @param linkerClass The class used to wrap given data as linkers.
    */
-  constructor (linkerClass = _DoubleLinker.DoubleLinker) {
+  constructor(linkerClass = _DoubleLinker.DoubleLinker) {
     /** The class used to create this instance, so that it can be recognized as valid without an instanceof check. */
-    this.classType = DoublyLinkedList
+    this.classType = DoublyLinkedList;
     /** A linker of the list (null when the list is empty); the head is found by walking back from it. */
-    this.innerList = null
+    this.innerList = null;
     /** Whether the inner list has been initialized (it can only be initialized once). */
-    this.initialized = false
+    this.initialized = false;
     /** The last linker, remembered so that adding to the end does not need to walk the whole list (null when not known yet). */
-    this.tailCache = null
+    this.tailCache = null;
     /** The number of linkers, kept up to date by the list's own methods so that the length does not need to walk the whole list (null when not known yet). */
-    this.countCache = null
-    this.linkerClass = linkerClass
+    this.countCache = null;
+    this.linkerClass = linkerClass;
   }
-
   /**
    * Initialize the inner list, should only run once.
    * @param initialList Give the list of double-linkers to start in this doubly linked-list.
    */
-  initialize (initialList) {
+  initialize(initialList) {
     // Borrowed from LinkedList, which types its return as a LinkedList although it returns whatever list called it
-    return _LinkedList.LinkedList.prototype.initialize.call(this, initialList)
+    return _LinkedList.LinkedList.prototype.initialize.call(this, initialList);
   }
-
   /**
    * Retrieve the innerList used (the list itself, not a copy).
    */
-  get list () {
-    return this.innerList
+  get list() {
+    return this.innerList;
   }
-
   /**
    * Retrieve the first DoubleLinker in the list.
    */
-  get first () {
-    let head = this.innerList
+  get first() {
+    let head = this.innerList;
     if (head === null) {
-      return null
+      return null;
     }
     // innerList is normally the head already, walking back also finds anything linked on before it outside of this list
     while (head.prev !== null) {
-      head = head.prev
+      head = head.prev;
     }
-    this.innerList = head
-    return head
+    this.innerList = head;
+    return head;
   }
-
   /**
    * Retrieve the last DoubleLinker in the list. The end is remembered, so this does not walk the list.
    */
-  get last () {
+  get last() {
     if (this.innerList === null) {
-      return null
+      return null;
     }
-    let tail = this.tailCache !== null ? this.tailCache : this.innerList
+    let tail = this.tailCache !== null ? this.tailCache : this.innerList;
     // The remembered tail is normally the end already, walking on from it also finds anything linked on outside of this list
     while (tail.next !== null) {
-      tail = tail.next
+      tail = tail.next;
     }
-    this.tailCache = tail
-    return tail
+    this.tailCache = tail;
+    return tail;
   }
-
   /**
    * Return the length of the list. It is kept up to date by the list's own methods, so this does not walk the list
    * (call reset() after linkers were changed directly).
    */
-  get length () {
+  get length() {
     if (this.countCache === null) {
-      this.reset()
+      this.reset();
     }
-    return this.countCache
+    return this.countCache;
   }
-
   /**
    * Insert a new node (or data) after a node.
    * @param node The existing node as reference (which must be in this list, this is not checked), or null to insert at the start of the list
    * @param newNode The new node to go after the existing node
    */
-  insertAfter (node, newNode) {
-    newNode = this.linkerClass.make(newNode, this.linkerClass)
+  insertAfter(node, newNode) {
+    newNode = this.linkerClass.make(newNode, this.linkerClass);
     if (node === null || typeof node === 'undefined') {
       // After nothing means at the start of the list
-      const head = this.first
-      newNode.prev = null
-      newNode.next = head
+      const head = this.first;
+      newNode.prev = null;
+      newNode.next = head;
       if (head) {
-        head.prev = newNode
+        head.prev = newNode;
       } else {
-        this.tailCache = newNode
+        this.tailCache = newNode;
       }
-      this.innerList = newNode
+      this.innerList = newNode;
     } else {
       // Ensure the next reference of this node is assigned to the new node
-      newNode.next = node.next
+      newNode.next = node.next;
       // Ensure this node is assigned as the prev reference of the new node
-      newNode.prev = node
+      newNode.prev = node;
       // Then set this node's next reference to the new node
-      node.next = newNode
+      node.next = newNode;
       if (newNode.next) {
         // Update the next reference to ensure circular reference for prev points to the new node
-        newNode.next.prev = newNode
+        newNode.next.prev = newNode;
       } else {
-        this.tailCache = newNode
+        this.tailCache = newNode;
       }
     }
     if (this.countCache !== null) {
-      ++this.countCache
+      ++this.countCache;
     }
-    return this
+    return this;
   }
-
   /**
    * Insert a new node (or data) before a node.
    * @param node The existing node as reference (which must be in this list, this is not checked), or null to insert at the end of the list
    * @param newNode The new node to go before the existing node
    */
-  insertBefore (node, newNode) {
-    newNode = this.linkerClass.make(newNode, this.linkerClass)
+  insertBefore(node, newNode) {
+    newNode = this.linkerClass.make(newNode, this.linkerClass);
     if (node === null || typeof node === 'undefined') {
       // Before nothing means at the end of the list
-      const tail = this.last
-      newNode.next = null
-      newNode.prev = tail
+      const tail = this.last;
+      newNode.next = null;
+      newNode.prev = tail;
       if (tail === null) {
-        this.innerList = newNode
+        this.innerList = newNode;
       } else {
-        tail.next = newNode
+        tail.next = newNode;
       }
-      this.tailCache = newNode
+      this.tailCache = newNode;
     } else {
       // The new node will reference this prev node as prev
-      newNode.prev = node.prev
+      newNode.prev = node.prev;
       // The new node will reference this node as next
-      newNode.next = node
+      newNode.next = node;
       // This prev will reference the new node
-      node.prev = newNode
+      node.prev = newNode;
       if (newNode.prev) {
         // Update the prev reference to ensure circular reference for next points to the new node
-        newNode.prev.next = newNode
+        newNode.prev.next = newNode;
       } else {
-        this.innerList = newNode
+        this.innerList = newNode;
       }
     }
     if (this.countCache !== null) {
-      ++this.countCache
+      ++this.countCache;
     }
-    return this
+    return this;
   }
-
   /**
    * Add a node (or data) after the given (or last) node in the list.
    * @param node The new node to add to the end of the list
    * @param after The existing last node
    */
-  append (node, after = this.last) {
-    return this.insertAfter(after, node)
+  append(node, after = this.last) {
+    return this.insertAfter(after, node);
   }
-
   /**
    * Add a node (or data) before the given (or first) node in the list.
    * @param node The new node to add to the start of the list
    * @param before The existing first node
    */
-  prepend (node, before = this.first) {
-    return this.insertBefore(before, node)
+  prepend(node, before = this.first) {
+    return this.insertBefore(before, node);
   }
-
   /**
    * Remove a linker from this linked list.
    * @param node The node we wish to remove (and it will be returned after removal)
    */
-  remove (node) {
+  remove(node) {
     if (node === null || typeof node === 'undefined') {
-      return null
+      return null;
     }
     if (node.prev) {
       // The previous node will reference this next node
-      node.prev.next = node.next
+      node.prev.next = node.next;
     }
     if (node.next) {
       // The next node will reference this previous node
-      node.next.prev = node.prev
+      node.next.prev = node.prev;
     }
     // The list finds its head by walking from innerList, so it must not keep pointing at the node being removed. For the
     // last remaining node there is nothing to walk to, which would otherwise leave the removed node in the list.
     if (this.innerList === node) {
-      this.innerList = node.next || node.prev || null
+      this.innerList = node.next || node.prev || null;
     }
     if (this.tailCache === node) {
-      this.tailCache = node.prev
+      this.tailCache = node.prev;
     }
     if (this.innerList === null) {
-      this.tailCache = null
+      this.tailCache = null;
     }
     if (this.countCache !== null) {
-      --this.countCache
+      --this.countCache;
     }
-    return node
+    return node;
   }
-
   /**
    * Refresh all references (the head, the end and the length) by walking the list once, and return the head. The list's
    * own methods keep these up to date, so this is only needed after linkers were changed directly.
    */
-  reset () {
+  reset() {
     // Start at the pointer for the list
-    let pointer = this.innerList
+    let pointer = this.innerList;
     if (pointer === null) {
-      this.countCache = 0
-      this.tailCache = null
-      return null
+      this.countCache = 0;
+      this.tailCache = null;
+      return null;
     }
     // Follow references back to the beginning
     while (pointer.prev !== null) {
-      pointer = pointer.prev
+      pointer = pointer.prev;
     }
     // We are pointing to the true head, now count along to the end to find the tail and the length
-    this.innerList = pointer
-    let count = 0
-    let tail = pointer
-    let current = pointer
+    this.innerList = pointer;
+    let count = 0;
+    let tail = pointer;
+    let current = pointer;
     while (current !== null) {
-      ++count
-      tail = current
-      current = current.next
+      ++count;
+      tail = current;
+      current = current.next;
     }
-    this.countCache = count
-    this.tailCache = tail
-    return pointer
+    this.countCache = count;
+    this.tailCache = tail;
+    return pointer;
   }
-
   /**
    * Retrieve a DoubleLinker item from this list by numeric index, otherwise return null.
    * @param index The integer number for retrieving a node by position.
    */
-  item (index) {
+  item(index) {
     if (index >= 0) {
       // For a positive index, start from the beginning of the list until the current item counter equals our index
-      let current = this.first
-      let currentIndex = -1
+      let current = this.first;
+      let currentIndex = -1;
       while (++currentIndex < index && current !== null) {
-        current = current.next
+        current = current.next;
       }
-      return currentIndex === index ? current : null
+      return currentIndex === index ? current : null;
     }
     // For a negative index, get the delta of index and length, then go backwards until we reach that delta
-    let current = this.last
-    let currentIndex = this.length
-    const calculatedIndex = this.length + index
+    let current = this.last;
+    let currentIndex = this.length;
+    const calculatedIndex = this.length + index;
     if (calculatedIndex < 0) {
-      return null
+      return null;
     }
     while (--currentIndex > calculatedIndex && current !== null) {
-      current = current.prev
+      current = current.prev;
     }
-    return currentIndex === calculatedIndex ? current : null
+    return currentIndex === calculatedIndex ? current : null;
   }
-
   /**
    * Be able to run forEach on this DoublyLinkedList to iterate over the DoubleLinker Items.
    * @param callback The function to call for-each double linker
    * @param thisArg Optional, 'this' reference
    * @returns The list which was iterated.
    */
-  forEach (callback, thisArg = this) {
-    return _LinkedList.LinkedList.prototype.forEach.call(this, callback, thisArg)
+  forEach(callback, thisArg = this) {
+    return _LinkedList.LinkedList.prototype.forEach.call(this, callback, thisArg);
   }
-
   /**
    * Be able to iterate over this class.
    */
-  [Symbol.iterator] () {
-    const current = this.first
-    return new _DoubleLinkerIterator.DoubleLinkerIterator(current)
+  [Symbol.iterator]() {
+    const current = this.first;
+    return new _DoubleLinkerIterator.DoubleLinkerIterator(current);
   }
 }
 /**
@@ -5417,21 +5386,20 @@ class DoublyLinkedList {
  * @param linkerClass The class to use for each linker
  * @param classType Provide the type of IsArrayable to use.
  */
-exports.DoublyLinkedList = DoublyLinkedList
+exports.DoublyLinkedList = DoublyLinkedList;
 DoublyLinkedList.fromArray = (values = [], linkerClass = _DoubleLinker.DoubleLinker, classType = DoublyLinkedList) => {
-  return _LinkedList.LinkedList.fromArray(values, linkerClass, classType)
-}
-
+  return _LinkedList.LinkedList.fromArray(values, linkerClass, classType);
+};
 },{"../../recipes/DoubleLinkerIterator":55,"../linked-list/LinkedList":50,"./DoubleLinker":48,"core-js/modules/esnext.iterator.constructor.js":193,"core-js/modules/esnext.iterator.for-each.js":197}],50:[function(require,module,exports){
-'use strict'
+"use strict";
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.LinkedList = void 0
-const _Linker = require('./Linker')
-const _LinkerIterator = require('../../recipes/LinkerIterator')
-const _Arrayable = require('../arrayable/Arrayable')
+});
+exports.LinkedList = void 0;
+var _Linker = require("./Linker");
+var _LinkerIterator = require("../../recipes/LinkerIterator");
+var _Arrayable = require("../arrayable/Arrayable");
 /**
  * LinkedList represents a collection stored as a LinkedList with next references.
  * @extends Arrayable
@@ -5441,258 +5409,244 @@ class LinkedList {
    * Create the new LinkedList instance.
    * @param linkerClass The class used to wrap given data as linkers.
    */
-  constructor (linkerClass = _Linker.Linker) {
+  constructor(linkerClass = _Linker.Linker) {
     /** The class used to create this instance, so that it can be recognized as valid without an instanceof check. */
-    this.classType = LinkedList
+    this.classType = LinkedList;
     /** The first linker of the list (null when the list is empty), from which the whole list is reached. */
-    this.innerList = null
+    this.innerList = null;
     /** Whether the inner list has been initialized (it can only be initialized once). */
-    this.initialized = false
+    this.initialized = false;
     /** The last linker, remembered so that adding to the end does not need to walk the whole list (null when not known yet). */
-    this.tailCache = null
+    this.tailCache = null;
     /** The number of linkers, kept up to date by the list's own methods so that the length does not need to walk the whole list (null when not known yet). */
-    this.countCache = null
-    this.linkerClass = linkerClass
+    this.countCache = null;
+    this.linkerClass = linkerClass;
   }
-
   /**
    * Initialize the inner list, should only run once.
    * @param initialList Give the list of linkers to start in this linked-list.
    */
-  initialize (initialList) {
+  initialize(initialList) {
     // Borrowed from Arrayable, which types its return as an Arrayable although it returns whatever list called it
-    return _Arrayable.Arrayable.prototype.initialize.call(this, initialList)
+    return _Arrayable.Arrayable.prototype.initialize.call(this, initialList);
   }
-
   /**
    * Retrieve the innerList used (the list itself, not a copy).
    */
-  get list () {
-    return this.innerList
+  get list() {
+    return this.innerList;
   }
-
   /**
    * Retrieve the first Linker in the list.
    */
-  get first () {
-    return this.innerList
+  get first() {
+    return this.innerList;
   }
-
   /**
    * Retrieve the last Linker in the list. The end is remembered, so this does not walk the list.
    */
-  get last () {
+  get last() {
     if (this.innerList === null) {
-      return null
+      return null;
     }
-    let tail = this.tailCache !== null ? this.tailCache : this.innerList
+    let tail = this.tailCache !== null ? this.tailCache : this.innerList;
     // The remembered tail is normally the end already, walking on from it also finds anything linked on outside of this list
     while (tail.next !== null) {
-      tail = tail.next
+      tail = tail.next;
     }
-    this.tailCache = tail
-    return tail
+    this.tailCache = tail;
+    return tail;
   }
-
   /**
    * Return the length of the list. It is kept up to date by the list's own methods, so this does not walk the list
    * (call reset() after linkers were changed directly).
    */
-  get length () {
+  get length() {
     if (this.countCache === null) {
-      this.reset()
+      this.reset();
     }
-    return this.countCache
+    return this.countCache;
   }
-
   /**
    * Insert a new node (or data) after a node.
    * @param node The existing node as reference, or null to insert at the start of the list
    * @param newNode The new node to go after the existing node
    */
-  insertAfter (node, newNode) {
-    newNode = this.linkerClass.make(newNode, this.linkerClass)
+  insertAfter(node, newNode) {
+    newNode = this.linkerClass.make(newNode, this.linkerClass);
     if (node === null || typeof node === 'undefined') {
       // After nothing means at the start of the list
-      newNode.next = this.innerList
+      newNode.next = this.innerList;
       if (this.innerList === null) {
-        this.tailCache = newNode
+        this.tailCache = newNode;
       }
-      this.innerList = newNode
+      this.innerList = newNode;
     } else {
-      newNode.next = node.next
-      node.next = newNode
+      newNode.next = node.next;
+      node.next = newNode;
       if (newNode.next === null) {
-        this.tailCache = newNode
+        this.tailCache = newNode;
       }
     }
     if (this.countCache !== null) {
-      ++this.countCache
+      ++this.countCache;
     }
-    return this
+    return this;
   }
-
   /**
    * Insert a new node (or data) before a node.
    * @param node The existing node as reference, or null to insert at the end of the list
    * @param newNode The new node to go before the existing node
    * @throws {Error} When the reference node is not in this list
    */
-  insertBefore (node, newNode) {
-    newNode = this.linkerClass.make(newNode, this.linkerClass)
+  insertBefore(node, newNode) {
+    newNode = this.linkerClass.make(newNode, this.linkerClass);
     if (node === null || typeof node === 'undefined') {
       // Before nothing means at the end of the list
-      const tail = this.last
-      newNode.next = null
+      const tail = this.last;
+      newNode.next = null;
       if (tail === null) {
-        this.innerList = newNode
+        this.innerList = newNode;
       } else {
-        tail.next = newNode
+        tail.next = newNode;
       }
-      this.tailCache = newNode
+      this.tailCache = newNode;
     } else {
-      let prevNode = null
-      let currentNode = this.first
+      let prevNode = null;
+      let currentNode = this.first;
       while (currentNode !== null && currentNode !== node) {
-        prevNode = currentNode
-        currentNode = currentNode.next
+        prevNode = currentNode;
+        currentNode = currentNode.next;
       }
       if (currentNode === null) {
-        throw new Error('The reference node is not in this list.')
+        throw new Error('The reference node is not in this list.');
       }
-      newNode.next = node
+      newNode.next = node;
       if (prevNode) {
-        prevNode.next = newNode
+        prevNode.next = newNode;
       } else {
-        this.innerList = newNode
+        this.innerList = newNode;
       }
     }
     if (this.countCache !== null) {
-      ++this.countCache
+      ++this.countCache;
     }
-    return this
+    return this;
   }
-
   /**
    * Add a node (or data) after the given (or last) node in the list.
    * @param node The new node to add to the end of the list
    * @param after The existing last node
    */
-  append (node, after = this.last) {
-    return this.insertAfter(after, node)
+  append(node, after = this.last) {
+    return this.insertAfter(after, node);
   }
-
   /**
    * Add a node (or data) before the given (or first) node in the list.
    * @param node The new node to add to the start of the list
    * @param before The existing first node
    */
-  prepend (node, before = this.first) {
-    return this.insertBefore(before, node)
+  prepend(node, before = this.first) {
+    return this.insertBefore(before, node);
   }
-
   /**
    * Remove a linker from this linked list.
    * @param node The node we wish to remove (and it will be returned after removal)
    * @returns The removed node, or null when it was not in this list (nothing is removed)
    */
-  remove (node) {
+  remove(node) {
     if (node === null || typeof node === 'undefined') {
-      return null
+      return null;
     }
-    let prevNode = null
-    let currentNode = this.first
+    let prevNode = null;
+    let currentNode = this.first;
     while (currentNode !== null && currentNode !== node) {
-      prevNode = currentNode
-      currentNode = currentNode.next
+      prevNode = currentNode;
+      currentNode = currentNode.next;
     }
     if (currentNode === null) {
       // The node is not in this list, so there is nothing to remove
-      return null
+      return null;
     }
     if (prevNode) {
-      prevNode.next = node.next
+      prevNode.next = node.next;
     } else {
-      this.innerList = node.next
+      this.innerList = node.next;
     }
     if (this.tailCache === node) {
-      this.tailCache = prevNode
+      this.tailCache = prevNode;
     }
     if (this.innerList === null) {
-      this.tailCache = null
+      this.tailCache = null;
     }
     if (this.countCache !== null) {
-      --this.countCache
+      --this.countCache;
     }
-    return node
+    return node;
   }
-
   /**
    * Refresh the remembered end and length of the list by walking it once. The list's own methods keep these up to date,
    * so this is only needed after linkers were changed directly (for example by setting next on a linker).
    * @returns The first linker of the list
    */
-  reset () {
-    let count = 0
-    let tail = null
-    let current = this.innerList
+  reset() {
+    let count = 0;
+    let tail = null;
+    let current = this.innerList;
     while (current !== null) {
-      ++count
-      tail = current
-      current = current.next
+      ++count;
+      tail = current;
+      current = current.next;
     }
-    this.countCache = count
-    this.tailCache = tail
-    return this.innerList
+    this.countCache = count;
+    this.tailCache = tail;
+    return this.innerList;
   }
-
   /**
    * Retrieve a Linker item from this list by numeric index, otherwise return null.
    * @param index The integer number for retrieving a node by position.
    */
-  item (index) {
+  item(index) {
     if (index >= 0) {
-      let current = this.first
-      let currentIndex = -1
+      let current = this.first;
+      let currentIndex = -1;
       while (++currentIndex < index && current !== null) {
-        current = current.next
+        current = current.next;
       }
-      return currentIndex === index ? current : null
+      return currentIndex === index ? current : null;
     }
-    let current = this.first
-    let currentIndex = 0
-    const calculatedIndex = this.length + index
+    let current = this.first;
+    let currentIndex = 0;
+    const calculatedIndex = this.length + index;
     if (calculatedIndex < 0) {
-      return null
+      return null;
     }
     while (currentIndex < calculatedIndex && current !== null) {
-      current = current.next
-      ++currentIndex
+      current = current.next;
+      ++currentIndex;
     }
-    return currentIndex === calculatedIndex ? current : null
+    return currentIndex === calculatedIndex ? current : null;
   }
-
   /**
    * Be able to run forEach on this LinkedList to iterate over the linkers.
    * @param callback The function to call for-each linker
    * @param thisArg Optional, 'this' reference
    */
-  forEach (callback, thisArg = this) {
-    let index = 0
-    let current = thisArg.first
+  forEach(callback, thisArg = this) {
+    let index = 0;
+    let current = thisArg.first;
     while (current !== null) {
-      callback(current, index, thisArg)
-      current = current.next
-      ++index
+      callback(current, index, thisArg);
+      current = current.next;
+      ++index;
     }
-    return thisArg
+    return thisArg;
   }
-
   /**
    * Be able to iterate over this class.
    */
-  [Symbol.iterator] () {
-    return new _LinkerIterator.LinkerIterator(this.first)
+  [Symbol.iterator]() {
+    return new _LinkerIterator.LinkerIterator(this.first);
   }
 }
 /**
@@ -5701,22 +5655,21 @@ class LinkedList {
  * @param linkerClass The class to use for each linker
  * @param classType Provide the type of IsArrayable to use.
  */
-exports.LinkedList = LinkedList
+exports.LinkedList = LinkedList;
 LinkedList.fromArray = (values = [], linkerClass = _Linker.Linker, classType = LinkedList) => {
-  const list = new classType(linkerClass)
-  return list.initialize(linkerClass.fromArray(values).head)
-}
-
+  const list = new classType(linkerClass);
+  return list.initialize(linkerClass.fromArray(values).head);
+};
 },{"../../recipes/LinkerIterator":56,"../arrayable/Arrayable":47,"./Linker":51}],51:[function(require,module,exports){
-'use strict'
+"use strict";
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.Linker = void 0
-require('core-js/modules/esnext.iterator.constructor.js')
-require('core-js/modules/esnext.iterator.reduce.js')
-const _ArrayElement = require('../arrayable/ArrayElement')
+});
+exports.Linker = void 0;
+require("core-js/modules/esnext.iterator.constructor.js");
+require("core-js/modules/esnext.iterator.reduce.js");
+var _ArrayElement = require("../arrayable/ArrayElement");
 /**
  * Linker represents a node in a LinkedList.
  * @extends ArrayElement
@@ -5728,18 +5681,18 @@ class Linker {
    * @param nodeData.data The data to be stored in this linker
    * @param nodeData.next The reference to the next linker if any
    */
-  constructor ({
+  constructor({
     data = null,
     next = null
   } = {}) {
     /** The class used to create this instance, so that it can be recognized as valid without an instanceof check. */
-    this.classType = Linker
+    this.classType = Linker;
     /** The data stored in this linker. */
-    this.data = null
+    this.data = null;
     /** The linker after this one, or null when this is the last. */
-    this.next = null
-    this.data = data
-    this.next = next
+    this.next = null;
+    this.data = data;
+    this.next = next;
   }
 }
 /**
@@ -5747,62 +5700,61 @@ class Linker {
  * @param linker Return a valid Linker instance from given data, or even an already valid one.
  * @param classType Provide the type of IsLinker to use.
  */
-exports.Linker = Linker
+exports.Linker = Linker;
 Linker.make = (linker, classType = Linker) => {
   if (linker === null || typeof linker !== 'object') {
     // It is not an object (or it is null), so instantiate the Linker with element as the data
     return new classType({
       data: linker
-    })
+    });
   }
   if (linker.classType) {
     // Already valid Linker, return as-is
-    return linker
+    return linker;
   }
   if (!('data' in linker)) {
     // Not the settings for a linker (which would have data, even if it is falsy), so it is the data itself
     linker = {
       data: linker
-    }
+    };
   }
   // Create the new node as the configured #classType
-  return _ArrayElement.ArrayElement.make(linker, classType)
-}
+  return _ArrayElement.ArrayElement.make(linker, classType);
+};
 /**
  * Convert an array into Linker instances, return the head and tail Linkers.
  * @param values Provide an array of data that will be converted to a chain of linkers.
  * @param classType Provide the type of IsLinker to use.
  */
 Linker.fromArray = (values = [], classType = Linker) => values.reduce((references, linker) => {
-  const newLinker = classType.make(linker, classType)
+  const newLinker = classType.make(linker, classType);
   if (references.head === null) {
     // Initialize the head and tail with the new node
     return {
       head: newLinker,
       tail: newLinker
-    }
+    };
   }
   // Only update the tail once head has been set, tail is always the most recent node
-  references.tail.next = newLinker
-  references.tail = newLinker
-  return references
+  references.tail.next = newLinker;
+  references.tail = newLinker;
+  return references;
 }, {
   head: null,
   tail: null
-})
-
+});
 },{"../arrayable/ArrayElement":46,"core-js/modules/esnext.iterator.constructor.js":193,"core-js/modules/esnext.iterator.reduce.js":199}],52:[function(require,module,exports){
-'use strict'
+"use strict";
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.LinkedTreeList = void 0
-require('core-js/modules/esnext.iterator.constructor.js')
-require('core-js/modules/esnext.iterator.for-each.js')
-const _TreeLinker = require('./TreeLinker')
-const _TreeLinkerIterator = require('../../recipes/TreeLinkerIterator')
-const _DoublyLinkedList = require('../doubly-linked-list/DoublyLinkedList')
+});
+exports.LinkedTreeList = void 0;
+require("core-js/modules/esnext.iterator.constructor.js");
+require("core-js/modules/esnext.iterator.for-each.js");
+var _TreeLinker = require("./TreeLinker");
+var _TreeLinkerIterator = require("../../recipes/TreeLinkerIterator");
+var _DoublyLinkedList = require("../doubly-linked-list/DoublyLinkedList");
 /**
  * doubly linked tree list.
  */
@@ -5812,7 +5764,7 @@ const _DoublyLinkedList = require('../doubly-linked-list/DoublyLinkedList')
  * @param name The accessor to use
  * @param list The list to use it on
  */
-const borrowedGetter = (name, list) => Object.getOwnPropertyDescriptor(_DoublyLinkedList.DoublyLinkedList.prototype, name).get.call(list)
+const borrowedGetter = (name, list) => Object.getOwnPropertyDescriptor(_DoublyLinkedList.DoublyLinkedList.prototype, name).get.call(list);
 /**
  * LinkedTreeList represents a collection stored with a root and spreading in branching (tree) formation.
  * @extends DoublyLinkedList
@@ -5822,237 +5774,218 @@ class LinkedTreeList {
    * Create the new LinkedTreeList instance, configure the list class.
    * @param linkerClass The class used to wrap given data as tree linkers.
    */
-  constructor (linkerClass = _TreeLinker.TreeLinker) {
+  constructor(linkerClass = _TreeLinker.TreeLinker) {
     /** The class used to create this instance, so that it can be recognized as valid without an instanceof check. */
-    this.classType = LinkedTreeList
+    this.classType = LinkedTreeList;
     /** A linker of the list (null when the list is empty); the head is found by walking back from it. */
-    this.innerList = null
+    this.innerList = null;
     /** Whether the inner list has been initialized (it can only be initialized once). */
-    this.initialized = false
+    this.initialized = false;
     /** The last linker, remembered so that adding to the end does not need to walk the whole list (null when not known yet). */
-    this.tailCache = null
+    this.tailCache = null;
     /** The number of linkers, kept up to date by the list's own methods so that the length does not need to walk the whole list (null when not known yet). */
-    this.countCache = null
+    this.countCache = null;
     /** The node these linkers are the children of, remembered so that it is known even while the list is empty (undefined until it is known). */
-    this.ownerNode = undefined
-    this.linkerClass = linkerClass
+    this.ownerNode = undefined;
+    this.linkerClass = linkerClass;
   }
-
   /**
    * Initialize the inner list, should only run once.
    * @param initialList Give the list of tree-linkers to start in this linked-tree-list.
    */
-  initialize (initialList) {
+  initialize(initialList) {
     if (this.initialized) {
-      console.warn('Attempt to initialize LinkedTreeList which is not empty.')
-      return this
+      console.warn('Attempt to initialize LinkedTreeList which is not empty.');
+      return this;
     }
-    this.initialized = true
-    this.innerList = initialList
-    return this
+    this.initialized = true;
+    this.innerList = initialList;
+    return this;
   }
-
   /**
    * Retrieve the innerList used (the list itself, not a copy).
    */
-  get list () {
-    return this.innerList
+  get list() {
+    return this.innerList;
   }
-
   /**
    * Retrieve the first TreeLinker in the list.
    */
-  get first () {
-    return borrowedGetter('first', this)
+  get first() {
+    return borrowedGetter('first', this);
   }
-
   /**
    * Retrieve the last TreeLinker in the list. The end is remembered, so this does not walk the list.
    */
-  get last () {
-    return borrowedGetter('last', this)
+  get last() {
+    return borrowedGetter('last', this);
   }
-
   /**
    * Return the length of the list. It is kept up to date by the list's own methods, so this does not walk the list
    * (call reset() after linkers were changed directly).
    */
-  get length () {
-    return borrowedGetter('length', this)
+  get length() {
+    return borrowedGetter('length', this);
   }
-
   /**
    * Get the parent of this tree list: the node these linkers are the children of (remembered even while the list is
    * empty), or null for the linkers at the top of a tree.
    */
-  get parent () {
+  get parent() {
     if (this.ownerNode !== undefined) {
-      return this.ownerNode
+      return this.ownerNode;
     }
-    const first = this.first
-    return first === null ? null : first.parent
+    const first = this.first;
+    return first === null ? null : first.parent;
   }
-
   /**
    * Set the parent of this tree list: every linker in it gets the node as its parent, and the node gets this list as its
    * children. Linkers added to the list later get this parent too.
    * @param parent The new node to use as the parent for this group of children
    */
-  set parent (parent) {
-    this.ownerNode = parent
-    let current = this.first
+  set parent(parent) {
+    this.ownerNode = parent;
+    let current = this.first;
     while (current !== null) {
-      current.parent = parent
-      current = current.next
+      current.parent = parent;
+      current = current.next;
     }
     if (parent) {
-      parent.children = this
+      parent.children = this;
     }
   }
-
   /**
    * Return the root parent of the entire tree.
    */
-  get rootParent () {
-    let current = this.first
+  get rootParent() {
+    let current = this.first;
     if (!current) {
-      return null
+      return null;
     }
-    let parent = this.first.parent
+    let parent = this.first.parent;
     while (parent !== null) {
-      current = parent
-      parent = current.parent
+      current = parent;
+      parent = current.parent;
     }
-    return current
+    return current;
   }
-
   /**
    * Set the children on a parent item.
    * @param item The TreeLinker node (one of the linkers of this list) that will be the parent of the children
    * @param children The LinkedTreeList which has the child nodes to use, or null to remove the children of the item
    * @throws {Error} When the item is not one of the linkers of this list
    */
-  setChildren (item, children = null) {
+  setChildren(item, children = null) {
     // The item must be one of the linkers of this list (only the siblings are checked, not the whole tree)
-    let isChild = false
+    let isChild = false;
     this.forEach(linker => {
       if (linker === item) {
-        isChild = true
+        isChild = true;
       }
-    })
+    });
     if (!isChild) {
-      throw new Error('The item is not one of the linkers of this list.')
+      throw new Error('The item is not one of the linkers of this list.');
     }
     if (children === null || typeof children === 'undefined') {
-      item.children = null
-      return
+      item.children = null;
+      return;
     }
-    children.parent = item
+    children.parent = item;
   }
-
   /**
    * Make a linker of the given node (or data) and make this list's parent its parent.
    * @param newNode The node (or data) which is being added to this list
    */
-  adopt (newNode) {
-    const linker = this.linkerClass.make(newNode, this.linkerClass)
-    linker.parent = this.parent
-    return linker
+  adopt(newNode) {
+    const linker = this.linkerClass.make(newNode, this.linkerClass);
+    linker.parent = this.parent;
+    return linker;
   }
-
   /**
    * Insert a new node (or data) after a node. The new node gets the parent of this list.
    * @param node The existing node as reference, or null to insert at the start of the list
    * @param newNode The new node to go after the existing node
    */
-  insertAfter (node, newNode) {
-    return _DoublyLinkedList.DoublyLinkedList.prototype.insertAfter.call(this, node, this.adopt(newNode))
+  insertAfter(node, newNode) {
+    return _DoublyLinkedList.DoublyLinkedList.prototype.insertAfter.call(this, node, this.adopt(newNode));
   }
-
   /**
    * Insert a new node (or data) before a node. The new node gets the parent of this list.
    * @param node The existing node as reference, or null to insert at the end of the list
    * @param newNode The new node to go before the existing node
    */
-  insertBefore (node, newNode) {
-    return _DoublyLinkedList.DoublyLinkedList.prototype.insertBefore.call(this, node, this.adopt(newNode))
+  insertBefore(node, newNode) {
+    return _DoublyLinkedList.DoublyLinkedList.prototype.insertBefore.call(this, node, this.adopt(newNode));
   }
-
   /**
    * Add a node (or data) after the given (or last) node in the list.
    * @param node The new node to add to the end of the list
    * @param after The existing last node
    */
-  append (node, after = this.last) {
-    return _DoublyLinkedList.DoublyLinkedList.prototype.append.call(this, node, after)
+  append(node, after = this.last) {
+    return _DoublyLinkedList.DoublyLinkedList.prototype.append.call(this, node, after);
   }
-
   /**
    * Add a node (or data) before the given (or first) node in the list.
    * @param node The new node to add to the start of the list
    * @param before The existing first node
    */
-  prepend (node, before = this.first) {
-    return _DoublyLinkedList.DoublyLinkedList.prototype.prepend.call(this, node, before)
+  prepend(node, before = this.first) {
+    return _DoublyLinkedList.DoublyLinkedList.prototype.prepend.call(this, node, before);
   }
-
   /**
    * Remove a linker from this linked list. The removed node no longer has a parent.
    * @param node The node we wish to remove (and it will be returned after removal)
    * @returns The removed node, or null when there was nothing to remove
    */
-  remove (node) {
-    const owner = this.parent
-    const removed = _DoublyLinkedList.DoublyLinkedList.prototype.remove.call(this, node)
+  remove(node) {
+    const owner = this.parent;
+    const removed = _DoublyLinkedList.DoublyLinkedList.prototype.remove.call(this, node);
     if (removed && removed.parent === owner) {
       // Remember whose children these are (the list may now be empty), the removed node no longer has that parent
-      this.ownerNode = owner
-      removed.parent = null
+      this.ownerNode = owner;
+      removed.parent = null;
     }
-    return removed
+    return removed;
   }
-
   /**
    * Refresh all references (the head, the end and the length) by walking the list once, and return the head. The
    * list's own methods keep these up to date, so this is only needed after linkers were changed directly.
    */
-  reset () {
-    return _DoublyLinkedList.DoublyLinkedList.prototype.reset.call(this)
+  reset() {
+    return _DoublyLinkedList.DoublyLinkedList.prototype.reset.call(this);
   }
-
   /**
    * Retrieve a TreeLinker item from this list by numeric index, otherwise return null.
    * @param index The integer number for retrieving a node by position.
    */
-  item (index) {
-    return _DoublyLinkedList.DoublyLinkedList.prototype.item.call(this, index)
+  item(index) {
+    return _DoublyLinkedList.DoublyLinkedList.prototype.item.call(this, index);
   }
-
   /**
    * Be able to run forEach on this LinkedTreeList to iterate over the TreeLinker Items.
    * @param callback The function to call for-each tree node
    * @param thisArg Optional, 'this' reference
    * @returns The list which was iterated.
    */
-  forEach (callback, thisArg = this) {
-    let index = 0
-    let current = thisArg.first
+  forEach(callback, thisArg = this) {
+    let index = 0;
+    let current = thisArg.first;
     while (current !== null) {
-      callback(current, index, thisArg)
-      current = current.next
-      ++index
+      callback(current, index, thisArg);
+      current = current.next;
+      ++index;
     }
-    return thisArg
+    return thisArg;
   }
-
   /**
    * Be able to iterate over this class: the linkers of this list and everything below them (left-first). It stays within
    * this list (it does not start at, or climb up to, the parents), use the parseTree service to parse a whole tree.
    */
-  [Symbol.iterator] () {
+  [Symbol.iterator]() {
     // The linkers of this list and everything below them, left-first. It stays within this list: it does not start at,
     // or climb up to, the parents (use the parseTree service to parse a whole tree)
-    return new _TreeLinkerIterator.TreeLinkerIterator(this.first, this.parent)
+    return new _TreeLinkerIterator.TreeLinkerIterator(this.first, this.parent);
   }
 }
 /**
@@ -6061,23 +5994,22 @@ class LinkedTreeList {
  * @param linkerClass The class to use for each node
  * @param classType Provide the type of IsArrayable to use.
  */
-exports.LinkedTreeList = LinkedTreeList
+exports.LinkedTreeList = LinkedTreeList;
 LinkedTreeList.fromArray = (values = [], linkerClass = _TreeLinker.TreeLinker, classType = LinkedTreeList) => {
-  const list = new classType(linkerClass)
-  return list.initialize(linkerClass.fromArray(values).head)
-}
-
+  const list = new classType(linkerClass);
+  return list.initialize(linkerClass.fromArray(values).head);
+};
 },{"../../recipes/TreeLinkerIterator":57,"../doubly-linked-list/DoublyLinkedList":49,"./TreeLinker":53,"core-js/modules/esnext.iterator.constructor.js":193,"core-js/modules/esnext.iterator.for-each.js":197}],53:[function(require,module,exports){
-'use strict'
+"use strict";
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.TreeLinker = void 0
-require('core-js/modules/esnext.iterator.constructor.js')
-require('core-js/modules/esnext.iterator.map.js')
-const _DoubleLinker = require('../doubly-linked-list/DoubleLinker')
-const _LinkedTreeList = require('./LinkedTreeList')
+});
+exports.TreeLinker = void 0;
+require("core-js/modules/esnext.iterator.constructor.js");
+require("core-js/modules/esnext.iterator.map.js");
+var _DoubleLinker = require("../doubly-linked-list/DoubleLinker");
+var _LinkedTreeList = require("./LinkedTreeList");
 /**
  * TreeLinker represents a node in a LinkedTreeList having a parent (or root) and child nodes.
  * @extends DoubleLinker
@@ -6093,7 +6025,7 @@ class TreeLinker {
    * @param settings.parent The reference to a parent linker if any
    * @param listClass Give the type of list to use for storing the children
    */
-  constructor ({
+  constructor({
     data = null,
     next = null,
     prev = null,
@@ -6102,24 +6034,23 @@ class TreeLinker {
     listClass = _LinkedTreeList.LinkedTreeList
   } = {}) {
     /** The class used to create this instance, so that it can be recognized as valid without an instanceof check. */
-    this.classType = TreeLinker
+    this.classType = TreeLinker;
     /** The data stored in this tree node. */
-    this.data = null
+    this.data = null;
     /** The sibling after this node, or null when this is the last child. */
-    this.next = null
+    this.next = null;
     /** The sibling before this node, or null when this is the first child. */
-    this.prev = null
+    this.prev = null;
     /** The node this node is a child of, or null for a root node. */
-    this.parent = null
+    this.parent = null;
     /** The list of the children of this node, or null when it has none. */
-    this.children = null
-    this.data = data
-    this.next = next
-    this.prev = prev
-    this.parent = parent
-    this.children = this.childrenFromArray(children, listClass)
+    this.children = null;
+    this.data = data;
+    this.next = next;
+    this.prev = prev;
+    this.parent = parent;
+    this.children = this.childrenFromArray(children, listClass);
   }
-
   /**
    * Create the children for this tree from an array. Each child becomes a tree linker with this node as its parent: an
    * existing linker is kept as it is, an object with a data property gives the settings of the linker, and anything
@@ -6127,21 +6058,21 @@ class TreeLinker {
    * @param children Provide an array of data / linker references to be children of this tree node.
    * @param listClass Give the type of list to use for storing the children
    */
-  childrenFromArray (children = null, listClass = _LinkedTreeList.LinkedTreeList) {
+  childrenFromArray(children = null, listClass = _LinkedTreeList.LinkedTreeList) {
     if (children === null) {
-      return null
+      return null;
     }
     // Every child is made into a tree linker (an existing one is kept as it is, and a plain value is the data) and is
     // given this node as its parent
     const nodes = children.map(child => {
-      const linker = this.classType.make(child, this.classType)
-      linker.parent = this
-      return linker
-    })
+      const linker = this.classType.make(child, this.classType);
+      linker.parent = this;
+      return linker;
+    });
     // Creates a linked-tree-list to store the children, which remembers this node as its parent even when it is empty
-    const list = listClass.fromArray(nodes, this.classType)
-    list.parent = this
-    return list
+    const list = listClass.fromArray(nodes, this.classType);
+    list.parent = this;
+    return list;
   }
 }
 /**
@@ -6149,24 +6080,23 @@ class TreeLinker {
  * @param linker Return a valid TreeLinker instance from given data, or even an already valid one.
  * @param classType Provide the type of IsTreeNode to use.
  */
-exports.TreeLinker = TreeLinker
+exports.TreeLinker = TreeLinker;
 TreeLinker.make = (linker, classType = TreeLinker) => {
-  return _DoubleLinker.DoubleLinker.make(linker, classType)
-}
+  return _DoubleLinker.DoubleLinker.make(linker, classType);
+};
 /**
  * Convert an array into DoubleLinker instances, return the head and tail DoubleLinkers.
  * @param values Provide an array of data that will be converted to a chain of tree-linkers.
  * @param classType Provide the type of IsTreeNode to use.
  */
-TreeLinker.fromArray = (values = [], classType = TreeLinker) => _DoubleLinker.DoubleLinker.fromArray(values, classType)
-
+TreeLinker.fromArray = (values = [], classType = TreeLinker) => _DoubleLinker.DoubleLinker.fromArray(values, classType);
 },{"../doubly-linked-list/DoubleLinker":48,"./LinkedTreeList":52,"core-js/modules/esnext.iterator.constructor.js":193,"core-js/modules/esnext.iterator.map.js":198}],54:[function(require,module,exports){
-'use strict'
+"use strict";
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.ArrayIterator = void 0
+});
+exports.ArrayIterator = void 0;
 /**
  * Class ArrayIterator returns the next value when using elements of array type list.
  */
@@ -6176,38 +6106,36 @@ class ArrayIterator {
    * @param innerList The elements to iterate over.
    * @param index The position to start from.
    */
-  constructor (innerList, index = 0) {
-    this.innerList = innerList
-    this.index = index
+  constructor(innerList, index = 0) {
+    this.innerList = innerList;
+    this.index = index;
   }
-
   /**
    * Get the next element, moving the iterator forward.
    * @param value Not used, present to match the Iterator interface.
    * @returns The next element, or done when there are no more.
    */
-  next (value) {
+  next(value) {
     if (this.index < this.innerList.length) {
       return {
         value: this.innerList[this.index++],
         done: false
-      }
+      };
     }
     return {
       value: undefined,
       done: true
-    }
+    };
   }
 }
-exports.ArrayIterator = ArrayIterator
-
+exports.ArrayIterator = ArrayIterator;
 },{}],55:[function(require,module,exports){
-'use strict'
+"use strict";
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.DoubleLinkerIterator = void 0
+});
+exports.DoubleLinkerIterator = void 0;
 /**
  * Class DoubleLinkerIterator returns the next value when using linkers of linked type lists.
  */
@@ -6216,33 +6144,31 @@ class DoubleLinkerIterator {
    * Create an iterator starting at the given item.
    * @param current The item to start from.
    */
-  constructor (current) {
-    this.current = current
+  constructor(current) {
+    this.current = current;
   }
-
   /**
    * Get the current item and move on to the following one.
    * @param value Not used, present to match the Iterator interface.
    * @returns The current item, or done when there are no more.
    */
-  next (value) {
+  next(value) {
     const result = {
       value: this.current,
       done: !this.current
-    }
-    this.current = this.current ? this.current.next : null
-    return result
+    };
+    this.current = this.current ? this.current.next : null;
+    return result;
   }
 }
-exports.DoubleLinkerIterator = DoubleLinkerIterator
-
+exports.DoubleLinkerIterator = DoubleLinkerIterator;
 },{}],56:[function(require,module,exports){
-'use strict'
+"use strict";
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.LinkerIterator = void 0
+});
+exports.LinkerIterator = void 0;
 /**
  * Class LinkerIterator returns the next value when using linkers of linked type lists.
  */
@@ -6251,34 +6177,32 @@ class LinkerIterator {
    * Create an iterator starting at the given item.
    * @param current The item to start from.
    */
-  constructor (current) {
-    this.current = current
+  constructor(current) {
+    this.current = current;
   }
-
   /**
    * Get the current item and move on to the following one.
    * @param value Not used, present to match the Iterator interface.
    * @returns The current item, or done when there are no more.
    */
-  next (value) {
+  next(value) {
     const result = {
       value: this.current,
       done: !this.current
-    }
-    this.current = this.current ? this.current.next : null
-    return result
+    };
+    this.current = this.current ? this.current.next : null;
+    return result;
   }
 }
-exports.LinkerIterator = LinkerIterator
-
+exports.LinkerIterator = LinkerIterator;
 },{}],57:[function(require,module,exports){
-'use strict'
+"use strict";
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.TreeLinkerIterator = void 0
-const _parseTreeNext = require('../services/parseTreeNext')
+});
+exports.TreeLinkerIterator = void 0;
+var _parseTreeNext = require("../services/parseTreeNext");
 /**
  * Class TreeLinkerIterator returns the next value taking a left-first approach down a tree.
  */
@@ -6288,34 +6212,32 @@ class TreeLinkerIterator {
    * @param current The item to start from.
    * @param boundaryParent The parent of the nodes to stay within (null for the top of a tree), the whole tree when not given.
    */
-  constructor (current, boundaryParent) {
-    this.current = current
-    this.boundaryParent = boundaryParent
+  constructor(current, boundaryParent) {
+    this.current = current;
+    this.boundaryParent = boundaryParent;
   }
-
   /**
    * Get the current item and move on to the following one (left-first, down each branch).
    * @param value Not used, present to match the Iterator interface.
    * @returns The current item, or done when there are no more.
    */
-  next (value) {
+  next(value) {
     const result = {
       value: this.current,
       done: !this.current
-    }
-    this.current = (0, _parseTreeNext.parseTreeNext)(this.current, this.boundaryParent)
-    return result
+    };
+    this.current = (0, _parseTreeNext.parseTreeNext)(this.current, this.boundaryParent);
+    return result;
   }
 }
-exports.TreeLinkerIterator = TreeLinkerIterator
-
+exports.TreeLinkerIterator = TreeLinkerIterator;
 },{"../services/parseTreeNext":58}],58:[function(require,module,exports){
-'use strict'
+"use strict";
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.parseTreeNext = void 0
+});
+exports.parseTreeNext = void 0;
 /**
  * Be able to parse over every node in a tree.
  * 1. Start at root (get root parent)
@@ -6332,26 +6254,25 @@ exports.parseTreeNext = void 0
  */
 const parseTreeNext = (treeNode, boundaryParent) => {
   if (!treeNode) {
-    return null
+    return null;
   }
   if (treeNode.children && treeNode.children.length) {
-    return treeNode.children.first
+    return treeNode.children.first;
   }
   if (treeNode.next) {
-    return treeNode.next
+    return treeNode.next;
   }
   // Nothing more below or beside this node, so go back up until there is a node which has a next (or the boundary)
-  let parent = treeNode.parent
+  let parent = treeNode.parent;
   while (parent && parent !== boundaryParent) {
     if (parent.next) {
-      return parent.next
+      return parent.next;
     }
-    parent = parent.parent
+    parent = parent.parent;
   }
-  return null
-}
-exports.parseTreeNext = parseTreeNext
-
+  return null;
+};
+exports.parseTreeNext = parseTreeNext;
 },{}],59:[function(require,module,exports){
 'use strict';
 var isCallable = require('../internals/is-callable');
