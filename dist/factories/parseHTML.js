@@ -1,8 +1,8 @@
-'use strict'
+"use strict";
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
+});
 /**
  * Parses an HTML string into pseudo-dom nodes, for innerHTML / outerHTML / insertAdjacentHTML. Built on
  * htmlparser2's Parser (a SAX-style tokenizer) with a custom handler which builds pseudo-dom nodes directly -
@@ -13,8 +13,8 @@ Object.defineProperty(exports, '__esModule', {
  * dependency on ElementService / HTMLElementService - importing either here, from a factory ElementService itself
  * would need to call, would create an import cycle.
  */
-const htmlparser2_1 = require('htmlparser2')
-const NodeService_1 = require('../services/NodeService')
+const htmlparser2_1 = require("htmlparser2");
+const NodeService_1 = require("../services/NodeService");
 /**
  * Parse an HTML string into the nodes it describes (siblings at the top level, exactly like the DOM's own HTML
  * parsing does for innerHTML / insertAdjacentHTML - there is no single root unless the markup itself has one).
@@ -23,58 +23,58 @@ const NodeService_1 = require('../services/NodeService')
  * @param ElementClass The class to build each parsed element with
  */
 const parseHTML = (html, ownerDocument, ElementClass) => {
-  const roots = []
-  const stack = []
+  const roots = [];
+  const stack = [];
   const appendNode = node => {
-    node.ownerDocumentStore = ownerDocument
+    node.ownerDocumentStore = ownerDocument;
     if (stack.length) {
-      stack[stack.length - 1].appendChild(node)
+      stack[stack.length - 1].appendChild(node);
     } else {
-      roots.push(node)
+      roots.push(node);
     }
-  }
+  };
   const parser = new htmlparser2_1.Parser({
-    onopentagname (name) {
+    onopentagname(name) {
       const element = new ElementClass({
         tagName: name
-      })
-      appendNode(element)
-      stack.push(element)
+      });
+      appendNode(element);
+      stack.push(element);
     },
-    onattribute (name, value) {
+    onattribute(name, value) {
       if (!stack.length) {
-        return
+        return;
       }
-      const element = stack[stack.length - 1]
+      const element = stack[stack.length - 1];
       // pseudo-dom's className / classList and style are not kept in sync with a literal 'class' / 'style'
       // attribute the way setAttribute usually is (there is no such special-casing here, unlike a real DOM) - route
       // them to the real objects directly, the same way cssSelectAdapter does for reading 'class' when matching a
       // CSS selector, so parsed markup's class="..." / style="..." actually populates className/classList and style.
       if (name === 'class') {
-        element.className = value
-        return
+        element.className = value;
+        return;
       }
       if (name === 'style' && element.style) {
-        element.style.cssText = value
-        return
+        element.style.cssText = value;
+        return;
       }
-      element.setAttribute(name, value)
+      element.setAttribute(name, value);
     },
-    ontext (text) {
-      appendNode(new NodeService_1.TextService(text))
+    ontext(text) {
+      appendNode(new NodeService_1.TextService(text));
     },
-    oncomment (data) {
-      appendNode(new NodeService_1.CommentService(data))
+    oncomment(data) {
+      appendNode(new NodeService_1.CommentService(data));
     },
-    onclosetag () {
-      stack.pop()
+    onclosetag() {
+      stack.pop();
     }
   }, {
     lowerCaseTags: true,
     lowerCaseAttributeNames: true
-  })
-  parser.write(String(html || ''))
-  parser.end()
-  return roots
-}
-exports.default = parseHTML
+  });
+  parser.write(String(html || ''));
+  parser.end();
+  return roots;
+};
+exports.default = parseHTML;

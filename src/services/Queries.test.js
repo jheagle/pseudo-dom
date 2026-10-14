@@ -1,5 +1,5 @@
 import { HTMLElementService } from './HTMLElementService'
-import { TextService, CommentService } from './NodeService'
+import { CommentService } from './NodeService'
 import { DocumentService } from './DocumentService'
 import { DocumentFragmentService } from './DocumentFragmentService'
 import { HTMLCollectionService } from './HTMLCollectionService'

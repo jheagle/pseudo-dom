@@ -1,330 +1,293 @@
-'use strict'
+"use strict";
 
-require('core-js/modules/esnext.iterator.constructor.js')
-require('core-js/modules/esnext.iterator.every.js')
-require('core-js/modules/esnext.iterator.filter.js')
-require('core-js/modules/esnext.iterator.for-each.js')
-const __importDefault = void 0 && (void 0).__importDefault || function (mod) {
-  return mod && mod.__esModule
-    ? mod
-    : {
-        default: mod
-      }
-}
-Object.defineProperty(exports, '__esModule', {
+require("core-js/modules/esnext.iterator.constructor.js");
+require("core-js/modules/esnext.iterator.every.js");
+require("core-js/modules/esnext.iterator.filter.js");
+require("core-js/modules/esnext.iterator.for-each.js");
+var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.CommentService = exports.TextService = exports.NodeService = void 0
+});
+exports.CommentService = exports.TextService = exports.NodeService = void 0;
 /**
  * Substitute for the DOM Node Class.
  */
-const generateNodeList_1 = __importDefault(require('../factories/generateNodeList'))
-const TreeLinker_1 = require('collect-your-stuff/dist/collections/linked-tree-list/TreeLinker')
-const EventTargetService_1 = __importDefault(require('./EventTargetService'))
-const HTMLCollectionService_1 = require('./HTMLCollectionService')
-const query_1 = require('../factories/query')
+const generateNodeList_1 = __importDefault(require("../factories/generateNodeList"));
+const TreeLinker_1 = require("collect-your-stuff/dist/collections/linked-tree-list/TreeLinker");
+const EventTargetService_1 = __importDefault(require("./EventTargetService"));
+const HTMLCollectionService_1 = require("./HTMLCollectionService");
+const query_1 = require("../factories/query");
 /**
  * Simulate the behaviour of the Node Class when there is no DOM available.
  */
 class NodeService extends EventTargetService_1.default {
-  constructor () {
-    super()
-    this.nodeValueStore = null
-    this.ownerDocumentStore = null
-    this.nodeId = NodeService.nextNodeId++
-    this.nodeNameValue = ''
-    this.childList = (0, generateNodeList_1.default)()
-    this.parent = null
-    this.listLinker = null
+  constructor() {
+    super();
+    this.nodeValueStore = null;
+    this.ownerDocumentStore = null;
+    this.nodeId = NodeService.nextNodeId++;
+    this.nodeNameValue = '';
+    this.childList = (0, generateNodeList_1.default)();
+    this.parent = null;
+    this.listLinker = null;
   }
-
-  get baseURI () {
-    return window.location || '/'
+  get baseURI() {
+    return window.location || '/';
   }
-
-  get childNodes () {
-    return this.childList
+  get childNodes() {
+    return this.childList;
   }
-
-  get firstChild () {
-    return this.childList.first ? this.childList.first.data : null
+  get firstChild() {
+    return this.childList.first ? this.childList.first.data : null;
   }
-
-  get isConnected () {
+  get isConnected() {
     // Connected means the tree the node is in has a document at the top
-    return this.getRootNode().nodeType === NodeService.DOCUMENT_NODE
+    return this.getRootNode().nodeType === NodeService.DOCUMENT_NODE;
   }
-
-  get lastChild () {
-    return this.childList.last ? this.childList.last.data : null
+  get lastChild() {
+    return this.childList.last ? this.childList.last.data : null;
   }
-
-  get nextSibling () {
-    return this.listLinker && this.listLinker.next ? this.listLinker.next.data : null
+  get nextSibling() {
+    return this.listLinker && this.listLinker.next ? this.listLinker.next.data : null;
   }
-
-  get nodeName () {
-    return this.nodeNameValue || ''
+  get nodeName() {
+    return this.nodeNameValue || '';
   }
-
-  get nodeType () {
-    return NodeService.DEFAULT_NODE
+  get nodeType() {
+    return NodeService.DEFAULT_NODE;
   }
-
-  get nodeValue () {
-    return this.nodeValueStore
+  get nodeValue() {
+    return this.nodeValueStore;
   }
-
-  set nodeValue (value) {
-    this.nodeValueStore = value
+  set nodeValue(value) {
+    this.nodeValueStore = value;
   }
-
-  get ownerDocument () {
+  get ownerDocument() {
     if (this.nodeType === NodeService.DOCUMENT_NODE) {
-      return null
+      return null;
     }
-    const root = this.getRootNode()
-    return root.nodeType === NodeService.DOCUMENT_NODE ? root : this.ownerDocumentStore
+    const root = this.getRootNode();
+    return root.nodeType === NodeService.DOCUMENT_NODE ? root : this.ownerDocumentStore;
   }
-
-  get parentNode () {
-    return this.parent
+  get parentNode() {
+    return this.parent;
   }
-
-  get parentElement () {
-    return this.parent && this.parent.nodeType === NodeService.ELEMENT_NODE ? this.parent : null
+  get parentElement() {
+    return this.parent && this.parent.nodeType === NodeService.ELEMENT_NODE ? this.parent : null;
   }
-
-  get previousSibling () {
-    return this.listLinker && this.listLinker.prev ? this.listLinker.prev.data : null
+  get previousSibling() {
+    return this.listLinker && this.listLinker.prev ? this.listLinker.prev.data : null;
   }
-
-  get textContent () {
+  get textContent() {
     if (this.nodeType === NodeService.DOCUMENT_NODE || this.nodeType === NodeService.DOCUMENT_TYPE_NODE) {
-      return null
+      return null;
     }
     // The text of everything below, in order (comments and the like do not count)
-    let text = ''
+    let text = '';
     Array.from(this.childNodes).forEach(child => {
       if (child.nodeType === NodeService.TEXT_NODE) {
-        text += child.nodeValue
+        text += child.nodeValue;
       } else if (child.nodeType !== NodeService.COMMENT_NODE) {
-        text += child.textContent
+        text += child.textContent;
       }
-    })
-    return text
+    });
+    return text;
   }
-
-  set textContent (text) {
+  set textContent(text) {
     if (this.nodeType === NodeService.DOCUMENT_NODE || this.nodeType === NodeService.DOCUMENT_TYPE_NODE) {
-      return
+      return;
     }
     // All the children are replaced by a single text node (or none for an empty text)
     while (this.firstChild) {
-      this.removeChild(this.firstChild)
+      this.removeChild(this.firstChild);
     }
     if (text !== null && typeof text !== 'undefined' && String(text) !== '') {
-      const textNode = new TextService(String(text))
-      textNode.ownerDocumentStore = this.ownerDocument
-      this.appendChild(textNode)
+      const textNode = new TextService(String(text));
+      textNode.ownerDocumentStore = this.ownerDocument;
+      this.appendChild(textNode);
     }
   }
-
   /**
    * Add a node as the last child of this node (a node which is already in a tree is moved).
    * @param childNode The node to add
    * @returns The added node
    */
-  appendChild (childNode) {
-    return this.insertBefore(childNode, null)
+  appendChild(childNode) {
+    return this.insertBefore(childNode, null);
   }
-
   /**
    * Whether this kind of node can have children (text, comments and attributes cannot).
    */
-  get acceptsChildren () {
-    return true
+  get acceptsChildren() {
+    return true;
   }
-
   /**
    * Make a copy of this node without its children, its parent or its listeners, which is what cloneNode starts from.
    * Kinds of node which are made with arguments override this to give them.
    */
-  cloneShallow () {
-    const copy = new this.constructor()
-    copy.nodeValue = this.nodeValue
-    copy.ownerDocumentStore = this.ownerDocumentStore
-    return copy
+  cloneShallow() {
+    const copy = new this.constructor();
+    copy.nodeValue = this.nodeValue;
+    copy.ownerDocumentStore = this.ownerDocumentStore;
+    return copy;
   }
-
   /**
    * Whether another node of the same type is equal to this one apart from its children, which isEqualNode compares
    * afterwards. Kinds of node with more to compare (an element has attributes) override this.
    * @param other The node to compare with
    */
-  equalsShallow (other) {
-    return this.nodeName === other.nodeName && this.nodeValue === other.nodeValue
+  equalsShallow(other) {
+    return this.nodeName === other.nodeName && this.nodeValue === other.nodeValue;
   }
-
   /**
    * Add nodes (strings become text nodes) as the last children of this node, in the order given.
    * @param nodes The nodes (or text) to add
    * @throws {Error} When this kind of node cannot have children
    */
-  append (...nodes) {
-    nodes.forEach(node => this.appendChild(this.toChildNode(node)))
+  append(...nodes) {
+    nodes.forEach(node => this.appendChild(this.toChildNode(node)));
   }
-
   /**
    * Add nodes (strings become text nodes) as the first children of this node, in the order given.
    * @param nodes The nodes (or text) to add
    * @throws {Error} When this kind of node cannot have children
    */
-  prepend (...nodes) {
-    const reference = this.firstChild
-    nodes.forEach(node => this.insertBefore(this.toChildNode(node), reference))
+  prepend(...nodes) {
+    const reference = this.firstChild;
+    nodes.forEach(node => this.insertBefore(this.toChildNode(node), reference));
   }
-
   /**
    * Remove every child of this node and put the given nodes (strings become text nodes) in their place, in order.
    * @param nodes The nodes (or text) to add
    * @throws {Error} When this kind of node cannot have children
    */
-  replaceChildren (...nodes) {
+  replaceChildren(...nodes) {
     while (this.firstChild) {
-      this.removeChild(this.firstChild)
+      this.removeChild(this.firstChild);
     }
-    this.append(...nodes)
+    this.append(...nodes);
   }
-
   /**
    * Add nodes (strings become text nodes) as this node's previous siblings, in order. Does nothing when this node has
    * no parent.
    * @param nodes The nodes (or text) to add
    */
-  before (...nodes) {
-    const parent = this.parentNode
+  before(...nodes) {
+    const parent = this.parentNode;
     if (!parent) {
-      return
+      return;
     }
-    nodes.forEach(node => parent.insertBefore(this.toChildNode(node), this))
+    nodes.forEach(node => parent.insertBefore(this.toChildNode(node), this));
   }
-
   /**
    * Add nodes (strings become text nodes) as this node's next siblings, in order. Does nothing when this node has no
    * parent.
    * @param nodes The nodes (or text) to add
    */
-  after (...nodes) {
-    const parent = this.parentNode
+  after(...nodes) {
+    const parent = this.parentNode;
     if (!parent) {
-      return
+      return;
     }
-    const reference = this.nextSibling
-    nodes.forEach(node => parent.insertBefore(this.toChildNode(node), reference))
+    const reference = this.nextSibling;
+    nodes.forEach(node => parent.insertBefore(this.toChildNode(node), reference));
   }
-
   /**
    * Put the given nodes (strings become text nodes) where this node is, in order, then remove this node. Does nothing
    * when this node has no parent.
    * @param nodes The nodes (or text) to put in this node's place
    */
-  replaceWith (...nodes) {
-    const parent = this.parentNode
+  replaceWith(...nodes) {
+    const parent = this.parentNode;
     if (!parent) {
-      return
+      return;
     }
-    nodes.forEach(node => parent.insertBefore(this.toChildNode(node), this))
-    parent.removeChild(this)
+    nodes.forEach(node => parent.insertBefore(this.toChildNode(node), this));
+    parent.removeChild(this);
   }
-
   /**
    * Remove this node from its parent. Does nothing when it has no parent.
    */
-  remove () {
+  remove() {
     if (this.parentNode) {
-      this.parentNode.removeChild(this)
+      this.parentNode.removeChild(this);
     }
   }
-
   /**
    * Turn a value given to append / prepend / before / after / replaceWith / replaceChildren into a node: a string
    * becomes a text node belonging to this node's document, anything else is returned as it is.
    * @param value The value to add
    */
-  toChildNode (value) {
+  toChildNode(value) {
     if (typeof value !== 'string') {
-      return value
+      return value;
     }
-    const text = new TextService(value)
-    text.ownerDocumentStore = this.ownerDocument
-    return text
+    const text = new TextService(value);
+    text.ownerDocumentStore = this.ownerDocument;
+    return text;
   }
-
   /**
    * Every element below this node with the given tag name (or every element when tagName is *), live.
    * @param tagName
    */
-  getElementsByTagName (tagName) {
-    const matchesTag = tagName === '*' ? () => true : element => element.tagName === tagName
-    return new HTMLCollectionService_1.HTMLCollectionService(this, matchesTag, true)
+  getElementsByTagName(tagName) {
+    const matchesTag = tagName === '*' ? () => true : element => element.tagName === tagName;
+    return new HTMLCollectionService_1.HTMLCollectionService(this, matchesTag, true);
   }
-
   /**
    * Every element below this node which has all of the given (space separated) classes, live.
    * @param className
    */
-  getElementsByClassName (className) {
-    const names = className.trim().split(/\s+/).filter(Boolean)
-    return new HTMLCollectionService_1.HTMLCollectionService(this, element => names.every(name => element.classList.contains(name)), true)
+  getElementsByClassName(className) {
+    const names = className.trim().split(/\s+/).filter(Boolean);
+    return new HTMLCollectionService_1.HTMLCollectionService(this, element => names.every(name => element.classList.contains(name)), true);
   }
-
   /**
    * Every element below this node with the given tag name, live. There is no real namespace parsing here, so this
    * ignores the namespace and behaves exactly like getElementsByTagName.
    * @param namespace Ignored
    * @param tagName
    */
-  getElementsByTagNameNS (namespace, tagName) {
-    return this.getElementsByTagName(tagName)
+  getElementsByTagNameNS(namespace, tagName) {
+    return this.getElementsByTagName(tagName);
   }
-
   /**
    * The first element below this node which matches the CSS selector, in tree order, or null when there is none.
    * @param selectors A CSS selector
    */
-  querySelector (selectors) {
-    return (0, query_1.querySelector)(selectors, this)
+  querySelector(selectors) {
+    return (0, query_1.querySelector)(selectors, this);
   }
-
   /**
    * Every element below this node which matches the CSS selector, in tree order. A plain array (not a live
    * collection): like the DOM's querySelectorAll, it is a snapshot taken when it is called.
    * @param selectors A CSS selector
    */
-  querySelectorAll (selectors) {
-    return (0, query_1.querySelectorAll)(selectors, this)
+  querySelectorAll(selectors) {
+    return (0, query_1.querySelectorAll)(selectors, this);
   }
-
   /**
    * Called each time a node has been inserted as a child of this node, so that nodes which need to react to children
    * (for example elements applying default events) can do so.
    * @param child The node which was inserted
    */
-  childInserted (child) {}
+  childInserted(child) {}
   /**
    * Make a copy of this node (without its parent, and without its event listeners). With deep the children are copied
    * too, all the way down.
    * @param deep Copy the children as well
    */
-  cloneNode (deep = false) {
-    const copy = this.cloneShallow()
+  cloneNode(deep = false) {
+    const copy = this.cloneShallow();
     if (deep) {
-      Array.from(this.childNodes).forEach(child => copy.appendChild(child.cloneNode(true)))
+      Array.from(this.childNodes).forEach(child => copy.appendChild(child.cloneNode(true)));
     }
-    return copy
+    return copy;
   }
-
   /**
    * Say where another node is in relation to this one, as the bits of NodeService.DOCUMENT_POSITION_*: 0 for this node
    * itself, DISCONNECTED (with IMPLEMENTATION_SPECIFIC and a consistent PRECEDING or FOLLOWING) for a node in another tree,
@@ -332,68 +295,64 @@ class NodeService extends EventTargetService_1.default {
    * otherwise PRECEDING or FOLLOWING by their order in the tree.
    * @param otherNode The node to locate
    */
-  compareDocumentPosition (otherNode) {
+  compareDocumentPosition(otherNode) {
     if (otherNode === this) {
-      return 0
+      return 0;
     }
     const pathFromRoot = node => {
-      const path = []
+      const path = [];
       for (let current = node; current; current = current.parentNode) {
-        path.unshift(current)
+        path.unshift(current);
       }
-      return path
-    }
-    const mine = pathFromRoot(this)
-    const theirs = pathFromRoot(otherNode)
+      return path;
+    };
+    const mine = pathFromRoot(this);
+    const theirs = pathFromRoot(otherNode);
     if (mine[0] !== theirs[0]) {
       // Not in the same tree, so there is no real order: use a consistent one (the order the nodes were made in)
-      const before = otherNode.nodeId < this.nodeId ? NodeService.DOCUMENT_POSITION_PRECEDING : NodeService.DOCUMENT_POSITION_FOLLOWING
-      return NodeService.DOCUMENT_POSITION_DISCONNECTED | NodeService.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC | before
+      const before = otherNode.nodeId < this.nodeId ? NodeService.DOCUMENT_POSITION_PRECEDING : NodeService.DOCUMENT_POSITION_FOLLOWING;
+      return NodeService.DOCUMENT_POSITION_DISCONNECTED | NodeService.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC | before;
     }
     if (theirs.length < mine.length && theirs.every((node, index) => mine[index] === node)) {
-      return NodeService.DOCUMENT_POSITION_CONTAINS | NodeService.DOCUMENT_POSITION_PRECEDING
+      return NodeService.DOCUMENT_POSITION_CONTAINS | NodeService.DOCUMENT_POSITION_PRECEDING;
     }
     if (mine.length < theirs.length && mine.every((node, index) => theirs[index] === node)) {
-      return NodeService.DOCUMENT_POSITION_CONTAINED_BY | NodeService.DOCUMENT_POSITION_FOLLOWING
+      return NodeService.DOCUMENT_POSITION_CONTAINED_BY | NodeService.DOCUMENT_POSITION_FOLLOWING;
     }
     // The paths part ways at siblings: whichever comes first among them is first in the tree
-    let depth = 0
+    let depth = 0;
     while (mine[depth] === theirs[depth]) {
-      ++depth
+      ++depth;
     }
     for (let sibling = mine[depth].nextSibling; sibling; sibling = sibling.nextSibling) {
       if (sibling === theirs[depth]) {
-        return NodeService.DOCUMENT_POSITION_FOLLOWING
+        return NodeService.DOCUMENT_POSITION_FOLLOWING;
       }
     }
-    return NodeService.DOCUMENT_POSITION_PRECEDING
+    return NodeService.DOCUMENT_POSITION_PRECEDING;
   }
-
   /**
    * Check whether a node is this node or one of its descendants.
    * @param otherNode The node to look for
    */
-  contains (otherNode) {
-    let current = otherNode
+  contains(otherNode) {
+    let current = otherNode;
     while (current) {
       if (current === this) {
-        return true
+        return true;
       }
-      current = current.parentNode
+      current = current.parentNode;
     }
-    return false
+    return false;
   }
-
-  getRootNode (options = {
+  getRootNode(options = {
     composed: false
   }) {
-    return this.parent ? this.parent.getRootNode(options) : this
+    return this.parent ? this.parent.getRootNode(options) : this;
   }
-
-  hasChildNodes () {
-    return this.childList.length > 0
+  hasChildNodes() {
+    return this.childList.length > 0;
   }
-
   /**
    * Insert a node as a child of this node, before the given child (or at the end when there is none). A node which is
    * already in a tree is moved, and the children of a document fragment are moved in order.
@@ -402,117 +361,109 @@ class NodeService extends EventTargetService_1.default {
    * @returns The inserted node
    * @throws {Error} When the reference node is not a child of this node, or the new node is this node or contains it
    */
-  insertBefore (newNode, referenceNode = null) {
+  insertBefore(newNode, referenceNode = null) {
     if (!this.acceptsChildren) {
-      throw new Error('This kind of node cannot have children.')
+      throw new Error('This kind of node cannot have children.');
     }
     if (referenceNode !== null && referenceNode.parentNode !== this) {
-      throw new Error('The node before which the new node is to be inserted is not a child of this node.')
+      throw new Error('The node before which the new node is to be inserted is not a child of this node.');
     }
     if (newNode === referenceNode) {
       // Inserting a node before itself leaves it where it is
-      return newNode
+      return newNode;
     }
     if (typeof newNode.contains === 'function' && newNode.contains(this)) {
-      throw new Error('The new node cannot be inserted into itself or one of its own descendants.')
+      throw new Error('The new node cannot be inserted into itself or one of its own descendants.');
     }
     if (newNode.nodeType === NodeService.DOCUMENT_FRAGMENT_NODE) {
       // The children of a fragment are inserted (moved) in order, and the fragment is left empty
       while (newNode.firstChild) {
-        this.insertBefore(newNode.firstChild, referenceNode)
+        this.insertBefore(newNode.firstChild, referenceNode);
       }
-      return newNode
+      return newNode;
     }
     if (newNode.parentNode) {
       // A node can only be in one place, so it is moved from where it was
-      newNode.parentNode.removeChild(newNode)
+      newNode.parentNode.removeChild(newNode);
     }
     const linker = new TreeLinker_1.TreeLinker({
       data: newNode
-    })
-    this.childList.insertBefore(referenceNode ? referenceNode.listLinker : null, linker)
-    const inserted = newNode
-    inserted.parent = this
-    inserted.listLinker = linker
-    this.childInserted(inserted)
-    return newNode
+    });
+    this.childList.insertBefore(referenceNode ? referenceNode.listLinker : null, linker);
+    const inserted = newNode;
+    inserted.parent = this;
+    inserted.listLinker = linker;
+    this.childInserted(inserted);
+    return newNode;
   }
-
-  isDefaultNamespace (namespaceURI) {
-    return namespaceURI === null
+  isDefaultNamespace(namespaceURI) {
+    return namespaceURI === null;
   }
-
   /**
    * Whether another node is the same as this one, by what they hold: the same type, name and value (an element also
    * needs the same attributes), and children which are equal in the same order.
    * @param otherNode The node to compare with
    */
-  isEqualNode (otherNode) {
+  isEqualNode(otherNode) {
     if (!otherNode || otherNode.nodeType !== this.nodeType || !this.equalsShallow(otherNode)) {
-      return false
+      return false;
     }
-    const mine = Array.from(this.childNodes)
-    const theirs = Array.from(otherNode.childNodes)
-    return mine.length === theirs.length && mine.every((child, index) => child.isEqualNode(theirs[index]))
+    const mine = Array.from(this.childNodes);
+    const theirs = Array.from(otherNode.childNodes);
+    return mine.length === theirs.length && mine.every((child, index) => child.isEqualNode(theirs[index]));
   }
-
-  isSameNode (otherNode) {
-    return this === otherNode
+  isSameNode(otherNode) {
+    return this === otherNode;
   }
-
-  lookupPrefix (namespace) {
-    return null
+  lookupPrefix(namespace) {
+    return null;
   }
-
-  lookupNamespaceURI (prefix) {
-    return null
+  lookupNamespaceURI(prefix) {
+    return null;
   }
-
   /**
    * Tidy the text below this node: neighbouring text nodes are joined into one and empty text nodes are removed.
    */
-  normalize () {
-    let child = this.firstChild
+  normalize() {
+    let child = this.firstChild;
     while (child) {
       if (child.nodeType === NodeService.TEXT_NODE) {
         // Join the text nodes which follow into this one, and drop it when it is empty
-        let text = child.nodeValue
-        let following = child.nextSibling
+        let text = child.nodeValue;
+        let following = child.nextSibling;
         while (following && following.nodeType === NodeService.TEXT_NODE) {
-          text += following.nodeValue
-          const after = following.nextSibling
-          this.removeChild(following)
-          following = after
+          text += following.nodeValue;
+          const after = following.nextSibling;
+          this.removeChild(following);
+          following = after;
         }
-        child.nodeValue = text
+        child.nodeValue = text;
         if (text === '') {
-          this.removeChild(child)
+          this.removeChild(child);
         }
-        child = following
+        child = following;
       } else {
-        child.normalize()
-        child = child.nextSibling
+        child.normalize();
+        child = child.nextSibling;
       }
     }
   }
-
   /**
    * Remove a child from this node, it no longer has a parent or siblings afterwards.
    * @param childElement The child node to remove
    * @returns The removed node
    * @throws {Error} When the node is not a child of this node
    */
-  removeChild (childElement) {
+  removeChild(childElement) {
     if (!childElement || childElement.parentNode !== this) {
-      throw new Error('The node to be removed is not a child of this node.')
+      throw new Error('The node to be removed is not a child of this node.');
     }
-    const removed = childElement
-    this.childList.remove(removed.listLinker)
-    removed.parent = null
-    removed.listLinker = null
-    return childElement
+    const removed = childElement;
+    this.childList.remove(removed.listLinker);
+    removed.parent = null;
+    removed.listLinker = null;
+    return childElement;
   }
-
   /**
    * Replace a child of this node with another node (which is moved if it is already in a tree).
    * @param newChild The node which takes the place
@@ -520,44 +471,44 @@ class NodeService extends EventTargetService_1.default {
    * @returns The replaced node
    * @throws {Error} When the old node is not a child of this node
    */
-  replaceChild (newChild, oldChild) {
+  replaceChild(newChild, oldChild) {
     if (!oldChild || oldChild.parentNode !== this) {
-      throw new Error('The node to be replaced is not a child of this node.')
+      throw new Error('The node to be replaced is not a child of this node.');
     }
     if (newChild === oldChild) {
-      return oldChild
+      return oldChild;
     }
     // The new node goes where the old one was, which is before the old node's next sibling (unless that is the new node)
-    let reference = oldChild.nextSibling
+    let reference = oldChild.nextSibling;
     if (reference === newChild) {
-      reference = newChild.nextSibling
+      reference = newChild.nextSibling;
     }
-    this.removeChild(oldChild)
-    this.insertBefore(newChild, reference)
-    return oldChild
+    this.removeChild(oldChild);
+    this.insertBefore(newChild, reference);
+    return oldChild;
   }
 }
-exports.NodeService = NodeService
-NodeService.DEFAULT_NODE = 0
-NodeService.ELEMENT_NODE = 1
-NodeService.ATTRIBUTE_NODE = 2
-NodeService.TEXT_NODE = 3
-NodeService.CDATA_SECTION_NODE = 4
-NodeService.ENTITY_REFERENCE_NODE = 5
-NodeService.ENTITY_NODE = 6
-NodeService.PROCESSING_INSTRUCTION_NODE = 7
-NodeService.COMMENT_NODE = 8
-NodeService.DOCUMENT_NODE = 9
-NodeService.DOCUMENT_TYPE_NODE = 10
-NodeService.DOCUMENT_FRAGMENT_NODE = 11
-NodeService.NOTATION_NODE = 12
-NodeService.DOCUMENT_POSITION_DISCONNECTED = 1
-NodeService.DOCUMENT_POSITION_PRECEDING = 2
-NodeService.DOCUMENT_POSITION_FOLLOWING = 4
-NodeService.DOCUMENT_POSITION_CONTAINS = 8
-NodeService.DOCUMENT_POSITION_CONTAINED_BY = 16
-NodeService.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC = 32
-NodeService.nextNodeId = 1
+exports.NodeService = NodeService;
+NodeService.DEFAULT_NODE = 0;
+NodeService.ELEMENT_NODE = 1;
+NodeService.ATTRIBUTE_NODE = 2;
+NodeService.TEXT_NODE = 3;
+NodeService.CDATA_SECTION_NODE = 4;
+NodeService.ENTITY_REFERENCE_NODE = 5;
+NodeService.ENTITY_NODE = 6;
+NodeService.PROCESSING_INSTRUCTION_NODE = 7;
+NodeService.COMMENT_NODE = 8;
+NodeService.DOCUMENT_NODE = 9;
+NodeService.DOCUMENT_TYPE_NODE = 10;
+NodeService.DOCUMENT_FRAGMENT_NODE = 11;
+NodeService.NOTATION_NODE = 12;
+NodeService.DOCUMENT_POSITION_DISCONNECTED = 1;
+NodeService.DOCUMENT_POSITION_PRECEDING = 2;
+NodeService.DOCUMENT_POSITION_FOLLOWING = 4;
+NodeService.DOCUMENT_POSITION_CONTAINS = 8;
+NodeService.DOCUMENT_POSITION_CONTAINED_BY = 16;
+NodeService.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC = 32;
+NodeService.nextNodeId = 1;
 /**
  * Simulate the behaviour of the Text Class when there is no DOM available: the text in an element.
  */
@@ -565,58 +516,48 @@ class TextService extends NodeService {
   /**
    * @param data The text
    */
-  constructor (data = '') {
-    super()
-    this.nodeValue = String(data)
+  constructor(data = '') {
+    super();
+    this.nodeValue = String(data);
   }
-
-  get acceptsChildren () {
-    return false
+  get acceptsChildren() {
+    return false;
   }
-
-  get nodeName () {
-    return '#text'
+  get nodeName() {
+    return '#text';
   }
-
-  get nodeType () {
-    return NodeService.TEXT_NODE
+  get nodeType() {
+    return NodeService.TEXT_NODE;
   }
-
   /** The text */
-  get data () {
-    return this.nodeValue
+  get data() {
+    return this.nodeValue;
   }
-
-  set data (data) {
-    this.nodeValue = String(data)
+  set data(data) {
+    this.nodeValue = String(data);
   }
-
   /** How many characters there are */
-  get length () {
-    return this.data.length
+  get length() {
+    return this.data.length;
   }
-
-  get textContent () {
-    return this.data
+  get textContent() {
+    return this.data;
   }
-
-  set textContent (text) {
-    this.data = text === null ? '' : String(text)
+  set textContent(text) {
+    this.data = text === null ? '' : String(text);
   }
-
   /** The text of this node and of the text nodes next to it */
-  get wholeText () {
-    let first = this
+  get wholeText() {
+    let first = this;
     while (first.previousSibling && first.previousSibling.nodeType === NodeService.TEXT_NODE) {
-      first = first.previousSibling
+      first = first.previousSibling;
     }
-    let text = ''
+    let text = '';
     for (let current = first; current && current.nodeType === NodeService.TEXT_NODE; current = current.nextSibling) {
-      text += current.nodeValue
+      text += current.nodeValue;
     }
-    return text
+    return text;
   }
-
   /**
    * Break this text node in two at a position: this node keeps the text before it and a new node with the rest is put
    * after this one.
@@ -624,26 +565,25 @@ class TextService extends NodeService {
    * @returns The new node
    * @throws {Error} When the offset is beyond the end of the text
    */
-  splitText (offset) {
+  splitText(offset) {
     if (offset < 0 || offset > this.length) {
-      throw new Error('The offset is beyond the end of the text.')
+      throw new Error('The offset is beyond the end of the text.');
     }
-    const rest = new TextService(this.data.slice(offset))
-    rest.ownerDocumentStore = this.ownerDocumentStore
-    this.data = this.data.slice(0, offset)
+    const rest = new TextService(this.data.slice(offset));
+    rest.ownerDocumentStore = this.ownerDocumentStore;
+    this.data = this.data.slice(0, offset);
     if (this.parentNode) {
-      this.parentNode.insertBefore(rest, this.nextSibling)
+      this.parentNode.insertBefore(rest, this.nextSibling);
     }
-    return rest
+    return rest;
   }
-
-  cloneShallow () {
-    const copy = new TextService(this.data)
-    copy.ownerDocumentStore = this.ownerDocumentStore
-    return copy
+  cloneShallow() {
+    const copy = new TextService(this.data);
+    copy.ownerDocumentStore = this.ownerDocumentStore;
+    return copy;
   }
 }
-exports.TextService = TextService
+exports.TextService = TextService;
 /**
  * Simulate the behaviour of the Comment Class when there is no DOM available: a note in the markup which is not shown.
  */
@@ -651,49 +591,40 @@ class CommentService extends NodeService {
   /**
    * @param data The comment
    */
-  constructor (data = '') {
-    super()
-    this.nodeValue = String(data)
+  constructor(data = '') {
+    super();
+    this.nodeValue = String(data);
   }
-
-  get acceptsChildren () {
-    return false
+  get acceptsChildren() {
+    return false;
   }
-
-  get nodeName () {
-    return '#comment'
+  get nodeName() {
+    return '#comment';
   }
-
-  get nodeType () {
-    return NodeService.COMMENT_NODE
+  get nodeType() {
+    return NodeService.COMMENT_NODE;
   }
-
   /** The comment */
-  get data () {
-    return this.nodeValue
+  get data() {
+    return this.nodeValue;
   }
-
-  set data (data) {
-    this.nodeValue = String(data)
+  set data(data) {
+    this.nodeValue = String(data);
   }
-
   /** How many characters there are */
-  get length () {
-    return this.data.length
+  get length() {
+    return this.data.length;
   }
-
-  get textContent () {
-    return this.data
+  get textContent() {
+    return this.data;
   }
-
-  set textContent (text) {
-    this.data = text === null ? '' : String(text)
+  set textContent(text) {
+    this.data = text === null ? '' : String(text);
   }
-
-  cloneShallow () {
-    const copy = new CommentService(this.data)
-    copy.ownerDocumentStore = this.ownerDocumentStore
-    return copy
+  cloneShallow() {
+    const copy = new CommentService(this.data);
+    copy.ownerDocumentStore = this.ownerDocumentStore;
+    return copy;
   }
 }
-exports.CommentService = CommentService
+exports.CommentService = CommentService;

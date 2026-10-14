@@ -1,30 +1,30 @@
-'use strict'
+"use strict";
 
-require('core-js/modules/esnext.iterator.constructor.js')
-require('core-js/modules/esnext.iterator.filter.js')
-require('core-js/modules/esnext.iterator.for-each.js')
-require('core-js/modules/esnext.iterator.some.js')
-Object.defineProperty(exports, '__esModule', {
+require("core-js/modules/esnext.iterator.constructor.js");
+require("core-js/modules/esnext.iterator.filter.js");
+require("core-js/modules/esnext.iterator.for-each.js");
+require("core-js/modules/esnext.iterator.some.js");
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.cssSelectAdapter = void 0
+});
+exports.cssSelectAdapter = void 0;
 /**
  * The css-select Adapter which lets it query pseudo-dom's own tree, instead of the domutils-based tree it
  * defaults to.
  */
-const NodeService_1 = require('../services/NodeService')
+const NodeService_1 = require("../services/NodeService");
 /**
  * Walk up from a node (not including it) to find the nearest element, in the given direction.
  * @param node The node to start from
  * @param direction Which sibling reference to follow
  */
 const nearestElementSibling = (node, direction) => {
-  let current = node ? node[direction] : null
+  let current = node ? node[direction] : null;
   while (current && current.nodeType !== NodeService_1.NodeService.ELEMENT_NODE) {
-    current = current[direction]
+    current = current[direction];
   }
-  return current || null
-}
+  return current || null;
+};
 /**
  * Maps pseudo-dom's own Node / Element API onto the Adapter interface css-select needs to query a tree which is not
  * domutils' own (css-select's own Adapter<Node, ElementNode> type). Every method here is one pseudo-dom already has
@@ -37,8 +37,8 @@ exports.cssSelectAdapter = {
   // (there is no such special-cased attribute here, unlike a real DOM) - so the 'class' css-select needs for class
   // selectors is read from className instead.
   getAttributeValue: (elem, name) => {
-    const value = name === 'class' ? elem.className : elem.getAttribute(name)
-    return value === null || value === undefined ? undefined : value
+    const value = name === 'class' ? elem.className : elem.getAttribute(name);
+    return value === null || value === undefined ? undefined : value;
   },
   getChildren: node => Array.from(node.childNodes),
   getName: elem => elem.tagName,
@@ -50,33 +50,33 @@ exports.cssSelectAdapter = {
   hasAttrib: (elem, name) => elem.hasAttribute(name),
   removeSubsets: nodes => nodes.filter((node, index) => !nodes.some((other, otherIndex) => otherIndex !== index && typeof other.contains === 'function' && other !== node && other.contains(node))),
   findAll: (test, nodes) => {
-    const found = []
+    const found = [];
     const visit = list => list.forEach(node => {
       if (!exports.cssSelectAdapter.isTag(node)) {
-        return
+        return;
       }
       if (test(node)) {
-        found.push(node)
+        found.push(node);
       }
-      visit(exports.cssSelectAdapter.getChildren(node))
-    })
-    visit(nodes)
-    return found
+      visit(exports.cssSelectAdapter.getChildren(node));
+    });
+    visit(nodes);
+    return found;
   },
   findOne: (test, nodes) => {
     for (const node of nodes) {
       if (!exports.cssSelectAdapter.isTag(node)) {
-        continue
+        continue;
       }
       if (test(node)) {
-        return node
+        return node;
       }
-      const inChildren = exports.cssSelectAdapter.findOne(test, exports.cssSelectAdapter.getChildren(node))
+      const inChildren = exports.cssSelectAdapter.findOne(test, exports.cssSelectAdapter.getChildren(node));
       if (inChildren) {
-        return inChildren
+        return inChildren;
       }
     }
-    return null
+    return null;
   }
-}
-exports.default = exports.cssSelectAdapter
+};
+exports.default = exports.cssSelectAdapter;

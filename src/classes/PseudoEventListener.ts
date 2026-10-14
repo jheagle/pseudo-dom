@@ -13,6 +13,7 @@ class PseudoEventListener {
     once: false,
     passive: false
   }
+
   private eventType: string = ''
   private handler: Function
   private readonly originalCallback: Function

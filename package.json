@@ -1,7 +1,7 @@
 {
   "name": "pseudo-dom",
   "description": "Mock the DOM on the server side for managing state and testing",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
   "unpkg": "browser/pseudo-dom.min.js",
@@ -27,7 +27,7 @@
     "si-funciona": "^2.6.1"
   },
   "devDependencies": {
-    "js-build-tools": "^5.3.2",
+    "js-build-tools": "^6.1.0",
     "standard": "^17.1.2",
     "test-filesystem": "^1.5.1",
     "typedoc": "^0.28.20"

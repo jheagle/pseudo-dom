@@ -1,7 +1,5 @@
-import { NodeService, TextService, CommentService } from './NodeService'
-import { ElementService } from './ElementService'
+import { TextService, CommentService } from './NodeService'
 import { HTMLElementService } from './HTMLElementService'
-import { DocumentFragmentService } from './DocumentFragmentService'
 
 const el = (tagName, attributes = {}) => {
   const element = new HTMLElementService({ tagName })
