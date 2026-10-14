@@ -2761,7 +2761,7 @@ class ElementService extends NodeService_1.NodeService {
   }
 }
 exports.ElementService = ElementService;
-},{"../factories/createEvent":5,"../factories/query":14,"../factories/serializeHTML":15,"../functions/getParentNodesFromAttribute":19,"./AttrService":22,"./DOMTokenListService":25,"./HTMLCollectionService":32,"./NamedNodeMapService":37,"./NodeService":38,"./ShadowRootService":40,"core-js/modules/esnext.iterator.constructor.js":193,"core-js/modules/esnext.iterator.every.js":194,"core-js/modules/esnext.iterator.find.js":196,"core-js/modules/esnext.iterator.for-each.js":197,"core-js/modules/esnext.iterator.map.js":198,"core-js/modules/esnext.iterator.some.js":200,"core-js/modules/esnext.set.add-all.js":214,"core-js/modules/esnext.set.delete-all.js":215,"core-js/modules/esnext.set.difference.js":216,"core-js/modules/esnext.set.every.js":217,"core-js/modules/esnext.set.filter.js":218,"core-js/modules/esnext.set.find.js":219,"core-js/modules/esnext.set.intersection.js":220,"core-js/modules/esnext.set.is-disjoint-from.js":221,"core-js/modules/esnext.set.is-subset-of.js":222,"core-js/modules/esnext.set.is-superset-of.js":223,"core-js/modules/esnext.set.join.js":224,"core-js/modules/esnext.set.map.js":225,"core-js/modules/esnext.set.reduce.js":226,"core-js/modules/esnext.set.some.js":227,"core-js/modules/esnext.set.symmetric-difference.js":228,"core-js/modules/esnext.set.union.js":229,"si-funciona/dist/helpers/objects/cloneObject":263,"si-funciona/dist/helpers/objects/isEqual":265}],29:[function(require,module,exports){
+},{"../factories/createEvent":5,"../factories/query":14,"../factories/serializeHTML":15,"../functions/getParentNodesFromAttribute":19,"./AttrService":22,"./DOMTokenListService":25,"./HTMLCollectionService":32,"./NamedNodeMapService":37,"./NodeService":38,"./ShadowRootService":40,"core-js/modules/esnext.iterator.constructor.js":193,"core-js/modules/esnext.iterator.every.js":194,"core-js/modules/esnext.iterator.find.js":196,"core-js/modules/esnext.iterator.for-each.js":197,"core-js/modules/esnext.iterator.map.js":198,"core-js/modules/esnext.iterator.some.js":200,"core-js/modules/esnext.set.add-all.js":214,"core-js/modules/esnext.set.delete-all.js":215,"core-js/modules/esnext.set.difference.js":216,"core-js/modules/esnext.set.every.js":217,"core-js/modules/esnext.set.filter.js":218,"core-js/modules/esnext.set.find.js":219,"core-js/modules/esnext.set.intersection.js":220,"core-js/modules/esnext.set.is-disjoint-from.js":221,"core-js/modules/esnext.set.is-subset-of.js":222,"core-js/modules/esnext.set.is-superset-of.js":223,"core-js/modules/esnext.set.join.js":224,"core-js/modules/esnext.set.map.js":225,"core-js/modules/esnext.set.reduce.js":226,"core-js/modules/esnext.set.some.js":227,"core-js/modules/esnext.set.symmetric-difference.js":228,"core-js/modules/esnext.set.union.js":229,"si-funciona/dist/helpers/objects/cloneObject":262,"si-funciona/dist/helpers/objects/isEqual":264}],29:[function(require,module,exports){
 "use strict";
 
 /**
@@ -4776,7 +4776,7 @@ require('core-js/modules/esnext.iterator.reduce.js')
 class ArrayElement {
   /**
    * Create the new Element instance, provide the data and optionally configure the type of Element.
-   * @param {*} [data=null] The data to be stored in this element.
+   * @param data The data to be stored in this element.
    */
   constructor (data = null) {
     /** The class used to create this instance, so that it can be recognized as valid without an instanceof check. */
@@ -4788,9 +4788,8 @@ class ArrayElement {
 }
 /**
  * Make a new Element from the data given if it is not already a valid Element.
- * @param {ArrayElement|*} element Return a valid ArrayElement instance from given data, or even an already valid one.
- * @param {IsElement} [classType=ArrayElement] Provide the type of IsElement to use.
- * @return {ArrayElement}
+ * @param element Return a valid ArrayElement instance from given data, or even an already valid one.
+ * @param classType Provide the type of IsElement to use.
  */
 exports.ArrayElement = ArrayElement
 ArrayElement.make = (element, classType = ArrayElement) => {
@@ -4807,9 +4806,8 @@ ArrayElement.make = (element, classType = ArrayElement) => {
 }
 /**
  * Convert an array into Element instances, return the head and tail Elements.
- * @param {Array<IsElement>} [values=[]] Provide an array of data that will be converted to array of elements.
- * @param {IsElement} [classType=ArrayElement] Provide the type of IsElement to use.
- * @returns {{head: ArrayElement[], tail: ArrayElement}}
+ * @param values Provide an array of data that will be converted to array of elements.
+ * @param classType Provide the type of IsElement to use.
  */
 ArrayElement.fromArray = (values = [], classType = ArrayElement) => values.reduce((references, element) => {
   const newElement = classType.make(element, classType)
@@ -4839,10 +4837,7 @@ exports.Arrayable = void 0
 const _ArrayElement = require('./ArrayElement')
 const _ArrayIterator = require('../../recipes/ArrayIterator')
 /**
- * @file arrayable list.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.1.0
- * @memberOf module:collect-your-stuff
+ * arrayable list.
  */
 
 /**
@@ -4851,7 +4846,7 @@ const _ArrayIterator = require('../../recipes/ArrayIterator')
 class Arrayable {
   /**
    * Create the new Arrayable instance, configure the Arrayable class.
-   * @param {ArrayElement} [elementClass=ArrayElement] The class used to wrap given data as elements.
+   * @param elementClass The class used to wrap given data as elements.
    */
   constructor (elementClass = _ArrayElement.ArrayElement) {
     /** The class used to create this instance, so that it can be recognized as valid without an instanceof check. */
@@ -4865,8 +4860,7 @@ class Arrayable {
 
   /**
    * Find the position of an element which must be in this list.
-   * @param {ArrayElement} node The element to find
-   * @returns {number}
+   * @param node The element to find
    * @throws {Error} When the element is not in this list
    */
   indexOfElement (node) {
@@ -4879,8 +4873,7 @@ class Arrayable {
 
   /**
    * Initialize the inner list, should only run once.
-   * @param {Array<ArrayElement>} initialList Give the array of elements to start in this Arrayable.
-   * @return {Arrayable}
+   * @param initialList Give the array of elements to start in this Arrayable.
    */
   initialize (initialList) {
     if (this.initialized) {
@@ -4894,7 +4887,6 @@ class Arrayable {
 
   /**
    * Retrieve the innerList used (the list itself, not a copy).
-   * @returns {Array<ArrayElement>}
    */
   get list () {
     return this.innerList
@@ -4902,7 +4894,7 @@ class Arrayable {
 
   /**
    * Retrieve the first Element from the Arrayable
-   * @returns {ArrayElement|null} The first element, or null when the Arrayable is empty
+   * @returns The first element, or null when the Arrayable is empty
    */
   get first () {
     return this.length ? this.innerList[0] : null
@@ -4910,7 +4902,7 @@ class Arrayable {
 
   /**
    * Retrieve the last Element from the Arrayable
-   * @returns {ArrayElement|null} The last element, or null when the Arrayable is empty
+   * @returns The last element, or null when the Arrayable is empty
    */
   get last () {
     return this.length ? this.innerList[this.length - 1] : null
@@ -4918,7 +4910,6 @@ class Arrayable {
 
   /**
    * Return the length of the list.
-   * @returns {number}
    */
   get length () {
     return this.innerList.length
@@ -4926,9 +4917,8 @@ class Arrayable {
 
   /**
    * Insert a new node (or data) after a node.
-   * @param {ArrayElement|null} node The existing node as reference, or null to insert at the start of the list
-   * @param {ArrayElement|*} newNode The new node to go after the existing node
-   * @returns {Arrayable}
+   * @param node The existing node as reference, or null to insert at the start of the list
+   * @param newNode The new node to go after the existing node
    * @throws {Error} When the reference node is not in this list
    */
   insertAfter (node, newNode) {
@@ -4940,9 +4930,8 @@ class Arrayable {
 
   /**
    * Insert a new node (or data) before a node.
-   * @param {ArrayElement|null} node The existing node as reference, or null to insert at the end of the list
-   * @param {ArrayElement|*} newNode The new node to go before the existing node
-   * @returns {Arrayable}
+   * @param node The existing node as reference, or null to insert at the end of the list
+   * @param newNode The new node to go before the existing node
    * @throws {Error} When the reference node is not in this list
    */
   insertBefore (node, newNode) {
@@ -4954,9 +4943,8 @@ class Arrayable {
 
   /**
    * Add a node (or data) after the given (or last) node in the list.
-   * @param {ArrayElement|*} node The new node to add to the end of the list
-   * @param {ArrayElement} after The existing last node
-   * @returns {Arrayable}
+   * @param node The new node to add to the end of the list
+   * @param after The existing last node
    */
   append (node, after = this.last) {
     if (after === this.last) {
@@ -4969,9 +4957,8 @@ class Arrayable {
 
   /**
    * Add a node (or data) before the given (or first) node in the list.
-   * @param {ArrayElement|*} node The new node to add to the start of the list
-   * @param {ArrayElement} before The existing first node
-   * @returns {Arrayable}
+   * @param node The new node to add to the start of the list
+   * @param before The existing first node
    */
   prepend (node, before = this.first) {
     if (before === this.first) {
@@ -4984,8 +4971,8 @@ class Arrayable {
 
   /**
    * Remove an element from this arrayable.
-   * @param {ArrayElement} node The node we wish to remove (and it will be returned after removal)
-   * @return {ArrayElement|null} The removed node, or null when it was not in this list (nothing is removed)
+   * @param node The node we wish to remove (and it will be returned after removal)
+   * @returns The removed node, or null when it was not in this list (nothing is removed)
    */
   remove (node) {
     const deleteAt = this.innerList.indexOf(node)
@@ -4998,8 +4985,7 @@ class Arrayable {
 
   /**
    * Retrieve an ArrayElement item from this list by numeric index, otherwise return null.
-   * @param {number} index The integer number for retrieving a node by position.
-   * @return {ArrayElement|null}
+   * @param index The integer number for retrieving a node by position.
    */
   item (index) {
     if (index >= this.length) {
@@ -5021,9 +5007,8 @@ class Arrayable {
 
   /**
    * Be able to run forEach on this Arrayable to iterate over the elements.
-   * @param {forEachCallback} callback The function to call for-each element
-   * @param {Arrayable} thisArg Optional, 'this' reference
-   * @returns {Arrayable}
+   * @param callback The function to call for-each element
+   * @param thisArg Optional, 'this' reference
    */
   forEach (callback, thisArg = this) {
     for (let i = 0; i < thisArg.length; ++i) {
@@ -5034,7 +5019,6 @@ class Arrayable {
 
   /**
    * Be able to iterate over this class.
-   * @returns {Iterator}
    */
   [Symbol.iterator] () {
     const index = 0
@@ -5043,10 +5027,9 @@ class Arrayable {
 }
 /**
  * Convert an array to an Arrayable.
- * @param {Array} values An array of values which will be converted to elements in this arrayable
- * @param {IsElement} [elementClass=ArrayElement] The class to use for each element
- * @param {IsArrayable<ArrayElement>} [classType=Arrayable] Provide the type of IsArrayable to use.
- * @returns {Arrayable}
+ * @param values An array of values which will be converted to elements in this arrayable
+ * @param elementClass The class to use for each element
+ * @param classType Provide the type of IsArrayable to use.
  */
 exports.Arrayable = Arrayable
 Arrayable.fromArray = (values = [], elementClass = _ArrayElement.ArrayElement, classType = Arrayable) => {
@@ -5071,10 +5054,10 @@ const _Linker = require('../linked-list/Linker')
 class DoubleLinker {
   /**
    * Create the new DoubleLinker instance, provide the data and optionally the next and prev references.
-   * @param {Object} [nodeData={}] The settings for the new linker.
-   * @param {*} [nodeData.data=null] The data to be stored in this linker
-   * @param {DoubleLinker|null} [nodeData.next=null] The reference to the next linker if any
-   * @param {DoubleLinker|null} [nodeData.prev=null] The reference to the previous linker if any
+   * @param nodeData The settings for the new linker.
+   * @param nodeData.data The data to be stored in this linker
+   * @param nodeData.next The reference to the next linker if any
+   * @param nodeData.prev The reference to the previous linker if any
    */
   constructor ({
     data = null,
@@ -5096,9 +5079,8 @@ class DoubleLinker {
 }
 /**
  * Make a new DoubleLinker from the data given if it is not already a valid Linker.
- * @param {DoubleLinker|*} linker Return a valid Linker instance from given data, or even an already valid one.
- * @param {IsDoubleLinker} [classType=DoubleLinker] Provide the type of IsDoubleLinker to use.
- * @return {DoubleLinker}
+ * @param linker Return a valid Linker instance from given data, or even an already valid one.
+ * @param classType Provide the type of IsDoubleLinker to use.
  */
 exports.DoubleLinker = DoubleLinker
 DoubleLinker.make = (linker, classType = DoubleLinker) => {
@@ -5106,9 +5088,8 @@ DoubleLinker.make = (linker, classType = DoubleLinker) => {
 }
 /**
  * Convert an array into DoubleLinker instances, return the head and tail DoubleLinkers.
- * @param {Array} [values=[]] Provide an array of data that will be converted to a chain of linkers.
- * @param {IsDoubleLinker} [classType=DoubleLinker] Provide the type of IsDoubleLinker to use.
- * @returns {{head: DoubleLinker, tail: DoubleLinker}}
+ * @param values Provide an array of data that will be converted to a chain of linkers.
+ * @param classType Provide the type of IsDoubleLinker to use.
  */
 DoubleLinker.fromArray = (values = [], classType = DoubleLinker) => values.reduce((references, linker) => {
   const newLinker = classType.make(linker, classType)
@@ -5142,10 +5123,7 @@ const _DoubleLinker = require('./DoubleLinker')
 const _DoubleLinkerIterator = require('../../recipes/DoubleLinkerIterator')
 const _LinkedList = require('../linked-list/LinkedList')
 /**
- * @file doubly linked list.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.1.0
- * @memberOf module:collect-your-stuff
+ * doubly linked list.
  */
 
 /**
@@ -5155,7 +5133,7 @@ const _LinkedList = require('../linked-list/LinkedList')
 class DoublyLinkedList {
   /**
    * Create the new DoublyLinkedList instance.
-   * @param {DoubleLinker} [linkerClass=DoubleLinker] The class used to wrap given data as linkers.
+   * @param linkerClass The class used to wrap given data as linkers.
    */
   constructor (linkerClass = _DoubleLinker.DoubleLinker) {
     /** The class used to create this instance, so that it can be recognized as valid without an instanceof check. */
@@ -5173,8 +5151,7 @@ class DoublyLinkedList {
 
   /**
    * Initialize the inner list, should only run once.
-   * @param {DoubleLinker} initialList Give the list of double-linkers to start in this doubly linked-list.
-   * @return {DoublyLinkedList}
+   * @param initialList Give the list of double-linkers to start in this doubly linked-list.
    */
   initialize (initialList) {
     // Borrowed from LinkedList, which types its return as a LinkedList although it returns whatever list called it
@@ -5183,7 +5160,6 @@ class DoublyLinkedList {
 
   /**
    * Retrieve the innerList used (the list itself, not a copy).
-   * @returns {DoubleLinker}
    */
   get list () {
     return this.innerList
@@ -5191,7 +5167,6 @@ class DoublyLinkedList {
 
   /**
    * Retrieve the first DoubleLinker in the list.
-   * @returns {DoubleLinker}
    */
   get first () {
     let head = this.innerList
@@ -5208,7 +5183,6 @@ class DoublyLinkedList {
 
   /**
    * Retrieve the last DoubleLinker in the list. The end is remembered, so this does not walk the list.
-   * @returns {DoubleLinker}
    */
   get last () {
     if (this.innerList === null) {
@@ -5226,7 +5200,6 @@ class DoublyLinkedList {
   /**
    * Return the length of the list. It is kept up to date by the list's own methods, so this does not walk the list
    * (call reset() after linkers were changed directly).
-   * @returns {number}
    */
   get length () {
     if (this.countCache === null) {
@@ -5237,9 +5210,8 @@ class DoublyLinkedList {
 
   /**
    * Insert a new node (or data) after a node.
-   * @param {DoubleLinker|*} node The existing node as reference (which must be in this list, this is not checked), or null to insert at the start of the list
-   * @param {DoubleLinker|*} newNode The new node to go after the existing node
-   * @returns {DoublyLinkedList}
+   * @param node The existing node as reference (which must be in this list, this is not checked), or null to insert at the start of the list
+   * @param newNode The new node to go after the existing node
    */
   insertAfter (node, newNode) {
     newNode = this.linkerClass.make(newNode, this.linkerClass)
@@ -5276,9 +5248,8 @@ class DoublyLinkedList {
 
   /**
    * Insert a new node (or data) before a node.
-   * @param {DoubleLinker|*} node The existing node as reference (which must be in this list, this is not checked), or null to insert at the end of the list
-   * @param {DoubleLinker|*} newNode The new node to go before the existing node
-   * @returns {DoublyLinkedList}
+   * @param node The existing node as reference (which must be in this list, this is not checked), or null to insert at the end of the list
+   * @param newNode The new node to go before the existing node
    */
   insertBefore (node, newNode) {
     newNode = this.linkerClass.make(newNode, this.linkerClass)
@@ -5315,9 +5286,8 @@ class DoublyLinkedList {
 
   /**
    * Add a node (or data) after the given (or last) node in the list.
-   * @param {DoubleLinker|*} node The new node to add to the end of the list
-   * @param {DoubleLinker} after The existing last node
-   * @returns {DoubleLinker}
+   * @param node The new node to add to the end of the list
+   * @param after The existing last node
    */
   append (node, after = this.last) {
     return this.insertAfter(after, node)
@@ -5325,9 +5295,8 @@ class DoublyLinkedList {
 
   /**
    * Add a node (or data) before the given (or first) node in the list.
-   * @param {DoubleLinker|*} node The new node to add to the start of the list
-   * @param {DoubleLinker} before The existing first node
-   * @returns {DoubleLinker}
+   * @param node The new node to add to the start of the list
+   * @param before The existing first node
    */
   prepend (node, before = this.first) {
     return this.insertBefore(before, node)
@@ -5335,8 +5304,7 @@ class DoublyLinkedList {
 
   /**
    * Remove a linker from this linked list.
-   * @param {DoubleLinker} node The node we wish to remove (and it will be returned after removal)
-   * @return {DoubleLinker}
+   * @param node The node we wish to remove (and it will be returned after removal)
    */
   remove (node) {
     if (node === null || typeof node === 'undefined') {
@@ -5370,7 +5338,6 @@ class DoublyLinkedList {
   /**
    * Refresh all references (the head, the end and the length) by walking the list once, and return the head. The list's
    * own methods keep these up to date, so this is only needed after linkers were changed directly.
-   * @return {DoubleLinker|null}
    */
   reset () {
     // Start at the pointer for the list
@@ -5401,8 +5368,7 @@ class DoublyLinkedList {
 
   /**
    * Retrieve a DoubleLinker item from this list by numeric index, otherwise return null.
-   * @param {number} index The integer number for retrieving a node by position.
-   * @returns {DoubleLinker|null}
+   * @param index The integer number for retrieving a node by position.
    */
   item (index) {
     if (index >= 0) {
@@ -5429,9 +5395,9 @@ class DoublyLinkedList {
 
   /**
    * Be able to run forEach on this DoublyLinkedList to iterate over the DoubleLinker Items.
-   * @param {forEachCallback} callback The function to call for-each double linker
-   * @param {DoublyLinkedList} thisArg Optional, 'this' reference
-   * @return {DoublyLinkedList} The list which was iterated.
+   * @param callback The function to call for-each double linker
+   * @param thisArg Optional, 'this' reference
+   * @returns The list which was iterated.
    */
   forEach (callback, thisArg = this) {
     return _LinkedList.LinkedList.prototype.forEach.call(this, callback, thisArg)
@@ -5439,7 +5405,6 @@ class DoublyLinkedList {
 
   /**
    * Be able to iterate over this class.
-   * @returns {Iterator}
    */
   [Symbol.iterator] () {
     const current = this.first
@@ -5448,10 +5413,9 @@ class DoublyLinkedList {
 }
 /**
  * Convert an array into a DoublyLinkedList instance, return the new instance.
- * @param {Array} [values=[]] An array of values which will be converted to linkers in this doubly-linked-list
- * @param {IsDoubleLinker} [linkerClass=DoubleLinker] The class to use for each linker
- * @param {IsArrayable<IsDoubleLinker>} [classType=LinkedList] Provide the type of IsArrayable to use.
- * @returns {DoublyLinkedList}
+ * @param values An array of values which will be converted to linkers in this doubly-linked-list
+ * @param linkerClass The class to use for each linker
+ * @param classType Provide the type of IsArrayable to use.
  */
 exports.DoublyLinkedList = DoublyLinkedList
 DoublyLinkedList.fromArray = (values = [], linkerClass = _DoubleLinker.DoubleLinker, classType = DoublyLinkedList) => {
@@ -5475,7 +5439,7 @@ const _Arrayable = require('../arrayable/Arrayable')
 class LinkedList {
   /**
    * Create the new LinkedList instance.
-   * @param {Linker} [linkerClass=Linker] The class used to wrap given data as linkers.
+   * @param linkerClass The class used to wrap given data as linkers.
    */
   constructor (linkerClass = _Linker.Linker) {
     /** The class used to create this instance, so that it can be recognized as valid without an instanceof check. */
@@ -5493,8 +5457,7 @@ class LinkedList {
 
   /**
    * Initialize the inner list, should only run once.
-   * @param {Linker|Array} initialList Give the list of linkers to start in this linked-list.
-   * @return {LinkedList}
+   * @param initialList Give the list of linkers to start in this linked-list.
    */
   initialize (initialList) {
     // Borrowed from Arrayable, which types its return as an Arrayable although it returns whatever list called it
@@ -5503,7 +5466,6 @@ class LinkedList {
 
   /**
    * Retrieve the innerList used (the list itself, not a copy).
-   * @returns {Linker}
    */
   get list () {
     return this.innerList
@@ -5511,7 +5473,6 @@ class LinkedList {
 
   /**
    * Retrieve the first Linker in the list.
-   * @returns {Linker}
    */
   get first () {
     return this.innerList
@@ -5519,7 +5480,6 @@ class LinkedList {
 
   /**
    * Retrieve the last Linker in the list. The end is remembered, so this does not walk the list.
-   * @returns {Linker}
    */
   get last () {
     if (this.innerList === null) {
@@ -5537,7 +5497,6 @@ class LinkedList {
   /**
    * Return the length of the list. It is kept up to date by the list's own methods, so this does not walk the list
    * (call reset() after linkers were changed directly).
-   * @returns {number}
    */
   get length () {
     if (this.countCache === null) {
@@ -5548,9 +5507,8 @@ class LinkedList {
 
   /**
    * Insert a new node (or data) after a node.
-   * @param {Linker|*} node The existing node as reference, or null to insert at the start of the list
-   * @param {Linker|*} newNode The new node to go after the existing node
-   * @returns {LinkedList}
+   * @param node The existing node as reference, or null to insert at the start of the list
+   * @param newNode The new node to go after the existing node
    */
   insertAfter (node, newNode) {
     newNode = this.linkerClass.make(newNode, this.linkerClass)
@@ -5576,9 +5534,8 @@ class LinkedList {
 
   /**
    * Insert a new node (or data) before a node.
-   * @param {Linker|*} node The existing node as reference, or null to insert at the end of the list
-   * @param {Linker|*} newNode The new node to go before the existing node
-   * @returns {LinkedList}
+   * @param node The existing node as reference, or null to insert at the end of the list
+   * @param newNode The new node to go before the existing node
    * @throws {Error} When the reference node is not in this list
    */
   insertBefore (node, newNode) {
@@ -5618,9 +5575,8 @@ class LinkedList {
 
   /**
    * Add a node (or data) after the given (or last) node in the list.
-   * @param {Linker|*} node The new node to add to the end of the list
-   * @param {Linker} after The existing last node
-   * @returns {Linker}
+   * @param node The new node to add to the end of the list
+   * @param after The existing last node
    */
   append (node, after = this.last) {
     return this.insertAfter(after, node)
@@ -5628,9 +5584,8 @@ class LinkedList {
 
   /**
    * Add a node (or data) before the given (or first) node in the list.
-   * @param {Linker|*} node The new node to add to the start of the list
-   * @param {Linker} before The existing first node
-   * @returns {Linker}
+   * @param node The new node to add to the start of the list
+   * @param before The existing first node
    */
   prepend (node, before = this.first) {
     return this.insertBefore(before, node)
@@ -5638,8 +5593,8 @@ class LinkedList {
 
   /**
    * Remove a linker from this linked list.
-   * @param {Linker} node The node we wish to remove (and it will be returned after removal)
-   * @return {Linker|null} The removed node, or null when it was not in this list (nothing is removed)
+   * @param node The node we wish to remove (and it will be returned after removal)
+   * @returns The removed node, or null when it was not in this list (nothing is removed)
    */
   remove (node) {
     if (node === null || typeof node === 'undefined') {
@@ -5675,7 +5630,7 @@ class LinkedList {
   /**
    * Refresh the remembered end and length of the list by walking it once. The list's own methods keep these up to date,
    * so this is only needed after linkers were changed directly (for example by setting next on a linker).
-   * @return {Linker|null} The first linker of the list
+   * @returns The first linker of the list
    */
   reset () {
     let count = 0
@@ -5693,8 +5648,7 @@ class LinkedList {
 
   /**
    * Retrieve a Linker item from this list by numeric index, otherwise return null.
-   * @param {number} index The integer number for retrieving a node by position.
-   * @returns {Linker|null}
+   * @param index The integer number for retrieving a node by position.
    */
   item (index) {
     if (index >= 0) {
@@ -5720,9 +5674,8 @@ class LinkedList {
 
   /**
    * Be able to run forEach on this LinkedList to iterate over the linkers.
-   * @param {forEachCallback} callback The function to call for-each linker
-   * @param {LinkedList} thisArg Optional, 'this' reference
-   * @returns {LinkedList}
+   * @param callback The function to call for-each linker
+   * @param thisArg Optional, 'this' reference
    */
   forEach (callback, thisArg = this) {
     let index = 0
@@ -5737,7 +5690,6 @@ class LinkedList {
 
   /**
    * Be able to iterate over this class.
-   * @returns {Iterator}
    */
   [Symbol.iterator] () {
     return new _LinkerIterator.LinkerIterator(this.first)
@@ -5745,10 +5697,9 @@ class LinkedList {
 }
 /**
  * Convert an array to a LinkedList.
- * @param {Array} values An array of values which will be converted to linkers in this linked-list
- * @param {IsLinker} linkerClass The class to use for each linker
- * @param {IsArrayable<Linker>} [classType=LinkedList] Provide the type of IsArrayable to use.
- * @returns {LinkedList}
+ * @param values An array of values which will be converted to linkers in this linked-list
+ * @param linkerClass The class to use for each linker
+ * @param classType Provide the type of IsArrayable to use.
  */
 exports.LinkedList = LinkedList
 LinkedList.fromArray = (values = [], linkerClass = _Linker.Linker, classType = LinkedList) => {
@@ -5773,9 +5724,9 @@ const _ArrayElement = require('../arrayable/ArrayElement')
 class Linker {
   /**
    * Create the new Linker instance, provide the data and optionally give the next Linker.
-   * @param {Object} [nodeData={}] The settings for the new linker.
-   * @param {*} [nodeData.data=null] The data to be stored in this linker
-   * @param {Linker|null} [nodeData.next=null] The reference to the next linker if any
+   * @param nodeData The settings for the new linker.
+   * @param nodeData.data The data to be stored in this linker
+   * @param nodeData.next The reference to the next linker if any
    */
   constructor ({
     data = null,
@@ -5793,9 +5744,8 @@ class Linker {
 }
 /**
  * Make a new Linker from the data given if it is not already a valid Linker.
- * @param {Linker|*} linker Return a valid Linker instance from given data, or even an already valid one.
- * @param {IsLinker} [classType=Linker] Provide the type of IsLinker to use.
- * @return {Linker}
+ * @param linker Return a valid Linker instance from given data, or even an already valid one.
+ * @param classType Provide the type of IsLinker to use.
  */
 exports.Linker = Linker
 Linker.make = (linker, classType = Linker) => {
@@ -5820,9 +5770,8 @@ Linker.make = (linker, classType = Linker) => {
 }
 /**
  * Convert an array into Linker instances, return the head and tail Linkers.
- * @param {Array} [values=[]] Provide an array of data that will be converted to a chain of linkers.
- * @param {IsLinker} [classType=Linker] Provide the type of IsLinker to use.
- * @returns {{head: Linker, tail: Linker}}
+ * @param values Provide an array of data that will be converted to a chain of linkers.
+ * @param classType Provide the type of IsLinker to use.
  */
 Linker.fromArray = (values = [], classType = Linker) => values.reduce((references, linker) => {
   const newLinker = classType.make(linker, classType)
@@ -5855,17 +5804,13 @@ const _TreeLinker = require('./TreeLinker')
 const _TreeLinkerIterator = require('../../recipes/TreeLinkerIterator')
 const _DoublyLinkedList = require('../doubly-linked-list/DoublyLinkedList')
 /**
- * @file doubly linked tree list.
- * @author Joshua Heagle <joshuaheagle@gmail.com>
- * @version 1.1.0
- * @memberOf module:collect-your-stuff
+ * doubly linked tree list.
  */
 
 /**
  * Use one of the accessors of DoublyLinkedList (which keeps track of the head, tail and length) for a LinkedTreeList.
- * @param {string} name The accessor to use
- * @param {LinkedTreeList} list The list to use it on
- * @returns {*}
+ * @param name The accessor to use
+ * @param list The list to use it on
  */
 const borrowedGetter = (name, list) => Object.getOwnPropertyDescriptor(_DoublyLinkedList.DoublyLinkedList.prototype, name).get.call(list)
 /**
@@ -5875,7 +5820,7 @@ const borrowedGetter = (name, list) => Object.getOwnPropertyDescriptor(_DoublyLi
 class LinkedTreeList {
   /**
    * Create the new LinkedTreeList instance, configure the list class.
-   * @param {TreeLinker} [linkerClass=TreeLinker] The class used to wrap given data as tree linkers.
+   * @param linkerClass The class used to wrap given data as tree linkers.
    */
   constructor (linkerClass = _TreeLinker.TreeLinker) {
     /** The class used to create this instance, so that it can be recognized as valid without an instanceof check. */
@@ -5895,8 +5840,7 @@ class LinkedTreeList {
 
   /**
    * Initialize the inner list, should only run once.
-   * @param {TreeLinker} initialList Give the list of tree-linkers to start in this linked-tree-list.
-   * @return {LinkedTreeList}
+   * @param initialList Give the list of tree-linkers to start in this linked-tree-list.
    */
   initialize (initialList) {
     if (this.initialized) {
@@ -5910,7 +5854,6 @@ class LinkedTreeList {
 
   /**
    * Retrieve the innerList used (the list itself, not a copy).
-   * @returns {TreeLinker}
    */
   get list () {
     return this.innerList
@@ -5918,7 +5861,6 @@ class LinkedTreeList {
 
   /**
    * Retrieve the first TreeLinker in the list.
-   * @returns {TreeLinker}
    */
   get first () {
     return borrowedGetter('first', this)
@@ -5926,7 +5868,6 @@ class LinkedTreeList {
 
   /**
    * Retrieve the last TreeLinker in the list. The end is remembered, so this does not walk the list.
-   * @returns {TreeLinker}
    */
   get last () {
     return borrowedGetter('last', this)
@@ -5935,7 +5876,6 @@ class LinkedTreeList {
   /**
    * Return the length of the list. It is kept up to date by the list's own methods, so this does not walk the list
    * (call reset() after linkers were changed directly).
-   * @returns {number}
    */
   get length () {
     return borrowedGetter('length', this)
@@ -5944,7 +5884,6 @@ class LinkedTreeList {
   /**
    * Get the parent of this tree list: the node these linkers are the children of (remembered even while the list is
    * empty), or null for the linkers at the top of a tree.
-   * @return {TreeLinker|null}
    */
   get parent () {
     if (this.ownerNode !== undefined) {
@@ -5957,7 +5896,7 @@ class LinkedTreeList {
   /**
    * Set the parent of this tree list: every linker in it gets the node as its parent, and the node gets this list as its
    * children. Linkers added to the list later get this parent too.
-   * @param {TreeLinker|null} parent The new node to use as the parent for this group of children
+   * @param parent The new node to use as the parent for this group of children
    */
   set parent (parent) {
     this.ownerNode = parent
@@ -5973,7 +5912,6 @@ class LinkedTreeList {
 
   /**
    * Return the root parent of the entire tree.
-   * @return {TreeLinker}
    */
   get rootParent () {
     let current = this.first
@@ -5990,8 +5928,8 @@ class LinkedTreeList {
 
   /**
    * Set the children on a parent item.
-   * @param {TreeLinker} item The TreeLinker node (one of the linkers of this list) that will be the parent of the children
-   * @param {LinkedTreeList|null} [children=null] The LinkedTreeList which has the child nodes to use, or null to remove the children of the item
+   * @param item The TreeLinker node (one of the linkers of this list) that will be the parent of the children
+   * @param children The LinkedTreeList which has the child nodes to use, or null to remove the children of the item
    * @throws {Error} When the item is not one of the linkers of this list
    */
   setChildren (item, children = null) {
@@ -6014,8 +5952,7 @@ class LinkedTreeList {
 
   /**
    * Make a linker of the given node (or data) and make this list's parent its parent.
-   * @param {TreeLinker|*} newNode The node (or data) which is being added to this list
-   * @returns {TreeLinker}
+   * @param newNode The node (or data) which is being added to this list
    */
   adopt (newNode) {
     const linker = this.linkerClass.make(newNode, this.linkerClass)
@@ -6025,9 +5962,8 @@ class LinkedTreeList {
 
   /**
    * Insert a new node (or data) after a node. The new node gets the parent of this list.
-   * @param {TreeLinker|*} node The existing node as reference, or null to insert at the start of the list
-   * @param {TreeLinker|*} newNode The new node to go after the existing node
-   * @returns {LinkedTreeList}
+   * @param node The existing node as reference, or null to insert at the start of the list
+   * @param newNode The new node to go after the existing node
    */
   insertAfter (node, newNode) {
     return _DoublyLinkedList.DoublyLinkedList.prototype.insertAfter.call(this, node, this.adopt(newNode))
@@ -6035,9 +5971,8 @@ class LinkedTreeList {
 
   /**
    * Insert a new node (or data) before a node. The new node gets the parent of this list.
-   * @param {TreeLinker|*} node The existing node as reference, or null to insert at the end of the list
-   * @param {TreeLinker|*} newNode The new node to go before the existing node
-   * @returns {LinkedTreeList}
+   * @param node The existing node as reference, or null to insert at the end of the list
+   * @param newNode The new node to go before the existing node
    */
   insertBefore (node, newNode) {
     return _DoublyLinkedList.DoublyLinkedList.prototype.insertBefore.call(this, node, this.adopt(newNode))
@@ -6045,9 +5980,8 @@ class LinkedTreeList {
 
   /**
    * Add a node (or data) after the given (or last) node in the list.
-   * @param {TreeLinker|*} node The new node to add to the end of the list
-   * @param {TreeLinker} after The existing last node
-   * @returns {TreeLinker}
+   * @param node The new node to add to the end of the list
+   * @param after The existing last node
    */
   append (node, after = this.last) {
     return _DoublyLinkedList.DoublyLinkedList.prototype.append.call(this, node, after)
@@ -6055,9 +5989,8 @@ class LinkedTreeList {
 
   /**
    * Add a node (or data) before the given (or first) node in the list.
-   * @param {TreeLinker|*} node The new node to add to the start of the list
-   * @param {TreeLinker} before The existing first node
-   * @returns {TreeLinker}
+   * @param node The new node to add to the start of the list
+   * @param before The existing first node
    */
   prepend (node, before = this.first) {
     return _DoublyLinkedList.DoublyLinkedList.prototype.prepend.call(this, node, before)
@@ -6065,8 +5998,8 @@ class LinkedTreeList {
 
   /**
    * Remove a linker from this linked list. The removed node no longer has a parent.
-   * @param {TreeLinker} node The node we wish to remove (and it will be returned after removal)
-   * @return {TreeLinker|null} The removed node, or null when there was nothing to remove
+   * @param node The node we wish to remove (and it will be returned after removal)
+   * @returns The removed node, or null when there was nothing to remove
    */
   remove (node) {
     const owner = this.parent
@@ -6082,7 +6015,6 @@ class LinkedTreeList {
   /**
    * Refresh all references (the head, the end and the length) by walking the list once, and return the head. The
    * list's own methods keep these up to date, so this is only needed after linkers were changed directly.
-   * @return {TreeLinker}
    */
   reset () {
     return _DoublyLinkedList.DoublyLinkedList.prototype.reset.call(this)
@@ -6090,8 +6022,7 @@ class LinkedTreeList {
 
   /**
    * Retrieve a TreeLinker item from this list by numeric index, otherwise return null.
-   * @param {number} index The integer number for retrieving a node by position.
-   * @returns {TreeLinker|null}
+   * @param index The integer number for retrieving a node by position.
    */
   item (index) {
     return _DoublyLinkedList.DoublyLinkedList.prototype.item.call(this, index)
@@ -6099,9 +6030,9 @@ class LinkedTreeList {
 
   /**
    * Be able to run forEach on this LinkedTreeList to iterate over the TreeLinker Items.
-   * @param {forEachCallback} callback The function to call for-each tree node
-   * @param {LinkedTreeList} thisArg Optional, 'this' reference
-   * @return {LinkedTreeList} The list which was iterated.
+   * @param callback The function to call for-each tree node
+   * @param thisArg Optional, 'this' reference
+   * @returns The list which was iterated.
    */
   forEach (callback, thisArg = this) {
     let index = 0
@@ -6117,7 +6048,6 @@ class LinkedTreeList {
   /**
    * Be able to iterate over this class: the linkers of this list and everything below them (left-first). It stays within
    * this list (it does not start at, or climb up to, the parents), use the parseTree service to parse a whole tree.
-   * @returns {Iterator}
    */
   [Symbol.iterator] () {
     // The linkers of this list and everything below them, left-first. It stays within this list: it does not start at,
@@ -6127,10 +6057,9 @@ class LinkedTreeList {
 }
 /**
  * Convert an array into a LinkedTreeList instance, return the new instance.
- * @param {Array} [values=[]] An array of values which will be converted to nodes in this tree-list
- * @param {TreeLinker} [linkerClass=TreeLinker] The class to use for each node
- * @param {IsArrayable<TreeLinker>} [classType=LinkedTreeList] Provide the type of IsArrayable to use.
- * @returns {LinkedTreeList}
+ * @param values An array of values which will be converted to nodes in this tree-list
+ * @param linkerClass The class to use for each node
+ * @param classType Provide the type of IsArrayable to use.
  */
 exports.LinkedTreeList = LinkedTreeList
 LinkedTreeList.fromArray = (values = [], linkerClass = _TreeLinker.TreeLinker, classType = LinkedTreeList) => {
@@ -6156,13 +6085,13 @@ const _LinkedTreeList = require('./LinkedTreeList')
 class TreeLinker {
   /**
    * Create the new TreeLinker instance, provide the data and optionally set references for next, prev, parent, or children.
-   * @param {Object} [settings={}] The settings for the new tree node.
-   * @param {*} [settings.data=null] The data to be stored in this tree node
-   * @param {TreeLinker} [settings.next=null] The reference to the next linker if any
-   * @param {TreeLinker} [settings.prev=null] The reference to the previous linker if any
-   * @param {LinkedTreeList} [settings.children=null] The references to child linkers if any
-   * @param {TreeLinker} [settings.parent=null] The reference to a parent linker if any
-   * @param {IsArrayable<IsTreeNode>} listClass Give the type of list to use for storing the children
+   * @param settings The settings for the new tree node.
+   * @param settings.data The data to be stored in this tree node
+   * @param settings.next The reference to the next linker if any
+   * @param settings.prev The reference to the previous linker if any
+   * @param settings.children The references to child linkers if any
+   * @param settings.parent The reference to a parent linker if any
+   * @param listClass Give the type of list to use for storing the children
    */
   constructor ({
     data = null,
@@ -6195,9 +6124,8 @@ class TreeLinker {
    * Create the children for this tree from an array. Each child becomes a tree linker with this node as its parent: an
    * existing linker is kept as it is, an object with a data property gives the settings of the linker, and anything
    * else is the data of the linker.
-   * @param {Array|null} children Provide an array of data / linker references to be children of this tree node.
-   * @param {IsArrayable<IsTreeNode>} listClass Give the type of list to use for storing the children
-   * @return {LinkedTreeList|null}
+   * @param children Provide an array of data / linker references to be children of this tree node.
+   * @param listClass Give the type of list to use for storing the children
    */
   childrenFromArray (children = null, listClass = _LinkedTreeList.LinkedTreeList) {
     if (children === null) {
@@ -6218,9 +6146,8 @@ class TreeLinker {
 }
 /**
  * Make a new DoubleLinker from the data given if it is not already a valid Linker.
- * @param {TreeLinker|*} linker Return a valid TreeLinker instance from given data, or even an already valid one.
- * @param {IsTreeNode} [classType=TreeLinker] Provide the type of IsTreeNode to use.
- * @return {TreeLinker}
+ * @param linker Return a valid TreeLinker instance from given data, or even an already valid one.
+ * @param classType Provide the type of IsTreeNode to use.
  */
 exports.TreeLinker = TreeLinker
 TreeLinker.make = (linker, classType = TreeLinker) => {
@@ -6228,9 +6155,8 @@ TreeLinker.make = (linker, classType = TreeLinker) => {
 }
 /**
  * Convert an array into DoubleLinker instances, return the head and tail DoubleLinkers.
- * @param {Array} [values=[]] Provide an array of data that will be converted to a chain of tree-linkers.
- * @param {IsTreeNode} [classType=TreeLinker] Provide the type of IsTreeNode to use.
- * @returns {{head: TreeLinker, tail: TreeLinker}}
+ * @param values Provide an array of data that will be converted to a chain of tree-linkers.
+ * @param classType Provide the type of IsTreeNode to use.
  */
 TreeLinker.fromArray = (values = [], classType = TreeLinker) => _DoubleLinker.DoubleLinker.fromArray(values, classType)
 
@@ -6247,8 +6173,8 @@ exports.ArrayIterator = void 0
 class ArrayIterator {
   /**
    * Create an iterator over the given array.
-   * @param {Array<IsElement>} innerList The elements to iterate over.
-   * @param {number} [index=0] The position to start from.
+   * @param innerList The elements to iterate over.
+   * @param index The position to start from.
    */
   constructor (innerList, index = 0) {
     this.innerList = innerList
@@ -6257,8 +6183,8 @@ class ArrayIterator {
 
   /**
    * Get the next element, moving the iterator forward.
-   * @param {*} [value] Not used, present to match the Iterator interface.
-   * @return {IteratorResult<IsElement>} The next element, or done when there are no more.
+   * @param value Not used, present to match the Iterator interface.
+   * @returns The next element, or done when there are no more.
    */
   next (value) {
     if (this.index < this.innerList.length) {
@@ -6288,7 +6214,7 @@ exports.DoubleLinkerIterator = void 0
 class DoubleLinkerIterator {
   /**
    * Create an iterator starting at the given item.
-   * @param {IsDoubleLinker} current The item to start from.
+   * @param current The item to start from.
    */
   constructor (current) {
     this.current = current
@@ -6296,8 +6222,8 @@ class DoubleLinkerIterator {
 
   /**
    * Get the current item and move on to the following one.
-   * @param {*} [value] Not used, present to match the Iterator interface.
-   * @return {IteratorResult<IsDoubleLinker>} The current item, or done when there are no more.
+   * @param value Not used, present to match the Iterator interface.
+   * @returns The current item, or done when there are no more.
    */
   next (value) {
     const result = {
@@ -6323,7 +6249,7 @@ exports.LinkerIterator = void 0
 class LinkerIterator {
   /**
    * Create an iterator starting at the given item.
-   * @param {IsLinker} current The item to start from.
+   * @param current The item to start from.
    */
   constructor (current) {
     this.current = current
@@ -6331,8 +6257,8 @@ class LinkerIterator {
 
   /**
    * Get the current item and move on to the following one.
-   * @param {*} [value] Not used, present to match the Iterator interface.
-   * @return {IteratorResult<IsLinker>} The current item, or done when there are no more.
+   * @param value Not used, present to match the Iterator interface.
+   * @returns The current item, or done when there are no more.
    */
   next (value) {
     const result = {
@@ -6359,8 +6285,8 @@ const _parseTreeNext = require('../services/parseTreeNext')
 class TreeLinkerIterator {
   /**
    * Create an iterator starting at the given item.
-   * @param {IsTreeNode} current The item to start from.
-   * @param {IsTreeNode|null} [boundaryParent] The parent of the nodes to stay within (null for the top of a tree), the whole tree when not given.
+   * @param current The item to start from.
+   * @param boundaryParent The parent of the nodes to stay within (null for the top of a tree), the whole tree when not given.
    */
   constructor (current, boundaryParent) {
     this.current = current
@@ -6369,8 +6295,8 @@ class TreeLinkerIterator {
 
   /**
    * Get the current item and move on to the following one (left-first, down each branch).
-   * @param {*} [value] Not used, present to match the Iterator interface.
-   * @return {IteratorResult<IsTreeNode>} The current item, or done when there are no more.
+   * @param value Not used, present to match the Iterator interface.
+   * @returns The current item, or done when there are no more.
    */
   next (value) {
     const result = {
@@ -6401,9 +6327,8 @@ exports.parseTreeNext = void 0
  * 7. Stop at root (next is null and parent is null
  * A boundary can be given to parse only part of a tree: going back up to the parents stops at the boundary, so the
  * parsing stays within the nodes whose parent is the boundary (and everything below them).
- * @param {IsTreeNode} treeNode Provide a node in a tree and get the next node (left-first approach)
- * @param {IsTreeNode|null} [boundaryParent] The parent of the nodes to stay within, null for the nodes at the top of a tree. When it is not given the whole tree is parsed.
- * @returns {IsTreeNode|null}
+ * @param treeNode Provide a node in a tree and get the next node (left-first approach)
+ * @param boundaryParent The parent of the nodes to stay within, null for the nodes at the top of a tree. When it is not given the whole tree is parsed.
  */
 const parseTreeNext = (treeNode, boundaryParent) => {
   if (!treeNode) {
@@ -14701,78 +14626,36 @@ process.chdir = function (dir) {
 process.umask = function() { return 0; };
 
 },{}],261:[function(require,module,exports){
-'use strict'
+"use strict";
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.default = void 0
+});
+exports.default = void 0;
 /**
  * Given a function, call with the correct number of parameters from an array of possible parameters.
- * @memberOf module:functionHelpers
- * @param {Function} fn - The function to be called
- * @param {Array} params - Array of possible function parameters
- * @param {number} [minimum=2] - Minimum number of parameters to use in the function
- * @returns {*}
+ * @param fn - The function to be called
+ * @param params - Array of possible function parameters
+ * @param minimum - Minimum number of parameters to use in the function
  */
-const callWithParams = (fn, params = [], minimum = 2) => fn(...params.slice(0, fn.length || minimum))
-const _default = exports.default = callWithParams
-
+const callWithParams = (fn, params = [], minimum = 2) => fn(...params.slice(0, fn.length || minimum));
+var _default = exports.default = callWithParams;
 },{}],262:[function(require,module,exports){
-'use strict'
+"use strict";
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.default = void 0
-require('core-js/modules/esnext.iterator.constructor.js')
-require('core-js/modules/esnext.iterator.filter.js')
-require('core-js/modules/esnext.iterator.map.js')
-/**
- * Remove elements out of relevance range and update the max relevance.
- * @memberOf module:functionHelpers
- * @param {relevanceMap} map
- * @param {Object} [options={}]
- * @param {number} [options.mapLimit=1000] - Only filter once the map exceeds this many entries.
- * @param {number} [options.relevancyRange=100] - How many of the most-recent relevance values to keep.
- * @returns {relevanceMap}
- */
-const relevancyFilter = (map, {
-  mapLimit = 1000,
-  relevancyRange = 100
-} = {}) => {
-  if (map.length <= mapLimit) {
-    return map
-  }
-  const minRelevance = map.length - relevancyRange
-  const filtered = map.filter(reference => reference.relevance >= minRelevance)
-  return filtered.map(reference => {
-    reference.relevance = reference.relevance > filtered.length ? filtered.length : reference.relevance
-    return reference
-  })
-}
-const _default = exports.default = relevancyFilter
-
-},{"core-js/modules/esnext.iterator.constructor.js":193,"core-js/modules/esnext.iterator.filter.js":195,"core-js/modules/esnext.iterator.map.js":198}],263:[function(require,module,exports){
-'use strict'
-
-Object.defineProperty(exports, '__esModule', {
-  value: true
-})
-exports.default = void 0
-const _mergeObjectsBase = _interopRequireDefault(require('./mergeObjectsBase'))
-function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: e } }
+});
+exports.default = void 0;
+var _mergeObjectsBase = _interopRequireDefault(require("./mergeObjectsBase"));
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 /**
  * Clone objects for manipulation without data corruption, returns a copy of the provided object.
- * NOTE: Use the mapLimit and relevancyRange to resolve "too much recursion" when the object is large and is known to
- * have circular references. A high mapLimit may lead to heavy memory usage and slow performance.
- * @memberOf module:objectHelpers
- * @param {Object} object - The original object that is being cloned
- * @param {Object} [options={}]
- * @param {number} [options.mapLimit=100] - Size of temporary reference array used in memory before assessing relevancy.
- * @param {number} [options.depthLimit=-1] - Control how many nested levels deep will be used, -1 = no limit, >-1 = nth level limited.
- * @param {number} [options.relevancyRange=1000] - Total reference map length subtract this range, any relevancy less than that amount at time of evaluation will be removed.
- * @returns {Object}
+ * @param object - The original object that is being cloned
+ * @param options
+ * @param options.mapLimit - Deprecated and ignored (circular references are handled without trimming).
+ * @param options.depthLimit - Control how many nested levels deep will be used, -1 = no limit, >-1 = nth level limited.
+ * @param options.relevancyRange - Deprecated and ignored: see mapLimit.
  */
 const cloneObject = (object, {
   mapLimit = 100,
@@ -14783,112 +14666,108 @@ const cloneObject = (object, {
   depthLimit,
   relevancyRange,
   useClone: true
-})(object)
-const _default = exports.default = cloneObject
+})(object);
+var _default = exports.default = cloneObject;
+},{"./mergeObjectsBase":267}],263:[function(require,module,exports){
+"use strict";
 
-},{"./mergeObjectsBase":268}],264:[function(require,module,exports){
-'use strict'
-
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.default = void 0
-const _isInstanceObject = _interopRequireDefault(require('./isInstanceObject'))
-function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: e } }
+});
+exports.default = void 0;
+var _isInstanceObject = _interopRequireDefault(require("./isInstanceObject"));
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 /**
  * Determine if the value is a reference instance
- * @memberOf module:objectHelpers
- * @param {Array|Object|*} value
- * @returns {boolean}
+ * @param value
  */
-const isCloneable = value => typeof value === 'object' && value !== null && !(0, _isInstanceObject.default)(value)
-const _default = exports.default = isCloneable
+const isCloneable = value => typeof value === 'object' && value !== null && !(0, _isInstanceObject.default)(value);
+var _default = exports.default = isCloneable;
+},{"./isInstanceObject":265}],264:[function(require,module,exports){
+"use strict";
 
-},{"./isInstanceObject":266}],265:[function(require,module,exports){
-'use strict'
-
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.default = void 0
-require('core-js/modules/es.regexp.flags.js')
-require('core-js/modules/esnext.iterator.constructor.js')
-require('core-js/modules/esnext.iterator.every.js')
-require('core-js/modules/esnext.iterator.some.js')
-require('core-js/modules/esnext.map.delete-all.js')
-require('core-js/modules/esnext.map.every.js')
-require('core-js/modules/esnext.map.filter.js')
-require('core-js/modules/esnext.map.find.js')
-require('core-js/modules/esnext.map.find-key.js')
-require('core-js/modules/esnext.map.includes.js')
-require('core-js/modules/esnext.map.key-of.js')
-require('core-js/modules/esnext.map.map-keys.js')
-require('core-js/modules/esnext.map.map-values.js')
-require('core-js/modules/esnext.map.merge.js')
-require('core-js/modules/esnext.map.reduce.js')
-require('core-js/modules/esnext.map.some.js')
-require('core-js/modules/esnext.map.update.js')
-require('core-js/modules/esnext.set.add-all.js')
-require('core-js/modules/esnext.set.delete-all.js')
-require('core-js/modules/esnext.set.difference.js')
-require('core-js/modules/esnext.set.every.js')
-require('core-js/modules/esnext.set.filter.js')
-require('core-js/modules/esnext.set.find.js')
-require('core-js/modules/esnext.set.intersection.js')
-require('core-js/modules/esnext.set.is-disjoint-from.js')
-require('core-js/modules/esnext.set.is-subset-of.js')
-require('core-js/modules/esnext.set.is-superset-of.js')
-require('core-js/modules/esnext.set.join.js')
-require('core-js/modules/esnext.set.map.js')
-require('core-js/modules/esnext.set.reduce.js')
-require('core-js/modules/esnext.set.some.js')
-require('core-js/modules/esnext.set.symmetric-difference.js')
-require('core-js/modules/esnext.set.union.js')
-require('core-js/modules/esnext.weak-map.delete-all.js')
-require('core-js/modules/esnext.weak-set.add-all.js')
-require('core-js/modules/esnext.weak-set.delete-all.js')
-const sameValueZero = (first, second) => first === second || first !== first && second !== second
+});
+exports.default = void 0;
+require("core-js/modules/es.regexp.flags.js");
+require("core-js/modules/esnext.iterator.constructor.js");
+require("core-js/modules/esnext.iterator.every.js");
+require("core-js/modules/esnext.iterator.some.js");
+require("core-js/modules/esnext.map.delete-all.js");
+require("core-js/modules/esnext.map.every.js");
+require("core-js/modules/esnext.map.filter.js");
+require("core-js/modules/esnext.map.find.js");
+require("core-js/modules/esnext.map.find-key.js");
+require("core-js/modules/esnext.map.includes.js");
+require("core-js/modules/esnext.map.key-of.js");
+require("core-js/modules/esnext.map.map-keys.js");
+require("core-js/modules/esnext.map.map-values.js");
+require("core-js/modules/esnext.map.merge.js");
+require("core-js/modules/esnext.map.reduce.js");
+require("core-js/modules/esnext.map.some.js");
+require("core-js/modules/esnext.map.update.js");
+require("core-js/modules/esnext.set.add-all.js");
+require("core-js/modules/esnext.set.delete-all.js");
+require("core-js/modules/esnext.set.difference.js");
+require("core-js/modules/esnext.set.every.js");
+require("core-js/modules/esnext.set.filter.js");
+require("core-js/modules/esnext.set.find.js");
+require("core-js/modules/esnext.set.intersection.js");
+require("core-js/modules/esnext.set.is-disjoint-from.js");
+require("core-js/modules/esnext.set.is-subset-of.js");
+require("core-js/modules/esnext.set.is-superset-of.js");
+require("core-js/modules/esnext.set.join.js");
+require("core-js/modules/esnext.set.map.js");
+require("core-js/modules/esnext.set.reduce.js");
+require("core-js/modules/esnext.set.some.js");
+require("core-js/modules/esnext.set.symmetric-difference.js");
+require("core-js/modules/esnext.set.union.js");
+require("core-js/modules/esnext.weak-map.delete-all.js");
+require("core-js/modules/esnext.weak-set.add-all.js");
+require("core-js/modules/esnext.weak-set.delete-all.js");
+const sameValueZero = (first, second) => first === second || first !== first && second !== second;
 const compare = (first, second, seen) => {
   if (sameValueZero(first, second)) {
-    return true
+    return true;
   }
   if (typeof first !== 'object' || typeof second !== 'object' || first === null || second === null) {
     // Different primitives, or a function (which is only equal to itself), or an object against a primitive
-    return false
+    return false;
   }
   if (Object.getPrototypeOf(first) !== Object.getPrototypeOf(second)) {
-    return false
+    return false;
   }
   // A pair which is already being compared further up is not a difference (this is what makes circular references work)
-  const comparing = seen.get(first)
+  const comparing = seen.get(first);
   if (comparing && comparing.has(second)) {
-    return true
+    return true;
   }
   if (comparing) {
-    comparing.add(second)
+    comparing.add(second);
   } else {
-    seen.set(first, new WeakSet([second]))
+    seen.set(first, new WeakSet([second]));
   }
   if (first instanceof Date) {
-    return first.getTime() === second.getTime()
+    return first.getTime() === second.getTime();
   }
   if (first instanceof RegExp) {
-    return first.source === second.source && first.flags === second.flags
+    return first.source === second.source && first.flags === second.flags;
   }
   if (first instanceof Map) {
-    return first.size === second.size && Array.from(first.entries()).every(([key, value]) => second.has(key) && compare(value, second.get(key), seen))
+    return first.size === second.size && Array.from(first.entries()).every(([key, value]) => second.has(key) && compare(value, second.get(key), seen));
   }
   if (first instanceof Set) {
-    const others = Array.from(second.values())
-    return first.size === second.size && Array.from(first.values()).every(value => others.some(other => compare(value, other, seen)))
+    const others = Array.from(second.values());
+    return first.size === second.size && Array.from(first.values()).every(value => others.some(other => compare(value, other, seen)));
   }
   if (Array.isArray(first) && first.length !== second.length) {
-    return false
+    return false;
   }
-  const firstKeys = Object.keys(first)
-  const secondKeys = Object.keys(second)
-  return firstKeys.length === secondKeys.length && firstKeys.every(key => Object.prototype.hasOwnProperty.call(second, key) && compare(first[key], second[key], seen))
-}
+  const firstKeys = Object.keys(first);
+  const secondKeys = Object.keys(second);
+  return firstKeys.length === secondKeys.length && firstKeys.every(key => Object.prototype.hasOwnProperty.call(second, key) && compare(first[key], second[key], seen));
+};
 /**
  * Check whether two values are equal by value, however they are stored: two separately made arrays or objects with the
  * same contents are equal, while two references only need to be the same when the value is a function.
@@ -14898,241 +14777,219 @@ const compare = (first, second, seen) => {
  * equal values, the order of the properties does not matter
  * - Dates, regular expressions, Maps and Sets are compared by what they hold
  * - Circular references are handled: a pair of objects which is already being compared is taken to be equal
- * @memberOf module:objectHelpers
- * @param {*} first - The first value.
- * @param {*} second - The second value.
- * @returns {boolean} True when the values are equal.
+ * @param first - The first value.
+ * @param second - The second value.
+ * @returns True when the values are equal.
  */
-const isEqual = (first, second) => compare(first, second, new WeakMap())
-const _default = exports.default = isEqual
+const isEqual = (first, second) => compare(first, second, new WeakMap());
+var _default = exports.default = isEqual;
+},{"core-js/modules/es.regexp.flags.js":192,"core-js/modules/esnext.iterator.constructor.js":193,"core-js/modules/esnext.iterator.every.js":194,"core-js/modules/esnext.iterator.some.js":200,"core-js/modules/esnext.map.delete-all.js":201,"core-js/modules/esnext.map.every.js":202,"core-js/modules/esnext.map.filter.js":203,"core-js/modules/esnext.map.find-key.js":204,"core-js/modules/esnext.map.find.js":205,"core-js/modules/esnext.map.includes.js":206,"core-js/modules/esnext.map.key-of.js":207,"core-js/modules/esnext.map.map-keys.js":208,"core-js/modules/esnext.map.map-values.js":209,"core-js/modules/esnext.map.merge.js":210,"core-js/modules/esnext.map.reduce.js":211,"core-js/modules/esnext.map.some.js":212,"core-js/modules/esnext.map.update.js":213,"core-js/modules/esnext.set.add-all.js":214,"core-js/modules/esnext.set.delete-all.js":215,"core-js/modules/esnext.set.difference.js":216,"core-js/modules/esnext.set.every.js":217,"core-js/modules/esnext.set.filter.js":218,"core-js/modules/esnext.set.find.js":219,"core-js/modules/esnext.set.intersection.js":220,"core-js/modules/esnext.set.is-disjoint-from.js":221,"core-js/modules/esnext.set.is-subset-of.js":222,"core-js/modules/esnext.set.is-superset-of.js":223,"core-js/modules/esnext.set.join.js":224,"core-js/modules/esnext.set.map.js":225,"core-js/modules/esnext.set.reduce.js":226,"core-js/modules/esnext.set.some.js":227,"core-js/modules/esnext.set.symmetric-difference.js":228,"core-js/modules/esnext.set.union.js":229,"core-js/modules/esnext.weak-map.delete-all.js":230,"core-js/modules/esnext.weak-set.add-all.js":231,"core-js/modules/esnext.weak-set.delete-all.js":232}],265:[function(require,module,exports){
+"use strict";
 
-},{"core-js/modules/es.regexp.flags.js":192,"core-js/modules/esnext.iterator.constructor.js":193,"core-js/modules/esnext.iterator.every.js":194,"core-js/modules/esnext.iterator.some.js":200,"core-js/modules/esnext.map.delete-all.js":201,"core-js/modules/esnext.map.every.js":202,"core-js/modules/esnext.map.filter.js":203,"core-js/modules/esnext.map.find-key.js":204,"core-js/modules/esnext.map.find.js":205,"core-js/modules/esnext.map.includes.js":206,"core-js/modules/esnext.map.key-of.js":207,"core-js/modules/esnext.map.map-keys.js":208,"core-js/modules/esnext.map.map-values.js":209,"core-js/modules/esnext.map.merge.js":210,"core-js/modules/esnext.map.reduce.js":211,"core-js/modules/esnext.map.some.js":212,"core-js/modules/esnext.map.update.js":213,"core-js/modules/esnext.set.add-all.js":214,"core-js/modules/esnext.set.delete-all.js":215,"core-js/modules/esnext.set.difference.js":216,"core-js/modules/esnext.set.every.js":217,"core-js/modules/esnext.set.filter.js":218,"core-js/modules/esnext.set.find.js":219,"core-js/modules/esnext.set.intersection.js":220,"core-js/modules/esnext.set.is-disjoint-from.js":221,"core-js/modules/esnext.set.is-subset-of.js":222,"core-js/modules/esnext.set.is-superset-of.js":223,"core-js/modules/esnext.set.join.js":224,"core-js/modules/esnext.set.map.js":225,"core-js/modules/esnext.set.reduce.js":226,"core-js/modules/esnext.set.some.js":227,"core-js/modules/esnext.set.symmetric-difference.js":228,"core-js/modules/esnext.set.union.js":229,"core-js/modules/esnext.weak-map.delete-all.js":230,"core-js/modules/esnext.weak-set.add-all.js":231,"core-js/modules/esnext.weak-set.delete-all.js":232}],266:[function(require,module,exports){
-'use strict'
-
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.default = void 0
-require('core-js/modules/es.array.includes.js')
-const _isObject = _interopRequireDefault(require('./isObject'))
-const _objectKeys = _interopRequireDefault(require('./objectKeys'))
-function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: e } }
+});
+exports.default = void 0;
+require("core-js/modules/es.array.includes.js");
+var _isObject = _interopRequireDefault(require("./isObject"));
+var _objectKeys = _interopRequireDefault(require("./objectKeys"));
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 /**
  * Check if the current object has inherited properties.
- * @memberOf module:objectHelpers
- * @param {Object|Array} object
- * @returns {boolean}
+ * @param object
  */
 const isInstanceObject = object => {
   if (typeof object !== 'function' && !(0, _isObject.default)(object)) {
-    return false
+    return false;
   }
   if (!['Array', 'Function', 'Object'].includes(object.constructor.name)) {
-    return true
+    return true;
   }
-  return object.constructor.name !== 'Array' && (0, _objectKeys.default)(object, true).length > (0, _objectKeys.default)(object).length
-}
-const _default = exports.default = isInstanceObject
+  return object.constructor.name !== 'Array' && (0, _objectKeys.default)(object, true).length > (0, _objectKeys.default)(object).length;
+};
+var _default = exports.default = isInstanceObject;
+},{"./isObject":266,"./objectKeys":268,"core-js/modules/es.array.includes.js":183}],266:[function(require,module,exports){
+"use strict";
 
-},{"./isObject":267,"./objectKeys":269,"core-js/modules/es.array.includes.js":183}],267:[function(require,module,exports){
-'use strict'
-
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.default = void 0
+});
+exports.default = void 0;
 /**
  * Check if the provided thing is an object / array.
- * @memberOf module:objectHelpers
- * @param {*} object
- * @returns {boolean}
+ * @param object
  */
-const isObject = object => typeof object === 'object' && object !== null
-const _default = exports.default = isObject
+const isObject = object => typeof object === 'object' && object !== null;
+var _default = exports.default = isObject;
+},{}],267:[function(require,module,exports){
+"use strict";
 
-},{}],268:[function(require,module,exports){
-'use strict'
-
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.default = void 0
-require('core-js/modules/esnext.iterator.constructor.js')
-require('core-js/modules/esnext.iterator.find.js')
-require('core-js/modules/esnext.iterator.map.js')
-require('core-js/modules/esnext.iterator.reduce.js')
-const _isCloneable = _interopRequireDefault(require('./isCloneable'))
-const _reduceObject = _interopRequireDefault(require('./reduceObject'))
-const _relevancyFilter = _interopRequireDefault(require('../functions/relevancyFilter'))
-const _setValue = _interopRequireDefault(require('./setValue'))
-function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: e } }
+});
+exports.default = void 0;
+require("core-js/modules/esnext.iterator.constructor.js");
+require("core-js/modules/esnext.iterator.map.js");
+require("core-js/modules/esnext.iterator.reduce.js");
+require("core-js/modules/esnext.map.delete-all.js");
+require("core-js/modules/esnext.map.every.js");
+require("core-js/modules/esnext.map.filter.js");
+require("core-js/modules/esnext.map.find.js");
+require("core-js/modules/esnext.map.find-key.js");
+require("core-js/modules/esnext.map.includes.js");
+require("core-js/modules/esnext.map.key-of.js");
+require("core-js/modules/esnext.map.map-keys.js");
+require("core-js/modules/esnext.map.map-values.js");
+require("core-js/modules/esnext.map.merge.js");
+require("core-js/modules/esnext.map.reduce.js");
+require("core-js/modules/esnext.map.some.js");
+require("core-js/modules/esnext.map.update.js");
+var _isCloneable = _interopRequireDefault(require("./isCloneable"));
+var _reduceObject = _interopRequireDefault(require("./reduceObject"));
+var _setValue = _interopRequireDefault(require("./setValue"));
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 /**
  * Perform a deep merge of objects. This will return a function that will combine all objects and sub-objects.
  * Objects having the same attributes will overwrite from last object to first.
- * NOTE: Use the mapLimit and relevancyRange to resolve "too much recursion" when the object is large and is known to
- * have circular references. A high mapLimit may lead to heavy memory usage and slow performance.
- * @memberOf module:objectHelpers
- * @param {Object} [options={}]
- * @param {number} [options.mapLimit=100] - Size of temporary reference array used in memory before assessing relevancy.
- * @param {number} [options.depthLimit=-1] - Control how many nested levels deep will be used, -1 = no limit, >-1 = nth level limited.
- * @param {number} [options.relevancyRange=1000] - Total reference map length subtract this range, any relevancy less than that amount at time of evaluation will be removed.
- * @param {Iterable|array} [options.map=[]] - A predetermined list of references gathered (to be passed to itself during recursion).
- * @param {boolean} [options.useClone=false]
- * @returns {module:objectHelpers~mergeObjectsCallback|mergeObjectsCallback}
+ * Every call of the returned function keeps its own record of the objects it has already visited (so circular
+ * references are followed only once, and an object which is referenced in several places is merged once), and nothing
+ * is remembered between calls: the results of separate calls never share state or go stale.
+ * @param options
+ * @param options.mapLimit - Deprecated and ignored: the record of visited objects is now scoped to a
+ * single call, so it does not need trimming.
+ * @param options.depthLimit - Control how many nested levels deep will be used, -1 = no limit, >-1 = nth level limited.
+ * @param options.relevancyRange - Deprecated and ignored: see mapLimit.
+ * @param options.map] - A predetermined list of references (source and the object it should
+ * resolve to) which every call starts from. It is only read, never added to.
+ * @param options.useClone
  */
 const mergeObjectsBase = ({
-  mapLimit = 100,
   depthLimit = -1,
-  relevancyRange = 1000,
   map = [],
   useClone = false
-} = {}) => (...objects) => {
-  const firstObject = useClone ? Array.isArray(objects[0]) ? [] : {} : objects.shift()
-  if (objects.length < 1) {
-    return firstObject
-  }
-  if (depthLimit === 0) {
-    return firstObject
-  }
-  return objects.reduce((newObj, arg) => {
-    if (!arg) {
-      return newObj
+} = {}) => {
+  const merge = (visited, depth, objects) => {
+    const firstObject = useClone ? Array.isArray(objects[0]) ? [] : {} : objects.shift();
+    if (objects.length < 1) {
+      return firstObject;
     }
-    map.push({
-      source: arg,
-      object: newObj,
-      relevance: map.length
-    })
-    map = (0, _relevancyFilter.default)(map, {
-      mapLimit,
-      relevancyRange
-    })
-    return (0, _reduceObject.default)(arg, (returnObj, value, key) => {
-      if ((0, _isCloneable.default)(value)) {
-        let objectValue = newObj[key]
-        const exists = map.find(existing => existing.source === value)
-        if (exists) {
-          exists.relevance = map.length + 1
-          return (0, _setValue.default)(key, exists.object, returnObj)
-        }
-        if (!(0, _isCloneable.default)(objectValue) || !objectValue) {
-          objectValue = useClone ? Array.isArray(value) ? [] : {} : value
-        }
-        if ((0, _isCloneable.default)(objectValue)) {
-          return (0, _setValue.default)(key, mergeObjectsBase({
-            mapLimit,
-            depthLimit: depthLimit - 1,
-            relevancyRange,
-            map,
-            useClone
-          })(objectValue, value), returnObj)
-        }
-        map.push({
-          source: value,
-          object: objectValue,
-          relevance: map.length
-        })
-        map = (0, _relevancyFilter.default)(map, {
-          mapLimit,
-          relevancyRange
-        })
+    if (depth === 0) {
+      return firstObject;
+    }
+    return objects.reduce((newObj, arg) => {
+      if (!arg) {
+        return newObj;
       }
-      return (0, _setValue.default)(key, value, returnObj)
-    }, newObj)
-  }, firstObject || {})
-}
-const _default = exports.default = mergeObjectsBase
+      if (!visited.has(arg)) {
+        visited.set(arg, newObj);
+      }
+      return (0, _reduceObject.default)(arg, (returnObj, value, key) => {
+        if ((0, _isCloneable.default)(value)) {
+          if (visited.has(value)) {
+            return (0, _setValue.default)(key, visited.get(value), returnObj);
+          }
+          let objectValue = newObj[key];
+          if (!(0, _isCloneable.default)(objectValue) || !objectValue) {
+            if (!useClone) {
+              // Merging by reference: the source object is used as it is, there is nothing to merge it into.
+              visited.set(value, value);
+              return (0, _setValue.default)(key, value, returnObj);
+            }
+            objectValue = Array.isArray(value) ? [] : {};
+          }
+          return (0, _setValue.default)(key, merge(visited, depth - 1, [objectValue, value]), returnObj);
+        }
+        return (0, _setValue.default)(key, value, returnObj);
+      }, newObj);
+    }, firstObject || {});
+  };
+  return (...objects) => merge(new Map(map.map(({
+    source,
+    object
+  }) => [source, object])), depthLimit, objects);
+};
+var _default = exports.default = mergeObjectsBase;
+},{"./isCloneable":263,"./reduceObject":269,"./setValue":270,"core-js/modules/esnext.iterator.constructor.js":193,"core-js/modules/esnext.iterator.map.js":198,"core-js/modules/esnext.iterator.reduce.js":199,"core-js/modules/esnext.map.delete-all.js":201,"core-js/modules/esnext.map.every.js":202,"core-js/modules/esnext.map.filter.js":203,"core-js/modules/esnext.map.find-key.js":204,"core-js/modules/esnext.map.find.js":205,"core-js/modules/esnext.map.includes.js":206,"core-js/modules/esnext.map.key-of.js":207,"core-js/modules/esnext.map.map-keys.js":208,"core-js/modules/esnext.map.map-values.js":209,"core-js/modules/esnext.map.merge.js":210,"core-js/modules/esnext.map.reduce.js":211,"core-js/modules/esnext.map.some.js":212,"core-js/modules/esnext.map.update.js":213}],268:[function(require,module,exports){
+"use strict";
 
-},{"../functions/relevancyFilter":262,"./isCloneable":264,"./reduceObject":270,"./setValue":271,"core-js/modules/esnext.iterator.constructor.js":193,"core-js/modules/esnext.iterator.find.js":196,"core-js/modules/esnext.iterator.map.js":198,"core-js/modules/esnext.iterator.reduce.js":199}],269:[function(require,module,exports){
-'use strict'
-
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.default = void 0
-const _isObject = _interopRequireDefault(require('./isObject'))
-function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: e } }
+});
+exports.default = void 0;
+var _isObject = _interopRequireDefault(require("./isObject"));
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 /**
  * Get an array of keys from any object or array. Will return empty array when invalid or there are no keys.
  * Optional flag will include the inherited keys from prototype chain when set.
- * @memberOf module:objectHelpers
- * @param {Object|Array} object
- * @param {boolean} [includeInherited=false]
- * @returns {Array.<string|number>}
+ * @param object
+ * @param includeInherited
  */
 const objectKeys = (object, includeInherited = false) => {
   if (typeof object !== 'function' && !(0, _isObject.default)(object)) {
-    return []
+    return [];
   }
   if (includeInherited) {
-    const propNames = Object.getOwnPropertyNames(object)
+    const propNames = Object.getOwnPropertyNames(object);
     if (propNames.length) {
-      return propNames
+      return propNames;
     }
   }
-  const keys = []
+  const keys = [];
   for (const key in object) {
     if (includeInherited || Object.prototype.hasOwnProperty.call(object, key)) {
       if (Array.isArray(object)) {
-        keys.push(parseInt(key))
-        continue
+        keys.push(parseInt(key));
+        continue;
       }
-      keys.push(key)
+      keys.push(key);
     }
   }
-  return keys
-}
-const _default = exports.default = objectKeys
+  return keys;
+};
+var _default = exports.default = objectKeys;
+},{"./isObject":266}],269:[function(require,module,exports){
+"use strict";
 
-},{"./isObject":267}],270:[function(require,module,exports){
-'use strict'
-
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.default = void 0
-require('core-js/modules/esnext.iterator.constructor.js')
-require('core-js/modules/esnext.iterator.reduce.js')
-const _callWithParams = _interopRequireDefault(require('../functions/callWithParams'))
-const _objectKeys = _interopRequireDefault(require('./objectKeys'))
-function _interopRequireDefault (e) { return e && e.__esModule ? e : { default: e } }
+});
+exports.default = void 0;
+require("core-js/modules/esnext.iterator.constructor.js");
+require("core-js/modules/esnext.iterator.reduce.js");
+var _callWithParams = _interopRequireDefault(require("../functions/callWithParams"));
+var _objectKeys = _interopRequireDefault(require("./objectKeys"));
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 /**
  * This function is intended to replicate behaviour of the Array.reduce() function but for Objects.
  * If an array is passed in instead then it will perform standard reduce(). It is recommended to
  * always use the standard reduce() function when it is known that the object is actually an array.
- * @memberOf module:objectHelpers
- * @param {Object|Array} obj - The Object (or Array) to be filtered
- * @param {module:objectHelpers~reduceCallback|Function|reduceCallback} fn - The function to be processed for each filtered property
- * @param {Object|Array} [initialValue] - Optional. Value to use as the first argument to the first call of the
+ * @param obj - The Object (or Array) to be filtered
+ * @param fn - The function to be processed for each filtered property
+ * @param initialValue - Optional. Value to use as the first argument to the first call of the
  * callback. If no initial value is supplied, the first element in the array will be used. Calling reduce on an empty
  * array without an initial value is an error.
- * @returns {*}
  */
-const reduceObject = (obj, fn, initialValue = obj[(0, _objectKeys.default)(obj)[0]] || obj[0]) => Array.isArray(obj) ? obj.reduce(fn, initialValue) : (0, _objectKeys.default)(obj, true).reduce((newObj, curr) => (0, _callWithParams.default)(fn, [newObj, obj[curr], curr, obj], 2), initialValue)
-const _default = exports.default = reduceObject
+const reduceObject = (obj, fn, initialValue = obj[(0, _objectKeys.default)(obj)[0]] || obj[0]) => Array.isArray(obj) ? obj.reduce(fn, initialValue) : (0, _objectKeys.default)(obj, true).reduce((newObj, curr) => (0, _callWithParams.default)(fn, [newObj, obj[curr], curr, obj], 2), initialValue);
+var _default = exports.default = reduceObject;
+},{"../functions/callWithParams":261,"./objectKeys":268,"core-js/modules/esnext.iterator.constructor.js":193,"core-js/modules/esnext.iterator.reduce.js":199}],270:[function(require,module,exports){
+"use strict";
 
-},{"../functions/callWithParams":261,"./objectKeys":269,"core-js/modules/esnext.iterator.constructor.js":193,"core-js/modules/esnext.iterator.reduce.js":199}],271:[function(require,module,exports){
-'use strict'
-
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
-})
-exports.default = void 0
+});
+exports.default = void 0;
 /**
  * Set a value on an item, then return the item.
  * NOTE: Argument order designed for usage with pipe
- * @memberOf module:objectHelpers
- * @param {string|number} key - The key on the item which will have its value set
- * @param {*} value - Any value to be applied to the key
- * @param {Object|Array} item - An object or array to be updated
- * @returns {Object|Array}
+ * @param key - The key on the item which will have its value set
+ * @param value - Any value to be applied to the key
+ * @param item - An object or array to be updated
  */
 const setValue = (key, value, item) => {
   // @ts-ignore
-  item[key] = value
-  return item
-}
-const _default = exports.default = setValue
-
+  item[key] = value;
+  return item;
+};
+var _default = exports.default = setValue;
 },{}]},{},[21])(21)
 });
