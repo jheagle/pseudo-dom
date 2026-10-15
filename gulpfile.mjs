@@ -1,5 +1,6 @@
 export {
   build,
+  copyFiles,
   defaultCmd as default,
   docs,
   partials,

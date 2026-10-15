@@ -6,6 +6,12 @@
       "domhandler"
     ]
   },
+  "copyFiles": [
+    {
+      "from": "browser/*.js",
+      "to": "../joshuaheagle.local/projects/pseudo-dom/browser"
+    }
+  ],
   "docs": {
     "enabled": true,
     "from": "src",
