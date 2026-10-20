@@ -127,6 +127,7 @@ describe('innerHTML (setter, parsing)', () => {
     div.innerHTML = '<span class="a b"></span>'
     expect(div.firstChild.className).toBe('a b')
     expect(div.firstChild.classList.contains('b')).toBe(true)
+    expect(div.firstChild.getAttribute('class')).toBe('a b')
   })
 
   test('a style="..." attribute populates the real style object', () => {

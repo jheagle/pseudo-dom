@@ -29,11 +29,8 @@ export const cssSelectAdapter = {
     cssSelectAdapter.isTag(elem) && (test(elem) || cssSelectAdapter.existsOne(test, cssSelectAdapter.getChildren(elem)))
   ),
 
-  // pseudo-dom's className / classList are kept in sync with each other, but not with a literal 'class' attribute
-  // (there is no such special-cased attribute here, unlike a real DOM) - so the 'class' css-select needs for class
-  // selectors is read from className instead.
   getAttributeValue: (elem: any, name: string): string | undefined => {
-    const value = name === 'class' ? elem.className : elem.getAttribute(name)
+    const value = elem.getAttribute(name)
     return value === null || value === undefined ? undefined : value
   },
 

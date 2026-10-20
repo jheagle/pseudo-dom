@@ -2,11 +2,11 @@
 
 Mock the DOM for server-side DOM state and in tests.
 
-## Status: early development (0.x)
+## Status: stable (1.x)
 
 Pseudo DOM recreates the browser DOM API (following the MDN documentation) so DOM-dependent code can run in Node -
-in tests, without a real or headless browser. It's written in TypeScript and ships type definitions. The API will
-change before 1.0.
+in tests, without a real or headless browser. It's written in TypeScript and ships type definitions. It follows
+semantic versioning, so breaking API changes only come with a new major version.
 
 ## At a glance
 

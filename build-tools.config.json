@@ -12,6 +12,9 @@
       "to": "../joshuaheagle.local/projects/pseudo-dom/browser"
     }
   ],
+  "dist": {
+    "main": "dist/browser"
+  },
   "docs": {
     "enabled": true,
     "from": "src",
