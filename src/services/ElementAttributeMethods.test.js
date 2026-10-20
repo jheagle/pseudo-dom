@@ -27,6 +27,40 @@ describe('getAttributeNames / hasAttributes', () => {
   })
 })
 
+describe('the class attribute and className', () => {
+  test('setting the class attribute sets className and classList', () => {
+    const div = new ElementService({ tagName: 'div' })
+    div.setAttribute('class', 'a b')
+    expect(div.className).toBe('a b')
+    expect(div.classList.contains('b')).toBe(true)
+  })
+
+  test('setting className (or classList) sets the class attribute', () => {
+    const div = new ElementService({ tagName: 'div' })
+    expect(div.hasAttribute('class')).toBe(false)
+    expect(div.getAttribute('class')).toBeNull()
+    div.className = 'a'
+    div.classList.add('b')
+    expect(div.hasAttribute('class')).toBe(true)
+    expect(div.getAttribute('class')).toBe('a b')
+  })
+
+  test('removing the class attribute clears className', () => {
+    const div = new ElementService({ tagName: 'div' })
+    div.className = 'a'
+    div.removeAttribute('class')
+    expect(div.className).toBe('')
+    expect(div.hasAttribute('class')).toBe(false)
+  })
+
+  test('there is no separate class attribute stored beside className', () => {
+    const div = new ElementService({ tagName: 'div' })
+    div.setAttribute('class', 'a')
+    expect(div.getAttributeNames().filter(name => name === 'class')).toEqual([])
+    expect(div.outerHTML).toBe('<div class="a"></div>')
+  })
+})
+
 describe('toggleAttribute', () => {
   test('adds the attribute (empty value) when it is not present', () => {
     const div = new ElementService({ tagName: 'div' })

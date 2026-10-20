@@ -46,14 +46,9 @@ const parseHTML = (html, ownerDocument, ElementClass) => {
         return;
       }
       const element = stack[stack.length - 1];
-      // pseudo-dom's className / classList and style are not kept in sync with a literal 'class' / 'style'
-      // attribute the way setAttribute usually is (there is no such special-casing here, unlike a real DOM) - route
-      // them to the real objects directly, the same way cssSelectAdapter does for reading 'class' when matching a
-      // CSS selector, so parsed markup's class="..." / style="..." actually populates className/classList and style.
-      if (name === 'class') {
-        element.className = value;
-        return;
-      }
+      // pseudo-dom's style is not kept in sync with a literal 'style' attribute (there is no such special-casing
+      // here, unlike a real DOM) - route it to the real style object directly, so parsed markup's style="..." actually
+      // populates style. (class="..." needs nothing special: setAttribute keeps it in sync with className/classList.)
       if (name === 'style' && element.style) {
         element.style.cssText = value;
         return;

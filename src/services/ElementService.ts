@@ -378,6 +378,9 @@ export class ElementService extends NodeService implements Partial<PseudoElement
    * @param attributeName
    */
   hasAttribute (attributeName: string): boolean {
+    if (attributeName === 'class') {
+      return this.className !== ''
+    }
     return this.attributeList.some(({ name }) => name === attributeName)
   }
 
@@ -387,6 +390,8 @@ export class ElementService extends NodeService implements Partial<PseudoElement
    * @param attributeValue
    */
   setAttribute (attributeName: string, attributeValue: string): void {
+    // The class attribute is stored as className (the property it is reflected in), so the two stay in sync
+    attributeName = attributeName === 'class' ? 'className' : attributeName
     const existing = this.attributeList.find(({ name }) => name === attributeName)
     if (existing) {
       existing.value = attributeValue
@@ -404,6 +409,9 @@ export class ElementService extends NodeService implements Partial<PseudoElement
    * @returns The value, or null when there is no such attribute
    */
   getAttribute (attributeName: string): string | null {
+    if (attributeName === 'class') {
+      return this.className === '' ? null : this.className
+    }
     const found = this.currentAttributes().find(({ name }) => name === attributeName)
     return found ? found.value : null
   }
@@ -413,6 +421,10 @@ export class ElementService extends NodeService implements Partial<PseudoElement
    * @param attributeName
    */
   removeAttribute (attributeName: string): void {
+    if (attributeName === 'class') {
+      this.className = ''
+      return
+    }
     const index = this.attributeList.findIndex(({ name }) => name === attributeName)
     if (index >= 0) {
       this.attributeList.splice(index, 1)

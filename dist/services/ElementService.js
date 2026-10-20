@@ -405,6 +405,9 @@ class ElementService extends NodeService_1.NodeService {
    * @param attributeName
    */
   hasAttribute(attributeName) {
+    if (attributeName === 'class') {
+      return this.className !== '';
+    }
     return this.attributeList.some(({
       name
     }) => name === attributeName);
@@ -415,6 +418,8 @@ class ElementService extends NodeService_1.NodeService {
    * @param attributeValue
    */
   setAttribute(attributeName, attributeValue) {
+    // The class attribute is stored as className (the property it is reflected in), so the two stay in sync
+    attributeName = attributeName === 'class' ? 'className' : attributeName;
     const existing = this.attributeList.find(({
       name
     }) => name === attributeName);
@@ -436,6 +441,9 @@ class ElementService extends NodeService_1.NodeService {
    * @returns The value, or null when there is no such attribute
    */
   getAttribute(attributeName) {
+    if (attributeName === 'class') {
+      return this.className === '' ? null : this.className;
+    }
     const found = this.currentAttributes().find(({
       name
     }) => name === attributeName);
@@ -446,6 +454,10 @@ class ElementService extends NodeService_1.NodeService {
    * @param attributeName
    */
   removeAttribute(attributeName) {
+    if (attributeName === 'class') {
+      this.className = '';
+      return;
+    }
     const index = this.attributeList.findIndex(({
       name
     }) => name === attributeName);

@@ -33,11 +33,8 @@ const nearestElementSibling = (node, direction) => {
 exports.cssSelectAdapter = {
   isTag: node => !!node && node.nodeType === NodeService_1.NodeService.ELEMENT_NODE,
   existsOne: (test, elems) => elems.some(elem => exports.cssSelectAdapter.isTag(elem) && (test(elem) || exports.cssSelectAdapter.existsOne(test, exports.cssSelectAdapter.getChildren(elem)))),
-  // pseudo-dom's className / classList are kept in sync with each other, but not with a literal 'class' attribute
-  // (there is no such special-cased attribute here, unlike a real DOM) - so the 'class' css-select needs for class
-  // selectors is read from className instead.
   getAttributeValue: (elem, name) => {
-    const value = name === 'class' ? elem.className : elem.getAttribute(name);
+    const value = elem.getAttribute(name);
     return value === null || value === undefined ? undefined : value;
   },
   getChildren: node => Array.from(node.childNodes),
