@@ -19,7 +19,8 @@
     "test:quick": "gulp testQuick",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "watch": "gulp watchFull",
-    "watch:test": "gulp watchTest"
+    "watch:test": "gulp watchTest",
+    "lint": "gulp lint"
   },
   "dependencies": {
     "browser-or-node": "^3.0.0",
@@ -30,7 +31,7 @@
     "si-funciona": "^2.8.0"
   },
   "devDependencies": {
-    "js-build-tools": "^6.3.0",
+    "js-build-tools": "^6.4.1",
     "release-it": "^21.1.1",
     "standard": "^17.1.2",
     "test-filesystem": "^2.0.2",
@@ -63,5 +64,11 @@
   "files": [
     "dist",
     "browser"
-  ]
+  ],
+  "allowScripts": {
+    "core-js": false,
+    "core-js-pure": false,
+    "@parcel/watcher": false,
+    "unrs-resolver": false
+  }
 }

@@ -3,6 +3,7 @@ export {
   copyFiles,
   defaultCmd as default,
   docs,
+  lint,
   partials,
   testFull,
   testQuick,
