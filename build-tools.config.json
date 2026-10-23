@@ -19,7 +19,9 @@
     "enabled": true,
     "from": "src",
     "index": "MAIN.md",
-    "to": "../joshuaheagle.local/projects/pseudo-dom/docs"
+    "to": "../joshuaheagle.local/projects/pseudo-dom/docs",
+    "inBuild": false,
+    "gitRevision": "main"
   },
   "typescript": {
     "config": "tsconfig.json",
