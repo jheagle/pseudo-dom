@@ -1,1 +1,5 @@
 node_modules/
+
+# Generated build output (built by `npm run build`, published to npm)
+/dist/
+/browser/

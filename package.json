@@ -20,7 +20,8 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "watch": "gulp watchFull",
     "watch:test": "gulp watchTest",
-    "lint": "gulp lint"
+    "lint": "gulp lint",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "browser-or-node": "^3.0.0",
