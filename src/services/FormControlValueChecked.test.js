@@ -76,3 +76,79 @@ describe('cloneNode', () => {
     expect(copy.checked).toBe(true)
   })
 })
+
+const parsed = html => {
+  const container = new HTMLElementService({ tagName: 'div' })
+  container.innerHTML = html
+  return container
+}
+
+describe('textarea value', () => {
+  test('starts as its text, as in the DOM, and setting it leaves the text alone', () => {
+    const textarea = parsed('<textarea>hello\nthere</textarea>').querySelector('textarea')
+    expect(textarea.value).toBe('hello\nthere')
+    textarea.value = 'typed'
+    expect(textarea.value).toBe('typed')
+    expect(textarea.textContent).toBe('hello\nthere')
+  })
+
+  test('ignores a value attribute (a textarea has none in the DOM), and follows its text until edited', () => {
+    const textarea = new HTMLElementService({ tagName: 'textarea' })
+    textarea.setAttribute('value', 'attribute')
+    expect(textarea.value).toBe('')
+    textarea.textContent = 'text'
+    expect(textarea.value).toBe('text')
+  })
+})
+
+describe('reflected boolean attributes', () => {
+  test('disabled reads the attribute, and setting it adds or removes the attribute', () => {
+    const button = parsed('<button disabled>Go</button>').querySelector('button')
+    expect(button.disabled).toBe(true)
+    button.disabled = false
+    expect(button.hasAttribute('disabled')).toBe(false)
+    expect(button.outerHTML).toBe('<button>Go</button>')
+    button.disabled = true
+    expect(button.getAttribute('disabled')).toBe('')
+    expect(new HTMLElementService({ tagName: 'input' }).disabled).toBe(false)
+  })
+
+  test.each([
+    ['readOnly', 'readonly', 'input'],
+    ['readOnly', 'readonly', 'textarea'],
+    ['required', 'required', 'select'],
+    ['multiple', 'multiple', 'select'],
+    ['disabled', 'disabled', 'fieldset'],
+    ['disabled', 'disabled', 'optgroup']
+  ])('%s reflects the %s attribute on %s', (property, attribute, tagName) => {
+    const element = new HTMLElementService({ tagName })
+    expect(element[property]).toBe(false)
+    element.setAttribute(attribute, '')
+    expect(element[property]).toBe(true)
+    element[property] = false
+    expect(element.hasAttribute(attribute)).toBe(false)
+  })
+
+  test('elements without the property get a plain property, and their attributes are left alone', () => {
+    const div = new HTMLElementService({ tagName: 'div' })
+    expect(div.disabled).toBeUndefined()
+    div.disabled = true
+    expect(div.disabled).toBe(true)
+    expect(div.hasAttribute('disabled')).toBe(false)
+  })
+})
+
+describe('label', () => {
+  test('optgroup and option reflect the label attribute; an option without one uses its text', () => {
+    const select = parsed('<select><optgroup label="Fruit"><option>  Apple\n pie </option><option label="B">Banana</option></optgroup></select>')
+    const optgroup = select.querySelector('optgroup')
+    const [apple, banana] = select.querySelectorAll('option')
+    expect(optgroup.label).toBe('Fruit')
+    optgroup.label = 'Fruits'
+    expect(optgroup.getAttribute('label')).toBe('Fruits')
+    expect(apple.label).toBe('Apple pie')
+    expect(banana.label).toBe('B')
+    expect(new HTMLElementService({ tagName: 'optgroup' }).label).toBe('')
+    expect(new HTMLElementService({ tagName: 'div' }).label).toBeUndefined()
+  })
+})
