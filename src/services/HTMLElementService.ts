@@ -13,6 +13,17 @@ import createDataset from '../factories/createDataset'
 import parseHTML from '../factories/parseHTML'
 
 /**
+ * The boolean attributes reflected as properties, by property name: the attribute, and the tags that have the property
+ * (on any other element, assigning it makes a plain own property, as in the DOM).
+ */
+const reflectedBooleans: { [property: string]: { attribute: string, tags: Array<string> } } = {
+  disabled: { attribute: 'disabled', tags: ['button', 'input', 'select', 'textarea', 'optgroup', 'option', 'fieldset'] },
+  readOnly: { attribute: 'readonly', tags: ['input', 'textarea'] },
+  required: { attribute: 'required', tags: ['input', 'select', 'textarea'] },
+  multiple: { attribute: 'multiple', tags: ['input', 'select'] }
+}
+
+/**
  * Simulate the behaviour of the HTMLElement Class when there is no DOM available.
  *
  * It also has these simple properties, which are stored as attributes:
@@ -82,6 +93,103 @@ export class HTMLElementService extends ElementService implements Partial<Pseudo
   }
 
   /**
+   * Whether this tag has the property for a reflected attribute (see reflectedBooleans and reflectedStrings).
+   * @param tags
+   */
+  private hasReflected (tags: Array<string>): boolean {
+    return tags.indexOf(this.tagName.toLowerCase()) >= 0
+  }
+
+  /**
+   * Read a boolean attribute through its property, as the DOM reflects them: true while the attribute is there.
+   * @param property
+   */
+  private getReflectedBoolean (property: string): boolean | undefined {
+    const { attribute, tags } = reflectedBooleans[property]
+    return this.hasReflected(tags) ? this.hasAttribute(attribute) : undefined
+  }
+
+  /**
+   * Set a boolean attribute through its property: true adds it (empty, as the DOM does), false removes it. On an element
+   * without the property it's a plain own property, as in the DOM.
+   * @param property
+   * @param value
+   */
+  private setReflectedBoolean (property: string, value: boolean | undefined): void {
+    const { attribute, tags } = reflectedBooleans[property]
+    if (!this.hasReflected(tags)) {
+      this.setExpando(property, value)
+      return
+    }
+    if (value) {
+      this.setAttribute(attribute, '')
+    } else {
+      this.removeAttribute(attribute)
+    }
+  }
+
+  /** Whether the form control can't be used (button, input, select, textarea, optgroup, option, fieldset). */
+  get disabled (): boolean | undefined {
+    return this.getReflectedBoolean('disabled')
+  }
+
+  set disabled (value: boolean | undefined) {
+    this.setReflectedBoolean('disabled', value)
+  }
+
+  /** Whether the value can't be edited (input, textarea): the readonly attribute. */
+  get readOnly (): boolean | undefined {
+    return this.getReflectedBoolean('readOnly')
+  }
+
+  set readOnly (value: boolean | undefined) {
+    this.setReflectedBoolean('readOnly', value)
+  }
+
+  /** Whether a value is required (input, select, textarea). */
+  get required (): boolean | undefined {
+    return this.getReflectedBoolean('required')
+  }
+
+  set required (value: boolean | undefined) {
+    this.setReflectedBoolean('required', value)
+  }
+
+  /** Whether several values can be chosen (input, select). */
+  get multiple (): boolean | undefined {
+    return this.getReflectedBoolean('multiple')
+  }
+
+  set multiple (value: boolean | undefined) {
+    this.setReflectedBoolean('multiple', value)
+  }
+
+  /**
+   * The label of an optgroup or option: its label attribute ('' without one; an option then uses its text, as in the
+   * DOM). Setting it sets the attribute. Other elements don't have one.
+   */
+  get label (): string | undefined {
+    const tag = this.tagName.toLowerCase()
+    if (tag !== 'optgroup' && tag !== 'option') {
+      return undefined
+    }
+    const attribute: any = this.getAttribute('label')
+    if (attribute !== null) {
+      return String(attribute)
+    }
+    return tag === 'option' ? String(this.textContent || '').replace(/\s+/g, ' ').trim() : ''
+  }
+
+  set label (value: string | undefined) {
+    const tag = this.tagName.toLowerCase()
+    if (tag === 'optgroup' || tag === 'option') {
+      this.setAttribute('label', String(value))
+    } else {
+      this.setExpando('label', value)
+    }
+  }
+
+  /**
    * Whether this tag has a `checked` (only input does).
    */
   private hasCheckedProperty (): boolean {
@@ -99,8 +207,9 @@ export class HTMLElementService extends ElementService implements Partial<Pseudo
 
   /**
    * The current value of a form control. Until it is set (or edited), it is the value attribute (the default value),
-   * or '' when there is none ('on' for a checkbox or radio); setting it never changes the attribute, like the DOM's.
-   * Only form controls (input, textarea, select, button, option, output) have one.
+   * or '' when there is none ('on' for a checkbox or radio); a textarea's is its text instead, as in the DOM (it has no
+   * value attribute). Setting it never changes the attribute or the text, like the DOM's. Only form controls (input,
+   * textarea, select, button, option, output) have one.
    */
   get value (): string | undefined {
     if (!this.hasValueProperty()) {
@@ -108,6 +217,9 @@ export class HTMLElementService extends ElementService implements Partial<Pseudo
     }
     if (this.dirtyValue !== null) {
       return this.dirtyValue
+    }
+    if (this.tagName.toLowerCase() === 'textarea') {
+      return String(this.textContent || '')
     }
     const attribute: any = this.getAttribute('value')
     if (attribute !== null) {
