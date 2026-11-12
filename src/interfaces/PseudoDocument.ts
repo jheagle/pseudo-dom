@@ -4,6 +4,12 @@ import { PseudoDocumentFragment } from './PseudoDocumentFragment'
 
 export interface PseudoDocument extends PseudoNode {
   /**
+   * The document's root element (the html element of an HTML document): its first child that is an element, or null
+   * when it has none.
+   */
+  readonly documentElement: PseudoElement | null
+
+  /**
    * The first element, in tree order, whose id matches the given value, or null when there is none.
    * @param id
    */

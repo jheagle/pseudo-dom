@@ -25,6 +25,19 @@ describe('DocumentService', () => {
     expect(div.ownerDocument).toBe(document)
   })
 
+  test('documentElement is the first child that is an element, or null when there is none', () => {
+    const document = new DocumentService()
+    expect(document.documentElement).toBeNull()
+    // A comment before the root element (like one above <html>) is skipped
+    document.appendChild(document.createComment('before the root'))
+    expect(document.documentElement).toBeNull()
+    const root = document.createElement('html')
+    document.appendChild(root)
+    expect(document.documentElement).toBe(root)
+    document.removeChild(root)
+    expect(document.documentElement).toBeNull()
+  })
+
   test('createElement defaults to a div', () => {
     expect(new DocumentService().createElement().tagName).toBe('div')
   })

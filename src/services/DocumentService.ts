@@ -25,6 +25,15 @@ export class DocumentService extends NodeService implements PseudoDocument {
   set textContent (text: string | null) {}
 
   /**
+   * The document's root element (the html element of an HTML document): its first child that is an element, or null
+   * when it has none.
+   */
+  get documentElement (): PseudoElement | null {
+    return (Array.from(this.childNodes) as any[])
+      .find((child: any) => child.nodeType === NodeService.ELEMENT_NODE) as PseudoElement || null
+  }
+
+  /**
    * The first element, in tree order, whose id matches the given value, or null when there is none.
    * @param id
    */
