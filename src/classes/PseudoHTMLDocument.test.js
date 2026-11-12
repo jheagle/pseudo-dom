@@ -52,6 +52,22 @@ describe('PseudoHTMLDocument', () => {
     expect(fragment.ownerDocument).toBe(document)
   })
 
+  test('documentElement is the html element, holding the head and the body', () => {
+    const document = new PseudoHTMLDocument()
+    expect(document.documentElement.tagName).toBe('html')
+    expect(document.documentElement).toBe(document.firstChild)
+    expect(document.head.parentNode).toBe(document.documentElement)
+    expect(document.body.parentNode).toBe(document.documentElement)
+  })
+
+  test('a deep copy\'s documentElement is its own html element, not the original\'s', () => {
+    const document = new PseudoHTMLDocument()
+    const copy = document.cloneNode(true)
+    expect(copy.documentElement.tagName).toBe('html')
+    expect(copy.documentElement).not.toBe(document.documentElement)
+    expect(copy.body.parentNode).toBe(copy.documentElement)
+  })
+
   test('a document does not have Element-only members (it is not an Element, unlike before)', () => {
     const document = new PseudoHTMLDocument()
     expect(document.tagName).toBeUndefined()
