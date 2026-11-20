@@ -1,5 +1,7 @@
 # Pseudo DOM
 
+[![tests](https://github.com/jheagle/pseudo-dom/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/jheagle/pseudo-dom/actions/workflows/tests.yml)
+
 Mock the DOM for server-side DOM state and in tests.
 
 Pseudo DOM recreates the browser DOM API (following the MDN documentation) so DOM-dependent code can run in Node -
